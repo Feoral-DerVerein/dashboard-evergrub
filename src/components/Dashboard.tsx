@@ -1,12 +1,12 @@
-
 import { Home, Users, ShoppingCart, BarChart, Bell, Heart, Plus, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Link } from "react-router-dom";
 
-const QuickAccessItem = ({ icon: Icon, label }: { icon: any; label: string }) => (
-  <div className="quick-access-item">
+const QuickAccessItem = ({ icon: Icon, label, to }: { icon: any; label: string; to?: string }) => (
+  <Link to={to || "/"} className="quick-access-item">
     <Icon className="w-6 h-6 text-gray-600 mb-2" />
     <span className="text-sm text-gray-600">{label}</span>
-  </div>
+  </Link>
 );
 
 const StatCard = ({ label, value, trend }: { label: string; value: string; trend?: string }) => (
@@ -29,22 +29,22 @@ const RecentActivityItem = ({ title, time, amount }: { title: string; time: stri
 
 const BottomNav = () => (
   <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between">
-    <button className="bottom-nav-item">
+    <Link to="/" className="bottom-nav-item">
       <Home className="w-6 h-6" />
       <span className="text-xs">Home</span>
-    </button>
-    <button className="bottom-nav-item">
+    </Link>
+    <Link to="/profile" className="bottom-nav-item">
       <User className="w-6 h-6" />
       <span className="text-xs">Profile</span>
-    </button>
-    <button className="bottom-nav-item">
+    </Link>
+    <Link to="/notifications" className="bottom-nav-item">
       <Bell className="w-6 h-6" />
       <span className="text-xs">Notifications</span>
-    </button>
-    <button className="bottom-nav-item">
+    </Link>
+    <Link to="/add" className="bottom-nav-item">
       <Plus className="w-6 h-6" />
       <span className="text-xs">Add</span>
-    </button>
+    </Link>
   </div>
 );
 
@@ -69,7 +69,7 @@ const Dashboard = () => {
           <section className="mb-8">
             <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
             <div className="grid grid-cols-2 gap-4">
-              <QuickAccessItem icon={Home} label="KPI" />
+              <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
               <QuickAccessItem icon={Users} label="Users" />
               <QuickAccessItem icon={ShoppingCart} label="Add Products" />
               <QuickAccessItem icon={ShoppingCart} label="Orders" />
