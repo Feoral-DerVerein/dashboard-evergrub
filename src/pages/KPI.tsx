@@ -1,4 +1,3 @@
-
 import { Bell, Download, Lock, Home, Plus, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
@@ -221,7 +220,7 @@ const KPI = () => {
           </Link>
           <Link to="/add" className="flex flex-col items-center gap-1 text-gray-600">
             <Plus className="w-6 h-6" />
-            <span className="text-xs">Plus</span>
+            <span className="text-xs">Add</span>
           </Link>
         </div>
       </nav>
