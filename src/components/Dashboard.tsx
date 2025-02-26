@@ -29,23 +29,33 @@ const RecentActivityItem = ({ title, time, amount }: { title: string; time: stri
 );
 
 export const BottomNav = () => (
-  <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between">
-    <Link to="/" className="bottom-nav-item">
-      <Home className="w-6 h-6" />
-      <span className="text-xs">Home</span>
-    </Link>
-    <Link to="/profile" className="bottom-nav-item">
-      <User className="w-6 h-6" />
-      <span className="text-xs">Profile</span>
-    </Link>
-    <Link to="/notifications" className="bottom-nav-item">
-      <Bell className="w-6 h-6" />
-      <span className="text-xs">Notifications</span>
-    </Link>
-    <Link to="/add" className="bottom-nav-item">
-      <Plus className="w-6 h-6" />
-      <span className="text-xs">Add</span>
-    </Link>
+  <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3">
+    <div className="max-w-md mx-auto flex justify-between items-center relative">
+      <Link to="/" className="bottom-nav-item">
+        <Home className="w-6 h-6" />
+        <span className="text-xs">Home</span>
+      </Link>
+      <Link to="/profile" className="bottom-nav-item">
+        <User className="w-6 h-6" />
+        <span className="text-xs">Profile</span>
+      </Link>
+      <div className="absolute left-1/2 -translate-x-1/2 -top-8">
+        <Link
+          to="/add"
+          className="flex flex-col items-center justify-center w-16 h-16 rounded-full bg-green-600 text-white shadow-lg transform transition-transform hover:scale-105"
+        >
+          <Plus className="w-8 h-8" />
+        </Link>
+      </div>
+      <Link to="/notifications" className="bottom-nav-item">
+        <Bell className="w-6 h-6" />
+        <span className="text-xs">Notifications</span>
+      </Link>
+      <Link to="/wishlist" className="bottom-nav-item">
+        <Heart className="w-6 h-6" />
+        <span className="text-xs">Wishlist</span>
+      </Link>
+    </div>
   </div>
 );
 

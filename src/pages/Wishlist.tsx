@@ -1,4 +1,3 @@
-
 import { Bell, Filter } from "lucide-react";
 import { BottomNav } from "@/components/Dashboard";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -217,7 +216,7 @@ const Wishlist = () => {
     : eventOrders.filter(order => order.type === filter);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gray-50 pb-24">
       <div className="max-w-md mx-auto bg-white min-h-screen">
         <header className="px-6 py-4 sticky top-0 bg-white z-10 border-b">
           <div className="flex justify-between items-center mb-4">
@@ -258,4 +257,3 @@ const Wishlist = () => {
 };
 
 export default Wishlist;
-
