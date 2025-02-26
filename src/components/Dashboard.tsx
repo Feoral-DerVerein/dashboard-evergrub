@@ -1,4 +1,3 @@
-
 import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package, Plus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -30,7 +29,7 @@ const RecentActivityItem = ({ title, time, amount }: { title: string; time: stri
 
 export const BottomNav = () => (
   <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between">
-    <Link to="/" className="bottom-nav-item">
+    <Link to="/dashboard" className="bottom-nav-item">
       <Home className="w-6 h-6" />
       <span className="text-xs">Home</span>
     </Link>
