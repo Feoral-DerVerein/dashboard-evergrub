@@ -89,10 +89,13 @@ const Products = () => {
               <h1 className="text-2xl font-bold text-gray-900">Products</h1>
               <p className="text-gray-500">Manage your products</p>
             </div>
-            <button className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm">
+            <Link
+              to="/products/add"
+              className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm"
+            >
               <Plus className="w-4 h-4" />
               Add Product
-            </button>
+            </Link>
           </div>
 
           <div className="relative mb-6">
