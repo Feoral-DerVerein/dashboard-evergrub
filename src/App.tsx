@@ -9,6 +9,7 @@ import KPI from "./pages/KPI";
 import Users from "./pages/Users";
 import Products from "./pages/Products";
 import AddProduct from "./pages/AddProduct";
+import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/users" element={<Users />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/add" element={<AddProduct />} />
+          <Route path="/orders" element={<Orders />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
