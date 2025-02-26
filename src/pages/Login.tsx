@@ -13,14 +13,17 @@ const Login = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signIn, isLoading: isSigningIn } = useSignIn();
-  const { signUp, isLoading: isSigningUp } = useSignUp();
+  const { signIn, isLoaded: isSignInLoaded } = useSignIn();
+  const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
+  const [isPending, setIsPending] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSignInLoaded || !isSignUpLoaded) return;
     
+    setIsPending(true);
     try {
       if (activeTab === 'login') {
         const result = await signIn?.create({
@@ -55,6 +58,8 @@ const Login = () => {
         description: "Invalid credentials",
         variant: "destructive",
       });
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -130,12 +135,12 @@ const Login = () => {
           <Button
             type="submit"
             className="w-full bg-[#4C956C] hover:bg-[#3d7857] text-white py-6"
-            disabled={isSigningIn || isSigningUp}
+            disabled={!isSignInLoaded || !isSignUpLoaded || isPending}
           >
             {activeTab === 'login' ? (
-              isSigningIn ? 'Signing in...' : 'Log In'
+              isPending ? 'Signing in...' : 'Log In'
             ) : (
-              isSigningUp ? 'Signing up...' : 'Sign Up'
+              isPending ? 'Signing up...' : 'Sign Up'
             )}
           </Button>
         </form>
