@@ -16,6 +16,7 @@ import Wishlist from "./pages/Wishlist";
 import Plus from "./pages/Plus";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Parcel from "./pages/Parcel";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/plus" element={<Plus />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/parcel" element={<Parcel />} />
           <Route path="/reports" element={<NotFound />} />
           <Route path="/analytics" element={<NotFound />} />
           <Route path="/support" element={<NotFound />} />
