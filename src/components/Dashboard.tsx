@@ -1,5 +1,5 @@
 
-import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User } from "lucide-react";
+import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 
@@ -38,6 +38,10 @@ export const BottomNav = () => (
       <User className="w-6 h-6" />
       <span className="text-xs">Profile</span>
     </Link>
+    <Link to="/parcel" className="bottom-nav-item">
+      <Package className="w-6 h-6" />
+      <span className="text-xs">Parcel</span>
+    </Link>
     <Link to="/notifications" className="bottom-nav-item">
       <Bell className="w-6 h-6" />
       <span className="text-xs">Notifications</span>
@@ -73,6 +77,7 @@ const Dashboard = () => {
               <QuickAccessItem icon={BarChart} label="Sales" to="/sales" />
               <QuickAccessItem icon={Bell} label="Notifications" to="/notifications" />
               <QuickAccessItem icon={Heart} label="Wishlist" to="/wishlist" />
+              <QuickAccessItem icon={Package} label="Parcel" to="/parcel" />
             </div>
           </section>
 
