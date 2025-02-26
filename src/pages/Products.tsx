@@ -34,14 +34,14 @@ const initialProducts: Product[] = [
     name: "Fresh Milk",
     price: 1.99,
     category: "Dairy",
-    image: "/lovable-uploads/a4f90ff7-19da-4c0b-952d-c65ea39c4d32.png"
+    image: "/lovable-uploads/a3172ad7-521b-4bff-a334-94b79ec5e1bf.png"
   },
   {
     id: 4,
     name: "Butter",
     price: 2.49,
     category: "Dairy",
-    image: "/lovable-uploads/560fe3d2-8e81-48aa-8f97-9da38ca157e2.png"
+    image: "/lovable-uploads/57d5a65f-f4d4-44de-bc3f-090ee9d3e6c8.png"
   },
   {
     id: 5,
