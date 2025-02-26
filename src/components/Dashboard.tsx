@@ -37,7 +37,7 @@ export const BottomNav = () => (
       <User className="w-6 h-6" />
       <span className="text-xs">Profile</span>
     </Link>
-    <Link to="/plus" className="bottom-nav-item">
+    <Link to="/products/add" className="bottom-nav-item">
       <Plus className="w-6 h-6" />
       <span className="text-xs">Add</span>
     </Link>
