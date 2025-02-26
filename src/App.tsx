@@ -12,7 +12,6 @@ import AddProduct from "./pages/AddProduct";
 import Orders from "./pages/Orders";
 import Sales from "./pages/Sales";
 import Notifications from "./pages/Notifications";
-import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,7 +31,6 @@ const App = () => (
           <Route path="/orders" element={<Orders />} />
           <Route path="/sales" element={<Sales />} />
           <Route path="/notifications" element={<Notifications />} />
-          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
