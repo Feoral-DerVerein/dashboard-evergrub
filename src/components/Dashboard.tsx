@@ -1,5 +1,5 @@
 
-import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package } from "lucide-react";
+import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package, Plus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 
@@ -41,6 +41,10 @@ export const BottomNav = () => (
     <Link to="/notifications" className="bottom-nav-item">
       <Bell className="w-6 h-6" />
       <span className="text-xs">Notifications</span>
+    </Link>
+    <Link to="/plus" className="bottom-nav-item">
+      <Plus className="w-6 h-6" />
+      <span className="text-xs">Plus</span>
     </Link>
   </div>
 );
@@ -112,3 +116,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
