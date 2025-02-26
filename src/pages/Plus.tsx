@@ -137,7 +137,7 @@ const Plus = () => {
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <Link to="/" className="text-gray-600 hover:text-gray-900">
+              <Link to="/dashboard" className="text-gray-600 hover:text-gray-900">
                 <ArrowLeft className="w-6 h-6" />
               </Link>
               <h1 className="text-2xl font-bold">WiseBite Plus</h1>
