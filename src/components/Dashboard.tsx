@@ -42,7 +42,7 @@ export const BottomNav = () => (
       <Bell className="w-6 h-6" />
       <span className="text-xs">Notifications</span>
     </Link>
-    <Link to="/add" className="bottom-nav-item">
+    <Link to="/plus" className="bottom-nav-item">
       <Plus className="w-6 h-6" />
       <span className="text-xs">Add</span>
     </Link>
