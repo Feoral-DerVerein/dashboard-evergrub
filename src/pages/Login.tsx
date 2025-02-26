@@ -1,58 +1,34 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
-import { useSignIn, useSignUp } from "@clerk/clerk-react";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signIn, isLoading: isSigningIn } = useSignIn();
-  const { signUp, isLoading: isSigningUp } = useSignUp();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     
-    try {
-      if (activeTab === 'login') {
-        const result = await signIn?.create({
-          identifier: email,
-          password,
-        });
-        
-        if (result?.status === "complete") {
-          toast({
-            title: "Login successful",
-            description: "Welcome back!",
-          });
-          navigate("/dashboard");
-        }
-      } else {
-        const result = await signUp?.create({
-          emailAddress: email,
-          password,
-        });
-        
-        if (result?.status === "complete") {
-          toast({
-            title: "Sign up successful",
-            description: "Welcome to WiseBite!",
-          });
-          navigate("/dashboard");
-        }
-      }
-    } catch (error) {
+    // TODO: Add actual authentication logic here
+    // For now, we'll just check if the fields are not empty
+    if (email && password) {
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      navigate("/dashboard");
+    } else {
       toast({
         title: "Error",
-        description: "Invalid credentials",
+        description: "Please fill in all fields",
         variant: "destructive",
       });
     }
@@ -130,13 +106,8 @@ const Login = () => {
           <Button
             type="submit"
             className="w-full bg-[#4C956C] hover:bg-[#3d7857] text-white py-6"
-            disabled={isSigningIn || isSigningUp}
           >
-            {activeTab === 'login' ? (
-              isSigningIn ? 'Signing in...' : 'Log In'
-            ) : (
-              isSigningUp ? 'Signing up...' : 'Sign Up'
-            )}
+            {activeTab === 'login' ? 'Log In' : 'Sign Up'}
           </Button>
         </form>
 
