@@ -38,10 +38,6 @@ export const BottomNav = () => (
       <User className="w-6 h-6" />
       <span className="text-xs">Profile</span>
     </Link>
-    <Link to="/parcel" className="bottom-nav-item">
-      <Package className="w-6 h-6" />
-      <span className="text-xs">Parcel</span>
-    </Link>
     <Link to="/notifications" className="bottom-nav-item">
       <Bell className="w-6 h-6" />
       <span className="text-xs">Notifications</span>
