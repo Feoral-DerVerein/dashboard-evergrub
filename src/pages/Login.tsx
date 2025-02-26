@@ -1,13 +1,38 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    
+    // TODO: Add actual authentication logic here
+    // For now, we'll just check if the fields are not empty
+    if (email && password) {
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      navigate("/dashboard");
+    } else {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white px-6 pb-20">
@@ -41,12 +66,15 @@ const Login = () => {
           </button>
         </div>
 
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Input
               type="email"
               placeholder="Enter your email"
               className="bg-gray-50"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div className="relative">
@@ -54,6 +82,9 @@ const Login = () => {
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               className="bg-gray-50 pr-10"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
             <button
               type="button"
@@ -76,7 +107,7 @@ const Login = () => {
             type="submit"
             className="w-full bg-[#4C956C] hover:bg-[#3d7857] text-white py-6"
           >
-            Log In
+            {activeTab === 'login' ? 'Log In' : 'Sign Up'}
           </Button>
         </form>
 
