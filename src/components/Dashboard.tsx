@@ -1,3 +1,4 @@
+
 import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package, Plus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -55,12 +56,12 @@ const Dashboard = () => {
         <header className="px-6 pt-8 pb-6">
           <div className="flex justify-between items-center mb-1">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">WiseBite...</h1>
-              <p className="text-gray-500">Welcome back, Alex</p>
+              <h1 className="text-2xl font-bold text-gray-900">WiseBite</h1>
+              <p className="text-gray-500">Welcome, Saffire</p>
             </div>
             <Avatar className="h-10 w-10">
-              <AvatarImage src="/placeholder.svg" />
-              <AvatarFallback>AL</AvatarFallback>
+              <AvatarImage src="/lovable-uploads/eb1f48af-1886-47c2-a56a-96d580f7e040.png" />
+              <AvatarFallback>S</AvatarFallback>
             </Avatar>
           </div>
         </header>
