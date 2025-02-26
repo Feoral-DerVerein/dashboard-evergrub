@@ -10,6 +10,7 @@ type Product = {
   price: number;
   category: string;
   image: string;
+  description: string;
 };
 
 const categories = ["All", "Fruits", "Bread", "Dairy", "Beverages"];
@@ -20,14 +21,16 @@ const initialProducts: Product[] = [
     name: "Fresh Organic Bananas",
     price: 2.99,
     category: "Fruits",
-    image: "/lovable-uploads/6e661578-093b-4836-bed7-2bcc3de33ab8.png"
+    image: "/lovable-uploads/6e661578-093b-4836-bed7-2bcc3de33ab8.png",
+    description: "Fresh, organic bananas sourced from local farms. Perfect for smoothies, baking, or as a healthy snack. Sold by bunch."
   },
   {
     id: 2,
     name: "Whole Grain Bread",
     price: 3.49,
     category: "Bread",
-    image: "/lovable-uploads/6e661578-093b-4836-bed7-2bcc3de33ab8.png"
+    image: "/lovable-uploads/6e661578-093b-4836-bed7-2bcc3de33ab8.png",
+    description: "Freshly baked whole grain bread made with organic flour. Rich in fiber and perfect for sandwiches or toast."
   }
 ];
 
@@ -54,8 +57,8 @@ const Products = () => {
               <h1 className="text-2xl font-bold text-gray-900">Products</h1>
               <p className="text-gray-500">Manage your products</p>
             </div>
-            <button className="bg-green-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-green-700 transition-colors">
-              <Plus className="w-5 h-5" />
+            <button className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm">
+              <Plus className="w-4 h-4" />
               Add Product
             </button>
           </div>
@@ -103,20 +106,18 @@ const Products = () => {
           <div className="grid grid-cols-2 gap-4">
             {filteredProducts.map((product) => (
               <div key={product.id} className="border border-gray-200 rounded-lg p-3">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-32 object-cover rounded-md mb-2"
-                />
+                <div className="h-32 bg-gray-50 rounded-md mb-2 p-2 overflow-y-auto">
+                  <p className="text-sm text-gray-600">{product.description}</p>
+                </div>
                 <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
                 <p className="text-green-600 font-medium mb-2">$ {product.price.toFixed(2)}</p>
                 <div className="flex gap-2">
-                  <button className="flex-1 flex items-center justify-center gap-1 px-3 py-1 text-sm text-gray-600 bg-gray-100 rounded hover:bg-gray-200">
-                    <Edit className="w-4 h-4" />
+                  <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200">
+                    <Edit className="w-3 h-3" />
                     Edit
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-1 px-3 py-1 text-sm text-red-600 bg-red-50 rounded hover:bg-red-100">
-                    <Trash2 className="w-4 h-4" />
+                  <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100">
+                    <Trash2 className="w-3 h-3" />
                     Delete
                   </button>
                 </div>
