@@ -1,6 +1,5 @@
-
 import { BottomNav } from "@/components/Dashboard";
-import { ArrowLeft, Bell, Filter } from "lucide-react";
+import { Bell, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -137,12 +136,7 @@ const Parcel = () => {
       <div className="max-w-md mx-auto bg-white min-h-screen">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Link to="/" className="text-gray-600 hover:text-gray-900">
-                <ArrowLeft className="w-6 h-6" />
-              </Link>
-              <h1 className="text-2xl font-bold">WiseBite Plus</h1>
-            </div>
+            <h1 className="text-2xl font-bold">WiseBite Plus</h1>
             <Button variant="ghost" size="icon">
               <Bell className="w-6 h-6" />
             </Button>
