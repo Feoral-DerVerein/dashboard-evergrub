@@ -21,7 +21,7 @@ const initialProducts: Product[] = [
     name: "Fresh Organic Bananas",
     price: 2.99,
     category: "Fruits",
-    image: "/lovable-uploads/6e661578-093b-4836-bed7-2bcc3de33ab8.png",
+    image: "/lovable-uploads/557180f2-5bec-429f-bd15-819ceb7125a8.png",
     description: "Fresh, organic bananas sourced from local farms. Perfect for smoothies, baking, or as a healthy snack. Sold by bunch."
   },
   {
@@ -29,7 +29,7 @@ const initialProducts: Product[] = [
     name: "Whole Grain Bread",
     price: 3.49,
     category: "Bread",
-    image: "/lovable-uploads/6e661578-093b-4836-bed7-2bcc3de33ab8.png",
+    image: "/lovable-uploads/4f94a856-2c39-4c16-9c3d-3ae6fdf872ed.png",
     description: "Freshly baked whole grain bread made with organic flour. Rich in fiber and perfect for sandwiches or toast."
   }
 ];
