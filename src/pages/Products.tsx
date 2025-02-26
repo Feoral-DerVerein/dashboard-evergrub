@@ -10,10 +10,9 @@ type Product = {
   price: number;
   category: string;
   image: string;
-  description: string;
 };
 
-const categories = ["All", "Fruits", "Bread", "Dairy", "Beverages"];
+const categories = ["All", "Fruits", "Bread", "Dairy", "Meat", "Beverages"];
 
 const initialProducts: Product[] = [
   {
@@ -21,16 +20,49 @@ const initialProducts: Product[] = [
     name: "Fresh Organic Bananas",
     price: 2.99,
     category: "Fruits",
-    image: "/lovable-uploads/557180f2-5bec-429f-bd15-819ceb7125a8.png",
-    description: "Fresh, organic bananas sourced from local farms. Perfect for smoothies, baking, or as a healthy snack. Sold by bunch."
+    image: "/lovable-uploads/557180f2-5bec-429f-bd15-819ceb7125a8.png"
   },
   {
     id: 2,
     name: "Whole Grain Bread",
     price: 3.49,
     category: "Bread",
-    image: "/lovable-uploads/4f94a856-2c39-4c16-9c3d-3ae6fdf872ed.png",
-    description: "Freshly baked whole grain bread made with organic flour. Rich in fiber and perfect for sandwiches or toast."
+    image: "/lovable-uploads/4f94a856-2c39-4c16-9c3d-3ae6fdf872ed.png"
+  },
+  {
+    id: 3,
+    name: "Fresh Milk",
+    price: 1.99,
+    category: "Dairy",
+    image: "/lovable-uploads/17b6fc9f-5711-4855-ab25-41649bdfa461.png"
+  },
+  {
+    id: 4,
+    name: "Butter",
+    price: 2.49,
+    category: "Dairy",
+    image: "/lovable-uploads/17b6fc9f-5711-4855-ab25-41649bdfa461.png"
+  },
+  {
+    id: 5,
+    name: "Ice Cream",
+    price: 3.99,
+    category: "Dairy",
+    image: "/lovable-uploads/17b6fc9f-5711-4855-ab25-41649bdfa461.png"
+  },
+  {
+    id: 6,
+    name: "Ground Beef",
+    price: 4.99,
+    category: "Meat",
+    image: "/lovable-uploads/17b6fc9f-5711-4855-ab25-41649bdfa461.png"
+  },
+  {
+    id: 7,
+    name: "Chicken Breast",
+    price: 3.99,
+    category: "Meat",
+    image: "/lovable-uploads/17b6fc9f-5711-4855-ab25-41649bdfa461.png"
   }
 ];
 
@@ -46,7 +78,7 @@ const Products = () => {
   });
 
   const totalProducts = products.length;
-  const outOfStock = 3; // Hardcoded for demo
+  const outOfStock = 3;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -111,9 +143,6 @@ const Products = () => {
                   alt={product.name}
                   className="w-full h-32 object-cover rounded-md mb-2"
                 />
-                <div className="bg-gray-50 rounded-md mb-2 p-2">
-                  <p className="text-sm text-gray-600">{product.description}</p>
-                </div>
                 <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
                 <p className="text-green-600 font-medium mb-2">$ {product.price.toFixed(2)}</p>
                 <div className="flex gap-2">
