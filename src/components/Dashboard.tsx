@@ -1,3 +1,4 @@
+
 import { Home, Users, ShoppingCart, BarChart, Bell, Heart, Plus, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -70,7 +71,7 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
             <div className="grid grid-cols-2 gap-4">
               <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
-              <QuickAccessItem icon={Users} label="Users" />
+              <QuickAccessItem icon={Users} label="Users" to="/users" />
               <QuickAccessItem icon={ShoppingCart} label="Add Products" />
               <QuickAccessItem icon={ShoppingCart} label="Orders" />
               <QuickAccessItem icon={BarChart} label="Sales" />
