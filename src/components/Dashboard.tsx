@@ -74,7 +74,7 @@ const Dashboard = () => {
               <QuickAccessItem icon={Users} label="Users" to="/users" />
               <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
               <QuickAccessItem icon={ShoppingCart} label="Orders" to="/orders" />
-              <QuickAccessItem icon={BarChart} label="Sales" />
+              <QuickAccessItem icon={BarChart} label="Sales" to="/sales" />
               <QuickAccessItem icon={Bell} label="Notifications" />
               <QuickAccessItem icon={Heart} label="Wishlist" />
               <QuickAccessItem icon={Plus} label="Plus" />
