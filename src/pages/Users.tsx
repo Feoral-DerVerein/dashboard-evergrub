@@ -3,6 +3,7 @@ import { Bell, Home, Menu, Plus, Search, User, ChevronRight } from "lucide-react
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { BottomNav } from "@/components/Dashboard";
 
 type UserStatus = "online" | "offline";
 
@@ -104,26 +105,7 @@ const Users = () => {
         </div>
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3 px-6">
-        <div className="max-w-md mx-auto flex justify-between items-center">
-          <Link to="/" className="flex flex-col items-center gap-1 text-gray-600">
-            <Home className="w-6 h-6" />
-            <span className="text-xs">Home</span>
-          </Link>
-          <Link to="/profile" className="flex flex-col items-center gap-1 text-gray-600">
-            <User className="w-6 h-6" />
-            <span className="text-xs">Profile</span>
-          </Link>
-          <Link to="/notifications" className="flex flex-col items-center gap-1 text-gray-600">
-            <Bell className="w-6 h-6" />
-            <span className="text-xs">Notifications</span>
-          </Link>
-          <Link to="/add" className="flex flex-col items-center gap-1 text-gray-600">
-            <Plus className="w-6 h-6" />
-            <span className="text-xs">Add</span>
-          </Link>
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   );
 };
