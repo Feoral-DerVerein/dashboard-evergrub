@@ -44,7 +44,11 @@ export const BottomNav = () => (
     </Link>
     <Link to="/plus" className="bottom-nav-item">
       <Plus className="w-6 h-6" />
-      <span className="text-xs">Add</span>
+      <span className="text-xs">Parcel</span>
+    </Link>
+    <Link to="/wishlist" className="bottom-nav-item">
+      <Heart className="w-6 h-6" />
+      <span className="text-xs">Wishlist</span>
     </Link>
   </div>
 );
