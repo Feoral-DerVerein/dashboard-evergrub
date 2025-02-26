@@ -1,150 +1,253 @@
 
-import { Bell, Menu } from "lucide-react";
+import { Bell, Filter } from "lucide-react";
 import { BottomNav } from "@/components/Dashboard";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
-interface WishlistItem {
-  id: number;
-  name: string;
-  price: number;
-  unit: string;
-  image: string;
-  status: "Ready Now" | "Limited Stock" | "Out of Stock";
-  timeLeft: string;
+interface EventOrder {
+  id: string;
+  title: string;
+  time: string;
+  amount: number;
+  status: "Pending" | "Processing";
+  type: "Corporate" | "Nightclub" | "Wedding";
+  items: Array<{
+    id: string;
+    name: string;
+    category: string;
+    quantity: number;
+    price: number;
+    image: string;
+    detailImage: string;
+    expires?: string;
+    discount?: number;
+  }>;
 }
 
-const wishlistItems: WishlistItem[] = [
+const eventOrders: EventOrder[] = [
   {
-    id: 1,
-    name: "Fresh Organic Bananas",
-    price: 4.99,
-    unit: "bunch",
-    image: "/lovable-uploads/459ad899-55f0-42cb-9ff4-8065a49cfafd.png",
-    status: "Ready Now",
-    timeLeft: "2 days left"
+    id: "#WB78945",
+    title: "Corporate Lunch - Tech Co",
+    time: "Today, 12:30 PM",
+    amount: 1240,
+    status: "Pending",
+    type: "Corporate",
+    items: [
+      {
+        id: "1",
+        name: "Coke",
+        category: "Lunch",
+        quantity: 20,
+        price: 100,
+        image: "/lovable-uploads/e6294b5d-ff9b-47fa-96a4-588f2e280a0e.png",
+        detailImage: "/lovable-uploads/cc2e9f85-2ce6-4059-85c1-292d74b99aa3.png",
+        expires: "Sep 14, 2023",
+        discount: 15
+      }
+    ]
   },
   {
-    id: 2,
-    name: "Fresh Milk",
-    price: 3.49,
-    unit: "gallon",
-    image: "/placeholder.svg",
-    status: "Limited Stock",
-    timeLeft: "10 days left"
-  },
-  {
-    id: 3,
-    name: "Organic Eggs",
-    price: 5.99,
-    unit: "dozen",
-    image: "/placeholder.svg",
-    status: "Out of Stock",
-    timeLeft: ""
-  },
-  {
-    id: 4,
-    name: "Whole Grain Bread",
-    price: 4.29,
-    unit: "loaf",
-    image: "/placeholder.svg",
-    status: "Ready Now",
-    timeLeft: "20 hours left"
-  },
-  {
-    id: 5,
-    name: "Fresh Avocados",
-    price: 6.99,
-    unit: "bag",
-    image: "/placeholder.svg",
-    status: "Limited Stock",
-    timeLeft: "1 day left"
+    id: "#WB78946",
+    title: "Nightclub Event",
+    time: "Tomorrow, 8:00 PM",
+    amount: 2850,
+    status: "Processing",
+    type: "Nightclub",
+    items: [
+      {
+        id: "2",
+        name: "Wine",
+        category: "Drinks",
+        quantity: 10,
+        price: 285,
+        image: "/placeholder.svg",
+        detailImage: "/placeholder.svg"
+      }
+    ]
   }
 ];
 
-const WishlistItem = ({ item }: { item: WishlistItem }) => {
-  const getStatusColor = (status: WishlistItem["status"]) => {
-    switch (status) {
-      case "Ready Now":
-        return "bg-green-100 text-green-600";
-      case "Limited Stock":
-        return "bg-orange-100 text-orange-600";
-      case "Out of Stock":
-        return "bg-red-100 text-red-600";
-    }
-  };
-
-  const getButtonStyle = (status: WishlistItem["status"]) => {
-    if (status === "Ready Now") {
-      return "bg-blue-500 text-white px-6";
-    }
-    return "border border-blue-500 text-blue-500 px-4";
-  };
+const OrderItem = ({ order }: { order: EventOrder }) => {
+  const [showDetails, setShowDetails] = useState(false);
 
   return (
-    <div className="flex items-start space-x-4 p-4 border-b border-gray-100">
-      <img
-        src={item.image}
-        alt={item.name}
-        className="w-16 h-16 rounded-lg object-cover"
-      />
-      <div className="flex-1">
-        <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
-        <div className="flex items-center space-x-2 mt-1">
-          <span className={`px-2 py-1 rounded-full text-sm ${getStatusColor(item.status)}`}>
-            {item.status}
-          </span>
-          {item.timeLeft && (
-            <span className="text-sm text-gray-500">{item.timeLeft}</span>
-          )}
+    <>
+      <div className="bg-white rounded-lg p-4 mb-4">
+        <div className="flex justify-between items-start mb-2">
+          <div>
+            <h3 className="font-semibold text-lg">{order.title}</h3>
+            <p className="text-gray-500 text-sm flex items-center gap-1">
+              {order.time}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-green-600 font-semibold text-lg">
+              ${order.amount.toLocaleString()}
+            </p>
+            <span className={`text-sm px-3 py-1 rounded-full ${
+              order.status === "Pending" 
+                ? "bg-orange-100 text-orange-600"
+                : "bg-yellow-100 text-yellow-600"
+            }`}>
+              {order.status}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center justify-between mt-2">
-          <span className="text-lg font-semibold">
-            ${item.price} / {item.unit}
-          </span>
-          <button
-            className={`rounded-full py-2 ${getButtonStyle(item.status)}`}
+        <div className="flex gap-2 mt-4">
+          <Button 
+            className="flex-1 bg-green-600 hover:bg-green-700"
           >
-            {item.status === "Ready Now" ? "Notify" : "Notify When Ready"}
-          </button>
+            Accept Order
+          </Button>
+          <Button 
+            variant="outline"
+            className="flex-1"
+            onClick={() => setShowDetails(true)}
+          >
+            View Details
+          </Button>
         </div>
       </div>
-    </div>
+
+      <Dialog open={showDetails} onOpenChange={setShowDetails}>
+        <DialogContent className="max-w-md mx-auto">
+          <div className="space-y-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-gray-600 text-sm">Order ID: {order.id}</p>
+                <h2 className="text-xl font-semibold">{order.title}</h2>
+                <p className="text-gray-600">{order.type}</p>
+              </div>
+              <span className={`text-sm px-3 py-1 rounded-full ${
+                order.status === "Pending" 
+                  ? "bg-orange-100 text-orange-600"
+                  : "bg-yellow-100 text-yellow-600"
+              }`}>
+                {order.status}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 py-4">
+              <div className="text-center">
+                <p className="text-sm text-gray-600">Total Items</p>
+                <p className="font-semibold">
+                  {order.items.reduce((acc, item) => acc + item.quantity, 0)} items
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-gray-600">Order Value</p>
+                <p className="font-semibold">${order.amount.toLocaleString()}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-gray-600">Time Left</p>
+                <p className="font-semibold">1 Week</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold">Order Items ({order.items.length})</h3>
+                <button className="text-blue-600 text-sm flex items-center gap-1">
+                  <Filter className="w-4 h-4" />
+                  Filter
+                </button>
+              </div>
+
+              {order.items.map((item) => (
+                <div key={item.id} className="border rounded-lg p-4">
+                  <div className="flex gap-3">
+                    <img 
+                      src={item.detailImage} 
+                      alt={item.name}
+                      className="w-20 h-20 object-cover rounded-lg"
+                    />
+                    <div className="flex-1">
+                      <div className="flex justify-between">
+                        <div>
+                          <h4 className="font-semibold">{item.name}</h4>
+                          <p className="text-gray-500 text-sm">{item.category}</p>
+                        </div>
+                        <p className="font-medium">x {item.quantity}</p>
+                      </div>
+                      <div className="mt-2 flex justify-between items-end">
+                        <div>
+                          <p className="font-semibold">
+                            $ {item.price}
+                            {item.discount && (
+                              <span className="text-red-500 text-sm ml-1">
+                                -{item.discount}%
+                              </span>
+                            )}
+                          </p>
+                          {item.expires && (
+                            <p className="text-orange-500 text-sm">
+                              Expires: {item.expires}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              Check Inventory
+            </Button>
+            <Button className="w-full bg-green-600 hover:bg-green-700">
+              Process Order
+            </Button>
+            <Button variant="ghost" className="w-full text-red-500 hover:text-red-600">
+              Cancel Order
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
 const Wishlist = () => {
-  const readyItems = wishlistItems.filter(item => item.status === "Ready Now").length;
+  const [filter, setFilter] = useState<"All Orders" | "Corporate" | "Nightclub" | "Wedding">("All Orders");
+
+  const filteredOrders = filter === "All Orders" 
+    ? eventOrders
+    : eventOrders.filter(order => order.type === filter);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto bg-white min-h-screen">
-        <header className="px-6 py-4 border-b border-gray-200 sticky top-0 bg-white z-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Menu className="w-6 h-6 text-gray-600" />
-              <h1 className="text-xl font-bold">Clients Wishlist</h1>
-            </div>
-            <div className="relative">
+        <header className="px-6 py-4 sticky top-0 bg-white z-10 border-b">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold">WiseBite Plus</h1>
+            <button className="relative">
               <Bell className="w-6 h-6 text-gray-600" />
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
-            </div>
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
           </div>
-          <div className="mt-4">
-            <p className="text-gray-600">
-              <span className="font-medium">{wishlistItems.length} Items</span> in Wishlist
-            </p>
-            <div className="mt-2 bg-gray-200 h-2 rounded-full">
-              <div
-                className="bg-blue-500 h-full rounded-full"
-                style={{ width: `${(readyItems / wishlistItems.length) * 100}%` }}
-              ></div>
-            </div>
-            <p className="text-blue-500 text-sm mt-1">{readyItems} Items Ready</p>
+          <h2 className="text-xl font-semibold mb-4">Event Orders</h2>
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {["All Orders", "Corporate", "Nightclub", "Wedding"].map((type) => (
+              <button
+                key={type}
+                onClick={() => setFilter(type as any)}
+                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
+                  filter === type
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                {type}
+              </button>
+            ))}
           </div>
         </header>
 
-        <main className="divide-y divide-gray-100">
-          {wishlistItems.map(item => (
-            <WishlistItem key={item.id} item={item} />
+        <main className="p-6">
+          {filteredOrders.map((order) => (
+            <OrderItem key={order.id} order={order} />
           ))}
         </main>
 
@@ -155,3 +258,4 @@ const Wishlist = () => {
 };
 
 export default Wishlist;
+
