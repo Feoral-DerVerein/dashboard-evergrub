@@ -62,7 +62,7 @@ const initialProducts: Product[] = [
     name: "Chicken Breast",
     price: 3.99,
     category: "Meat",
-    image: "/lovable-uploads/9affc00b-643f-45dc-b3c8-a58619ed93f1.png"
+    image: "/lovable-uploads/3a65a638-e8e8-4a0f-a8c4-cc2693037034.png"
   }
 ];
 
