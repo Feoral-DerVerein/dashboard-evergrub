@@ -106,7 +106,12 @@ const Products = () => {
           <div className="grid grid-cols-2 gap-4">
             {filteredProducts.map((product) => (
               <div key={product.id} className="border border-gray-200 rounded-lg p-3">
-                <div className="h-32 bg-gray-50 rounded-md mb-2 p-2 overflow-y-auto">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-32 object-cover rounded-md mb-2"
+                />
+                <div className="bg-gray-50 rounded-md mb-2 p-2">
                   <p className="text-sm text-gray-600">{product.description}</p>
                 </div>
                 <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
