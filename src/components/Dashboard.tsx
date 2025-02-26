@@ -1,4 +1,3 @@
-
 import { Home, Users, ShoppingCart, BarChart, Bell, Heart, Plus, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -28,7 +27,7 @@ const RecentActivityItem = ({ title, time, amount }: { title: string; time: stri
   </div>
 );
 
-const BottomNav = () => (
+export const BottomNav = () => (
   <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between">
     <Link to="/" className="bottom-nav-item">
       <Home className="w-6 h-6" />
@@ -72,7 +71,7 @@ const Dashboard = () => {
             <div className="grid grid-cols-2 gap-4">
               <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
               <QuickAccessItem icon={Users} label="Users" to="/users" />
-              <QuickAccessItem icon={ShoppingCart} label="Add Products" />
+              <QuickAccessItem icon={ShoppingCart} label="Add Products" to="/products" />
               <QuickAccessItem icon={ShoppingCart} label="Orders" />
               <QuickAccessItem icon={BarChart} label="Sales" />
               <QuickAccessItem icon={Bell} label="Notifications" />
