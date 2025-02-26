@@ -34,35 +34,35 @@ const initialProducts: Product[] = [
     name: "Fresh Milk",
     price: 1.99,
     category: "Dairy",
-    image: "/lovable-uploads/17b6fc9f-5711-4855-ab25-41649bdfa461.png"
+    image: "/lovable-uploads/a4f90ff7-19da-4c0b-952d-c65ea39c4d32.png"
   },
   {
     id: 4,
     name: "Butter",
     price: 2.49,
     category: "Dairy",
-    image: "/lovable-uploads/17b6fc9f-5711-4855-ab25-41649bdfa461.png"
+    image: "/lovable-uploads/560fe3d2-8e81-48aa-8f97-9da38ca157e2.png"
   },
   {
     id: 5,
     name: "Ice Cream",
     price: 3.99,
     category: "Dairy",
-    image: "/lovable-uploads/17b6fc9f-5711-4855-ab25-41649bdfa461.png"
+    image: "/lovable-uploads/08f9eaaa-edef-49b5-a4e1-a990c6362c76.png"
   },
   {
     id: 6,
     name: "Ground Beef",
     price: 4.99,
     category: "Meat",
-    image: "/lovable-uploads/17b6fc9f-5711-4855-ab25-41649bdfa461.png"
+    image: "/lovable-uploads/a8d0ed43-9247-43c0-b4b7-0b73bca854af.png"
   },
   {
     id: 7,
     name: "Chicken Breast",
     price: 3.99,
     category: "Meat",
-    image: "/lovable-uploads/17b6fc9f-5711-4855-ab25-41649bdfa461.png"
+    image: "/lovable-uploads/9affc00b-643f-45dc-b3c8-a58619ed93f1.png"
   }
 ];
 
