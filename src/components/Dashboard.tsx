@@ -1,5 +1,5 @@
 
-import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package } from "lucide-react";
+import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package, Plus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 
@@ -37,6 +37,10 @@ export const BottomNav = () => (
     <Link to="/profile" className="bottom-nav-item">
       <User className="w-6 h-6" />
       <span className="text-xs">Profile</span>
+    </Link>
+    <Link to="/plus" className="bottom-nav-item">
+      <Plus className="w-6 h-6" />
+      <span className="text-xs">Add</span>
     </Link>
     <Link to="/notifications" className="bottom-nav-item">
       <Bell className="w-6 h-6" />
