@@ -37,7 +37,11 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-white px-6 pb-20">
       <div className="pt-10 flex justify-center">
-        <div className="text-[#4C956C] text-3xl font-semibold">wisebite</div>
+        <img 
+          src="/lovable-uploads/b7d0f389-fd7e-4930-842f-809d01839c72.png"
+          alt="wisebite"
+          className="h-8"
+        />
       </div>
 
       <div className="mt-12">
