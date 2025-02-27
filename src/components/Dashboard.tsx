@@ -1,5 +1,5 @@
 
-import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package, Plus } from "lucide-react";
+import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package, Plus, ShoppingBasket } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 
@@ -77,7 +77,7 @@ const Dashboard = () => {
               <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
               <QuickAccessItem icon={Users} label="Users" to="/users" />
               <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
-              <QuickAccessItem icon={ShoppingCart} label="Orders" to="/orders" />
+              <QuickAccessItem icon={ShoppingBasket} label="Orders" to="/orders" />
               <QuickAccessItem icon={BarChart} label="Sales" to="/sales" />
               <QuickAccessItem icon={Bell} label="Notifications" to="/notifications" />
               <QuickAccessItem icon={Heart} label="Wishlist" to="/wishlist" />
