@@ -59,7 +59,7 @@ const Dashboard = () => {
               <img 
                 src="/lovable-uploads/98afa3c3-7256-419f-afa9-f52821cd6d21.png" 
                 alt="WiseBite" 
-                className="h-8 mb-1"
+                className="h-12 mb-1"
               />
               <p className="text-gray-500">Welcome, Saffire</p>
             </div>
