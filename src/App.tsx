@@ -19,6 +19,10 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Parcel from "./pages/Parcel";
 import ParcelDetails from "./pages/ParcelDetails";
+import Microsoft from "./pages/Microsoft";
+import Google from "./pages/Google";
+import Apple from "./pages/Apple";
+import Phone from "./pages/Phone";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +48,10 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/parcel" element={<Parcel />} />
           <Route path="/parcel/:id" element={<ParcelDetails />} />
+          <Route path="/microsoft" element={<Microsoft />} />
+          <Route path="/google" element={<Google />} />
+          <Route path="/apple" element={<Apple />} />
+          <Route path="/phone" element={<Phone />} />
           <Route path="/reports" element={<NotFound />} />
           <Route path="/analytics" element={<NotFound />} />
           <Route path="/support" element={<NotFound />} />
