@@ -3,7 +3,7 @@ import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Phone } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const Login = () => {
@@ -117,51 +117,17 @@ const Login = () => {
 
         <div className="mt-6 text-center text-gray-500">OR</div>
 
-        <div className="space-y-3 mt-6">
-          <Button
-            variant="outline"
-            className="w-full py-6 flex items-center justify-center gap-2"
-          >
-            <img
-              src="https://www.google.com/favicon.ico"
-              alt="Google"
-              className="w-5 h-5"
-            />
-            Continue with Google
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full py-6 flex items-center justify-center gap-2"
-          >
-            <img
-              src="/lovable-uploads/837a0a08-ba1b-4f30-a8c9-e22a6d00bdd0.png"
-              alt="Microsoft"
-              className="w-5 h-5"
-            />
-            Continue with Microsoft
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full py-6 flex items-center justify-center gap-2"
-          >
-            <img
-              src="/lovable-uploads/58d00e1b-97a1-4353-8b05-21178e8474df.png"
-              alt="Apple"
-              className="w-5 h-5"
-            />
-            Continue with Apple
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full py-6 flex items-center justify-center gap-2"
-          >
-            <Phone className="w-5 h-5 text-gray-600" />
-            Connect with Phone
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          className="w-full mt-6 py-6 flex items-center justify-center gap-2"
+        >
+          <img
+            src="https://www.google.com/favicon.ico"
+            alt="Google"
+            className="w-5 h-5"
+          />
+          Continue with Google
+        </Button>
 
         <p className="text-center text-gray-500 text-sm mt-8">
           By continuing, you agree to our{" "}
