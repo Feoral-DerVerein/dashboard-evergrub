@@ -3,7 +3,7 @@ import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff } from "lucide-react";
+import { Apple, Eye, EyeOff, Phone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const Login = () => {
@@ -117,17 +117,53 @@ const Login = () => {
 
         <div className="mt-6 text-center text-gray-500">OR</div>
 
-        <Button
-          variant="outline"
-          className="w-full mt-6 py-6 flex items-center justify-center gap-2"
-        >
-          <img
-            src="https://www.google.com/favicon.ico"
-            alt="Google"
-            className="w-5 h-5"
-          />
-          Continue with Google
-        </Button>
+        <div className="flex flex-col gap-3 mt-6">
+          <Button
+            variant="outline"
+            className="w-full py-6 flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-50"
+            onClick={() => {
+              toast({
+                title: "Microsoft login",
+                description: "Microsoft login is not implemented yet.",
+              });
+            }}
+          >
+            <img 
+              src="/lovable-uploads/7733d227-8256-4c4e-b0f2-58b4d139a2d0.png"
+              alt="Microsoft"
+              className="w-6 h-6"
+            />
+            Continue with Microsoft
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full py-6 flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-50"
+            onClick={() => {
+              toast({
+                title: "Apple login",
+                description: "Apple login is not implemented yet.",
+              });
+            }}
+          >
+            <Apple className="h-6 w-6" />
+            Continue with Apple
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full py-6 flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-50"
+            onClick={() => {
+              toast({
+                title: "Phone login",
+                description: "Phone login is not implemented yet.",
+              });
+            }}
+          >
+            <Phone className="h-6 w-6" />
+            Continue with Phone
+          </Button>
+        </div>
 
         <p className="text-center text-gray-500 text-sm mt-8">
           By continuing, you agree to our{" "}
