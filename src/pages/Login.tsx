@@ -11,44 +11,26 @@ const Login = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     
-    if (activeTab === 'login') {
-      // Login logic
-      if (email && password) {
-        toast({
-          title: "Login successful",
-          description: "Welcome back!",
-        });
-        navigate("/dashboard");
-      } else {
-        toast({
-          title: "Error",
-          description: "Please fill in all fields",
-          variant: "destructive",
-        });
-      }
+    // TODO: Add actual authentication logic here
+    // For now, we'll just check if the fields are not empty
+    if (email && password) {
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      navigate("/dashboard");
     } else {
-      // Signup logic
-      if (email && password && firstName && lastName) {
-        toast({
-          title: "Signup successful",
-          description: "Welcome to WiseBite!",
-        });
-        navigate("/dashboard");
-      } else {
-        toast({
-          title: "Error",
-          description: "Please fill in all fields",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
     }
   };
 
@@ -89,30 +71,6 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {activeTab === 'signup' && (
-            <>
-              <div>
-                <Input
-                  type="text"
-                  placeholder="First Name"
-                  className="bg-gray-50"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Input
-                  type="text"
-                  placeholder="Last Name"
-                  className="bg-gray-50"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  required
-                />
-              </div>
-            </>
-          )}
           <div>
             <Input
               type="email"
