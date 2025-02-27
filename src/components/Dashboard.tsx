@@ -57,7 +57,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-1">
             <div>
               <img 
-                src="/lovable-uploads/8e750ab9-ab7f-463b-9f6b-b0213be85b93.png" 
+                src="/lovable-uploads/98afa3c3-7256-419f-afa9-f52821cd6d21.png" 
                 alt="WiseBite" 
                 className="h-8 mb-1"
               />
