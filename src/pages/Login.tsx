@@ -3,7 +3,7 @@ import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Apple, Microsoft, Phone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const Login = () => {
@@ -17,8 +17,6 @@ const Login = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     
-    // TODO: Add actual authentication logic here
-    // For now, we'll just check if the fields are not empty
     if (email && password) {
       toast({
         title: "Login successful",
@@ -44,8 +42,43 @@ const Login = () => {
         />
       </div>
 
-      <div className="mt-12">
+      <div className="mt-12 max-w-md mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8">Welcome to WiseBite</h1>
+
+        <div className="space-y-4">
+          <Button
+            variant="outline"
+            className="w-full py-6 flex items-center justify-start gap-3 text-base font-normal"
+            onClick={() => navigate("/microsoft")}
+          >
+            <Microsoft className="h-6 w-6" />
+            Continue with Microsoft
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full py-6 flex items-center justify-start gap-3 text-base font-normal"
+            onClick={() => navigate("/apple")}
+          >
+            <Apple className="h-6 w-6" />
+            Continue with Apple
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full py-6 flex items-center justify-start gap-3 text-base font-normal"
+            onClick={() => navigate("/phone")}
+          >
+            <Phone className="h-6 w-6" />
+            Continue with Phone
+          </Button>
+        </div>
+
+        <div className="my-8 flex items-center gap-4">
+          <div className="h-px flex-1 bg-gray-200"></div>
+          <span className="text-gray-500">OR</span>
+          <div className="h-px flex-1 bg-gray-200"></div>
+        </div>
 
         <div className="flex justify-center gap-12 mb-8">
           <button
@@ -115,20 +148,6 @@ const Login = () => {
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-gray-500">OR</div>
-
-        <Button
-          variant="outline"
-          className="w-full mt-6 py-6 flex items-center justify-center gap-2"
-        >
-          <img
-            src="https://www.google.com/favicon.ico"
-            alt="Google"
-            className="w-5 h-5"
-          />
-          Continue with Google
-        </Button>
-
         <p className="text-center text-gray-500 text-sm mt-8">
           By continuing, you agree to our{" "}
           <Link to="/terms" className="text-gray-600">
@@ -145,3 +164,4 @@ const Login = () => {
 };
 
 export default Login;
+
