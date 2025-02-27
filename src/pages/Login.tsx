@@ -38,9 +38,9 @@ const Login = () => {
     <div className="min-h-screen bg-white px-6 pb-20">
       <div className="pt-10 flex justify-center">
         <img 
-          src="/lovable-uploads/b7d0f389-fd7e-4930-842f-809d01839c72.png"
-          alt="wisebite"
-          className="h-8"
+          src="/lovable-uploads/a18ff71a-0b3e-4795-a638-dd589a1a82ee.png"
+          alt="WiseBite"
+          className="h-6 w-auto"
         />
       </div>
 

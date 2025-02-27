@@ -57,9 +57,9 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-1">
             <div>
               <img 
-                src="/lovable-uploads/98afa3c3-7256-419f-afa9-f52821cd6d21.png" 
+                src="/lovable-uploads/a18ff71a-0b3e-4795-a638-dd589a1a82ee.png" 
                 alt="WiseBite" 
-                className="h-8 mb-1"
+                className="h-6 w-auto mb-1"
               />
               <p className="text-gray-500">Welcome, Saffire</p>
             </div>
