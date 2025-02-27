@@ -56,7 +56,11 @@ const Dashboard = () => {
         <header className="px-6 pt-8 pb-6">
           <div className="flex justify-between items-center mb-1">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">WiseBite</h1>
+              <img 
+                src="/lovable-uploads/98afa3c3-7256-419f-afa9-f52821cd6d21.png" 
+                alt="WiseBite" 
+                className="h-8 mb-1"
+              />
               <p className="text-gray-500">Welcome, Saffire</p>
             </div>
             <Avatar className="h-10 w-10">
