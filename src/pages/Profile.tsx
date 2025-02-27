@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Camera, MapPin, Clock, Phone, Mail, Facebook, Instagram, Plus, X } from "lucide-react";
+import { Camera, MapPin, Clock, Phone, Mail, Facebook, Instagram, Plus, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -37,12 +37,7 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto bg-white min-h-screen">
         <header className="px-6 py-4 border-b sticky top-0 bg-white z-10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link to="/" className="text-gray-600 hover:text-gray-900">
-              <ArrowLeft className="w-6 h-6" />
-            </Link>
-            <h1 className="text-xl font-semibold">Store Profile</h1>
-          </div>
+          <h1 className="text-xl font-semibold">Store Profile</h1>
           <Button variant="ghost" className="text-blue-600 hover:text-blue-700">
             Save
           </Button>
