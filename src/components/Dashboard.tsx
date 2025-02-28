@@ -6,19 +6,12 @@ import { Circle, TrendingUp, DollarSign, ShoppingBag, Settings, Home, User, Hear
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Check if user is logged in
-  useEffect(() => {
-    const userJson = localStorage.getItem('user');
-    if (!userJson && location.pathname !== '/') {
-      navigate('/');
-    }
-  }, [location.pathname, navigate]);
-
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t py-2 flex justify-around items-center px-6 max-w-md mx-auto z-20">
       <Link to="/dashboard" className={`flex flex-col items-center ${location.pathname === "/dashboard" ? "text-blue-600" : "text-gray-500"}`}>
@@ -65,22 +58,28 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [storeProfile, setStoreProfile] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
-    // Check if user is logged in
-    const userJson = localStorage.getItem('user');
-    if (!userJson) {
-      navigate('/');
-    } else {
-      setUserProfile(JSON.parse(userJson));
-    }
+    console.log("Dashboard mounting, user:", user);
     
     // Check if store profile exists
     const storeJson = localStorage.getItem('storeProfile');
     if (storeJson) {
       setStoreProfile(JSON.parse(storeJson));
     }
-  }, [navigate]);
+    
+    // Set user profile
+    if (user) {
+      const userProfileData = {
+        name: user.email?.split('@')[0] || 'User',
+        email: user.email,
+        avatar: user.user_metadata?.avatar_url || null
+      };
+      setUserProfile(userProfileData);
+      console.log("User profile set:", userProfileData);
+    }
+  }, [user, navigate]);
 
   return (
     <div className="bg-gray-50 min-h-screen pb-16">
