@@ -35,7 +35,14 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
   
   if (isLoading) {
-    return <div className="flex h-screen w-full items-center justify-center">Loading...</div>;
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
   
   if (!isAuthenticated) {
@@ -46,6 +53,19 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AppRoutes = () => {
+  const { isLoading } = useAuth();
+  
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <Routes>
       <Route path="/" element={<Login />} />
@@ -81,15 +101,15 @@ const AppRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
           <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+        </TooltipProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 

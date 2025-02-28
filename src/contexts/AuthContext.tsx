@@ -30,10 +30,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const fetchUserAndSession = async () => {
       try {
         const { session: currentSession } = await getSession();
-        const { user: currentUser } = await getCurrentUser();
+        
+        if (currentSession) {
+          const { user: currentUser } = await getCurrentUser();
+          setUser(currentUser);
+        }
         
         setSession(currentSession);
-        setUser(currentUser);
       } catch (error) {
         console.error('Error fetching user or session:', error);
       } finally {
@@ -46,7 +49,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
+        console.log('Auth state changed:', event);
         setSession(currentSession);
+        
         if (currentSession?.user) {
           setUser(currentSession.user);
           if (event === 'SIGNED_IN') {
@@ -64,6 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             });
           }
         }
+        
         setIsLoading(false);
       }
     );
