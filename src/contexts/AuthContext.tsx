@@ -1,7 +1,6 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase, getCurrentUser, getSession } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
 
 interface AuthContextType {
@@ -14,7 +13,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
-  isLoading: true,
+  isLoading: false,
   isAuthenticated: false,
 });
 
@@ -23,61 +22,32 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Mock authentication for development
   useEffect(() => {
-    const fetchUserAndSession = async () => {
-      try {
-        const { session: currentSession } = await getSession();
-        const { user: currentUser } = await getCurrentUser();
-        
-        setSession(currentSession);
-        setUser(currentUser);
-      } catch (error) {
-        console.error('Error fetching user or session:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserAndSession();
-
-    // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        setSession(currentSession);
-        if (currentSession?.user) {
-          setUser(currentSession.user);
-          if (event === 'SIGNED_IN') {
-            toast({
-              title: "Welcome back!",
-              description: `Signed in as ${currentSession.user.email}`,
-            });
-          }
-        } else {
-          setUser(null);
-          if (event === 'SIGNED_OUT') {
-            toast({
-              title: "Signed out",
-              description: "You have been signed out successfully",
-            });
-          }
-        }
-        setIsLoading(false);
-      }
-    );
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
+    // Set mock user data
+    const mockUser = {
+      id: 'mock-user-id',
+      email: 'user@example.com',
+    } as User;
+    
+    setUser(mockUser);
+    setIsLoading(false);
+    
+    // Optional: Show toast for development
+    toast({
+      title: "Development mode",
+      description: "Using mock authentication data",
+    });
   }, [toast]);
 
   const value = {
     user,
     session,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated: true, // Always authenticated for development
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

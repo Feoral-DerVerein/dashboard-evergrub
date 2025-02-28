@@ -1,79 +1,55 @@
 
-import { createClient } from '@supabase/supabase-js';
+// Mock Supabase client and functions for development
+console.log('Using mock Supabase client for development');
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export const supabase = {
+  auth: {
+    onAuthStateChange: () => ({
+      data: { subscription: { unsubscribe: () => {} } },
+    }),
+    getUser: async () => ({ data: { user: null }, error: null }),
+    getSession: async () => ({ data: { session: null }, error: null }),
+    signOut: async () => ({ error: null }),
+  },
+};
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase credentials are missing. Make sure to add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment variables.');
-}
-
-export const supabase = createClient(
-  supabaseUrl || '',
-  supabaseAnonKey || ''
-);
-
-// Auth helper functions
+// Mock auth helper functions
 export const signUpWithEmail = async (email: string, password: string, metadata?: { full_name?: string }) => {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: metadata
-    }
-  });
-  return { data, error };
+  console.log('Mock signup with:', { email, password, metadata });
+  return { data: { user: { id: 'mock-id', email } }, error: null };
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-  return { data, error };
+  console.log('Mock sign in with:', { email, password });
+  return { data: { user: { id: 'mock-id', email } }, error: null };
 };
 
 export const signInWithGoogle = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/dashboard`
-    }
-  });
-  return { data, error };
+  console.log('Mock sign in with Google');
+  return { data: {}, error: null };
 };
 
 export const signInWithMicrosoft = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'azure',
-    options: {
-      redirectTo: `${window.location.origin}/dashboard`
-    }
-  });
-  return { data, error };
+  console.log('Mock sign in with Microsoft');
+  return { data: {}, error: null };
 };
 
 export const signInWithApple = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'apple',
-    options: {
-      redirectTo: `${window.location.origin}/dashboard`
-    }
-  });
-  return { data, error };
+  console.log('Mock sign in with Apple');
+  return { data: {}, error: null };
 };
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  return { error };
+  console.log('Mock sign out');
+  return { error: null };
 };
 
 export const getCurrentUser = async () => {
-  const { data, error } = await supabase.auth.getUser();
-  return { user: data.user, error };
+  console.log('Mock get current user');
+  return { user: { id: 'mock-id', email: 'user@example.com' }, error: null };
 };
 
 export const getSession = async () => {
-  const { data, error } = await supabase.auth.getSession();
-  return { session: data.session, error };
+  console.log('Mock get session');
+  return { session: { user: { id: 'mock-id' } }, error: null };
 };
