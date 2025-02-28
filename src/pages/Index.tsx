@@ -3,7 +3,7 @@ import Dashboard from "@/components/Dashboard";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       <Dashboard />
     </div>
   );
