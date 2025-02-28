@@ -5,13 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { 
-  signUpWithEmail, 
-  signInWithEmail, 
-  signInWithGoogle, 
-  signInWithMicrosoft, 
-  signInWithApple 
-} from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
@@ -24,7 +17,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, login } = useAuth();
 
   useEffect(() => {
     // If user is already authenticated, redirect to dashboard
@@ -39,23 +32,14 @@ const Login = () => {
     
     try {
       if (activeTab === 'login') {
-        // Login with Supabase
+        // Login with mock authentication
         if (email && password) {
-          const { data, error } = await signInWithEmail(email, password);
-          
-          if (error) {
-            toast({
-              title: "Login failed",
-              description: error.message,
-              variant: "destructive",
-            });
-          } else if (data?.user) {
-            toast({
-              title: "Login successful",
-              description: "Welcome back!",
-            });
-            navigate("/dashboard");
-          }
+          await login(email, password);
+          toast({
+            title: "Login successful",
+            description: "Welcome back!",
+          });
+          navigate("/dashboard");
         } else {
           toast({
             title: "Error",
@@ -64,7 +48,7 @@ const Login = () => {
           });
         }
       } else {
-        // Signup with Supabase
+        // Signup
         if (!name) {
           toast({
             title: "Error",
@@ -86,22 +70,12 @@ const Login = () => {
         }
         
         if (email && password && name) {
-          const { data, error } = await signUpWithEmail(email, password, { full_name: name });
-          
-          if (error) {
-            toast({
-              title: "Registration failed",
-              description: error.message,
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Registration successful",
-              description: "Please check your email to confirm your account",
-            });
-            // Stay on login page after signup for email confirmation
-            setActiveTab('login');
-          }
+          // Simple mock signup
+          toast({
+            title: "Registration successful",
+            description: "You can now login with your credentials",
+          });
+          setActiveTab('login');
         } else {
           toast({
             title: "Error",
@@ -125,34 +99,12 @@ const Login = () => {
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple' | 'phone') => {
     try {
       setIsLoading(true);
-      let result;
       
-      switch (provider) {
-        case 'google':
-          result = await signInWithGoogle();
-          break;
-        case 'microsoft':
-          result = await signInWithMicrosoft();
-          break;
-        case 'apple':
-          result = await signInWithApple();
-          break;
-        case 'phone':
-          toast({
-            title: "Not implemented",
-            description: "Phone authentication is not implemented yet",
-          });
-          return;
-      }
-      
-      if (result?.error) {
-        toast({
-          title: "Authentication failed",
-          description: result.error.message,
-          variant: "destructive",
-        });
-      }
-      // For OAuth providers, no need to navigate as the auth system will handle the redirect
+      // Mock social login
+      toast({
+        title: "Not implemented",
+        description: `${provider} authentication is not implemented yet`,
+      });
     } catch (error) {
       console.error("Social login error:", error);
       toast({

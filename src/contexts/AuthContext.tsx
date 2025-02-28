@@ -1,83 +1,86 @@
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase, getCurrentUser, getSession } from '@/lib/supabase';
-import { useToast } from '@/components/ui/use-toast';
+import { createContext, useContext, useState, ReactNode } from 'react';
+
+interface User {
+  id: string;
+  email: string;
+  name?: string;
+}
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  session: null,
-  isLoading: true,
+  isLoading: false,
   isAuthenticated: false,
+  login: async () => {},
+  logout: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchUserAndSession = async () => {
-      try {
-        const { session: currentSession } = await getSession();
-        const { user: currentUser } = await getCurrentUser();
-        
-        setSession(currentSession);
-        setUser(currentUser);
-      } catch (error) {
-        console.error('Error fetching user or session:', error);
-      } finally {
-        setIsLoading(false);
+  // Mock login function - replace with your authentication logic
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      // This is a mock implementation - in a real app, you would validate credentials
+      if (email && password) {
+        // Simulate successful login
+        setUser({
+          id: '1',
+          email: email,
+          name: 'User',
+        });
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userEmail', email);
+      } else {
+        throw new Error('Invalid credentials');
       }
-    };
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchUserAndSession();
+  // Mock logout function
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userEmail');
+  };
 
-    // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        setSession(currentSession);
-        if (currentSession?.user) {
-          setUser(currentSession.user);
-          if (event === 'SIGNED_IN') {
-            toast({
-              title: "Welcome back!",
-              description: `Signed in as ${currentSession.user.email}`,
-            });
-          }
-        } else {
-          setUser(null);
-          if (event === 'SIGNED_OUT') {
-            toast({
-              title: "Signed out",
-              description: "You have been signed out successfully",
-            });
-          }
-        }
-        setIsLoading(false);
-      }
-    );
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
-  }, [toast]);
+  // Check if user was previously logged in
+  useState(() => {
+    const isAuth = localStorage.getItem('isAuthenticated') === 'true';
+    const email = localStorage.getItem('userEmail');
+    
+    if (isAuth && email) {
+      setUser({
+        id: '1',
+        email: email,
+        name: 'User',
+      });
+    }
+  });
 
   const value = {
     user,
-    session,
     isLoading,
     isAuthenticated: !!user,
+    login,
+    logout
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
