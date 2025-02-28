@@ -12,3 +12,8 @@ export const supabase = createClient(
   supabaseUrl || '',
   supabaseAnonKey || ''
 );
+
+// This function would normally be implemented when using Supabase auth
+export const signOut = async () => {
+  return { error: null };
+};
