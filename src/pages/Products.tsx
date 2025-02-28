@@ -1,8 +1,7 @@
-
 import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { BottomNav } from "@/components/Dashboard";
+import BottomNav from "@/components/navigation/BottomNav";
 
 type Product = {
   id: number;

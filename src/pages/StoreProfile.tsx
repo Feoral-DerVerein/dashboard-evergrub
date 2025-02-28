@@ -1,4 +1,3 @@
-
 import { useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Camera, Upload, Plus, X } from "lucide-react";
-import { BottomNav } from "@/components/Dashboard";
+import BottomNav from "@/components/navigation/BottomNav";
 
 interface StoreInfo {
   name: string;
@@ -35,7 +34,6 @@ const StoreProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Check if user is logged in
   const userJson = localStorage.getItem('user');
   const user = userJson ? JSON.parse(userJson) : null;
 
@@ -116,10 +114,8 @@ const StoreProfile = () => {
     setIsSaving(true);
     
     try {
-      // Simulate API call to save store profile
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Save to localStorage for demo purposes
       localStorage.setItem('storeProfile', JSON.stringify({
         ...storeInfo,
         logo: logoPreview,
@@ -145,7 +141,6 @@ const StoreProfile = () => {
     }
   };
 
-  // Redirect if not logged in
   if (!user) {
     setTimeout(() => navigate("/"), 0);
     return null;
@@ -167,7 +162,6 @@ const StoreProfile = () => {
         </header>
 
         <main className="p-6 space-y-6">
-          {/* Store Logo */}
           <div className="flex flex-col items-center gap-2">
             <div className="relative">
               <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
@@ -191,7 +185,6 @@ const StoreProfile = () => {
             <span className="text-sm text-gray-600">Upload Store Logo</span>
           </div>
 
-          {/* Cover Photo */}
           <div className="relative h-40 bg-gray-100 rounded-lg flex items-center justify-center group overflow-hidden">
             {coverPreview ? (
               <img src={coverPreview} alt="Cover" className="w-full h-full object-cover" />
@@ -213,7 +206,6 @@ const StoreProfile = () => {
             </label>
           </div>
 
-          {/* Store Details */}
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">Store Name</label>
@@ -246,7 +238,6 @@ const StoreProfile = () => {
               />
             </div>
 
-            {/* Contact Details */}
             <div>
               <label className="text-sm font-medium text-gray-700 mb-2 block">Contact Details</label>
               <div className="space-y-3">
@@ -265,7 +256,6 @@ const StoreProfile = () => {
               </div>
             </div>
 
-            {/* Store Categories */}
             <div>
               <label className="text-sm font-medium text-gray-700 mb-2 block">Store Categories</label>
               <div className="flex flex-wrap mb-3">
@@ -289,7 +279,6 @@ const StoreProfile = () => {
               </div>
             </div>
 
-            {/* Photo Gallery */}
             <div>
               <label className="text-sm font-medium text-gray-700 mb-2 block">Photo Gallery</label>
               <div className="grid grid-cols-3 gap-2 mb-4">
@@ -320,7 +309,6 @@ const StoreProfile = () => {
             </div>
           </div>
 
-          {/* Save Button */}
           <Button 
             className="w-full bg-emerald-600 hover:bg-emerald-700"
             onClick={handleSave}

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Camera, MapPin, Clock, Phone, Mail, Facebook, Instagram, Plus, X } from "lucide-react";
@@ -6,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BottomNav } from "@/components/Dashboard";
+import BottomNav from "@/components/navigation/BottomNav";
 
 const BusinessHourRow = ({ day }: { day: string }) => (
   <div className="flex items-center gap-4 mb-4">

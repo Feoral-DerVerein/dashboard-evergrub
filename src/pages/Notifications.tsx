@@ -1,9 +1,8 @@
-
 import { Bell, Eye, Home, Plus, ShoppingBag, User, AlertTriangle, Heart, BarChart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { BottomNav } from "@/components/Dashboard";
+import BottomNav from "@/components/navigation/BottomNav";
 
 interface NotificationItem {
   id: number;

@@ -1,8 +1,7 @@
-
 import { Bell, Calendar, DollarSign, Download, Filter, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
-import { BottomNav } from "@/components/Dashboard";
+import BottomNav from "@/components/navigation/BottomNav";
 
 const CategoryButton = ({ label, isActive = false }: { label: string; isActive?: boolean }) => (
   <button
