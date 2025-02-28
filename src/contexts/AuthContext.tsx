@@ -1,8 +1,22 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase, getCurrentUser, getSession } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
+
+// Define User and Session types to replace the Supabase ones
+interface User {
+  id: string;
+  email: string | undefined;
+  user_metadata: {
+    full_name?: string;
+  };
+}
+
+interface Session {
+  user: User;
+  access_token: string;
+  refresh_token: string;
+  expires_at: number;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -20,6 +34,22 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+// Mock user data
+const mockUser: User = {
+  id: 'mock-user-id',
+  email: 'user@example.com',
+  user_metadata: {
+    full_name: 'Demo User'
+  }
+};
+
+const mockSession: Session = {
+  user: mockUser,
+  access_token: 'mock-token',
+  refresh_token: 'mock-refresh-token',
+  expires_at: Date.now() + 3600000
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -27,15 +57,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Simulate fetching session and user data
     const fetchUserAndSession = async () => {
       try {
-        const { session: currentSession } = await getSession();
-        const { user: currentUser } = await getCurrentUser();
+        // Simulate a small delay to mimic network request
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        setSession(currentSession);
-        setUser(currentUser);
+        setSession(mockSession);
+        setUser(mockUser);
+        
+        toast({
+          title: "Demo Mode",
+          description: "Using mock authentication",
+        });
       } catch (error) {
-        console.error('Error fetching user or session:', error);
+        console.error('Error in mock auth:', error);
       } finally {
         setIsLoading(false);
       }
@@ -43,34 +79,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     fetchUserAndSession();
 
-    // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        setSession(currentSession);
-        if (currentSession?.user) {
-          setUser(currentSession.user);
-          if (event === 'SIGNED_IN') {
-            toast({
-              title: "Welcome back!",
-              description: `Signed in as ${currentSession.user.email}`,
-            });
-          }
-        } else {
-          setUser(null);
-          if (event === 'SIGNED_OUT') {
-            toast({
-              title: "Signed out",
-              description: "You have been signed out successfully",
-            });
-          }
-        }
-        setIsLoading(false);
-      }
-    );
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
+    // No cleanup needed for mock implementation
+    return () => {};
   }, [toast]);
 
   const value = {

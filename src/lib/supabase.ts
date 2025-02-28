@@ -1,79 +1,98 @@
 
-import { createClient } from '@supabase/supabase-js';
+// Mock Supabase client and auth functions
+const mockUser = {
+  id: 'mock-user-id',
+  email: 'user@example.com',
+  user_metadata: {
+    full_name: 'Demo User'
+  }
+};
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const mockSession = {
+  user: mockUser,
+  access_token: 'mock-token',
+  refresh_token: 'mock-refresh-token',
+  expires_at: Date.now() + 3600000
+};
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase credentials are missing. Make sure to add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment variables.');
-}
-
-export const supabase = createClient(
-  supabaseUrl || '',
-  supabaseAnonKey || ''
-);
-
-// Auth helper functions
+// Mock Auth helper functions
 export const signUpWithEmail = async (email: string, password: string, metadata?: { full_name?: string }) => {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: metadata
-    }
-  });
-  return { data, error };
+  console.log('Mock signup with:', { email, password, metadata });
+  return { 
+    data: { user: mockUser, session: mockSession }, 
+    error: null 
+  };
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-  return { data, error };
+  console.log('Mock signin with:', { email, password });
+  return { 
+    data: { user: mockUser, session: mockSession }, 
+    error: null 
+  };
 };
 
 export const signInWithGoogle = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/dashboard`
-    }
-  });
-  return { data, error };
+  console.log('Mock Google signin');
+  return { 
+    data: { user: mockUser, session: mockSession }, 
+    error: null 
+  };
 };
 
 export const signInWithMicrosoft = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'azure',
-    options: {
-      redirectTo: `${window.location.origin}/dashboard`
-    }
-  });
-  return { data, error };
+  console.log('Mock Microsoft signin');
+  return { 
+    data: { user: mockUser, session: mockSession }, 
+    error: null 
+  };
 };
 
 export const signInWithApple = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'apple',
-    options: {
-      redirectTo: `${window.location.origin}/dashboard`
-    }
-  });
-  return { data, error };
+  console.log('Mock Apple signin');
+  return { 
+    data: { user: mockUser, session: mockSession }, 
+    error: null 
+  };
 };
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  return { error };
+  console.log('Mock signout');
+  return { error: null };
 };
 
 export const getCurrentUser = async () => {
-  const { data, error } = await supabase.auth.getUser();
-  return { user: data.user, error };
+  console.log('Mock get current user');
+  return { user: mockUser, error: null };
 };
 
 export const getSession = async () => {
-  const { data, error } = await supabase.auth.getSession();
-  return { session: data.session, error };
+  console.log('Mock get session');
+  return { session: mockSession, error: null };
+};
+
+// Mock subscription for auth state changes
+export const supabase = {
+  auth: {
+    onAuthStateChange: (callback: (event: string, session: any) => void) => {
+      // Simulate an initial auth state
+      setTimeout(() => {
+        callback('SIGNED_IN', mockSession);
+      }, 100);
+      
+      return {
+        data: {
+          subscription: {
+            unsubscribe: () => console.log('Mock unsubscribe from auth state changes')
+          }
+        }
+      };
+    },
+    getUser: async () => ({ data: { user: mockUser }, error: null }),
+    getSession: async () => ({ data: { session: mockSession }, error: null }),
+    signUp: async (params: any) => ({ data: { user: mockUser, session: mockSession }, error: null }),
+    signInWithPassword: async (params: any) => ({ data: { user: mockUser, session: mockSession }, error: null }),
+    signInWithOAuth: async (params: any) => ({ data: { url: 'https://example.com/oauth' }, error: null }),
+    signOut: async () => ({ error: null })
+  }
 };
