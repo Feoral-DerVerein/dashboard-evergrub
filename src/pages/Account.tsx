@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { BottomNav } from "@/components/Dashboard";
 import { useAuth } from "@/contexts/AuthContext";
+import { signOut } from "@/lib/supabase";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface StoreProfile {
@@ -18,7 +19,7 @@ const Account = () => {
   const [storeProfile, setStoreProfile] = useState<StoreProfile | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
     // Load store profile from localStorage if exists
@@ -47,12 +48,20 @@ const Account = () => {
 
   const handleLogout = async () => {
     try {
-      logout();
-      toast({
-        title: "Logged out",
-        description: "You have been logged out successfully"
-      });
-      navigate('/');
+      const { error } = await signOut();
+      if (error) {
+        toast({
+          title: "Logout failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Logged out",
+          description: "You have been logged out successfully"
+        });
+        navigate('/');
+      }
     } catch (error) {
       console.error("Logout error:", error);
       toast({
@@ -76,10 +85,10 @@ const Account = () => {
     return null;
   }
 
-  // Get user name
-  const fullName = user.name || user.email?.split('@')[0] || 'User';
-  // In our custom auth context, we don't have metadata
-  const avatarUrl = undefined; // No avatar URL in our custom auth context
+  // Get user metadata
+  const userMetadata = user.user_metadata || {};
+  const fullName = userMetadata.full_name || user.email?.split('@')[0] || 'User';
+  const avatarUrl = userMetadata.avatar_url;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -118,10 +127,14 @@ const Account = () => {
               <h3 className="font-medium mb-2">Account Information</h3>
               <div className="text-sm space-y-2">
                 <p><span className="text-gray-500">Email:</span> {user.email}</p>
-                <p><span className="text-gray-500">Account Created:</span> {new Date().toLocaleDateString()}</p>
+                <p><span className="text-gray-500">Account Created:</span> {new Date(user.created_at || '').toLocaleDateString()}</p>
                 <p>
                   <span className="text-gray-500">Email Verified:</span> 
-                  <span className="text-green-600 ml-1">Verified</span>
+                  {user.email_confirmed_at ? (
+                    <span className="text-green-600 ml-1">Verified</span>
+                  ) : (
+                    <span className="text-red-600 ml-1">Not Verified</span>
+                  )}
                 </p>
               </div>
             </CardContent>
