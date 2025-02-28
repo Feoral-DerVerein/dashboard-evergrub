@@ -27,28 +27,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log("AuthProvider initialized");
-    
     const fetchUserAndSession = async () => {
       try {
-        console.log("Fetching user and session...");
         const { session: currentSession } = await getSession();
         const { user: currentUser } = await getCurrentUser();
         
-        console.log("Session fetched:", currentSession ? "Session exists" : "No session");
-        console.log("User fetched:", currentUser ? "User exists" : "No user");
-        
         setSession(currentSession);
         setUser(currentUser);
-        
-        if (currentUser) {
-          console.log("User authenticated:", currentUser.email);
-        }
       } catch (error) {
         console.error('Error fetching user or session:', error);
       } finally {
         setIsLoading(false);
-        console.log("Auth loading completed");
       }
     };
 
@@ -57,13 +46,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
-        console.log("Auth state changed:", event);
         setSession(currentSession);
-        
         if (currentSession?.user) {
           setUser(currentSession.user);
-          console.log("User in session:", currentSession.user.email);
-          
           if (event === 'SIGNED_IN') {
             toast({
               title: "Welcome back!",
@@ -72,8 +57,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         } else {
           setUser(null);
-          console.log("No user in session");
-          
           if (event === 'SIGNED_OUT') {
             toast({
               title: "Signed out",
@@ -86,7 +69,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     return () => {
-      console.log("Cleaning up auth listener");
       authListener?.subscription.unsubscribe();
     };
   }, [toast]);
@@ -97,13 +79,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isLoading,
     isAuthenticated: !!user,
   };
-
-  console.log("Auth context value:", { 
-    hasUser: !!user, 
-    hasSession: !!session, 
-    isLoading, 
-    isAuthenticated: !!user 
-  });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
