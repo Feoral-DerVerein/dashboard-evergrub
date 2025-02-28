@@ -11,26 +11,81 @@ const Login = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    // TODO: Add actual authentication logic here
-    // For now, we'll just check if the fields are not empty
-    if (email && password) {
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      });
-      navigate("/dashboard");
-    } else {
+    try {
+      if (activeTab === 'login') {
+        // Login logic
+        if (email && password) {
+          // Simulate API call - Replace with actual authentication
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          localStorage.setItem('user', JSON.stringify({ email, name: 'User' }));
+          toast({
+            title: "Login successful",
+            description: "Welcome back!",
+          });
+          navigate("/dashboard");
+        } else {
+          toast({
+            title: "Error",
+            description: "Please fill in all fields",
+            variant: "destructive",
+          });
+        }
+      } else {
+        // Signup logic
+        if (!name) {
+          toast({
+            title: "Error",
+            description: "Please enter your name",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        if (password !== confirmPassword) {
+          toast({
+            title: "Error",
+            description: "Passwords do not match",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        if (email && password && name) {
+          // Simulate API call - Replace with actual registration
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          localStorage.setItem('user', JSON.stringify({ email, name }));
+          toast({
+            title: "Registration successful",
+            description: "Your account has been created!",
+          });
+          navigate("/profile");
+        } else {
+          toast({
+            title: "Error",
+            description: "Please fill in all fields",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: "An error occurred. Please try again.",
         variant: "destructive",
       });
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -71,6 +126,19 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {activeTab === 'signup' && (
+            <div>
+              <Input
+                type="text"
+                placeholder="Enter your full name"
+                className="bg-gray-50"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required={activeTab === 'signup'}
+              />
+            </div>
+          )}
+          
           <div>
             <Input
               type="email"
@@ -81,6 +149,7 @@ const Login = () => {
               required
             />
           </div>
+          
           <div className="relative">
             <Input
               type={showPassword ? "text" : "password"}
@@ -102,16 +171,45 @@ const Login = () => {
               )}
             </button>
           </div>
-          <div className="text-right">
-            <Link to="/forgot-password" className="text-blue-500 text-sm">
-              Forgot Password?
-            </Link>
-          </div>
+          
+          {activeTab === 'signup' && (
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm your password"
+                className="bg-gray-50 pr-10"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required={activeTab === 'signup'}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5 text-gray-400" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-400" />
+                )}
+              </button>
+            </div>
+          )}
+          
+          {activeTab === 'login' && (
+            <div className="text-right">
+              <Link to="/forgot-password" className="text-blue-500 text-sm">
+                Forgot Password?
+              </Link>
+            </div>
+          )}
+          
           <Button
             type="submit"
             className="w-full bg-[#4C956C] hover:bg-[#3d7857] text-white py-6"
+            disabled={isLoading}
           >
-            {activeTab === 'login' ? 'Log In' : 'Sign Up'}
+            {isLoading ? 'Processing...' : activeTab === 'login' ? 'Log In' : 'Sign Up'}
           </Button>
         </form>
 

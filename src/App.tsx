@@ -16,6 +16,8 @@ import Notifications from "./pages/Notifications";
 import Wishlist from "./pages/Wishlist";
 import Plus from "./pages/Plus";
 import Profile from "./pages/Profile";
+import Account from "./pages/Account";
+import StoreProfile from "./pages/StoreProfile";
 import NotFound from "./pages/NotFound";
 import Parcel from "./pages/Parcel";
 import ParcelDetails from "./pages/ParcelDetails";
@@ -46,6 +48,8 @@ const App = () => (
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/plus" element={<Plus />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/store-profile" element={<StoreProfile />} />
           <Route path="/parcel" element={<Parcel />} />
           <Route path="/parcel/:id" element={<ParcelDetails />} />
           <Route path="/microsoft" element={<Microsoft />} />
