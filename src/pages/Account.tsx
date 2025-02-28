@@ -5,7 +5,7 @@ import { Camera, User, Store, ShoppingBag, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import BottomNav from "@/components/navigation/BottomNav";
+import { BottomNav } from "@/components/Dashboard";
 import { useAuth } from "@/contexts/AuthContext";
 import { signOut } from "@/lib/supabase";
 import { Card, CardContent } from "@/components/ui/card";

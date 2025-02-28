@@ -1,5 +1,6 @@
+
 import { Bell, Menu } from "lucide-react";
-import BottomNav from "@/components/navigation/BottomNav";
+import { BottomNav } from "@/components/Dashboard";
 
 interface WishlistItem {
   id: number;

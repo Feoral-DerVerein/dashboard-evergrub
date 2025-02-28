@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Eye, X, Printer, ArrowLeft, MapPin, Phone } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import BottomNav from "@/components/navigation/BottomNav";
+import { BottomNav } from "@/components/Dashboard";
 
 interface OrderItem {
   id: string;

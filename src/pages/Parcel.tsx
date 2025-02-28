@@ -1,5 +1,4 @@
-
-import BottomNav from "@/components/navigation/BottomNav";
+import { BottomNav } from "@/components/Dashboard";
 import { Bell, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";

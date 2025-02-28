@@ -1,8 +1,9 @@
+
 import { Bell, Home, Menu, Plus, Search, User, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import BottomNav from "@/components/navigation/BottomNav";
+import { BottomNav } from "@/components/Dashboard";
 
 type UserStatus = "online" | "offline";
 
