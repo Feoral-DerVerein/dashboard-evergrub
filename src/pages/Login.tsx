@@ -1,167 +1,36 @@
 
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { 
-  signUpWithEmail, 
-  signInWithEmail, 
-  signInWithGoogle, 
-  signInWithMicrosoft, 
-  signInWithApple 
-} from "@/lib/supabase";
-import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    // If user is already authenticated, redirect to dashboard
-    if (isAuthenticated) {
-      navigate("/dashboard");
-    }
-  }, [isAuthenticated, navigate]);
-
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
-    try {
-      if (activeTab === 'login') {
-        // Login with Supabase
-        if (email && password) {
-          const { data, error } = await signInWithEmail(email, password);
-          
-          if (error) {
-            toast({
-              title: "Login failed",
-              description: error.message,
-              variant: "destructive",
-            });
-          } else if (data?.user) {
-            toast({
-              title: "Login successful",
-              description: "Welcome back!",
-            });
-            navigate("/dashboard");
-          }
-        } else {
-          toast({
-            title: "Error",
-            description: "Please fill in all fields",
-            variant: "destructive",
-          });
-        }
-      } else {
-        // Signup with Supabase
-        if (!name) {
-          toast({
-            title: "Error",
-            description: "Please enter your name",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
-        
-        if (password !== confirmPassword) {
-          toast({
-            title: "Error",
-            description: "Passwords do not match",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
-        
-        if (email && password && name) {
-          const { data, error } = await signUpWithEmail(email, password, { full_name: name });
-          
-          if (error) {
-            toast({
-              title: "Registration failed",
-              description: error.message,
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Registration successful",
-              description: "Please check your email to confirm your account",
-            });
-            // Stay on login page after signup for email confirmation
-            setActiveTab('login');
-          }
-        } else {
-          toast({
-            title: "Error",
-            description: "Please fill in all fields",
-            variant: "destructive",
-          });
-        }
-      }
-    } catch (error) {
+    // TODO: Add actual authentication logic here
+    // For now, we'll just check if the fields are not empty
+    if (email && password) {
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      navigate("/dashboard");
+    } else {
       toast({
         title: "Error",
-        description: "An error occurred. Please try again.",
+        description: "Please fill in all fields",
         variant: "destructive",
       });
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple' | 'phone') => {
-    try {
-      setIsLoading(true);
-      let result;
-      
-      switch (provider) {
-        case 'google':
-          result = await signInWithGoogle();
-          break;
-        case 'microsoft':
-          result = await signInWithMicrosoft();
-          break;
-        case 'apple':
-          result = await signInWithApple();
-          break;
-        case 'phone':
-          toast({
-            title: "Not implemented",
-            description: "Phone authentication is not implemented yet",
-          });
-          return;
-      }
-      
-      if (result?.error) {
-        toast({
-          title: "Authentication failed",
-          description: result.error.message,
-          variant: "destructive",
-        });
-      }
-      // For OAuth providers, no need to navigate as the auth system will handle the redirect
-    } catch (error) {
-      console.error("Social login error:", error);
-      toast({
-        title: "Authentication error",
-        description: "Failed to authenticate with provider",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -202,19 +71,6 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {activeTab === 'signup' && (
-            <div>
-              <Input
-                type="text"
-                placeholder="Enter your full name"
-                className="bg-gray-50"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required={activeTab === 'signup'}
-              />
-            </div>
-          )}
-          
           <div>
             <Input
               type="email"
@@ -225,7 +81,6 @@ const Login = () => {
               required
             />
           </div>
-          
           <div className="relative">
             <Input
               type={showPassword ? "text" : "password"}
@@ -247,45 +102,16 @@ const Login = () => {
               )}
             </button>
           </div>
-          
-          {activeTab === 'signup' && (
-            <div className="relative">
-              <Input
-                type={showPassword ? "text" : "password"}
-                placeholder="Confirm your password"
-                className="bg-gray-50 pr-10"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required={activeTab === 'signup'}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-400" />
-                )}
-              </button>
-            </div>
-          )}
-          
-          {activeTab === 'login' && (
-            <div className="text-right">
-              <Link to="/forgot-password" className="text-blue-500 text-sm">
-                Forgot Password?
-              </Link>
-            </div>
-          )}
-          
+          <div className="text-right">
+            <Link to="/forgot-password" className="text-blue-500 text-sm">
+              Forgot Password?
+            </Link>
+          </div>
           <Button
             type="submit"
             className="w-full bg-[#4C956C] hover:bg-[#3d7857] text-white py-6"
-            disabled={isLoading}
           >
-            {isLoading ? 'Processing...' : activeTab === 'login' ? 'Log In' : 'Sign Up'}
+            {activeTab === 'login' ? 'Log In' : 'Sign Up'}
           </Button>
         </form>
 
@@ -295,8 +121,12 @@ const Login = () => {
           <Button
             variant="outline"
             className="w-full py-6 flex items-center justify-center gap-3 rounded-full border-gray-300"
-            onClick={() => handleSocialLogin('google')}
-            disabled={isLoading}
+            onClick={() => {
+              toast({
+                title: "Google login",
+                description: "Google authentication not implemented yet",
+              });
+            }}
           >
             <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
               <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
@@ -312,8 +142,12 @@ const Login = () => {
           <Button
             variant="outline"
             className="w-full py-6 flex items-center justify-center gap-3 rounded-full border-gray-300"
-            onClick={() => handleSocialLogin('microsoft')}
-            disabled={isLoading}
+            onClick={() => {
+              toast({
+                title: "Microsoft login",
+                description: "Microsoft authentication not implemented yet",
+              });
+            }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
               <rect x="1" y="1" width="9" height="9" fill="#f25022" />
@@ -327,8 +161,12 @@ const Login = () => {
           <Button
             variant="outline"
             className="w-full py-6 flex items-center justify-center gap-3 rounded-full bg-black text-white border-0"
-            onClick={() => handleSocialLogin('apple')}
-            disabled={isLoading}
+            onClick={() => {
+              toast({
+                title: "Apple login",
+                description: "Apple authentication not implemented yet",
+              });
+            }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="21" viewBox="0 0 18 21" fill="none">
               <path d="M14.9883 11.2093C14.9633 8.51777 17.13 7.28027 17.22 7.22277C15.8925 5.25527 13.815 4.95277 13.0875 4.93027C11.3775 4.76027 9.7275 5.93027 8.865 5.93027C7.9875 5.93027 6.645 4.94277 5.2125 4.97027C3.375 4.99777 1.6575 6.04777 0.735 7.70777C-1.1775 11.0803 0.27 16.0503 2.115 18.7053C3.03 20.0053 4.1025 21.4653 5.5125 21.4128C6.8925 21.3603 7.425 20.5353 9.09 20.5353C10.74 20.5353 11.2425 21.4128 12.6825 21.3828C14.16 21.3603 15.09 20.0653 15.975 18.7578C17.055 17.2578 17.49 15.7953 17.505 15.7203C17.475 15.7053 15.0225 14.7303 14.9883 11.2093Z" fill="white" />
@@ -340,8 +178,12 @@ const Login = () => {
           <Button
             variant="outline"
             className="w-full py-6 flex items-center justify-center gap-3 rounded-full bg-blue-500 text-white border-0"
-            onClick={() => handleSocialLogin('phone')}
-            disabled={isLoading}
+            onClick={() => {
+              toast({
+                title: "Phone login",
+                description: "Phone authentication not implemented yet",
+              });
+            }}
           >
             <Smartphone className="h-5 w-5" />
             Continue with Phone
