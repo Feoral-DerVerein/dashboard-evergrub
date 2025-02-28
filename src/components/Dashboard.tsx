@@ -65,6 +65,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [storeProfile, setStoreProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in
@@ -80,11 +81,19 @@ const Dashboard = () => {
     if (storeJson) {
       setStoreProfile(JSON.parse(storeJson));
     }
+    
+    setIsLoading(false);
   }, [navigate]);
 
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
+  }
+
   return (
-    <div className="bg-gray-50 min-h-screen pb-16">
-      <div className="max-w-md mx-auto bg-white">
+    <div className="bg-gray-100 min-h-screen pb-16">
+      <div className="max-w-md mx-auto bg-white shadow-sm">
         <header className="sticky top-0 bg-white z-10 px-6 py-4 border-b flex items-center justify-between">
           <div className="flex items-center">
             <img
