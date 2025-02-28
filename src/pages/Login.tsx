@@ -24,11 +24,14 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  console.log("Login page rendering", { isAuthenticated, authLoading });
 
   useEffect(() => {
     // If user is already authenticated, redirect to dashboard
     if (isAuthenticated) {
+      console.log("User is authenticated, redirecting to dashboard");
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
@@ -38,18 +41,23 @@ const Login = () => {
     setIsLoading(true);
     
     try {
+      console.log("Login form submitted", { activeTab, email });
+      
       if (activeTab === 'login') {
         // Login with Supabase
         if (email && password) {
+          console.log("Attempting to sign in with email");
           const { data, error } = await signInWithEmail(email, password);
           
           if (error) {
+            console.error("Login error:", error);
             toast({
               title: "Login failed",
               description: error.message,
               variant: "destructive",
             });
           } else if (data?.user) {
+            console.log("Login successful");
             toast({
               title: "Login successful",
               description: "Welcome back!",
@@ -86,15 +94,18 @@ const Login = () => {
         }
         
         if (email && password && name) {
+          console.log("Attempting to sign up with email");
           const { data, error } = await signUpWithEmail(email, password, { full_name: name });
           
           if (error) {
+            console.error("Signup error:", error);
             toast({
               title: "Registration failed",
               description: error.message,
               variant: "destructive",
             });
           } else {
+            console.log("Signup successful");
             toast({
               title: "Registration successful",
               description: "Please check your email to confirm your account",
@@ -111,12 +122,12 @@ const Login = () => {
         }
       }
     } catch (error) {
+      console.error("Form submission error:", error);
       toast({
         title: "Error",
         description: "An error occurred. Please try again.",
         variant: "destructive",
       });
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -125,6 +136,7 @@ const Login = () => {
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple' | 'phone') => {
     try {
       setIsLoading(true);
+      console.log(`Attempting to sign in with ${provider}`);
       let result;
       
       switch (provider) {
@@ -146,15 +158,18 @@ const Login = () => {
       }
       
       if (result?.error) {
+        console.error(`${provider} login error:`, result.error);
         toast({
           title: "Authentication failed",
           description: result.error.message,
           variant: "destructive",
         });
+      } else {
+        console.log(`${provider} login initiated`);
       }
       // For OAuth providers, no need to navigate as the auth system will handle the redirect
     } catch (error) {
-      console.error("Social login error:", error);
+      console.error(`${provider} login error:`, error);
       toast({
         title: "Authentication error",
         description: "Failed to authenticate with provider",
@@ -164,6 +179,10 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  if (authLoading) {
+    return <div className="flex h-screen w-full items-center justify-center">Checking authentication status...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-white px-6 pb-20">
