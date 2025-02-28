@@ -8,7 +8,10 @@ interface User {
   email: string | undefined;
   user_metadata: {
     full_name?: string;
+    avatar_url?: string;
   };
+  created_at?: string;
+  email_confirmed_at?: string;
 }
 
 interface Session {
@@ -39,8 +42,11 @@ const mockUser: User = {
   id: 'mock-user-id',
   email: 'user@example.com',
   user_metadata: {
-    full_name: 'Demo User'
-  }
+    full_name: 'Demo User',
+    avatar_url: null
+  },
+  created_at: new Date().toISOString(),
+  email_confirmed_at: null
 };
 
 const mockSession: Session = {

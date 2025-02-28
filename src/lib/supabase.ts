@@ -4,8 +4,11 @@ const mockUser = {
   id: 'mock-user-id',
   email: 'user@example.com',
   user_metadata: {
-    full_name: 'Demo User'
-  }
+    full_name: 'Demo User',
+    avatar_url: null
+  },
+  created_at: new Date().toISOString(),
+  email_confirmed_at: null
 };
 
 const mockSession = {
