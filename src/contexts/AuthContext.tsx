@@ -27,23 +27,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log("AuthProvider mounting, fetching user and session...");
     const fetchUserAndSession = async () => {
       try {
-        console.log("Fetching session...");
         const { session: currentSession } = await getSession();
-        console.log("Session result:", currentSession);
-        
-        console.log("Fetching user...");
         const { user: currentUser } = await getCurrentUser();
-        console.log("User result:", currentUser);
         
         setSession(currentSession);
         setUser(currentUser);
       } catch (error) {
         console.error('Error fetching user or session:', error);
       } finally {
-        console.log("Setting isLoading to false");
         setIsLoading(false);
       }
     };
@@ -53,7 +46,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
-        console.log("Auth state changed:", event, currentSession?.user?.email);
         setSession(currentSession);
         if (currentSession?.user) {
           setUser(currentSession.user);
@@ -77,7 +69,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     return () => {
-      console.log("Cleaning up auth listener");
       authListener?.subscription.unsubscribe();
     };
   }, [toast]);
@@ -88,13 +79,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isLoading,
     isAuthenticated: !!user,
   };
-
-  console.log("AuthContext values:", { 
-    isLoading, 
-    isAuthenticated: !!user, 
-    hasUser: !!user, 
-    hasSession: !!session 
-  });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

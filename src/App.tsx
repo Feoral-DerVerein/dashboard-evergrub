@@ -34,18 +34,14 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
   
-  console.log("ProtectedRoute check:", { isAuthenticated, isLoading });
-  
   if (isLoading) {
     return <div className="flex h-screen w-full items-center justify-center">Loading...</div>;
   }
   
   if (!isAuthenticated) {
-    console.log("User not authenticated, redirecting to login");
     return <Navigate to="/" replace />;
   }
   
-  console.log("User authenticated, rendering protected content");
   return <>{children}</>;
 };
 
@@ -83,21 +79,18 @@ const AppRoutes = () => {
   );
 };
 
-const App = () => {
-  console.log("App component rendering");
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;

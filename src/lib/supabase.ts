@@ -1,16 +1,17 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Use empty strings as fallbacks to prevent crashes
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Log warning but don't throw an error
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials are missing. Make sure to add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment variables.');
+  console.error('Supabase credentials are missing. Make sure to add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment variables.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(
+  supabaseUrl || '',
+  supabaseAnonKey || ''
+);
 
 // Auth helper functions
 export const signUpWithEmail = async (email: string, password: string, metadata?: { full_name?: string }) => {
@@ -68,21 +69,11 @@ export const signOut = async () => {
 };
 
 export const getCurrentUser = async () => {
-  try {
-    const { data, error } = await supabase.auth.getUser();
-    return { user: data?.user || null, error };
-  } catch (error) {
-    console.error('Error getting current user:', error);
-    return { user: null, error };
-  }
+  const { data, error } = await supabase.auth.getUser();
+  return { user: data.user, error };
 };
 
 export const getSession = async () => {
-  try {
-    const { data, error } = await supabase.auth.getSession();
-    return { session: data?.session || null, error };
-  } catch (error) {
-    console.error('Error getting session:', error);
-    return { session: null, error };
-  }
+  const { data, error } = await supabase.auth.getSession();
+  return { session: data.session, error };
 };
