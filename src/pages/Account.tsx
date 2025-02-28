@@ -6,12 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { BottomNav } from "@/components/Dashboard";
-
-interface UserProfile {
-  name: string;
-  email: string;
-  avatar?: string;
-}
+import { useAuth } from "@/contexts/AuthContext";
+import { signOut } from "@/lib/supabase";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface StoreProfile {
   name: string;
@@ -19,21 +16,12 @@ interface StoreProfile {
 }
 
 const Account = () => {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [storeProfile, setStoreProfile] = useState<StoreProfile | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    // Load user profile from localStorage
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      setUserProfile(JSON.parse(userJson));
-    } else {
-      // Redirect to login if not logged in
-      navigate('/');
-    }
-
     // Load store profile from localStorage if exists
     const storeJson = localStorage.getItem('storeProfile');
     if (storeJson) {
@@ -43,41 +31,64 @@ const Account = () => {
         logo: store.logo
       });
     }
-  }, [navigate]);
+  }, []);
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && userProfile) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const updatedProfile = {
-          ...userProfile,
-          avatar: reader.result as string
-        };
-        setUserProfile(updatedProfile);
-        localStorage.setItem('user', JSON.stringify(updatedProfile));
-        
-        toast({
-          title: "Success",
-          description: "Profile picture updated"
-        });
-      };
-      reader.readAsDataURL(file);
+    if (file && user) {
+      // In a real implementation, you would upload the file to Supabase storage
+      // and update the user's avatar URL in the database
+      // For this demo, we'll just show a toast notification
+      toast({
+        title: "Feature not implemented",
+        description: "Avatar upload would be handled by Supabase Storage in a full implementation",
+      });
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully"
-    });
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      const { error } = await signOut();
+      if (error) {
+        toast({
+          title: "Logout failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Logged out",
+          description: "You have been logged out successfully"
+        });
+        navigate('/');
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred during logout",
+        variant: "destructive",
+      });
+    }
   };
 
-  if (!userProfile) {
-    return null; // Wait for redirect
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
   }
+
+  if (!user) {
+    navigate('/');
+    return null;
+  }
+
+  // Get user metadata
+  const userMetadata = user.user_metadata || {};
+  const fullName = userMetadata.full_name || user.email?.split('@')[0] || 'User';
+  const avatarUrl = userMetadata.avatar_url;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -91,9 +102,9 @@ const Account = () => {
           <div className="flex flex-col items-center mb-8">
             <div className="relative mb-3">
               <Avatar className="w-24 h-24">
-                <AvatarImage src={userProfile.avatar} />
+                <AvatarImage src={avatarUrl} />
                 <AvatarFallback className="bg-emerald-100 text-emerald-800 text-xl">
-                  {userProfile.name ? userProfile.name.charAt(0).toUpperCase() : 'U'}
+                  {fullName.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <label className="absolute bottom-0 right-0 p-1.5 bg-blue-600 rounded-full cursor-pointer">
@@ -106,9 +117,28 @@ const Account = () => {
                 />
               </label>
             </div>
-            <h2 className="text-xl font-semibold">{userProfile.name}</h2>
-            <p className="text-gray-500">{userProfile.email}</p>
+            <h2 className="text-xl font-semibold">{fullName}</h2>
+            <p className="text-gray-500">{user.email}</p>
           </div>
+
+          {/* User Info Card */}
+          <Card className="mb-6">
+            <CardContent className="p-4">
+              <h3 className="font-medium mb-2">Account Information</h3>
+              <div className="text-sm space-y-2">
+                <p><span className="text-gray-500">Email:</span> {user.email}</p>
+                <p><span className="text-gray-500">Account Created:</span> {new Date(user.created_at || '').toLocaleDateString()}</p>
+                <p>
+                  <span className="text-gray-500">Email Verified:</span> 
+                  {user.email_confirmed_at ? (
+                    <span className="text-green-600 ml-1">Verified</span>
+                  ) : (
+                    <span className="text-red-600 ml-1">Not Verified</span>
+                  )}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Account Menu */}
           <div className="space-y-4">
