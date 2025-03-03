@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Eye, X, Printer, ArrowLeft, MapPin, Phone } from "lucide-react";
+import { Eye, X, Printer, MapPin, Phone } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
@@ -204,7 +204,7 @@ const Orders = () => {
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-3 mb-6">
-            <ArrowLeft className="w-6 h-6 text-gray-500" />
+            {/* Eliminando la flecha negra de la esquina superior */}
             <h1 className="text-2xl font-bold">Orders Dashboard</h1>
           </div>
           <p className="text-gray-500 mb-4">Today's Orders</p>
