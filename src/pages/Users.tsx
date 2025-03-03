@@ -1,5 +1,4 @@
-
-import { Bell, Home, Menu, Plus, Search, User, ChevronRight } from "lucide-react";
+import { Bell, Home, Menu, Plus, Search, User, ChevronRight, UserRound } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -36,26 +35,39 @@ const FilterButton = ({ label, isActive = false }: { label: string; isActive?: b
   </button>
 );
 
-const UserCard = ({ user }: { user: UserItem }) => (
-  <Link to={`/users/${user.id}`} className="flex items-center justify-between p-4 hover:bg-gray-50">
-    <div className="flex items-center gap-3">
-      <div className="relative">
-        <Avatar className="h-12 w-12">
-          <AvatarImage src={user.avatarUrl} alt={user.name} />
-          <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-        </Avatar>
-        <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
-          user.status === 'online' ? 'bg-green-500' : 'bg-gray-300'
-        }`} />
+const UserCard = ({ user }: { user: UserItem }) => {
+  const initials = user.name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase();
+
+  return (
+    <Link to={`/users/${user.id}`} className="flex items-center justify-between p-4 hover:bg-gray-50">
+      <div className="flex items-center gap-3">
+        <div className="relative">
+          <Avatar className="h-12 w-12">
+            {user.avatarUrl !== "/placeholder.svg" ? (
+              <AvatarImage src={user.avatarUrl} alt={user.name} />
+            ) : (
+              <AvatarFallback className="bg-blue-100 text-blue-600">
+                {initials}
+              </AvatarFallback>
+            )}
+            <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+              user.status === 'online' ? 'bg-green-500' : 'bg-gray-300'
+            }`} />
+          </Avatar>
+        </div>
+        <div>
+          <h3 className="font-medium text-gray-900">{user.name}</h3>
+          <p className="text-gray-500 text-sm">{user.role}</p>
+        </div>
       </div>
-      <div>
-        <h3 className="font-medium text-gray-900">{user.name}</h3>
-        <p className="text-gray-500 text-sm">{user.role}</p>
-      </div>
-    </div>
-    <ChevronRight className="w-5 h-5 text-gray-400" />
-  </Link>
-);
+      <ChevronRight className="w-5 h-5 text-gray-400" />
+    </Link>
+  );
+};
 
 const Users = () => {
   const [searchQuery, setSearchQuery] = useState("");

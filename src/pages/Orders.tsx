@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Eye, X, Printer, MapPin, Phone } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -59,43 +58,62 @@ const orders: Order[] = [
   }
 ];
 
-const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (order: Order) => void }) => (
-  <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
-    <div className="flex items-center justify-between">
-      <div className="font-medium text-gray-600">{order.id}</div>
-      <div className={`text-sm ${
-        order.status === "completed" ? "text-green-500" : 
-        order.status === "pending" ? "text-orange-500" : "text-blue-500"
-      }`}>
-        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-      </div>
-    </div>
-    <div className="flex items-center justify-between mt-3">
-      <div className="flex items-center gap-3">
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={order.customerImage} alt={order.customerName} />
-          <AvatarFallback>{order.customerName.split(" ").map(n => n[0]).join("")}</AvatarFallback>
-        </Avatar>
-        <div>
-          <p className="font-medium">{order.customerName}</p>
-          <p className="text-sm text-gray-500">{order.items.length} items</p>
+const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (order: Order) => void }) => {
+  const initials = order.customerName
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase();
+
+  return (
+    <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
+      <div className="flex items-center justify-between">
+        <div className="font-medium text-gray-600">{order.id}</div>
+        <div className={`text-sm ${
+          order.status === "completed" ? "text-green-500" : 
+          order.status === "pending" ? "text-orange-500" : "text-blue-500"
+        }`}>
+          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        <div className="text-right">
-          <p className="font-medium">${order.total.toFixed(2)}</p>
-          <p className="text-sm text-gray-500">{order.timestamp}</p>
+      <div className="flex items-center justify-between mt-3">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            {order.customerImage !== "/placeholder.svg" ? (
+              <AvatarImage src={order.customerImage} alt={order.customerName} />
+            ) : (
+              <AvatarFallback className="bg-blue-100 text-blue-600">
+                {initials}
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div>
+            <p className="font-medium">{order.customerName}</p>
+            <p className="text-sm text-gray-500">{order.items.length} items</p>
+          </div>
         </div>
-        <button onClick={() => onViewDetails(order)} className="text-blue-500">
-          <Eye className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <p className="font-medium">${order.total.toFixed(2)}</p>
+            <p className="text-sm text-gray-500">{order.timestamp}</p>
+          </div>
+          <button onClick={() => onViewDetails(order)} className="text-blue-500">
+            <Eye className="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; isOpen: boolean; onClose: () => void }) => {
   if (!order) return null;
+
+  const initials = order.customerName
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase();
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
@@ -126,8 +144,13 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
 
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12">
-              <AvatarImage src={order.customerImage} alt={order.customerName} />
-              <AvatarFallback>{order.customerName.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+              {order.customerImage !== "/placeholder.svg" ? (
+                <AvatarImage src={order.customerImage} alt={order.customerName} />
+              ) : (
+                <AvatarFallback className="bg-blue-100 text-blue-600">
+                  {initials}
+                </AvatarFallback>
+              )}
             </Avatar>
             <div>
               <p className="font-semibold">{order.customerName}</p>
@@ -204,7 +227,6 @@ const Orders = () => {
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-3 mb-6">
-            {/* Eliminando la flecha negra de la esquina superior */}
             <h1 className="text-2xl font-bold">Orders Dashboard</h1>
           </div>
           <p className="text-gray-500 mb-4">Today's Orders</p>
