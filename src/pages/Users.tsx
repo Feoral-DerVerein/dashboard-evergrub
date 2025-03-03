@@ -1,4 +1,4 @@
-import { Bell, Home, Menu, Plus, Search, User, ChevronRight, UserRound } from "lucide-react";
+import { Bell, Home, Plus, Search, User, ChevronRight, UserRound } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -83,10 +83,7 @@ const Users = () => {
         <div className="max-w-md mx-auto bg-white min-h-screen animate-fade-in pb-20">
           <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
             <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-4">
-                <Menu className="w-6 h-6 text-gray-500" />
-                <h1 className="text-2xl font-bold">Users</h1>
-              </div>
+              <h1 className="text-2xl font-bold">Users</h1>
               <Plus className="w-6 h-6 text-gray-500" />
             </div>
             <div className="relative mb-4">
