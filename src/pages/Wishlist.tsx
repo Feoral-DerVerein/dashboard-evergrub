@@ -27,7 +27,7 @@ const wishlistItems: WishlistItem[] = [
     name: "Fresh Milk",
     price: 3.49,
     unit: "gallon",
-    image: "/placeholder.svg",
+    image: "/lovable-uploads/65fec487-8a30-491a-954f-ddfffdb5e9ca.png",
     status: "Limited Stock",
     timeLeft: "10 days left"
   },
@@ -36,7 +36,7 @@ const wishlistItems: WishlistItem[] = [
     name: "Organic Eggs",
     price: 5.99,
     unit: "dozen",
-    image: "/placeholder.svg",
+    image: "/lovable-uploads/a18ff71a-0b3e-4795-a638-dd589a1a82ee.png",
     status: "Out of Stock",
     timeLeft: ""
   },
@@ -45,7 +45,7 @@ const wishlistItems: WishlistItem[] = [
     name: "Whole Grain Bread",
     price: 4.29,
     unit: "loaf",
-    image: "/placeholder.svg",
+    image: "/lovable-uploads/6e661578-093b-4836-bed7-2bcc3de33ab8.png",
     status: "Ready Now",
     timeLeft: "20 hours left"
   },
@@ -54,7 +54,7 @@ const wishlistItems: WishlistItem[] = [
     name: "Fresh Avocados",
     price: 6.99,
     unit: "bag",
-    image: "/placeholder.svg",
+    image: "/lovable-uploads/a3172ad7-521b-4bff-a334-94b79ec5e1bf.png",
     status: "Limited Stock",
     timeLeft: "1 day left"
   }
