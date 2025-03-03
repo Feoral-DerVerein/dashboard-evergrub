@@ -18,7 +18,7 @@ const wishlistItems: WishlistItem[] = [
     name: "Fresh Organic Bananas",
     price: 4.99,
     unit: "bunch",
-    image: "/lovable-uploads/459ad899-55f0-42cb-9ff4-8065a49cfafd.png",
+    image: "/lovable-uploads/298479ff-ca23-474b-b635-b25052f38dce.png",
     status: "Ready Now",
     timeLeft: "2 days left"
   },
@@ -27,7 +27,7 @@ const wishlistItems: WishlistItem[] = [
     name: "Fresh Milk",
     price: 3.49,
     unit: "gallon",
-    image: "/lovable-uploads/65fec487-8a30-491a-954f-ddfffdb5e9ca.png",
+    image: "/lovable-uploads/7ca491d8-bc84-414f-af99-b02fc25a82d2.png",
     status: "Limited Stock",
     timeLeft: "10 days left"
   },
@@ -36,7 +36,7 @@ const wishlistItems: WishlistItem[] = [
     name: "Organic Eggs",
     price: 5.99,
     unit: "dozen",
-    image: "/lovable-uploads/a18ff71a-0b3e-4795-a638-dd589a1a82ee.png",
+    image: "/lovable-uploads/e5cd79e3-cace-4937-ac6d-87e4fcc616d2.png",
     status: "Out of Stock",
     timeLeft: ""
   },
@@ -45,7 +45,7 @@ const wishlistItems: WishlistItem[] = [
     name: "Whole Grain Bread",
     price: 4.29,
     unit: "loaf",
-    image: "/lovable-uploads/6e661578-093b-4836-bed7-2bcc3de33ab8.png",
+    image: "/lovable-uploads/c060febe-1a4f-4e7b-aa9f-04e5b1d7ebbc.png",
     status: "Ready Now",
     timeLeft: "20 hours left"
   },
@@ -54,7 +54,7 @@ const wishlistItems: WishlistItem[] = [
     name: "Fresh Avocados",
     price: 6.99,
     unit: "bag",
-    image: "/lovable-uploads/a3172ad7-521b-4bff-a334-94b79ec5e1bf.png",
+    image: "/lovable-uploads/c11c2253-b515-4580-9bb9-a67c957ba2ba.png",
     status: "Limited Stock",
     timeLeft: "1 day left"
   }
