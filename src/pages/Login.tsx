@@ -1,4 +1,3 @@
-
 import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Provider } from "@supabase/supabase-js";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +61,7 @@ const Login = () => {
     }
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
+  const handleSocialLogin = async (provider: Provider) => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
