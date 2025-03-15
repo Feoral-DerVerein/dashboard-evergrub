@@ -5,30 +5,77 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    // TODO: Add actual authentication logic here
-    // For now, we'll just check if the fields are not empty
-    if (email && password) {
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      });
-      navigate("/dashboard");
-    } else {
+    try {
+      if (activeTab === 'login') {
+        // Login with Supabase
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Inicio de sesión exitoso",
+          description: "¡Bienvenido de nuevo!",
+        });
+        navigate("/dashboard");
+      } else {
+        // Sign up with Supabase
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Registro exitoso",
+          description: "Se ha creado tu cuenta. Revisa tu correo para verificarla.",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error de autenticación:", error);
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: error.message || "Ocurrió un problema durante la autenticación",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin + '/dashboard',
+        },
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.error(`Error con ${provider}:`, error);
+      toast({
+        title: "Error",
+        description: error.message || `Hubo un problema con el inicio de sesión de ${provider}`,
         variant: "destructive",
       });
     }
@@ -110,8 +157,12 @@ const Login = () => {
           <Button
             type="submit"
             className="w-full bg-[#4C956C] hover:bg-[#3d7857] text-white py-6"
+            disabled={loading}
           >
-            {activeTab === 'login' ? 'Log In' : 'Sign Up'}
+            {loading 
+              ? "Procesando..." 
+              : activeTab === 'login' ? 'Log In' : 'Sign Up'
+            }
           </Button>
         </form>
 
@@ -121,12 +172,8 @@ const Login = () => {
           <Button
             variant="outline"
             className="w-full py-6 flex items-center justify-center gap-3 rounded-full border-gray-300"
-            onClick={() => {
-              toast({
-                title: "Google login",
-                description: "Google authentication not implemented yet",
-              });
-            }}
+            onClick={() => handleSocialLogin('google')}
+            disabled={loading}
           >
             <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
               <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
@@ -142,12 +189,8 @@ const Login = () => {
           <Button
             variant="outline"
             className="w-full py-6 flex items-center justify-center gap-3 rounded-full border-gray-300"
-            onClick={() => {
-              toast({
-                title: "Microsoft login",
-                description: "Microsoft authentication not implemented yet",
-              });
-            }}
+            onClick={() => handleSocialLogin('microsoft')}
+            disabled={loading}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
               <rect x="1" y="1" width="9" height="9" fill="#f25022" />
@@ -161,12 +204,8 @@ const Login = () => {
           <Button
             variant="outline"
             className="w-full py-6 flex items-center justify-center gap-3 rounded-full bg-black text-white border-0"
-            onClick={() => {
-              toast({
-                title: "Apple login",
-                description: "Apple authentication not implemented yet",
-              });
-            }}
+            onClick={() => handleSocialLogin('apple')}
+            disabled={loading}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="21" viewBox="0 0 18 21" fill="none">
               <path d="M14.9883 11.2093C14.9633 8.51777 17.13 7.28027 17.22 7.22277C15.8925 5.25527 13.815 4.95277 13.0875 4.93027C11.3775 4.76027 9.7275 5.93027 8.865 5.93027C7.9875 5.93027 6.645 4.94277 5.2125 4.97027C3.375 4.99777 1.6575 6.04777 0.735 7.70777C-1.1775 11.0803 0.27 16.0503 2.115 18.7053C3.03 20.0053 4.1025 21.4653 5.5125 21.4128C6.8925 21.3603 7.425 20.5353 9.09 20.5353C10.74 20.5353 11.2425 21.4128 12.6825 21.3828C14.16 21.3603 15.09 20.0653 15.975 18.7578C17.055 17.2578 17.49 15.7953 17.505 15.7203C17.475 15.7053 15.0225 14.7303 14.9883 11.2093Z" fill="white" />
@@ -184,6 +223,7 @@ const Login = () => {
                 description: "Phone authentication not implemented yet",
               });
             }}
+            disabled={loading}
           >
             <Smartphone className="h-5 w-5" />
             Continue with Phone
