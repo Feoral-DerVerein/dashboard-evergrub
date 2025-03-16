@@ -31,5 +31,5 @@ export type DbProduct = {
   created_at: string;
 };
 
-// Constante para el ID de la tienda Saffire Freycinet
-export const SAFFIRE_FREYCINET_STORE_ID = "saffire-freycinet";
+// Constante para el ID de la tienda
+export const SAFFIRE_FREYCINET_STORE_ID = "4";

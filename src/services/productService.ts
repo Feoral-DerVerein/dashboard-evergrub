@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Product, DbProduct, SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.types";
 import { mapDbProductToProduct, mapProductToDbProduct } from "@/utils/product.mappers";
@@ -110,7 +111,7 @@ export const productService = {
   // Get Saffire Freycinet products
   async getSaffreFreycinetProducts(): Promise<Product[]> {
     try {
-      console.log("Fetching Saffire Freycinet products with store ID:", SAFFIRE_FREYCINET_STORE_ID);
+      console.log("Fetching products with store ID:", SAFFIRE_FREYCINET_STORE_ID);
       
       // First, try to find products with exact storeid
       const { data, error } = await supabase
@@ -119,13 +120,13 @@ export const productService = {
         .eq('storeid', SAFFIRE_FREYCINET_STORE_ID);
       
       if (error) {
-        console.error("Error fetching Saffire Freycinet products:", error);
+        console.error("Error fetching store products:", error);
         throw error;
       }
       
-      // Update any products with NULL storeid
+      // Update any products with NULL storeid or different storeid
       if (!data || data.length === 0) {
-        console.log("No products found with exact storeid match. Updating all products with missing storeid...");
+        console.log("No products found with exact storeid match. Updating all products...");
         
         // Get all products
         const { data: allProducts, error: allProductsError } = await supabase
@@ -164,7 +165,7 @@ export const productService = {
           }
         }
         
-        console.log("No Saffire Freycinet products found after all checks");
+        console.log("No products found after all checks");
         
         // Log all products for diagnostic purposes
         const allProds = await supabase.from('products').select('*');
@@ -178,7 +179,7 @@ export const productService = {
         return [];
       }
       
-      console.log("Saffire Freycinet products fetched:", data.length);
+      console.log("Products with store ID 4 fetched:", data.length);
       if (data.length > 0) {
         console.log("Product samples:", data.slice(0, 2));
       }

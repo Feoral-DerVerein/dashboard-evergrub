@@ -14,7 +14,7 @@ export const mapDbProductToProduct = (dbProduct: DbProduct): Product => {
     quantity: dbProduct.quantity,
     expirationDate: dbProduct.expirationdate,
     image: dbProduct.image,
-    storeId: SAFFIRE_FREYCINET_STORE_ID, // Always use SAFFIRE_FREYCINET_STORE_ID
+    storeId: SAFFIRE_FREYCINET_STORE_ID, // Always use store ID 4
     userId: dbProduct.userid
   };
   
@@ -26,7 +26,7 @@ export const mapDbProductToProduct = (dbProduct: DbProduct): Product => {
 
 // Convert client product to database product
 export const mapProductToDbProduct = (product: Product): Omit<DbProduct, 'id' | 'created_at'> => {
-  // Always use Saffire Freycinet store ID
+  // Always use store ID 4
   const dbProduct = {
     name: product.name,
     price: product.price,
@@ -37,7 +37,7 @@ export const mapProductToDbProduct = (product: Product): Omit<DbProduct, 'id' | 
     quantity: product.quantity,
     expirationdate: product.expirationDate,
     image: product.image,
-    storeid: SAFFIRE_FREYCINET_STORE_ID, // Always use the fixed ID
+    storeid: SAFFIRE_FREYCINET_STORE_ID, // Always use store ID 4
     userid: product.userId
   };
   
