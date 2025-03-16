@@ -7,16 +7,31 @@ import {
   DbOrderItem, 
   mapDbOrderToOrder 
 } from "@/types/order.types";
-import { useAuth } from "@/context/AuthContext";
 
 export const orderService = {
   // Obtener todas las órdenes del usuario actual
   async getUserOrders(): Promise<Order[]> {
     try {
-      console.log("Obteniendo órdenes del usuario");
+      // Obtener el usuario actual desde la sesión
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Error al obtener la sesión:", sessionError);
+        throw sessionError;
+      }
+      
+      const userId = sessionData?.session?.user?.id;
+      
+      if (!userId) {
+        console.log("No hay usuario autenticado");
+        return [];
+      }
+      
+      console.log("Obteniendo órdenes del usuario:", userId);
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select('*')
+        .eq('user_id', userId)
         .order('timestamp', { ascending: false });
       
       if (ordersError) {
@@ -25,7 +40,7 @@ export const orderService = {
       }
       
       if (!ordersData || ordersData.length === 0) {
-        console.log("No se encontraron órdenes");
+        console.log("No se encontraron órdenes para el usuario:", userId);
         return [];
       }
       
