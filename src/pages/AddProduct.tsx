@@ -38,6 +38,7 @@ const AddProduct = () => {
   const [loadingProduct, setLoadingProduct] = useState(isEditMode);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUploadError, setImageUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const AddProduct = () => {
               image: product.image
             });
             
-            if (product.image) {
+            if (product.image && product.image !== '/placeholder.svg') {
               setPreviewImage(product.image);
             }
             
@@ -113,33 +114,55 @@ const AddProduct = () => {
 
     try {
       setLoading(true);
+      setImageUploadError(null);
       
+      // Show preview immediately for better UX
       const reader = new FileReader();
       reader.onload = (event) => {
         setPreviewImage(event.target?.result as string);
       };
       reader.readAsDataURL(file);
       
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      const filePath = `${user.id}/${fileName}`;
+      // Basic validation
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        throw new Error("File size exceeds 5MB limit");
+      }
       
-      const publicUrl = await productService.uploadProductImage(file, filePath);
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error("Only JPEG, PNG, WEBP, and GIF images are allowed");
+      }
       
-      setFormData({
-        ...formData,
-        image: publicUrl
-      });
+      // Prepare file path with safeguards
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const safeFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+      const filePath = `${user.id}/${safeFileName}.${fileExt}`;
       
-      toast({
-        title: "Image uploaded",
-        description: "Your image has been successfully uploaded",
-      });
+      try {
+        const publicUrl = await productService.uploadProductImage(file, filePath);
+        
+        setFormData({
+          ...formData,
+          image: publicUrl
+        });
+        
+        toast({
+          title: "Image uploaded",
+          description: "Your image has been successfully uploaded",
+        });
+      } catch (uploadError: any) {
+        console.error("Image upload failed:", uploadError);
+        setImageUploadError("Image upload failed. Using product without image.");
+        // We'll continue with the form submission even if image upload fails
+        // The product will use a placeholder image
+      }
     } catch (error: any) {
-      console.error("Error uploading image:", error);
+      console.error("Error processing image:", error);
+      setImageUploadError(error.message || "Failed to process image");
       toast({
         title: "Error",
-        description: error.message || "Failed to upload image",
+        description: error.message || "Failed to process image",
         variant: "destructive"
       });
     } finally {
@@ -264,6 +287,7 @@ const AddProduct = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Product name input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Product Name <span className="text-red-500">*</span>
@@ -277,6 +301,7 @@ const AddProduct = () => {
             />
           </div>
 
+          {/* Price and discount inputs */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -312,6 +337,7 @@ const AddProduct = () => {
             </div>
           </div>
 
+          {/* Description input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description <span className="text-red-500">*</span>
@@ -325,6 +351,7 @@ const AddProduct = () => {
             />
           </div>
 
+          {/* Category and brand inputs */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -364,6 +391,7 @@ const AddProduct = () => {
             </div>
           </div>
 
+          {/* Quantity input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Quantity <span className="text-red-500">*</span>
@@ -404,6 +432,7 @@ const AddProduct = () => {
             </div>
           </div>
 
+          {/* Expiration date input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Expiration Date <span className="text-red-500">*</span>
@@ -420,12 +449,13 @@ const AddProduct = () => {
             </div>
           </div>
 
+          {/* Image upload */}
           <div className="mt-6">
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp,image/gif"
               className="hidden"
             />
             <button
@@ -433,9 +463,9 @@ const AddProduct = () => {
               onClick={handleImageClick}
               className="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
             >
-              {previewImage || formData.image ? (
+              {previewImage ? (
                 <img
-                  src={previewImage || formData.image}
+                  src={previewImage}
                   alt="Product"
                   className="w-24 h-24 object-cover rounded-lg"
                 />
@@ -445,6 +475,9 @@ const AddProduct = () => {
               <span className="text-primary-600">
                 {loading ? "Uploading..." : "Change Photo"}
               </span>
+              {imageUploadError && (
+                <p className="text-red-500 text-xs mt-1">{imageUploadError}</p>
+              )}
               {uploadProgress > 0 && uploadProgress < 100 && (
                 <div className="w-full mt-2 bg-gray-200 rounded-full h-2.5">
                   <div 
@@ -456,6 +489,7 @@ const AddProduct = () => {
             </button>
           </div>
 
+          {/* Submit button */}
           <button
             type="submit"
             disabled={loading}

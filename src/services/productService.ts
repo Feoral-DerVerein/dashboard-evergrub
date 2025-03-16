@@ -218,6 +218,12 @@ export const productService = {
       
       const dbProduct = mapProductToDbProduct(productWithStore);
       console.log("Mapped to DB product:", dbProduct);
+      
+      // Handle empty image to prevent upload errors
+      if (!dbProduct.image || dbProduct.image.trim() === '') {
+        dbProduct.image = '/placeholder.svg';
+      }
+
       console.log("VERIFY - storeid in DB product:", dbProduct.storeid);
       
       const { data, error } = await supabase
@@ -228,6 +234,10 @@ export const productService = {
       if (error) {
         console.error("Error creating product:", error);
         throw error;
+      }
+      
+      if (!data || data.length === 0) {
+        throw new Error("No data returned after creating product");
       }
       
       console.log("Product created successfully:", data[0]);
@@ -264,7 +274,11 @@ export const productService = {
     if (updates.brand !== undefined) dbUpdates.brand = updates.brand;
     if (updates.quantity !== undefined) dbUpdates.quantity = updates.quantity;
     if (updates.expirationDate !== undefined) dbUpdates.expirationdate = updates.expirationDate;
-    if (updates.image !== undefined) dbUpdates.image = updates.image;
+    
+    // Handle empty image to prevent upload errors
+    if (updates.image !== undefined) {
+      dbUpdates.image = updates.image.trim() === '' ? '/placeholder.svg' : updates.image;
+    }
     
     // Siempre asegurar que el producto pertenezca a Saffire Freycinet
     dbUpdates.storeid = SAFFIRE_FREYCINET_STORE_ID;
@@ -282,6 +296,10 @@ export const productService = {
       if (error) {
         console.error("Error updating product:", error);
         throw error;
+      }
+      
+      if (!data || data.length === 0) {
+        throw new Error("No data returned after updating product");
       }
       
       console.log("Product updated successfully:", data[0]);
