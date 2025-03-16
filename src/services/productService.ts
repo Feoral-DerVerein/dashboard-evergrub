@@ -131,7 +131,17 @@ export const productService = {
         throw error;
       }
       
-      // Update any products with NULL storeid or different storeid
+      // Debug log to check what products are available in the database
+      const { data: allDbProducts, error: allError } = await supabase
+        .from('products')
+        .select('id, name, storeid');
+        
+      if (!allError && allDbProducts) {
+        console.log("ALL PRODUCTS IN DATABASE:", allDbProducts);
+        console.log("Store IDs in database:", allDbProducts.map(p => `${p.id}: ${p.name} - ${p.storeid}`));
+      }
+      
+      // If no products found with either store ID, try updating them
       if (!data || data.length === 0) {
         console.log("No products found with either storeid. Updating all products...");
         
@@ -150,15 +160,23 @@ export const productService = {
           
           // Update all products to assign correct storeid
           for (const product of allProducts) {
+            console.log(`Checking product ${product.id} (${product.name}) with storeid=${product.storeid}`);
             if (!product.storeid || 
                 (product.storeid !== SAFFIRE_FREYCINET_STORE_ID && 
                  product.storeid !== ALTERNATIVE_STORE_ID)) {
-              await supabase
+              
+              console.log(`Updating product ${product.id} to storeid=${SAFFIRE_FREYCINET_STORE_ID}`);
+              const { data: updatedProduct, error: updateError } = await supabase
                 .from('products')
                 .update({ storeid: SAFFIRE_FREYCINET_STORE_ID })
-                .eq('id', product.id);
+                .eq('id', product.id)
+                .select();
               
-              console.log(`Updated product ${product.id} (${product.name}) with storeid=${SAFFIRE_FREYCINET_STORE_ID}`);
+              if (updateError) {
+                console.error(`Error updating product ${product.id}:`, updateError);
+              } else {
+                console.log(`Updated product ${product.id} (${product.name}) with storeid=${SAFFIRE_FREYCINET_STORE_ID}`, updatedProduct);
+              }
             }
           }
           
@@ -211,8 +229,11 @@ export const productService = {
       };
       
       console.log("Creating product with data:", productWithStore);
+      console.log("IMPORTANT - Store ID being used:", SAFFIRE_FREYCINET_STORE_ID);
+      
       const dbProduct = mapProductToDbProduct(productWithStore);
       console.log("Mapped to DB product:", dbProduct);
+      console.log("VERIFY - storeid in DB product:", dbProduct.storeid);
       
       const { data, error } = await supabase
         .from('products')
@@ -225,6 +246,19 @@ export const productService = {
       }
       
       console.log("Product created successfully:", data[0]);
+      console.log("VERIFY - storeid in created product:", data[0].storeid);
+      
+      // Verificar inmediatamente que el producto se haya creado con el storeid correcto
+      const { data: verify, error: verifyError } = await supabase
+        .from('products')
+        .select('id, name, storeid')
+        .eq('id', data[0].id)
+        .single();
+        
+      if (!verifyError && verify) {
+        console.log("VERIFICATION - Product after creation:", verify);
+      }
+      
       return mapDbProductToProduct(data[0] as DbProduct);
     } catch (error) {
       console.error("Error in createProduct:", error);
