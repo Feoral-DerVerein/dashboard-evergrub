@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { useAuth } from "@/context/AuthContext";
-import { productService, Product } from "@/services/productService";
+import { productService, Product, SAFFIRE_FREYCINET_STORE_ID } from "@/services/productService";
 import { useToast } from "@/components/ui/use-toast";
 
 const categories = ["All", "Restaurant", "SPA Products"];
@@ -28,6 +28,12 @@ const Products = () => {
         console.log("Loading products for user:", user.id);
         const data = await productService.getProductsByUser(user.id);
         console.log("Products loaded:", data);
+        
+        // También verifiquemos los productos de Saffire Freycinet
+        console.log("Checking Saffire Freycinet products");
+        const saffreProducts = await productService.getSaffreFreycinetProducts();
+        console.log("Saffire Freycinet products:", saffreProducts);
+        
         setProducts(data);
       } catch (error: any) {
         console.error("Error al cargar productos:", error);
@@ -69,6 +75,15 @@ const Products = () => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  // Mostrar información de depuración de los productos
+  useEffect(() => {
+    if (products.length > 0) {
+      console.log("Productos actuales:", products);
+      console.log("Productos filtrados por categoría y búsqueda:", filteredProducts);
+      console.log("Store ID asociado a los productos:", SAFFIRE_FREYCINET_STORE_ID);
+    }
+  }, [products, filteredProducts]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">

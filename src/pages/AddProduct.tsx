@@ -1,3 +1,4 @@
+
 import { ArrowLeft, Calendar, Camera } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
@@ -176,19 +177,34 @@ const AddProduct = () => {
         storeId: SAFFIRE_FREYCINET_STORE_ID
       };
       
+      console.log("Submitting product with data:", productData);
+      console.log("Specifically note: storeId =", productData.storeId, "category =", productData.category);
+      
       if (isEditMode && id) {
-        await productService.updateProduct(parseInt(id), productData);
+        const updatedProduct = await productService.updateProduct(parseInt(id), productData);
+        console.log("Product updated successfully:", updatedProduct);
         toast({
           title: "Product updated",
           description: "Your product has been updated successfully",
         });
       } else {
-        await productService.createProduct(productData);
+        const newProduct = await productService.createProduct(productData);
+        console.log("Product created successfully:", newProduct);
         toast({
           title: "Product added",
           description: "Your product has been added successfully",
         });
       }
+      
+      // Verifica inmediatamente si el producto es accesible a través de la consulta de Saffire
+      setTimeout(async () => {
+        try {
+          const saffreProducts = await productService.getSaffreFreycinetProducts();
+          console.log("After create/update - Saffire products check:", saffreProducts);
+        } catch (e) {
+          console.error("Error checking Saffire products after create/update:", e);
+        }
+      }, 1000);
       
       navigate("/products");
     } catch (error: any) {
