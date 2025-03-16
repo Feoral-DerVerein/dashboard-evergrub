@@ -1,7 +1,9 @@
-
 import { ArrowLeft, Calendar, Camera } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import { productService, Product } from "@/services/productService";
 
 type ProductFormData = {
   name: string;
@@ -27,6 +29,10 @@ const AddProduct = () => {
     expirationDate: "",
     image: ""
   });
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const calculateFinalPrice = () => {
     const price = parseFloat(formData.price) || 0;
@@ -38,10 +44,53 @@ const AddProduct = () => {
   const categories = ["Fruits", "Bread", "Dairy", "Meat", "Beverages", "Larder and Snacks"];
   const brands = ["Equate", "Generic", "Premium"];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement product creation logic
-    console.log("Form submitted:", formData);
+    
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión para agregar productos",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const productData: Product = {
+        name: formData.name,
+        price: parseFloat(formData.price),
+        discount: parseFloat(formData.discount),
+        description: formData.description,
+        category: formData.category,
+        brand: formData.brand,
+        quantity: parseInt(formData.quantity),
+        expirationDate: formData.expirationDate,
+        image: formData.image,
+        userId: user.id,
+        storeId: user.id
+      };
+      
+      await productService.createProduct(productData);
+      
+      toast({
+        title: "Producto agregado",
+        description: "El producto se ha agregado correctamente",
+      });
+      
+      navigate("/products");
+    } catch (error: any) {
+      console.error("Error al agregar producto:", error);
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo agregar el producto",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,13 +102,14 @@ const AddProduct = () => {
               <Link to="/products" className="text-gray-500 hover:text-gray-700">
                 <ArrowLeft className="w-6 h-6" />
               </Link>
-              <h1 className="text-xl font-semibold">Update Product</h1>
+              <h1 className="text-xl font-semibold">Add Product</h1>
             </div>
             <button
               onClick={handleSubmit}
+              disabled={loading}
               className="text-primary-600 font-medium hover:text-primary-700"
             >
-              Save
+              {loading ? "Saving..." : "Save"}
             </button>
           </div>
         </div>
@@ -238,9 +288,10 @@ const AddProduct = () => {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors mt-6"
           >
-            Save Changes
+            {loading ? "Guardando..." : "Save Product"}
           </button>
         </form>
       </div>

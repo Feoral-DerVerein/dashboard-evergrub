@@ -1,84 +1,70 @@
 
 import { Search, Plus, Edit, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  image: string;
-};
+import { useAuth } from "@/context/AuthContext";
+import { productService, Product } from "@/services/productService";
+import { useToast } from "@/components/ui/use-toast";
 
 const categories = ["All", "Fruits", "Bread", "Dairy", "Meat", "Beverages"];
 
-const initialProducts: Product[] = [
-  {
-    id: 1,
-    name: "Fresh Organic Bananas",
-    price: 2.99,
-    category: "Fruits",
-    image: "/lovable-uploads/557180f2-5bec-429f-bd15-819ceb7125a8.png"
-  },
-  {
-    id: 2,
-    name: "Whole Grain Bread",
-    price: 3.49,
-    category: "Bread",
-    image: "/lovable-uploads/4f94a856-2c39-4c16-9c3d-3ae6fdf872ed.png"
-  },
-  {
-    id: 3,
-    name: "Fresh Milk",
-    price: 1.99,
-    category: "Dairy",
-    image: "/lovable-uploads/a3172ad7-521b-4bff-a334-94b79ec5e1bf.png"
-  },
-  {
-    id: 4,
-    name: "Butter",
-    price: 2.49,
-    category: "Dairy",
-    image: "/lovable-uploads/57d5a65f-f4d4-44de-bc3f-090ee9d3e6c8.png"
-  },
-  {
-    id: 5,
-    name: "Ice Cream",
-    price: 3.99,
-    category: "Dairy",
-    image: "/lovable-uploads/08f9eaaa-edef-49b5-a4e1-a990c6362c76.png"
-  },
-  {
-    id: 6,
-    name: "Ground Beef",
-    price: 4.99,
-    category: "Meat",
-    image: "/lovable-uploads/a8d0ed43-9247-43c0-b4b7-0b73bca854af.png"
-  },
-  {
-    id: 7,
-    name: "Chicken Breast",
-    price: 3.99,
-    category: "Meat",
-    image: "/lovable-uploads/3a65a638-e8e8-4a0f-a8c4-cc2693037034.png"
-  }
-];
-
 const Products = () => {
-  const [products] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  // Cargar productos al montar el componente
+  useEffect(() => {
+    const loadProducts = async () => {
+      if (!user) return;
+      
+      try {
+        const data = await productService.getProductsByUser(user.id);
+        setProducts(data);
+      } catch (error: any) {
+        console.error("Error al cargar productos:", error);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los productos",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, [user, toast]);
+
+  const handleDeleteProduct = async (id: number) => {
+    if (!confirm("¿Estás seguro de que deseas eliminar este producto?")) return;
+
+    try {
+      await productService.deleteProduct(id);
+      setProducts(products.filter(product => product.id !== id));
+      toast({
+        title: "Producto eliminado",
+        description: "El producto se ha eliminado correctamente"
+      });
+    } catch (error: any) {
+      console.error("Error al eliminar producto:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el producto",
+        variant: "destructive"
+      });
+    }
+  };
 
   const filteredProducts = products.filter((product) => {
     const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-
-  const totalProducts = products.length;
-  const outOfStock = 3;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -112,11 +98,13 @@ const Products = () => {
           <div className="flex justify-between items-center mb-4">
             <div>
               <p className="text-sm font-medium text-gray-500">Total Products</p>
-              <p className="text-2xl font-bold">{totalProducts}</p>
+              <p className="text-2xl font-bold">{products.length}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Out of Stock</p>
-              <p className="text-2xl font-bold text-red-500">{outOfStock}</p>
+              <p className="text-2xl font-bold text-red-500">
+                {products.filter(p => p.quantity === 0).length}
+              </p>
             </div>
           </div>
 
@@ -138,29 +126,51 @@ const Products = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="border border-gray-200 rounded-lg p-3">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-32 object-cover rounded-md mb-2"
-                />
-                <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
-                <p className="text-green-600 font-medium mb-2">$ {product.price.toFixed(2)}</p>
-                <div className="flex gap-2">
-                  <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200">
-                    <Edit className="w-3 h-3" />
-                    Edit
-                  </button>
-                  <button className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100">
-                    <Trash2 className="w-3 h-3" />
-                    Delete
-                  </button>
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <p>Cargando productos...</p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-gray-500">No hay productos disponibles</p>
+              <Link
+                to="/products/add"
+                className="inline-block mt-4 text-green-600 hover:text-green-700"
+              >
+                Agregar un producto
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {filteredProducts.map((product) => (
+                <div key={product.id} className="border border-gray-200 rounded-lg p-3">
+                  <img
+                    src={product.image || "/placeholder.svg"}
+                    alt={product.name}
+                    className="w-full h-32 object-cover rounded-md mb-2"
+                  />
+                  <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
+                  <p className="text-green-600 font-medium mb-2">$ {product.price.toFixed(2)}</p>
+                  <div className="flex gap-2">
+                    <Link
+                      to={`/products/edit/${product.id}`}
+                      className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
+                    >
+                      <Edit className="w-3 h-3" />
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => product.id && handleDeleteProduct(product.id)}
+                      className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <BottomNav />
