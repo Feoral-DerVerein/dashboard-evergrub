@@ -1,70 +1,11 @@
+
 import { supabase } from "@/integrations/supabase/client";
+import { Product, DbProduct, SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.types";
+import { mapDbProductToProduct, mapProductToDbProduct } from "@/utils/product.mappers";
+import { productImageService } from "./productImageService";
 
-export type Product = {
-  id?: number;
-  name: string;
-  price: number;
-  discount: number;
-  description: string;
-  category: string;
-  brand: string;
-  quantity: number;
-  expirationDate: string;
-  image: string;
-  storeId?: string; // ID de la tienda a la que pertenece el producto
-  userId: string; // ID del usuario que crea/posee el producto
-};
-
-// Constante para el ID de la tienda Saffire Freycinet
-export const SAFFIRE_FREYCINET_STORE_ID = "saffire-freycinet";
-
-// Type mapping to fix the mismatch between database and client-side types
-type DbProduct = {
-  id: number;
-  name: string;
-  price: number;
-  discount: number;
-  description: string;
-  category: string;
-  brand: string;
-  quantity: number;
-  expirationdate: string; // Note lowercase 'd'
-  image: string;
-  storeid: string | null; // Note lowercase 'id'
-  userid: string; // Note lowercase 'id'
-  created_at: string;
-};
-
-// Convert database product to client product
-const mapDbProductToProduct = (dbProduct: DbProduct): Product => ({
-  id: dbProduct.id,
-  name: dbProduct.name,
-  price: dbProduct.price,
-  discount: dbProduct.discount,
-  description: dbProduct.description,
-  category: dbProduct.category,
-  brand: dbProduct.brand,
-  quantity: dbProduct.quantity,
-  expirationDate: dbProduct.expirationdate,
-  image: dbProduct.image,
-  storeId: dbProduct.storeid || undefined,
-  userId: dbProduct.userid
-});
-
-// Convert client product to database product
-const mapProductToDbProduct = (product: Product): Omit<DbProduct, 'id' | 'created_at'> => ({
-  name: product.name,
-  price: product.price,
-  discount: product.discount,
-  description: product.description,
-  category: product.category,
-  brand: product.brand,
-  quantity: product.quantity,
-  expirationdate: product.expirationDate,
-  image: product.image,
-  storeid: SAFFIRE_FREYCINET_STORE_ID, // Siempre asignar a Saffire Freycinet
-  userid: product.userId
-});
+export { Product, SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.types";
+export { productImageService } from "./productImageService";
 
 export const productService = {
   // Get product by ID
@@ -226,25 +167,6 @@ export const productService = {
     }
   },
 
-  // Subir imagen de producto
-  async uploadProductImage(file: File, path: string): Promise<string> {
-    try {
-      const { data, error } = await supabase.storage
-        .from('product-images')
-        .upload(path, file, {
-          upsert: true,
-        });
-      
-      if (error) throw error;
-      
-      const { data: publicUrl } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(path);
-      
-      return publicUrl.publicUrl;
-    } catch (error) {
-      console.error("Error uploading product image:", error);
-      throw error;
-    }
-  }
+  // Re-export image upload function
+  uploadProductImage: productImageService.uploadProductImage
 };
