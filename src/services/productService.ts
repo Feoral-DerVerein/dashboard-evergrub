@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Product, DbProduct, SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.types";
 import { mapDbProductToProduct, mapProductToDbProduct } from "@/utils/product.mappers";
@@ -108,12 +107,12 @@ export const productService = {
     }
   },
 
-  // Obtener productos específicamente de la tienda Saffire Freycinet
+  // Get Saffire Freycinet products
   async getSaffreFreycinetProducts(): Promise<Product[]> {
     try {
       console.log("Fetching Saffire Freycinet products with store ID:", SAFFIRE_FREYCINET_STORE_ID);
       
-      // Primero, intenta buscar productos con storeid exacto
+      // First, try to find products with exact storeid
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -124,48 +123,50 @@ export const productService = {
         throw error;
       }
       
+      // Update any products with NULL storeid
       if (!data || data.length === 0) {
-        console.log("No products found with exact storeid match. Checking for NULL or empty storeid...");
+        console.log("No products found with exact storeid match. Updating all products with missing storeid...");
         
-        // Si no hay productos con el storeid exacto, verificamos productos con storeid NULL o vacío
-        const { data: nullStoreData, error: nullStoreError } = await supabase
+        // Get all products
+        const { data: allProducts, error: allProductsError } = await supabase
           .from('products')
-          .select('*')
-          .is('storeid', null);
+          .select('*');
           
-        if (nullStoreError) {
-          console.error("Error checking for NULL storeid products:", nullStoreError);
+        if (allProductsError) {
+          console.error("Error fetching all products:", allProductsError);
           return [];
         }
         
-        if (nullStoreData && nullStoreData.length > 0) {
-          console.log("Found products with NULL storeid:", nullStoreData.length);
+        if (allProducts && allProducts.length > 0) {
+          console.log("Found products to update:", allProducts.length);
           
-          // Actualizar estos productos para asignarles el storeid correcto
-          for (const product of nullStoreData) {
-            await supabase
-              .from('products')
-              .update({ storeid: SAFFIRE_FREYCINET_STORE_ID })
-              .eq('id', product.id);
-            
-            console.log(`Updated product ${product.id} (${product.name}) with storeid=${SAFFIRE_FREYCINET_STORE_ID}`);
+          // Update all products to assign correct storeid
+          for (const product of allProducts) {
+            if (!product.storeid || product.storeid !== SAFFIRE_FREYCINET_STORE_ID) {
+              await supabase
+                .from('products')
+                .update({ storeid: SAFFIRE_FREYCINET_STORE_ID })
+                .eq('id', product.id);
+              
+              console.log(`Updated product ${product.id} (${product.name}) with storeid=${SAFFIRE_FREYCINET_STORE_ID}`);
+            }
           }
           
-          // Volver a intentar la consulta original
+          // Try fetching products again after update
           const { data: refreshedData } = await supabase
             .from('products')
             .select('*')
             .eq('storeid', SAFFIRE_FREYCINET_STORE_ID);
             
           if (refreshedData && refreshedData.length > 0) {
-            console.log("After updating NULL storeid products, found:", refreshedData.length);
+            console.log("After updating products, found:", refreshedData.length);
             return (refreshedData as DbProduct[]).map(mapDbProductToProduct);
           }
         }
         
         console.log("No Saffire Freycinet products found after all checks");
         
-        // Verificar todos los productos para diagnóstico
+        // Log all products for diagnostic purposes
         const allProds = await supabase.from('products').select('*');
         console.log("All accessible products:", allProds.data);
         

@@ -14,7 +14,7 @@ export const mapDbProductToProduct = (dbProduct: DbProduct): Product => {
     quantity: dbProduct.quantity,
     expirationDate: dbProduct.expirationdate,
     image: dbProduct.image,
-    storeId: dbProduct.storeid || SAFFIRE_FREYCINET_STORE_ID, // Usar SAFFIRE_FREYCINET_STORE_ID como fallback
+    storeId: SAFFIRE_FREYCINET_STORE_ID, // Always use SAFFIRE_FREYCINET_STORE_ID
     userId: dbProduct.userid
   };
   
@@ -26,9 +26,7 @@ export const mapDbProductToProduct = (dbProduct: DbProduct): Product => {
 
 // Convert client product to database product
 export const mapProductToDbProduct = (product: Product): Omit<DbProduct, 'id' | 'created_at'> => {
-  // Asegurar que siempre se use el ID de Saffire Freycinet
-  const saffreStoreId = SAFFIRE_FREYCINET_STORE_ID;
-  
+  // Always use Saffire Freycinet store ID
   const dbProduct = {
     name: product.name,
     price: product.price,
@@ -39,7 +37,7 @@ export const mapProductToDbProduct = (product: Product): Omit<DbProduct, 'id' | 
     quantity: product.quantity,
     expirationdate: product.expirationDate,
     image: product.image,
-    storeid: saffreStoreId, // Siempre usar el ID fijo
+    storeid: SAFFIRE_FREYCINET_STORE_ID, // Always use the fixed ID
     userid: product.userId
   };
   
