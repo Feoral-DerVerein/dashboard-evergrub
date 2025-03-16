@@ -18,29 +18,29 @@ export type Product = {
 
 export const productService = {
   // Obtener productos por userID (propietario de la tienda)
-  async getProductsByUser(userId: string) {
+  async getProductsByUser(userId: string): Promise<Product[]> {
     const { data, error } = await supabase
       .from('products')
       .select('*')
       .eq('userId', userId);
     
     if (error) throw error;
-    return data;
+    return data as Product[];
   },
 
   // Crear un nuevo producto
-  async createProduct(product: Product) {
+  async createProduct(product: Product): Promise<Product> {
     const { data, error } = await supabase
       .from('products')
       .insert([product])
       .select();
     
     if (error) throw error;
-    return data[0];
+    return data[0] as Product;
   },
 
   // Actualizar un producto existente
-  async updateProduct(id: number, updates: Partial<Product>) {
+  async updateProduct(id: number, updates: Partial<Product>): Promise<Product> {
     const { data, error } = await supabase
       .from('products')
       .update(updates)
@@ -48,11 +48,11 @@ export const productService = {
       .select();
     
     if (error) throw error;
-    return data[0];
+    return data[0] as Product;
   },
 
   // Eliminar un producto
-  async deleteProduct(id: number) {
+  async deleteProduct(id: number): Promise<boolean> {
     const { error } = await supabase
       .from('products')
       .delete()
@@ -63,7 +63,7 @@ export const productService = {
   },
 
   // Subir imagen de producto
-  async uploadProductImage(file: File, path: string) {
+  async uploadProductImage(file: File, path: string): Promise<string> {
     const { data, error } = await supabase.storage
       .from('product-images')
       .upload(path, file, {
