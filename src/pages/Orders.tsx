@@ -227,7 +227,7 @@ const Orders = () => {
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-3 mb-6">
-            <h1 className="text-2xl font-bold">Orders Dashboard</h1>
+            <h1 className="text-2xl font-bold">Orders</h1>
           </div>
           <p className="text-gray-500 mb-4">Today's Orders</p>
           <div className="flex gap-2 overflow-x-auto pb-2">
