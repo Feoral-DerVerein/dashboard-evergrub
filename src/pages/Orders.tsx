@@ -1,62 +1,13 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
-
-interface OrderItem {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  quantity: number;
-}
-
-interface Order {
-  id: string;
-  customerName: string;
-  customerImage: string;
-  items: OrderItem[];
-  status: "pending" | "completed" | "accepted";
-  timestamp: string;
-  total: number;
-  location: string;
-  phone: string;
-  specialRequest?: string;
-}
-
-const orders: Order[] = [
-  {
-    id: "#12345",
-    customerName: "John Smith",
-    customerImage: "/lovable-uploads/65fec487-8a30-491a-954f-ddfffdb5e9ca.png",
-    items: [
-      { id: "1", name: "Milk (1L)", category: "Dairy", price: 3.00, quantity: 2 },
-      { id: "2", name: "Whole Wheat Bread", category: "Bakery", price: 4.50, quantity: 1 },
-      { id: "3", name: "Orange Juice", category: "Beverages", price: 5.98, quantity: 2 }
-    ],
-    status: "pending",
-    timestamp: "2:30 PM",
-    total: 89.50,
-    location: "Hobart",
-    phone: "+1 234 567 8900",
-    specialRequest: "No plastic bags please"
-  },
-  {
-    id: "#12346",
-    customerName: "Emma Davis",
-    customerImage: "/placeholder.svg",
-    items: [
-      { id: "4", name: "Coffee", category: "Beverages", price: 12.99, quantity: 1 },
-      { id: "5", name: "Cookies", category: "Snacks", price: 4.99, quantity: 2 }
-    ],
-    status: "completed",
-    timestamp: "3:15 PM",
-    total: 45.75,
-    location: "Sydney",
-    phone: "+1 234 567 8901"
-  }
-];
+import { orderService } from "@/services/orderService";
+import { Order, OrderItem } from "@/types/order.types";
+import { useAuth } from "@/context/AuthContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (order: Order) => void }) => {
   const initials = order.customerName
@@ -68,7 +19,7 @@ const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (ord
   return (
     <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
       <div className="flex items-center justify-between">
-        <div className="font-medium text-gray-600">{order.id}</div>
+        <div className="font-medium text-gray-600">{order.id.substring(0, 8)}</div>
         <div className={`text-sm ${
           order.status === "completed" ? "text-green-500" : 
           order.status === "pending" ? "text-orange-500" : "text-blue-500"
@@ -139,7 +90,7 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </div>
             </div>
-            <div className="font-semibold">{order.id}</div>
+            <div className="font-semibold">{order.id.substring(0, 8)}</div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -214,9 +165,63 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
   );
 };
 
+const LoadingSkeleton = () => (
+  <div className="space-y-4">
+    {[1, 2, 3].map((i) => (
+      <div key={i} className="bg-white rounded-lg p-4 shadow-sm mb-4">
+        <div className="flex justify-between mb-3">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-20" />
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div>
+              <Skeleton className="h-4 w-32 mb-2" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div>
+              <Skeleton className="h-4 w-16 mb-2" />
+              <Skeleton className="h-3 w-12" />
+            </div>
+            <Skeleton className="h-5 w-5 rounded-full" />
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 const Orders = () => {
   const [filter, setFilter] = useState<"all" | "pending" | "accepted" | "completed">("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      if (!user) {
+        console.log("Usuario no autenticado");
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        const fetchedOrders = await orderService.getUserOrders();
+        console.log("Órdenes obtenidas:", fetchedOrders);
+        setOrders(fetchedOrders);
+      } catch (error) {
+        console.error("Error al cargar órdenes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadOrders();
+  }, [user]);
 
   const filteredOrders = orders.filter(
     (order) => filter === "all" || order.status === filter
@@ -275,13 +280,21 @@ const Orders = () => {
         </header>
 
         <main className="px-6">
-          {filteredOrders.map((order) => (
-            <OrderCard
-              key={order.id}
-              order={order}
-              onViewDetails={(order) => setSelectedOrder(order)}
-            />
-          ))}
+          {loading ? (
+            <LoadingSkeleton />
+          ) : filteredOrders.length > 0 ? (
+            filteredOrders.map((order) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                onViewDetails={(order) => setSelectedOrder(order)}
+              />
+            ))
+          ) : (
+            <div className="text-center py-10">
+              <p className="text-gray-500">No orders found</p>
+            </div>
+          )}
         </main>
 
         <OrderDetailsModal

@@ -9,6 +9,93 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      order_items: {
+        Row: {
+          category: string | null
+          id: string
+          name: string
+          order_id: string | null
+          price: number
+          product_id: number | null
+          quantity: number
+        }
+        Insert: {
+          category?: string | null
+          id?: string
+          name: string
+          order_id?: string | null
+          price: number
+          product_id?: number | null
+          quantity?: number
+        }
+        Update: {
+          category?: string | null
+          id?: string
+          name?: string
+          order_id?: string | null
+          price?: number
+          product_id?: number | null
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string | null
+          customer_image: string | null
+          customer_name: string
+          id: string
+          location: string | null
+          phone: string | null
+          special_request: string | null
+          status: string
+          timestamp: string | null
+          total: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_image?: string | null
+          customer_name: string
+          id?: string
+          location?: string | null
+          phone?: string | null
+          special_request?: string | null
+          status?: string
+          timestamp?: string | null
+          total: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_image?: string | null
+          customer_name?: string
+          id?: string
+          location?: string | null
+          phone?: string | null
+          special_request?: string | null
+          status?: string
+          timestamp?: string | null
+          total?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           brand: string
