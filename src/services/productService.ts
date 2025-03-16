@@ -112,6 +112,8 @@ export const productService = {
   async getSaffreFreycinetProducts(): Promise<Product[]> {
     try {
       console.log("Fetching Saffire Freycinet products with store ID:", SAFFIRE_FREYCINET_STORE_ID);
+      
+      // Primero, intenta buscar productos con storeid exacto
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -123,18 +125,63 @@ export const productService = {
       }
       
       if (!data || data.length === 0) {
-        console.log("No Saffire Freycinet products found");
-        console.log("Let's check RLS permissions and the storeid value");
+        console.log("No products found with exact storeid match. Checking for NULL or empty storeid...");
+        
+        // Si no hay productos con el storeid exacto, verificamos productos con storeid NULL o vacío
+        const { data: nullStoreData, error: nullStoreError } = await supabase
+          .from('products')
+          .select('*')
+          .is('storeid', null);
+          
+        if (nullStoreError) {
+          console.error("Error checking for NULL storeid products:", nullStoreError);
+          return [];
+        }
+        
+        if (nullStoreData && nullStoreData.length > 0) {
+          console.log("Found products with NULL storeid:", nullStoreData.length);
+          
+          // Actualizar estos productos para asignarles el storeid correcto
+          for (const product of nullStoreData) {
+            await supabase
+              .from('products')
+              .update({ storeid: SAFFIRE_FREYCINET_STORE_ID })
+              .eq('id', product.id);
+            
+            console.log(`Updated product ${product.id} (${product.name}) with storeid=${SAFFIRE_FREYCINET_STORE_ID}`);
+          }
+          
+          // Volver a intentar la consulta original
+          const { data: refreshedData } = await supabase
+            .from('products')
+            .select('*')
+            .eq('storeid', SAFFIRE_FREYCINET_STORE_ID);
+            
+          if (refreshedData && refreshedData.length > 0) {
+            console.log("After updating NULL storeid products, found:", refreshedData.length);
+            return (refreshedData as DbProduct[]).map(mapDbProductToProduct);
+          }
+        }
+        
+        console.log("No Saffire Freycinet products found after all checks");
         
         // Verificar todos los productos para diagnóstico
         const allProds = await supabase.from('products').select('*');
         console.log("All accessible products:", allProds.data);
         
+        if (allProds.data && allProds.data.length > 0) {
+          console.log("Product storeid examples:");
+          allProds.data.forEach(p => console.log(`ID: ${p.id}, Name: ${p.name}, StoreID: ${p.storeid}`));
+        }
+        
         return [];
       }
       
       console.log("Saffire Freycinet products fetched:", data.length);
-      console.log("Product samples:", data.slice(0, 2));
+      if (data.length > 0) {
+        console.log("Product samples:", data.slice(0, 2));
+      }
+      
       return (data as DbProduct[]).map(mapDbProductToProduct);
     } catch (error) {
       console.error("Error in getSaffreFreycinetProducts:", error);
