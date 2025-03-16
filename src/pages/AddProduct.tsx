@@ -99,7 +99,7 @@ const AddProduct = () => {
     return finalPrice.toFixed(2);
   };
 
-  const categories = ["Fruits", "Bread", "Dairy", "Meat", "Beverages", "Larder and Snacks"];
+  const categories = ["Restaurant", "SPA Products"];
   const brands = ["Equate", "Generic", "Premium"];
 
   const handleImageClick = () => {

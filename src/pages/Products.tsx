@@ -1,3 +1,4 @@
+
 import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -6,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { productService, Product } from "@/services/productService";
 import { useToast } from "@/components/ui/use-toast";
 
-const categories = ["All", "Fruits", "Bread", "Dairy", "Meat", "Beverages"];
+const categories = ["All", "Restaurant", "SPA Products"];
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -76,7 +77,7 @@ const Products = () => {
           <div className="flex justify-between items-center mb-2">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-              <p className="text-gray-500">Manage your products</p>
+              <p className="text-gray-500">Manage your Saffire Freycinet products</p>
             </div>
             <Link
               to="/products/add"
