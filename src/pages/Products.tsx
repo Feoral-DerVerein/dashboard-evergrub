@@ -1,4 +1,3 @@
-
 import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -26,41 +25,35 @@ const Products = () => {
       
       try {
         console.log("Loading products for user:", user.id);
-        const data = await productService.getProductsByUser(user.id);
-        console.log("Products loaded:", data);
-        setProducts(data);
         
-        // También carguemos los productos de Saffire Freycinet
-        try {
-          console.log("Checking Saffire Freycinet products");
-          const saffreProducts = await productService.getSaffreFreycinetProducts();
-          console.log("Saffire Freycinet products:", saffreProducts);
-          
-          // Si encontramos productos de Saffire que no están en nuestra lista, agreguémoslos
-          if (saffreProducts.length > 0) {
-            // Combinar productos y eliminar duplicados por ID
-            const allProducts = [...data];
-            
-            saffreProducts.forEach(saffreProduct => {
-              if (!allProducts.some(p => p.id === saffreProduct.id)) {
-                allProducts.push(saffreProduct);
-              }
-            });
-            
-            setProducts(allProducts);
+        // Get both user's products and Saffire Freycinet products in one operation
+        const [userProducts, storeProducts] = await Promise.all([
+          productService.getProductsByUser(user.id),
+          productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID)
+        ]);
+        
+        console.log("User products loaded:", userProducts.length);
+        console.log("Saffire Freycinet store products loaded:", storeProducts.length);
+        
+        // Combine products and remove duplicates by ID
+        const combinedProducts = [...userProducts];
+        
+        storeProducts.forEach(storeProduct => {
+          if (!combinedProducts.some(p => p.id === storeProduct.id)) {
+            combinedProducts.push(storeProduct);
           }
-        } catch (saffreError) {
-          console.error("Error al cargar productos de Saffire Freycinet:", saffreError);
-          // No mostramos error al usuario por esto, solo log
-        }
+        });
+        
+        console.log("Combined unique products:", combinedProducts.length);
+        setProducts(combinedProducts);
       } catch (error: any) {
-        console.error("Error al cargar productos:", error);
+        console.error("Error loading products:", error);
         toast({
           title: "Error",
           description: "No se pudieron cargar los productos: " + (error.message || "Error desconocido"),
           variant: "destructive"
         });
-        // Configuramos productos como array vacío para evitar errores de renderizado
+        // Set products as empty array to avoid rendering errors
         setProducts([]);
       } finally {
         setLoading(false);
@@ -96,12 +89,13 @@ const Products = () => {
     return matchesCategory && matchesSearch;
   });
 
-  // Mostrar información de depuración de los productos
+  // Debug information about the products
   useEffect(() => {
     if (products.length > 0) {
-      console.log("Productos actuales:", products);
-      console.log("Productos filtrados por categoría y búsqueda:", filteredProducts);
-      console.log("Store ID asociado a los productos:", SAFFIRE_FREYCINET_STORE_ID);
+      console.log("Total products loaded:", products.length);
+      console.log("Products with Saffire Freycinet store ID:", 
+        products.filter(p => p.storeId === SAFFIRE_FREYCINET_STORE_ID).length);
+      console.log("Products filtered by category and search:", filteredProducts.length);
     }
   }, [products, filteredProducts]);
 

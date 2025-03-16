@@ -3,6 +3,9 @@ import { Product, DbProduct, SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.
 
 // Convert database product to client product
 export const mapDbProductToProduct = (dbProduct: DbProduct): Product => {
+  // Always use the storeid from the database if available, otherwise use the default
+  const storeId = dbProduct.storeid || SAFFIRE_FREYCINET_STORE_ID;
+  
   const product = {
     id: dbProduct.id,
     name: dbProduct.name,
@@ -14,7 +17,7 @@ export const mapDbProductToProduct = (dbProduct: DbProduct): Product => {
     quantity: dbProduct.quantity,
     expirationDate: dbProduct.expirationdate,
     image: dbProduct.image,
-    storeId: SAFFIRE_FREYCINET_STORE_ID, // Always use store ID 4
+    storeId: storeId, 
     userId: dbProduct.userid
   };
   
@@ -26,7 +29,7 @@ export const mapDbProductToProduct = (dbProduct: DbProduct): Product => {
 
 // Convert client product to database product
 export const mapProductToDbProduct = (product: Product): Omit<DbProduct, 'id' | 'created_at'> => {
-  // Always use store ID 4
+  // Always use the SAFFIRE_FREYCINET_STORE_ID to ensure consistency
   const dbProduct = {
     name: product.name,
     price: product.price,

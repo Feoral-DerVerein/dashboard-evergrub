@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Product, DbProduct, SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.types";
 import { mapDbProductToProduct, mapProductToDbProduct } from "@/utils/product.mappers";
@@ -41,7 +40,7 @@ export const productService = {
     }
   },
 
-  // Obtener productos por userID (propietario de la tienda)
+  // Get products by user ID (store owner)
   async getProductsByUser(userId: string): Promise<Product[]> {
     try {
       console.log("Fetching products for user:", userId);
@@ -60,7 +59,7 @@ export const productService = {
         return [];
       }
       
-      console.log("Products fetched:", data);
+      console.log(`Found ${data.length} products for user ${userId}`);
       return (data as DbProduct[]).map(mapDbProductToProduct);
     } catch (error) {
       console.error("Error in getProductsByUser:", error);
@@ -68,7 +67,7 @@ export const productService = {
     }
   },
 
-  // Obtener todos los productos (para marketplace)
+  // Get all products (for marketplace)
   async getAllProducts(): Promise<Product[]> {
     try {
       console.log("Fetching all products");
@@ -89,24 +88,44 @@ export const productService = {
     }
   },
 
-  // Obtener productos por storeId
+  // Get products by storeId
   async getProductsByStore(storeId: string): Promise<Product[]> {
     try {
       console.log(`Fetching products for store: ${storeId}`);
       
-      // Check for products with either the specified storeId or the alternative ID
+      // Try both possible store ID formats
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .or(`storeid.eq.${storeId},storeid.eq.${storeId === SAFFIRE_FREYCINET_STORE_ID ? ALTERNATIVE_STORE_ID : SAFFIRE_FREYCINET_STORE_ID}`);
+        .or(`storeid.eq.${storeId},storeid.eq.${ALTERNATIVE_STORE_ID}`);
       
       if (error) {
         console.error("Error fetching store products:", error);
         throw error;
       }
       
-      console.log(`Products for store ${storeId} fetched:`, data ? data.length : 0);
-      console.log("Store IDs found:", data?.map(p => p.storeid).filter((v, i, a) => a.indexOf(v) === i));
+      console.log(`Found ${data ? data.length : 0} products for store ${storeId}`);
+      
+      if (data && data.length === 0) {
+        // If no products found with the specified store ID,
+        // try fetching all products and then checking their store ID
+        console.log("No products found with the specified store ID, checking all products");
+        const { data: allProducts, error: allError } = await supabase
+          .from('products')
+          .select('*');
+          
+        if (!allError && allProducts) {
+          const storeProducts = allProducts.filter(
+            p => p.storeid === storeId || p.storeid === ALTERNATIVE_STORE_ID
+          );
+          
+          console.log(`Found ${storeProducts.length} products for store ${storeId} in all products`);
+          
+          if (storeProducts.length > 0) {
+            return storeProducts.map(p => mapDbProductToProduct(p as DbProduct));
+          }
+        }
+      }
       
       return (data as DbProduct[]).map(mapDbProductToProduct);
     } catch (error) {
@@ -118,112 +137,34 @@ export const productService = {
   // Get Saffire Freycinet products
   async getSaffreFreycinetProducts(): Promise<Product[]> {
     try {
-      console.log("Fetching products with store ID:", SAFFIRE_FREYCINET_STORE_ID, "or", ALTERNATIVE_STORE_ID);
-      
-      // First, try to fetch all products instead of using complex OR query that seems to fail
-      const { data: allProducts, error: allError } = await supabase
-        .from('products')
-        .select('*');
-      
-      if (allError) {
-        console.error("Error fetching all products:", allError);
-        return [];
-      }
-      
-      // Filter products with the correct store ID manually
-      const filteredProducts = allProducts?.filter(product => 
-        product.storeid === SAFFIRE_FREYCINET_STORE_ID || 
-        product.storeid === ALTERNATIVE_STORE_ID
-      ) || [];
-      
-      console.log(`Found ${filteredProducts.length} Saffire Freycinet products`);
-      
-      // If no products found with either store ID, try updating them
-      if (filteredProducts.length === 0 && allProducts && allProducts.length > 0) {
-        console.log("No products found with Saffire Freycinet store ID. Updating products...");
-        
-        // Update products to assign correct storeid
-        for (const product of allProducts) {
-          console.log(`Checking product ${product.id} (${product.name}) with storeid=${product.storeid}`);
-          if (!product.storeid || 
-              (product.storeid !== SAFFIRE_FREYCINET_STORE_ID && 
-               product.storeid !== ALTERNATIVE_STORE_ID)) {
-            
-            console.log(`Updating product ${product.id} to storeid=${SAFFIRE_FREYCINET_STORE_ID}`);
-            const { data: updatedProduct, error: updateError } = await supabase
-              .from('products')
-              .update({ storeid: SAFFIRE_FREYCINET_STORE_ID })
-              .eq('id', product.id)
-              .select();
-            
-            if (updateError) {
-              console.error(`Error updating product ${product.id}:`, updateError);
-            } else {
-              console.log(`Updated product ${product.id} (${product.name}) with storeid=${SAFFIRE_FREYCINET_STORE_ID}`, updatedProduct);
-            }
-          }
-        }
-        
-        // Fetch all products again after updates
-        const { data: refreshedData, error: refreshError } = await supabase
-          .from('products')
-          .select('*');
-          
-        if (refreshError) {
-          console.error("Error fetching refreshed products:", refreshError);
-          return [];
-        }
-        
-        // Filter again for products with the right store ID
-        const updatedProducts = refreshedData?.filter(product => 
-          product.storeid === SAFFIRE_FREYCINET_STORE_ID || 
-          product.storeid === ALTERNATIVE_STORE_ID
-        ) || [];
-            
-        if (updatedProducts.length > 0) {
-          console.log(`After updating products, found: ${updatedProducts.length}`);
-          return (updatedProducts as DbProduct[]).map(mapDbProductToProduct);
-        }
-      }
-      
-      if (filteredProducts.length > 0) {
-        console.log(`Products with Saffire Freycinet store ID found: ${filteredProducts.length}`);
-        if (filteredProducts.length > 0) {
-          console.log("Product samples:", filteredProducts.slice(0, 2));
-          console.log("Store IDs found:", filteredProducts.map(p => p.storeid).filter((v, i, a) => a.indexOf(v) === i));
-        }
-      } else {
-        console.log("No Saffire Freycinet products found after all attempts");
-      }
-      
-      return (filteredProducts as DbProduct[]).map(mapDbProductToProduct);
+      return await this.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
     } catch (error) {
       console.error("Error in getSaffreFreycinetProducts:", error);
-      // Return empty array instead of throwing to prevent UI errors
       return [];
     }
   },
 
-  // Crear un nuevo producto
+  // Create a new product
   async createProduct(product: Product): Promise<Product> {
     try {
-      // Asegurar que el producto se asigne a Saffire Freycinet
+      // Ensure the product is assigned to Saffire Freycinet
       const productWithStore = {
         ...product,
         storeId: SAFFIRE_FREYCINET_STORE_ID
       };
       
       console.log("Creating product with data:", productWithStore);
-      console.log("IMPORTANT - Store ID being used:", SAFFIRE_FREYCINET_STORE_ID);
       
       const dbProduct = mapProductToDbProduct(productWithStore);
-      console.log("Mapped to DB product:", dbProduct);
       
       // Handle empty image to prevent upload errors
       if (!dbProduct.image || dbProduct.image.trim() === '') {
         dbProduct.image = '/placeholder.svg';
       }
-
+      
+      // Explicitly set the store ID again to make sure it's not lost
+      dbProduct.storeid = SAFFIRE_FREYCINET_STORE_ID;
+      
       console.log("VERIFY - storeid in DB product:", dbProduct.storeid);
       
       const { data, error } = await supabase
@@ -241,9 +182,8 @@ export const productService = {
       }
       
       console.log("Product created successfully:", data[0]);
-      console.log("VERIFY - storeid in created product:", data[0].storeid);
       
-      // Verificar inmediatamente que el producto se haya creado con el storeid correcto
+      // Verify immediately that the product was created with the correct storeid
       const { data: verify, error: verifyError } = await supabase
         .from('products')
         .select('id, name, storeid')
@@ -254,14 +194,28 @@ export const productService = {
         console.log("VERIFICATION - Product after creation:", verify);
       }
       
-      return mapDbProductToProduct(data[0] as DbProduct);
+      // Map the created product back to a Product type
+      const createdProduct = mapDbProductToProduct(data[0] as DbProduct);
+      
+      // Add the product to localStorage for immediate use
+      try {
+        const existingProducts = JSON.parse(localStorage.getItem('saffire_products') || '[]');
+        existingProducts.push(createdProduct);
+        localStorage.setItem('saffire_products', JSON.stringify(existingProducts));
+        console.log("Product added to localStorage for immediate use");
+      } catch (e) {
+        console.error("Error updating localStorage:", e);
+        // Non-critical error, continue
+      }
+      
+      return createdProduct;
     } catch (error) {
       console.error("Error in createProduct:", error);
       throw error;
     }
   },
 
-  // Actualizar un producto existente
+  // Update a product
   async updateProduct(id: number, updates: Partial<Product>): Promise<Product> {
     // Map partial Product updates to partial DbProduct updates
     const dbUpdates: Partial<DbProduct> = {};
@@ -280,7 +234,7 @@ export const productService = {
       dbUpdates.image = updates.image.trim() === '' ? '/placeholder.svg' : updates.image;
     }
     
-    // Siempre asegurar que el producto pertenezca a Saffire Freycinet
+    // Always ensure the product pertains to Saffire Freycinet
     dbUpdates.storeid = SAFFIRE_FREYCINET_STORE_ID;
     
     try {
@@ -310,7 +264,7 @@ export const productService = {
     }
   },
 
-  // Eliminar un producto
+  // Delete a product
   async deleteProduct(id: number): Promise<boolean> {
     try {
       console.log("Deleting product with ID:", id);
