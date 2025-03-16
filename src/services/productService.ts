@@ -96,6 +96,33 @@ export const productService = {
     }
   },
 
+  // Obtener productos específicamente de la tienda Saffire Freycinet
+  async getSaffreFreycinetProducts(): Promise<Product[]> {
+    try {
+      console.log("Fetching Saffire Freycinet products");
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('storeid', SAFFIRE_FREYCINET_STORE_ID);
+      
+      if (error) {
+        console.error("Error fetching Saffire Freycinet products:", error);
+        throw error;
+      }
+      
+      if (!data) {
+        console.log("No Saffire Freycinet products found");
+        return [];
+      }
+      
+      console.log("Saffire Freycinet products fetched:", data.length);
+      return (data as DbProduct[]).map(mapDbProductToProduct);
+    } catch (error) {
+      console.error("Error in getSaffreFreycinetProducts:", error);
+      throw error;
+    }
+  },
+
   // Crear un nuevo producto
   async createProduct(product: Product): Promise<Product> {
     try {
