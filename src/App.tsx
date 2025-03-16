@@ -77,6 +77,11 @@ const AppRoutes = () => {
           <AddProduct />
         </ProtectedRoute>
       } />
+      <Route path="/products/edit/:id" element={
+        <ProtectedRoute>
+          <AddProduct />
+        </ProtectedRoute>
+      } />
       <Route path="/orders" element={
         <ProtectedRoute>
           <Orders />

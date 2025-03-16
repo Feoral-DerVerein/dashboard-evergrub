@@ -1,6 +1,7 @@
+
 import { ArrowLeft, Calendar, Camera } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useState, useRef } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { productService, Product } from "@/services/productService";
@@ -19,6 +20,9 @@ type ProductFormData = {
 };
 
 const AddProduct = () => {
+  const { id } = useParams<{ id: string }>();
+  const isEditMode = !!id;
+  
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
     price: "",
@@ -31,12 +35,64 @@ const AddProduct = () => {
     image: ""
   });
   const [loading, setLoading] = useState(false);
+  const [loadingProduct, setLoadingProduct] = useState(isEditMode);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Fetch product data if in edit mode
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (isEditMode && id) {
+        try {
+          console.log(`Fetching product with id: ${id}`);
+          const product = await productService.getProductById(parseInt(id));
+          
+          if (product) {
+            setFormData({
+              name: product.name,
+              price: product.price.toString(),
+              discount: product.discount.toString(),
+              description: product.description,
+              category: product.category,
+              brand: product.brand,
+              quantity: product.quantity.toString(),
+              expirationDate: product.expirationDate,
+              image: product.image
+            });
+            
+            if (product.image) {
+              setPreviewImage(product.image);
+            }
+            
+            console.log("Product loaded successfully:", product);
+          } else {
+            console.error("Product not found");
+            toast({
+              title: "Error",
+              description: "Product not found",
+              variant: "destructive"
+            });
+            navigate("/products");
+          }
+        } catch (error: any) {
+          console.error("Error loading product:", error);
+          toast({
+            title: "Error",
+            description: `Error loading product: ${error.message || "Unknown error"}`,
+            variant: "destructive"
+          });
+        } finally {
+          setLoadingProduct(false);
+        }
+      }
+    };
+    
+    fetchProduct();
+  }, [id, isEditMode, navigate, toast]);
 
   const calculateFinalPrice = () => {
     const price = parseFloat(formData.price) || 0;
@@ -122,25 +178,44 @@ const AddProduct = () => {
         storeId: user.id
       };
       
-      await productService.createProduct(productData);
-      
-      toast({
-        title: "Product added",
-        description: "Your product has been added successfully",
-      });
+      if (isEditMode && id) {
+        // Update existing product
+        await productService.updateProduct(parseInt(id), productData);
+        toast({
+          title: "Product updated",
+          description: "Your product has been updated successfully",
+        });
+      } else {
+        // Add new product
+        await productService.createProduct(productData);
+        toast({
+          title: "Product added",
+          description: "Your product has been added successfully",
+        });
+      }
       
       navigate("/products");
     } catch (error: any) {
-      console.error("Error adding product:", error);
+      console.error(`Error ${isEditMode ? 'updating' : 'adding'} product:`, error);
       toast({
         title: "Error",
-        description: error.message || "Failed to add product",
+        description: error.message || `Failed to ${isEditMode ? 'update' : 'add'} product`,
         variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
+
+  if (loadingProduct) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p>Loading product data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -151,7 +226,7 @@ const AddProduct = () => {
               <Link to="/products" className="text-gray-500 hover:text-gray-700">
                 <ArrowLeft className="w-6 h-6" />
               </Link>
-              <h1 className="text-xl font-semibold">Add Product</h1>
+              <h1 className="text-xl font-semibold">{isEditMode ? 'Edit Product' : 'Add Product'}</h1>
             </div>
             <button
               onClick={handleSubmit}
@@ -358,7 +433,7 @@ const AddProduct = () => {
             disabled={loading}
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors mt-6"
           >
-            {loading ? "Saving..." : "Save Product"}
+            {loading ? "Saving..." : isEditMode ? "Update Product" : "Save Product"}
           </button>
         </form>
       </div>

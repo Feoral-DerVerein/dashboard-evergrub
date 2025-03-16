@@ -1,4 +1,3 @@
-
 import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -17,7 +16,6 @@ const Products = () => {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Cargar productos al montar el componente
   useEffect(() => {
     const loadProducts = async () => {
       if (!user) {

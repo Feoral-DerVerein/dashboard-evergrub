@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export type Product = {
@@ -65,6 +64,34 @@ const mapProductToDbProduct = (product: Product): Omit<DbProduct, 'id' | 'create
 });
 
 export const productService = {
+  // Get product by ID
+  async getProductById(id: number): Promise<Product | null> {
+    try {
+      console.log("Fetching product with ID:", id);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) {
+        console.error("Error fetching product by ID:", error);
+        throw error;
+      }
+      
+      if (!data) {
+        console.log("No product found with ID:", id);
+        return null;
+      }
+      
+      console.log("Product fetched:", data);
+      return mapDbProductToProduct(data as DbProduct);
+    } catch (error) {
+      console.error("Error in getProductById:", error);
+      throw error;
+    }
+  },
+
   // Obtener productos por userID (propietario de la tienda)
   async getProductsByUser(userId: string): Promise<Product[]> {
     try {
