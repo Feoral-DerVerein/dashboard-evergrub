@@ -28,13 +28,31 @@ const Products = () => {
         console.log("Loading products for user:", user.id);
         const data = await productService.getProductsByUser(user.id);
         console.log("Products loaded:", data);
-        
-        // También verifiquemos los productos de Saffire Freycinet
-        console.log("Checking Saffire Freycinet products");
-        const saffreProducts = await productService.getSaffreFreycinetProducts();
-        console.log("Saffire Freycinet products:", saffreProducts);
-        
         setProducts(data);
+        
+        // También carguemos los productos de Saffire Freycinet
+        try {
+          console.log("Checking Saffire Freycinet products");
+          const saffreProducts = await productService.getSaffreFreycinetProducts();
+          console.log("Saffire Freycinet products:", saffreProducts);
+          
+          // Si encontramos productos de Saffire que no están en nuestra lista, agreguémoslos
+          if (saffreProducts.length > 0) {
+            // Combinar productos y eliminar duplicados por ID
+            const allProducts = [...data];
+            
+            saffreProducts.forEach(saffreProduct => {
+              if (!allProducts.some(p => p.id === saffreProduct.id)) {
+                allProducts.push(saffreProduct);
+              }
+            });
+            
+            setProducts(allProducts);
+          }
+        } catch (saffreError) {
+          console.error("Error al cargar productos de Saffire Freycinet:", saffreError);
+          // No mostramos error al usuario por esto, solo log
+        }
       } catch (error: any) {
         console.error("Error al cargar productos:", error);
         toast({
@@ -42,6 +60,8 @@ const Products = () => {
           description: "No se pudieron cargar los productos: " + (error.message || "Error desconocido"),
           variant: "destructive"
         });
+        // Configuramos productos como array vacío para evitar errores de renderizado
+        setProducts([]);
       } finally {
         setLoading(false);
       }

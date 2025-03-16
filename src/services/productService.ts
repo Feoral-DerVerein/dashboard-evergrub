@@ -120,102 +120,87 @@ export const productService = {
     try {
       console.log("Fetching products with store ID:", SAFFIRE_FREYCINET_STORE_ID, "or", ALTERNATIVE_STORE_ID);
       
-      // First, try to find products with either store ID
-      const { data, error } = await supabase
+      // First, try to fetch all products instead of using complex OR query that seems to fail
+      const { data: allProducts, error: allError } = await supabase
         .from('products')
-        .select('*')
-        .or(`storeid.eq.${SAFFIRE_FREYCINET_STORE_ID},storeid.eq.${ALTERNATIVE_STORE_ID}`);
+        .select('*');
       
-      if (error) {
-        console.error("Error fetching store products:", error);
-        throw error;
-      }
-      
-      // Debug log to check what products are available in the database
-      const { data: allDbProducts, error: allError } = await supabase
-        .from('products')
-        .select('id, name, storeid');
-        
-      if (!allError && allDbProducts) {
-        console.log("ALL PRODUCTS IN DATABASE:", allDbProducts);
-        console.log("Store IDs in database:", allDbProducts.map(p => `${p.id}: ${p.name} - ${p.storeid}`));
-      }
-      
-      // If no products found with either store ID, try updating them
-      if (!data || data.length === 0) {
-        console.log("No products found with either storeid. Updating all products...");
-        
-        // Get all products
-        const { data: allProducts, error: allProductsError } = await supabase
-          .from('products')
-          .select('*');
-          
-        if (allProductsError) {
-          console.error("Error fetching all products:", allProductsError);
-          return [];
-        }
-        
-        if (allProducts && allProducts.length > 0) {
-          console.log("Found products to update:", allProducts.length);
-          
-          // Update all products to assign correct storeid
-          for (const product of allProducts) {
-            console.log(`Checking product ${product.id} (${product.name}) with storeid=${product.storeid}`);
-            if (!product.storeid || 
-                (product.storeid !== SAFFIRE_FREYCINET_STORE_ID && 
-                 product.storeid !== ALTERNATIVE_STORE_ID)) {
-              
-              console.log(`Updating product ${product.id} to storeid=${SAFFIRE_FREYCINET_STORE_ID}`);
-              const { data: updatedProduct, error: updateError } = await supabase
-                .from('products')
-                .update({ storeid: SAFFIRE_FREYCINET_STORE_ID })
-                .eq('id', product.id)
-                .select();
-              
-              if (updateError) {
-                console.error(`Error updating product ${product.id}:`, updateError);
-              } else {
-                console.log(`Updated product ${product.id} (${product.name}) with storeid=${SAFFIRE_FREYCINET_STORE_ID}`, updatedProduct);
-              }
-            }
-          }
-          
-          // Try fetching products again after update
-          const { data: refreshedData } = await supabase
-            .from('products')
-            .select('*')
-            .or(`storeid.eq.${SAFFIRE_FREYCINET_STORE_ID},storeid.eq.${ALTERNATIVE_STORE_ID}`);
-            
-          if (refreshedData && refreshedData.length > 0) {
-            console.log("After updating products, found:", refreshedData.length);
-            return (refreshedData as DbProduct[]).map(mapDbProductToProduct);
-          }
-        }
-        
-        console.log("No products found after all checks");
-        
-        // Log all products for diagnostic purposes
-        const allProds = await supabase.from('products').select('*');
-        console.log("All accessible products:", allProds.data);
-        
-        if (allProds.data && allProds.data.length > 0) {
-          console.log("Product storeid examples:");
-          allProds.data.forEach(p => console.log(`ID: ${p.id}, Name: ${p.name}, StoreID: ${p.storeid}`));
-        }
-        
+      if (allError) {
+        console.error("Error fetching all products:", allError);
         return [];
       }
       
-      console.log(`Products with either store ID fetched: ${data.length}`);
-      if (data.length > 0) {
-        console.log("Product samples:", data.slice(0, 2));
-        console.log("Store IDs found:", data.map(p => p.storeid).filter((v, i, a) => a.indexOf(v) === i));
+      // Filter products with the correct store ID manually
+      const filteredProducts = allProducts?.filter(product => 
+        product.storeid === SAFFIRE_FREYCINET_STORE_ID || 
+        product.storeid === ALTERNATIVE_STORE_ID
+      ) || [];
+      
+      console.log(`Found ${filteredProducts.length} Saffire Freycinet products`);
+      
+      // If no products found with either store ID, try updating them
+      if (filteredProducts.length === 0 && allProducts && allProducts.length > 0) {
+        console.log("No products found with Saffire Freycinet store ID. Updating products...");
+        
+        // Update products to assign correct storeid
+        for (const product of allProducts) {
+          console.log(`Checking product ${product.id} (${product.name}) with storeid=${product.storeid}`);
+          if (!product.storeid || 
+              (product.storeid !== SAFFIRE_FREYCINET_STORE_ID && 
+               product.storeid !== ALTERNATIVE_STORE_ID)) {
+            
+            console.log(`Updating product ${product.id} to storeid=${SAFFIRE_FREYCINET_STORE_ID}`);
+            const { data: updatedProduct, error: updateError } = await supabase
+              .from('products')
+              .update({ storeid: SAFFIRE_FREYCINET_STORE_ID })
+              .eq('id', product.id)
+              .select();
+            
+            if (updateError) {
+              console.error(`Error updating product ${product.id}:`, updateError);
+            } else {
+              console.log(`Updated product ${product.id} (${product.name}) with storeid=${SAFFIRE_FREYCINET_STORE_ID}`, updatedProduct);
+            }
+          }
+        }
+        
+        // Fetch all products again after updates
+        const { data: refreshedData, error: refreshError } = await supabase
+          .from('products')
+          .select('*');
+          
+        if (refreshError) {
+          console.error("Error fetching refreshed products:", refreshError);
+          return [];
+        }
+        
+        // Filter again for products with the right store ID
+        const updatedProducts = refreshedData?.filter(product => 
+          product.storeid === SAFFIRE_FREYCINET_STORE_ID || 
+          product.storeid === ALTERNATIVE_STORE_ID
+        ) || [];
+            
+        if (updatedProducts.length > 0) {
+          console.log(`After updating products, found: ${updatedProducts.length}`);
+          return (updatedProducts as DbProduct[]).map(mapDbProductToProduct);
+        }
       }
       
-      return (data as DbProduct[]).map(mapDbProductToProduct);
+      if (filteredProducts.length > 0) {
+        console.log(`Products with Saffire Freycinet store ID found: ${filteredProducts.length}`);
+        if (filteredProducts.length > 0) {
+          console.log("Product samples:", filteredProducts.slice(0, 2));
+          console.log("Store IDs found:", filteredProducts.map(p => p.storeid).filter((v, i, a) => a.indexOf(v) === i));
+        }
+      } else {
+        console.log("No Saffire Freycinet products found after all attempts");
+      }
+      
+      return (filteredProducts as DbProduct[]).map(mapDbProductToProduct);
     } catch (error) {
       console.error("Error in getSaffreFreycinetProducts:", error);
-      throw error;
+      // Return empty array instead of throwing to prevent UI errors
+      return [];
     }
   },
 
