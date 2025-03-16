@@ -1,3 +1,4 @@
+
 import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -30,8 +31,8 @@ const Login = () => {
         if (error) throw error;
 
         toast({
-          title: "Inicio de sesión exitoso",
-          description: "¡Bienvenido de nuevo!",
+          title: "Login successful",
+          description: "Welcome back!",
         });
         navigate("/dashboard");
       } else {
@@ -43,8 +44,8 @@ const Login = () => {
         if (error) throw error;
 
         toast({
-          title: "Registro exitoso",
-          description: "Se ha creado tu cuenta. Revisa tu correo para verificarla.",
+          title: "Registration successful",
+          description: "Your account has been created. Check your email to verify it.",
         });
       }
     } catch (error: any) {
