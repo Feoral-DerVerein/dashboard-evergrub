@@ -1,9 +1,10 @@
 import { ArrowLeft, Calendar, Camera } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { productService, Product } from "@/services/productService";
+import { Input } from "@/components/ui/input";
 
 type ProductFormData = {
   name: string;
@@ -30,6 +31,9 @@ const AddProduct = () => {
     image: ""
   });
   const [loading, setLoading] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -44,13 +48,58 @@ const AddProduct = () => {
   const categories = ["Fruits", "Bread", "Dairy", "Meat", "Beverages", "Larder and Snacks"];
   const brands = ["Equate", "Generic", "Premium"];
 
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    try {
+      setLoading(true);
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setPreviewImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
+      
+      const publicUrl = await productService.uploadProductImage(file, filePath);
+      
+      setFormData({
+        ...formData,
+        image: publicUrl
+      });
+      
+      toast({
+        title: "Image uploaded",
+        description: "Your image has been successfully uploaded",
+      });
+    } catch (error: any) {
+      console.error("Error uploading image:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload image",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+      setUploadProgress(0);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!user) {
       toast({
         title: "Error",
-        description: "Debes iniciar sesión para agregar productos",
+        description: "You must be logged in to add products",
         variant: "destructive"
       });
       return;
@@ -68,7 +117,7 @@ const AddProduct = () => {
         brand: formData.brand,
         quantity: parseInt(formData.quantity),
         expirationDate: formData.expirationDate,
-        image: formData.image,
+        image: formData.image || "",
         userId: user.id,
         storeId: user.id
       };
@@ -76,16 +125,16 @@ const AddProduct = () => {
       await productService.createProduct(productData);
       
       toast({
-        title: "Producto agregado",
-        description: "El producto se ha agregado correctamente",
+        title: "Product added",
+        description: "Your product has been added successfully",
       });
       
       navigate("/products");
     } catch (error: any) {
-      console.error("Error al agregar producto:", error);
+      console.error("Error adding product:", error);
       toast({
         title: "Error",
-        description: error.message || "No se pudo agregar el producto",
+        description: error.message || "Failed to add product",
         variant: "destructive"
       });
     } finally {
@@ -269,20 +318,38 @@ const AddProduct = () => {
           </div>
 
           <div className="mt-6">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
             <button
               type="button"
+              onClick={handleImageClick}
               className="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
             >
-              {formData.image ? (
+              {previewImage || formData.image ? (
                 <img
-                  src={formData.image}
+                  src={previewImage || formData.image}
                   alt="Product"
                   className="w-24 h-24 object-cover rounded-lg"
                 />
               ) : (
                 <Camera className="w-8 h-8 text-gray-400 mb-2" />
               )}
-              <span className="text-primary-600">Change Photo</span>
+              <span className="text-primary-600">
+                {loading ? "Uploading..." : "Change Photo"}
+              </span>
+              {uploadProgress > 0 && uploadProgress < 100 && (
+                <div className="w-full mt-2 bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-green-600 h-2.5 rounded-full" 
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              )}
             </button>
           </div>
 
@@ -291,7 +358,7 @@ const AddProduct = () => {
             disabled={loading}
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors mt-6"
           >
-            {loading ? "Guardando..." : "Save Product"}
+            {loading ? "Saving..." : "Save Product"}
           </button>
         </form>
       </div>
