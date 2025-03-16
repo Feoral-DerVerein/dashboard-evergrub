@@ -9,6 +9,9 @@ export type { Product } from "@/types/product.types";
 export { SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.types";
 export { productImageService } from "./productImageService";
 
+// Alternative store ID that might exist in the database
+const ALTERNATIVE_STORE_ID = "saffire-freycinet";
+
 export const productService = {
   // Get product by ID
   async getProductById(id: number): Promise<Product | null> {
@@ -90,10 +93,12 @@ export const productService = {
   async getProductsByStore(storeId: string): Promise<Product[]> {
     try {
       console.log(`Fetching products for store: ${storeId}`);
+      
+      // Check for products with either the specified storeId or the alternative ID
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('storeid', storeId);
+        .or(`storeid.eq.${storeId},storeid.eq.${storeId === SAFFIRE_FREYCINET_STORE_ID ? ALTERNATIVE_STORE_ID : SAFFIRE_FREYCINET_STORE_ID}`);
       
       if (error) {
         console.error("Error fetching store products:", error);
@@ -101,6 +106,8 @@ export const productService = {
       }
       
       console.log(`Products for store ${storeId} fetched:`, data ? data.length : 0);
+      console.log("Store IDs found:", data?.map(p => p.storeid).filter((v, i, a) => a.indexOf(v) === i));
+      
       return (data as DbProduct[]).map(mapDbProductToProduct);
     } catch (error) {
       console.error("Error in getProductsByStore:", error);
@@ -111,13 +118,13 @@ export const productService = {
   // Get Saffire Freycinet products
   async getSaffreFreycinetProducts(): Promise<Product[]> {
     try {
-      console.log("Fetching products with store ID:", SAFFIRE_FREYCINET_STORE_ID);
+      console.log("Fetching products with store ID:", SAFFIRE_FREYCINET_STORE_ID, "or", ALTERNATIVE_STORE_ID);
       
-      // First, try to find products with exact storeid
+      // First, try to find products with either store ID
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('storeid', SAFFIRE_FREYCINET_STORE_ID);
+        .or(`storeid.eq.${SAFFIRE_FREYCINET_STORE_ID},storeid.eq.${ALTERNATIVE_STORE_ID}`);
       
       if (error) {
         console.error("Error fetching store products:", error);
@@ -126,7 +133,7 @@ export const productService = {
       
       // Update any products with NULL storeid or different storeid
       if (!data || data.length === 0) {
-        console.log("No products found with exact storeid match. Updating all products...");
+        console.log("No products found with either storeid. Updating all products...");
         
         // Get all products
         const { data: allProducts, error: allProductsError } = await supabase
@@ -143,7 +150,9 @@ export const productService = {
           
           // Update all products to assign correct storeid
           for (const product of allProducts) {
-            if (!product.storeid || product.storeid !== SAFFIRE_FREYCINET_STORE_ID) {
+            if (!product.storeid || 
+                (product.storeid !== SAFFIRE_FREYCINET_STORE_ID && 
+                 product.storeid !== ALTERNATIVE_STORE_ID)) {
               await supabase
                 .from('products')
                 .update({ storeid: SAFFIRE_FREYCINET_STORE_ID })
@@ -157,7 +166,7 @@ export const productService = {
           const { data: refreshedData } = await supabase
             .from('products')
             .select('*')
-            .eq('storeid', SAFFIRE_FREYCINET_STORE_ID);
+            .or(`storeid.eq.${SAFFIRE_FREYCINET_STORE_ID},storeid.eq.${ALTERNATIVE_STORE_ID}`);
             
           if (refreshedData && refreshedData.length > 0) {
             console.log("After updating products, found:", refreshedData.length);
@@ -179,9 +188,10 @@ export const productService = {
         return [];
       }
       
-      console.log("Products with store ID 4 fetched:", data.length);
+      console.log(`Products with either store ID fetched: ${data.length}`);
       if (data.length > 0) {
         console.log("Product samples:", data.slice(0, 2));
+        console.log("Store IDs found:", data.map(p => p.storeid).filter((v, i, a) => a.indexOf(v) === i));
       }
       
       return (data as DbProduct[]).map(mapDbProductToProduct);
