@@ -20,16 +20,21 @@ const Products = () => {
   // Cargar productos al montar el componente
   useEffect(() => {
     const loadProducts = async () => {
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       
       try {
+        console.log("Loading products for user:", user.id);
         const data = await productService.getProductsByUser(user.id);
+        console.log("Products loaded:", data);
         setProducts(data);
       } catch (error: any) {
         console.error("Error al cargar productos:", error);
         toast({
           title: "Error",
-          description: "No se pudieron cargar los productos",
+          description: "No se pudieron cargar los productos: " + (error.message || "Error desconocido"),
           variant: "destructive"
         });
       } finally {
@@ -54,7 +59,7 @@ const Products = () => {
       console.error("Error al eliminar producto:", error);
       toast({
         title: "Error",
-        description: "No se pudo eliminar el producto",
+        description: "No se pudo eliminar el producto: " + (error.message || "Error desconocido"),
         variant: "destructive"
       });
     }
@@ -148,6 +153,10 @@ const Products = () => {
                     src={product.image || "/placeholder.svg"}
                     alt={product.name}
                     className="w-full h-32 object-cover rounded-md mb-2"
+                    onError={(e) => {
+                      console.error("Image failed to load:", product.image);
+                      (e.target as HTMLImageElement).src = "/placeholder.svg";
+                    }}
                   />
                   <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
                   <p className="text-green-600 font-medium mb-2">$ {product.price.toFixed(2)}</p>

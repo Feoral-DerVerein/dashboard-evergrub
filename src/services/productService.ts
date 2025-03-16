@@ -67,26 +67,78 @@ const mapProductToDbProduct = (product: Product): Omit<DbProduct, 'id' | 'create
 export const productService = {
   // Obtener productos por userID (propietario de la tienda)
   async getProductsByUser(userId: string): Promise<Product[]> {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('userid', userId);
-    
-    if (error) throw error;
-    return (data as DbProduct[]).map(mapDbProductToProduct);
+    try {
+      console.log("Fetching products for user:", userId);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('userid', userId);
+      
+      if (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+      }
+      
+      if (!data) {
+        console.log("No data returned");
+        return [];
+      }
+      
+      console.log("Products fetched:", data);
+      return (data as DbProduct[]).map(mapDbProductToProduct);
+    } catch (error) {
+      console.error("Error in getProductsByUser:", error);
+      throw error;
+    }
+  },
+
+  // Obtener todos los productos (para marketplace)
+  async getAllProducts(): Promise<Product[]> {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*');
+      
+      if (error) throw error;
+      return (data as DbProduct[]).map(mapDbProductToProduct);
+    } catch (error) {
+      console.error("Error fetching all products:", error);
+      throw error;
+    }
+  },
+
+  // Obtener productos por storeId
+  async getProductsByStore(storeId: string): Promise<Product[]> {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('storeid', storeId);
+      
+      if (error) throw error;
+      return (data as DbProduct[]).map(mapDbProductToProduct);
+    } catch (error) {
+      console.error("Error fetching store products:", error);
+      throw error;
+    }
   },
 
   // Crear un nuevo producto
   async createProduct(product: Product): Promise<Product> {
-    const dbProduct = mapProductToDbProduct(product);
-    
-    const { data, error } = await supabase
-      .from('products')
-      .insert([dbProduct])
-      .select();
-    
-    if (error) throw error;
-    return mapDbProductToProduct(data[0] as DbProduct);
+    try {
+      const dbProduct = mapProductToDbProduct(product);
+      
+      const { data, error } = await supabase
+        .from('products')
+        .insert([dbProduct])
+        .select();
+      
+      if (error) throw error;
+      return mapDbProductToProduct(data[0] as DbProduct);
+    } catch (error) {
+      console.error("Error creating product:", error);
+      throw error;
+    }
   },
 
   // Actualizar un producto existente
@@ -105,41 +157,56 @@ export const productService = {
     if (updates.image !== undefined) dbUpdates.image = updates.image;
     if (updates.storeId !== undefined) dbUpdates.storeid = updates.storeId || null;
     
-    const { data, error } = await supabase
-      .from('products')
-      .update(dbUpdates)
-      .eq('id', id)
-      .select();
-    
-    if (error) throw error;
-    return mapDbProductToProduct(data[0] as DbProduct);
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .update(dbUpdates)
+        .eq('id', id)
+        .select();
+      
+      if (error) throw error;
+      return mapDbProductToProduct(data[0] as DbProduct);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      throw error;
+    }
   },
 
   // Eliminar un producto
   async deleteProduct(id: number): Promise<boolean> {
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-    return true;
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      throw error;
+    }
   },
 
   // Subir imagen de producto
   async uploadProductImage(file: File, path: string): Promise<string> {
-    const { data, error } = await supabase.storage
-      .from('product-images')
-      .upload(path, file, {
-        upsert: true,
-      });
-    
-    if (error) throw error;
-    
-    const { data: publicUrl } = supabase.storage
-      .from('product-images')
-      .getPublicUrl(path);
-    
-    return publicUrl.publicUrl;
+    try {
+      const { data, error } = await supabase.storage
+        .from('product-images')
+        .upload(path, file, {
+          upsert: true,
+        });
+      
+      if (error) throw error;
+      
+      const { data: publicUrl } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(path);
+      
+      return publicUrl.publicUrl;
+    } catch (error) {
+      console.error("Error uploading product image:", error);
+      throw error;
+    }
   }
 };
