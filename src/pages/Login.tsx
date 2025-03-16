@@ -22,7 +22,6 @@ const Login = () => {
     
     try {
       if (activeTab === 'login') {
-        // Login with Supabase
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -36,7 +35,6 @@ const Login = () => {
         });
         navigate("/dashboard");
       } else {
-        // Sign up with Supabase
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -61,10 +59,10 @@ const Login = () => {
     }
   };
 
-  const handleSocialLogin = async (provider: Provider) => {
+  const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: provider as Provider,
         options: {
           redirectTo: window.location.origin + '/dashboard',
         },
