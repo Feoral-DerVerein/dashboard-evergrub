@@ -4,7 +4,9 @@ import { Product, DbProduct, SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.
 import { mapDbProductToProduct, mapProductToDbProduct } from "@/utils/product.mappers";
 import { productImageService } from "./productImageService";
 
-export { Product, SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.types";
+// Use 'export type' for type re-exports when isolatedModules is enabled
+export type { Product } from "@/types/product.types";
+export { SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.types";
 export { productImageService } from "./productImageService";
 
 export const productService = {
