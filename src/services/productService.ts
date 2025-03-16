@@ -15,6 +15,9 @@ export type Product = {
   userId: string; // ID del usuario que crea/posee el producto
 };
 
+// Constante para el ID de la tienda Saffire Freycinet
+export const SAFFIRE_FREYCINET_STORE_ID = "saffire-freycinet";
+
 // Type mapping to fix the mismatch between database and client-side types
 type DbProduct = {
   id: number;
@@ -59,7 +62,7 @@ const mapProductToDbProduct = (product: Product): Omit<DbProduct, 'id' | 'create
   quantity: product.quantity,
   expirationdate: product.expirationDate,
   image: product.image,
-  storeid: product.storeId || null,
+  storeid: SAFFIRE_FREYCINET_STORE_ID, // Siempre asignar a Saffire Freycinet
   userid: product.userId
 });
 
@@ -153,7 +156,13 @@ export const productService = {
   // Crear un nuevo producto
   async createProduct(product: Product): Promise<Product> {
     try {
-      const dbProduct = mapProductToDbProduct(product);
+      // Asegurar que el producto se asigne a Saffire Freycinet
+      const productWithStore = {
+        ...product,
+        storeId: SAFFIRE_FREYCINET_STORE_ID
+      };
+      
+      const dbProduct = mapProductToDbProduct(productWithStore);
       
       const { data, error } = await supabase
         .from('products')
@@ -182,7 +191,9 @@ export const productService = {
     if (updates.quantity !== undefined) dbUpdates.quantity = updates.quantity;
     if (updates.expirationDate !== undefined) dbUpdates.expirationdate = updates.expirationDate;
     if (updates.image !== undefined) dbUpdates.image = updates.image;
-    if (updates.storeId !== undefined) dbUpdates.storeid = updates.storeId || null;
+    
+    // Siempre asegurar que el producto pertenezca a Saffire Freycinet
+    dbUpdates.storeid = SAFFIRE_FREYCINET_STORE_ID;
     
     try {
       const { data, error } = await supabase

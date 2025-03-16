@@ -1,10 +1,9 @@
-
 import { ArrowLeft, Calendar, Camera } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import { productService, Product } from "@/services/productService";
+import { productService, Product, SAFFIRE_FREYCINET_STORE_ID } from "@/services/productService";
 import { Input } from "@/components/ui/input";
 
 type ProductFormData = {
@@ -43,7 +42,6 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Fetch product data if in edit mode
   useEffect(() => {
     const fetchProduct = async () => {
       if (isEditMode && id) {
@@ -175,18 +173,16 @@ const AddProduct = () => {
         expirationDate: formData.expirationDate,
         image: formData.image || "",
         userId: user.id,
-        storeId: user.id
+        storeId: SAFFIRE_FREYCINET_STORE_ID
       };
       
       if (isEditMode && id) {
-        // Update existing product
         await productService.updateProduct(parseInt(id), productData);
         toast({
           title: "Product updated",
           description: "Your product has been updated successfully",
         });
       } else {
-        // Add new product
         await productService.createProduct(productData);
         toast({
           title: "Product added",
