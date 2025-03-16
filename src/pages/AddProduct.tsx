@@ -160,17 +160,28 @@ const AddProduct = () => {
       return;
     }
     
-    setLoading(true);
-    
     try {
+      setLoading(true);
+      
+      // Validate required fields
+      if (!formData.name || !formData.price || !formData.description || 
+          !formData.category || !formData.brand || !formData.expirationDate) {
+        throw new Error("Please fill in all required fields");
+      }
+
+      // Ensure price is a valid number
+      if (isNaN(parseFloat(formData.price)) || parseFloat(formData.price) <= 0) {
+        throw new Error("Please enter a valid price");
+      }
+      
       const productData: Product = {
-        name: formData.name,
+        name: formData.name.trim(),
         price: parseFloat(formData.price),
-        discount: parseFloat(formData.discount),
-        description: formData.description,
+        discount: parseFloat(formData.discount) || 0,
+        description: formData.description.trim(),
         category: formData.category,
         brand: formData.brand,
-        quantity: parseInt(formData.quantity),
+        quantity: parseInt(formData.quantity) || 1,
         expirationDate: formData.expirationDate,
         image: formData.image || "",
         userId: user.id,
@@ -178,33 +189,35 @@ const AddProduct = () => {
       };
       
       console.log("Submitting product with data:", productData);
-      console.log("Specifically note: storeId =", productData.storeId, "category =", productData.category);
       
+      let result;
       if (isEditMode && id) {
-        const updatedProduct = await productService.updateProduct(parseInt(id), productData);
-        console.log("Product updated successfully:", updatedProduct);
+        result = await productService.updateProduct(parseInt(id), productData);
+        console.log("Product updated successfully:", result);
         toast({
           title: "Product updated",
           description: "Your product has been updated successfully",
         });
       } else {
-        const newProduct = await productService.createProduct(productData);
-        console.log("Product created successfully:", newProduct);
+        result = await productService.createProduct(productData);
+        console.log("Product created successfully:", result);
         toast({
           title: "Product added",
           description: "Your product has been added successfully",
         });
       }
       
-      // Verifica inmediatamente si el producto es accesible a través de la consulta de Saffire
-      setTimeout(async () => {
-        try {
-          const saffreProducts = await productService.getSaffreFreycinetProducts();
-          console.log("After create/update - Saffire products check:", saffreProducts);
-        } catch (e) {
-          console.error("Error checking Saffire products after create/update:", e);
-        }
-      }, 1000);
+      // Manually add the product to localStorage for immediate display
+      try {
+        const existingProducts = JSON.parse(localStorage.getItem('saffire_products') || '[]');
+        const updatedProducts = isEditMode 
+          ? existingProducts.map((p: Product) => p.id === parseInt(id!) ? result : p) 
+          : [...existingProducts, result];
+        localStorage.setItem('saffire_products', JSON.stringify(updatedProducts));
+      } catch (e) {
+        console.error("Error updating localStorage:", e);
+        // This is non-critical, so we'll continue even if it fails
+      }
       
       navigate("/products");
     } catch (error: any) {
@@ -274,6 +287,7 @@ const AddProduct = () => {
                 <input
                   type="number"
                   step="0.01"
+                  min="0.01"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   className="w-full pl-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -286,6 +300,8 @@ const AddProduct = () => {
               <div className="relative">
                 <input
                   type="number"
+                  min="0"
+                  max="100"
                   value={formData.discount}
                   onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
                   className="w-full pr-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
