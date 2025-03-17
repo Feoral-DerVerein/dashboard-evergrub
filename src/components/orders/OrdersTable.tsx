@@ -91,23 +91,21 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                     
                     {order.status === "pending" && (
                       <Button
-                        variant="outline"
+                        variant="default"
                         size="sm"
-                        className="bg-blue-50 hover:bg-blue-100"
                         onClick={() => handleStatusChange(order.id, "accepted")}
                       >
-                        <Check className="h-4 w-4 text-blue-600" />
+                        <Check className="h-4 w-4" />
                       </Button>
                     )}
                     
                     {order.status === "accepted" && (
                       <Button
-                        variant="outline"
+                        variant="default"
                         size="sm"
-                        className="bg-green-50 hover:bg-green-100"
                         onClick={() => handleStatusChange(order.id, "completed")}
                       >
-                        <Check className="h-4 w-4 text-green-600" />
+                        <Check className="h-4 w-4" />
                       </Button>
                     )}
                   </div>

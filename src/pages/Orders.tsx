@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -120,23 +119,18 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
             <div className="font-semibold">{order.id.substring(0, 8)}</div>
           </div>
 
-          {/* Order status actions */}
           {order.status !== "completed" && (
             <div className="flex gap-2 justify-end">
               {order.status === "pending" && (
                 <Button 
-                  variant="outline" 
                   onClick={() => handleUpdateStatus("accepted")}
-                  className="bg-blue-50 hover:bg-blue-100 text-blue-700"
                 >
                   Accept Order
                 </Button>
               )}
               {order.status === "accepted" && (
-                <Button 
-                  variant="outline"
+                <Button
                   onClick={() => handleUpdateStatus("completed")}
-                  className="bg-green-50 hover:bg-green-100 text-green-700"
                 >
                   Mark as Completed
                 </Button>
@@ -294,17 +288,15 @@ const Orders = () => {
             <h1 className="text-2xl font-bold">Orders</h1>
             <div className="flex gap-2">
               <Button 
-                variant="outline" 
+                variant={viewMode === "cards" ? "default" : "outline"} 
                 size="sm" 
-                className={viewMode === "cards" ? "bg-blue-50" : ""}
                 onClick={() => setViewMode("cards")}
               >
                 Cards
               </Button>
               <Button
-                variant="outline"
+                variant={viewMode === "table" ? "default" : "outline"}
                 size="sm" 
-                className={viewMode === "table" ? "bg-blue-50" : ""}
                 onClick={() => setViewMode("table")}
               >
                 <LayoutDashboard className="h-4 w-4 mr-1" />
@@ -314,46 +306,38 @@ const Orders = () => {
           </div>
           <p className="text-gray-500 mb-4">Today's Orders</p>
           <div className="flex gap-2 overflow-x-auto pb-2">
-            <button
+            <Button
+              variant={filter === "all" ? "default" : "outline"}
+              size="sm"
+              className="rounded-full whitespace-nowrap"
               onClick={() => setFilter("all")}
-              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
-                filter === "all"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-600"
-              }`}
             >
               All Orders
-            </button>
-            <button
+            </Button>
+            <Button
+              variant={filter === "pending" ? "default" : "outline"}
+              size="sm"
+              className="rounded-full whitespace-nowrap"
               onClick={() => setFilter("pending")}
-              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
-                filter === "pending"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-600"
-              }`}
             >
               Pending
-            </button>
-            <button
+            </Button>
+            <Button
+              variant={filter === "accepted" ? "default" : "outline"}
+              size="sm"
+              className="rounded-full whitespace-nowrap"
               onClick={() => setFilter("accepted")}
-              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
-                filter === "accepted"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-600"
-              }`}
             >
               Accepted
-            </button>
-            <button
+            </Button>
+            <Button
+              variant={filter === "completed" ? "default" : "outline"}
+              size="sm"
+              className="rounded-full whitespace-nowrap"
               onClick={() => setFilter("completed")}
-              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
-                filter === "completed"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-600"
-              }`}
             >
               Completed
-            </button>
+            </Button>
           </div>
         </header>
 
