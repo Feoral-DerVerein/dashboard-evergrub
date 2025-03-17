@@ -71,7 +71,7 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
     .join('')
     .toUpperCase();
     
-  const handleUpdateStatus = async (newStatus: "pending" | "accepted" | "completed") => {
+  const handleUpdateStatus = async (newStatus: "pending" | "accepted" | "completed" | "rejected") => {
     try {
       await orderService.updateOrderStatus(order.id, newStatus);
       toast({
@@ -107,11 +107,11 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
             <div className="flex justify-between mb-2">
               <div className="text-gray-600">Order ID</div>
               <Badge 
-                variant="outline" 
-                className={`${
-                  order.status === "completed" ? "bg-green-100 text-green-800" : 
-                  order.status === "pending" ? "bg-yellow-100 text-yellow-800" : "bg-blue-100 text-blue-800"
-                }`}
+                variant={
+                  order.status === "completed" ? "success" : 
+                  order.status === "pending" ? "warning" : 
+                  order.status === "rejected" ? "destructive" : "info"
+                }
               >
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </Badge>
@@ -119,18 +119,28 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
             <div className="font-semibold">{order.id.substring(0, 8)}</div>
           </div>
 
-          {order.status !== "completed" && (
+          {order.status !== "completed" && order.status !== "rejected" && (
             <div className="flex gap-2 justify-end">
               {order.status === "pending" && (
-                <Button 
-                  onClick={() => handleUpdateStatus("accepted")}
-                >
-                  Accept Order
-                </Button>
+                <>
+                  <Button 
+                    onClick={() => handleUpdateStatus("accepted")}
+                    variant="default"
+                  >
+                    Accept Order
+                  </Button>
+                  <Button 
+                    onClick={() => handleUpdateStatus("rejected")}
+                    variant="destructive"
+                  >
+                    Reject Order
+                  </Button>
+                </>
               )}
               {order.status === "accepted" && (
                 <Button
                   onClick={() => handleUpdateStatus("completed")}
+                  variant="default"
                 >
                   Mark as Completed
                 </Button>
@@ -240,7 +250,7 @@ const LoadingSkeleton = () => (
 );
 
 const Orders = () => {
-  const [filter, setFilter] = useState<"all" | "pending" | "accepted" | "completed">("all");
+  const [filter, setFilter] = useState<"all" | "pending" | "accepted" | "completed" | "rejected">("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -337,6 +347,14 @@ const Orders = () => {
               onClick={() => setFilter("completed")}
             >
               Completed
+            </Button>
+            <Button
+              variant={filter === "rejected" ? "default" : "outline"}
+              size="sm"
+              className="rounded-full whitespace-nowrap"
+              onClick={() => setFilter("rejected")}
+            >
+              Rejected
             </Button>
           </div>
         </header>

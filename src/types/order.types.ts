@@ -16,7 +16,7 @@ export interface Order {
   customerName: string;
   customerImage: string;
   items: OrderItem[];
-  status: "pending" | "accepted" | "completed";
+  status: "pending" | "accepted" | "completed" | "rejected";
   timestamp: string;
   total: number;
   location: string;
@@ -63,7 +63,7 @@ export const mapDbOrderToOrder = (dbOrder: DbOrder, items: DbOrderItem[] = []): 
       price: item.price,
       quantity: item.quantity
     })),
-    status: dbOrder.status as "pending" | "accepted" | "completed",
+    status: dbOrder.status as "pending" | "accepted" | "completed" | "rejected",
     timestamp: new Date(dbOrder.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     total: dbOrder.total,
     location: dbOrder.location || "",

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Order, 
@@ -28,6 +27,23 @@ export const orderService = {
       }
       
       console.log("Obteniendo órdenes del usuario:", userId);
+      
+      // Debugging: fetch all orders to see if any exist in the system
+      const { data: allOrders, error: allOrdersError } = await supabase
+        .from('orders')
+        .select('*')
+        .order('timestamp', { ascending: false });
+        
+      if (allOrdersError) {
+        console.error("Error al verificar todas las órdenes:", allOrdersError);
+      } else {
+        console.log("Total de órdenes en el sistema:", allOrders?.length || 0);
+        if (allOrders && allOrders.length > 0) {
+          console.log("Ejemplo de orden:", allOrders[0]);
+        }
+      }
+      
+      // Fetch orders for the current user
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select('*')
@@ -61,6 +77,7 @@ export const orderService = {
         orders.push(mapDbOrderToOrder(dbOrder, itemsData as DbOrderItem[]));
       }
       
+      console.log("Órdenes obtenidas:", orders);
       return orders;
     } catch (error) {
       console.error("Error en getUserOrders:", error);
@@ -165,7 +182,7 @@ export const orderService = {
   },
   
   // Actualizar el estado de una orden
-  async updateOrderStatus(orderId: string, status: "pending" | "accepted" | "completed"): Promise<Order> {
+  async updateOrderStatus(orderId: string, status: "pending" | "accepted" | "completed" | "rejected"): Promise<Order> {
     try {
       console.log(`Actualizando estado de la orden ${orderId} a ${status}`);
       const { data: orderData, error: orderError } = await supabase

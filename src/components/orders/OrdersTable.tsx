@@ -25,7 +25,7 @@ interface OrdersTableProps {
 export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTableProps) {
   const { toast } = useToast();
   
-  const handleStatusChange = async (orderId: string, newStatus: "pending" | "accepted" | "completed") => {
+  const handleStatusChange = async (orderId: string, newStatus: "pending" | "accepted" | "completed" | "rejected") => {
     try {
       await orderService.updateOrderStatus(orderId, newStatus);
       toast({
@@ -51,6 +51,8 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
         return <Badge variant="info">Accepted</Badge>;
       case "completed":
         return <Badge variant="success">Completed</Badge>;
+      case "rejected":
+        return <Badge variant="destructive">Rejected</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -90,13 +92,23 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                     </Button>
                     
                     {order.status === "pending" && (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => handleStatusChange(order.id, "accepted")}
-                      >
-                        <Check className="h-4 w-4" />
-                      </Button>
+                      <>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleStatusChange(order.id, "accepted")}
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleStatusChange(order.id, "rejected")}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </>
                     )}
                     
                     {order.status === "accepted" && (
