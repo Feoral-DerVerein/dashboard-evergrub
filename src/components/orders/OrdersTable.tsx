@@ -28,10 +28,20 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
   const handleStatusChange = async (orderId: string, newStatus: "pending" | "accepted" | "completed" | "rejected") => {
     try {
       await orderService.updateOrderStatus(orderId, newStatus);
+      
+      let toastMessage = `Order status changed to ${newStatus}`;
+      let toastTitle = "Order updated";
+      
+      if (newStatus === "accepted") {
+        toastTitle = "Order Accepted";
+        toastMessage = "Order was accepted and notification sent to marketplace";
+      }
+      
       toast({
-        title: "Order updated",
-        description: `Order status changed to ${newStatus}`,
+        title: toastTitle,
+        description: toastMessage,
       });
+      
       onStatusChange();
     } catch (error) {
       console.error("Error updating order status:", error);

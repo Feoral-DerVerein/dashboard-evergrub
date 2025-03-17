@@ -200,6 +200,11 @@ export const orderService = {
         throw orderError;
       }
       
+      // Create a notification when an order is accepted
+      if (status === "accepted") {
+        await orderService.createOrderNotification(orderId, `Order #${orderId.substring(0, 8)} has been accepted`);
+      }
+      
       // Obtener los items de la orden actualizada
       const { data: itemsData, error: itemsError } = await supabase
         .from('order_items')
@@ -214,6 +219,52 @@ export const orderService = {
       return mapDbOrderToOrder(orderData as DbOrder, itemsData as DbOrderItem[]);
     } catch (error) {
       console.error("Error en updateOrderStatus:", error);
+      throw error;
+    }
+  },
+  
+  // Crear una notificación para una orden
+  async createOrderNotification(orderId: string, message: string): Promise<void> {
+    try {
+      console.log(`Creando notificación para la orden ${orderId}`);
+      
+      // Get order information to determine if it's a marketplace order
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single();
+        
+      if (orderError) {
+        console.error("Error al obtener información de la orden para notificación:", orderError);
+        throw orderError;
+      }
+      
+      // Check if this is a marketplace order (no user_id)
+      if (orderData && orderData.user_id === null) {
+        console.log("Esta es una orden de marketplace, creando notificación");
+        
+        const { error: notificationError } = await supabase
+          .from('notifications')
+          .insert([{
+            type: 'order',
+            title: 'Order Status Updated',
+            description: message,
+            is_read: false,
+            order_id: orderId,
+            for_marketplace: true,
+            timestamp: new Date().toISOString()
+          }]);
+          
+        if (notificationError) {
+          console.error("Error al crear la notificación:", notificationError);
+          throw notificationError;
+        }
+        
+        console.log("Notificación creada con éxito para marketplace");
+      }
+    } catch (error) {
+      console.error("Error en createOrderNotification:", error);
       throw error;
     }
   }
