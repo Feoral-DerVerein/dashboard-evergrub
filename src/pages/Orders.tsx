@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Eye, X, Printer, MapPin, Phone } from "lucide-react";
+import { Eye, X, Printer, MapPin, Phone, LayoutDashboard } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
@@ -8,6 +8,10 @@ import { orderService } from "@/services/orderService";
 import { Order, OrderItem } from "@/types/order.types";
 import { useAuth } from "@/context/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { OrdersTable } from "@/components/orders/OrdersTable";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (order: Order) => void }) => {
   const initials = order.customerName
@@ -58,6 +62,8 @@ const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (ord
 };
 
 const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; isOpen: boolean; onClose: () => void }) => {
+  const { toast } = useToast();
+  
   if (!order) return null;
 
   const initials = order.customerName
@@ -65,6 +71,24 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
     .map(n => n[0])
     .join('')
     .toUpperCase();
+    
+  const handleUpdateStatus = async (newStatus: "pending" | "accepted" | "completed") => {
+    try {
+      await orderService.updateOrderStatus(order.id, newStatus);
+      toast({
+        title: "Order status updated",
+        description: `Order is now ${newStatus}`,
+      });
+      onClose(); // Close modal after successful update
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      toast({
+        title: "Status update failed",
+        description: "Could not update the order status",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
@@ -83,15 +107,42 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
           <div>
             <div className="flex justify-between mb-2">
               <div className="text-gray-600">Order ID</div>
-              <div className={`text-sm ${
-                order.status === "completed" ? "text-green-500" : 
-                order.status === "pending" ? "text-orange-500" : "text-blue-500"
-              }`}>
+              <Badge 
+                variant="outline" 
+                className={`${
+                  order.status === "completed" ? "bg-green-100 text-green-800" : 
+                  order.status === "pending" ? "bg-yellow-100 text-yellow-800" : "bg-blue-100 text-blue-800"
+                }`}
+              >
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-              </div>
+              </Badge>
             </div>
             <div className="font-semibold">{order.id.substring(0, 8)}</div>
           </div>
+
+          {/* Order status actions */}
+          {order.status !== "completed" && (
+            <div className="flex gap-2 justify-end">
+              {order.status === "pending" && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleUpdateStatus("accepted")}
+                  className="bg-blue-50 hover:bg-blue-100 text-blue-700"
+                >
+                  Accept Order
+                </Button>
+              )}
+              {order.status === "accepted" && (
+                <Button 
+                  variant="outline"
+                  onClick={() => handleUpdateStatus("completed")}
+                  className="bg-green-50 hover:bg-green-100 text-green-700"
+                >
+                  Mark as Completed
+                </Button>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12">
@@ -199,27 +250,35 @@ const Orders = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const { user } = useAuth();
+  const { toast } = useToast();
+
+  const loadOrders = async () => {
+    if (!user) {
+      console.log("Usuario no autenticado");
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      const fetchedOrders = await orderService.getUserOrders();
+      console.log("Órdenes obtenidas:", fetchedOrders);
+      setOrders(fetchedOrders);
+    } catch (error) {
+      console.error("Error al cargar órdenes:", error);
+      toast({
+        title: "Error loading orders",
+        description: "Could not load orders. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadOrders = async () => {
-      if (!user) {
-        console.log("Usuario no autenticado");
-        setLoading(false);
-        return;
-      }
-      
-      try {
-        const fetchedOrders = await orderService.getUserOrders();
-        console.log("Órdenes obtenidas:", fetchedOrders);
-        setOrders(fetchedOrders);
-      } catch (error) {
-        console.error("Error al cargar órdenes:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadOrders();
   }, [user]);
 
@@ -231,8 +290,27 @@ const Orders = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center justify-between gap-3 mb-6">
             <h1 className="text-2xl font-bold">Orders</h1>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className={viewMode === "cards" ? "bg-blue-50" : ""}
+                onClick={() => setViewMode("cards")}
+              >
+                Cards
+              </Button>
+              <Button
+                variant="outline"
+                size="sm" 
+                className={viewMode === "table" ? "bg-blue-50" : ""}
+                onClick={() => setViewMode("table")}
+              >
+                <LayoutDashboard className="h-4 w-4 mr-1" />
+                Table
+              </Button>
+            </div>
           </div>
           <p className="text-gray-500 mb-4">Today's Orders</p>
           <div className="flex gap-2 overflow-x-auto pb-2">
@@ -283,13 +361,21 @@ const Orders = () => {
           {loading ? (
             <LoadingSkeleton />
           ) : filteredOrders.length > 0 ? (
-            filteredOrders.map((order) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                onViewDetails={(order) => setSelectedOrder(order)}
+            viewMode === "cards" ? (
+              filteredOrders.map((order) => (
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  onViewDetails={(order) => setSelectedOrder(order)}
+                />
+              ))
+            ) : (
+              <OrdersTable 
+                orders={filteredOrders} 
+                onViewDetails={(order) => setSelectedOrder(order)} 
+                onStatusChange={loadOrders}
               />
-            ))
+            )
           ) : (
             <div className="text-center py-10">
               <p className="text-gray-500">No orders found</p>
@@ -300,7 +386,10 @@ const Orders = () => {
         <OrderDetailsModal
           order={selectedOrder}
           isOpen={!!selectedOrder}
-          onClose={() => setSelectedOrder(null)}
+          onClose={() => {
+            setSelectedOrder(null);
+            loadOrders(); // Refresh orders when modal is closed
+          }}
         />
 
         <BottomNav />
