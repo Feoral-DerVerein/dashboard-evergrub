@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      notifications: {
+        Row: {
+          description: string
+          for_marketplace: boolean
+          id: string
+          is_read: boolean
+          order_id: string | null
+          timestamp: string
+          title: string
+          type: string
+        }
+        Insert: {
+          description: string
+          for_marketplace?: boolean
+          id?: string
+          is_read?: boolean
+          order_id?: string | null
+          timestamp?: string
+          title: string
+          type: string
+        }
+        Update: {
+          description?: string
+          for_marketplace?: boolean
+          id?: string
+          is_read?: boolean
+          order_id?: string | null
+          timestamp?: string
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           category: string | null
