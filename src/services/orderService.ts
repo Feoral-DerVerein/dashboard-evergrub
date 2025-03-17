@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Order, 
@@ -8,7 +9,7 @@ import {
 } from "@/types/order.types";
 
 export const orderService = {
-  // Obtener todas las órdenes del usuario actual
+  // Obtener todas las órdenes del usuario actual y las de marketplace
   async getUserOrders(): Promise<Order[]> {
     try {
       // Obtener el usuario actual desde la sesión
@@ -43,11 +44,11 @@ export const orderService = {
         }
       }
       
-      // Fetch orders for the current user
+      // Fetch orders for the current user OR orders with no user_id (marketplace)
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select('*')
-        .eq('user_id', userId)
+        .or(`user_id.eq.${userId},user_id.is.null`)
         .order('timestamp', { ascending: false });
       
       if (ordersError) {
@@ -56,9 +57,11 @@ export const orderService = {
       }
       
       if (!ordersData || ordersData.length === 0) {
-        console.log("No se encontraron órdenes para el usuario:", userId);
+        console.log("No se encontraron órdenes para el usuario o del marketplace");
         return [];
       }
+      
+      console.log("Órdenes encontradas:", ordersData.length);
       
       const orders: Order[] = [];
       
@@ -77,7 +80,7 @@ export const orderService = {
         orders.push(mapDbOrderToOrder(dbOrder, itemsData as DbOrderItem[]));
       }
       
-      console.log("Órdenes obtenidas:", orders);
+      console.log("Órdenes procesadas:", orders.length);
       return orders;
     } catch (error) {
       console.error("Error en getUserOrders:", error);
