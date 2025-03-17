@@ -1,3 +1,4 @@
+
 import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -13,6 +14,7 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -23,14 +25,13 @@ const Products = () => {
         return;
       }
       
+      setError(null);
       try {
         console.log("Loading products for user:", user.id);
         
-        // Get both user's products and Saffire Freycinet products in one operation
-        const [userProducts, storeProducts] = await Promise.all([
-          productService.getProductsByUser(user.id),
-          productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID)
-        ]);
+        // Get both user's products and Saffire Freycinet products
+        const userProducts = await productService.getProductsByUser(user.id);
+        const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
         
         console.log("User products loaded:", userProducts.length);
         console.log("Saffire Freycinet store products loaded:", storeProducts.length);
@@ -48,9 +49,10 @@ const Products = () => {
         setProducts(combinedProducts);
       } catch (error: any) {
         console.error("Error loading products:", error);
+        setError("Failed to load products. Please try again later.");
         toast({
           title: "Error",
-          description: "No se pudieron cargar los productos: " + (error.message || "Error desconocido"),
+          description: "Failed to load products: " + (error.message || "Unknown error"),
           variant: "destructive"
         });
         // Set products as empty array to avoid rendering errors
@@ -70,14 +72,14 @@ const Products = () => {
       await productService.deleteProduct(id);
       setProducts(products.filter(product => product.id !== id));
       toast({
-        title: "Producto eliminado",
-        description: "El producto se ha eliminado correctamente"
+        title: "Product deleted",
+        description: "The product has been successfully deleted"
       });
     } catch (error: any) {
-      console.error("Error al eliminar producto:", error);
+      console.error("Error deleting product:", error);
       toast({
         title: "Error",
-        description: "No se pudo eliminar el producto: " + (error.message || "Error desconocido"),
+        description: "Could not delete product: " + (error.message || "Unknown error"),
         variant: "destructive"
       });
     }
@@ -98,6 +100,47 @@ const Products = () => {
       console.log("Products filtered by category and search:", filteredProducts.length);
     }
   }, [products, filteredProducts]);
+
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    // This will trigger the useEffect to run again
+    if (user) {
+      const loadProducts = async () => {
+        try {
+          // Get both user's products and Saffire Freycinet products
+          const userProducts = await productService.getProductsByUser(user.id);
+          const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
+          
+          // Combine products and remove duplicates by ID
+          const combinedProducts = [...userProducts];
+          
+          storeProducts.forEach(storeProduct => {
+            if (!combinedProducts.some(p => p.id === storeProduct.id)) {
+              combinedProducts.push(storeProduct);
+            }
+          });
+          
+          setProducts(combinedProducts);
+        } catch (error: any) {
+          console.error("Error retrying product load:", error);
+          setError("Failed to load products. Please try again.");
+          toast({
+            title: "Error",
+            description: "Failed to load products: " + (error.message || "Unknown error"),
+            variant: "destructive"
+          });
+          setProducts([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      loadProducts();
+    } else {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -161,16 +204,26 @@ const Products = () => {
 
           {loading ? (
             <div className="flex justify-center items-center py-20">
-              <p>Cargando productos...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <p className="text-red-500 mb-4">{error}</p>
+              <button
+                onClick={handleRetry}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Retry Loading
+              </button>
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-gray-500">No hay productos disponibles</p>
+              <p className="text-gray-500">No products available</p>
               <Link
                 to="/products/add"
                 className="inline-block mt-4 text-green-600 hover:text-green-700"
               >
-                Agregar un producto
+                Add a product
               </Link>
             </div>
           ) : (

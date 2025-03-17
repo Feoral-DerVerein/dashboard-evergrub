@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Product, DbProduct, SAFFIRE_FREYCINET_STORE_ID } from "@/types/product.types";
 import { mapDbProductToProduct, mapProductToDbProduct } from "@/utils/product.mappers";
@@ -20,7 +21,7 @@ export const productService = {
         .from('products')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error("Error fetching product by ID:", error);
@@ -44,6 +45,12 @@ export const productService = {
   async getProductsByUser(userId: string): Promise<Product[]> {
     try {
       console.log("Fetching products for user:", userId);
+      
+      if (!userId) {
+        console.warn("No user ID provided for getProductsByUser");
+        return [];
+      }
+      
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -54,8 +61,8 @@ export const productService = {
         throw error;
       }
       
-      if (!data) {
-        console.log("No data returned");
+      if (!data || data.length === 0) {
+        console.log("No products found for user", userId);
         return [];
       }
       
@@ -63,7 +70,8 @@ export const productService = {
       return (data as DbProduct[]).map(mapDbProductToProduct);
     } catch (error) {
       console.error("Error in getProductsByUser:", error);
-      throw error;
+      // Return empty array instead of throwing to make UI more resilient
+      return [];
     }
   },
 
@@ -81,10 +89,11 @@ export const productService = {
       }
       
       console.log("All products fetched:", data ? data.length : 0);
-      return (data as DbProduct[]).map(mapDbProductToProduct);
+      return data ? (data as DbProduct[]).map(mapDbProductToProduct) : [];
     } catch (error) {
       console.error("Error in getAllProducts:", error);
-      throw error;
+      // Return empty array instead of throwing
+      return [];
     }
   },
 
@@ -93,7 +102,12 @@ export const productService = {
     try {
       console.log(`Fetching products for store: ${storeId}`);
       
-      // Try both possible store ID formats
+      if (!storeId) {
+        console.warn("No store ID provided for getProductsByStore");
+        return [];
+      }
+      
+      // Try both possible store ID formats with OR filter
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -106,15 +120,14 @@ export const productService = {
       
       console.log(`Found ${data ? data.length : 0} products for store ${storeId}`);
       
-      if (data && data.length === 0) {
-        // If no products found with the specified store ID,
-        // try fetching all products and then checking their store ID
-        console.log("No products found with the specified store ID, checking all products");
+      if (!data || data.length === 0) {
+        // Try a different approach if no results with OR filter
+        console.log("Trying alternative approach to fetch store products");
         const { data: allProducts, error: allError } = await supabase
           .from('products')
           .select('*');
           
-        if (!allError && allProducts) {
+        if (!allError && allProducts && allProducts.length > 0) {
           const storeProducts = allProducts.filter(
             p => p.storeid === storeId || p.storeid === ALTERNATIVE_STORE_ID
           );
@@ -127,10 +140,11 @@ export const productService = {
         }
       }
       
-      return (data as DbProduct[]).map(mapDbProductToProduct);
+      return data ? (data as DbProduct[]).map(mapDbProductToProduct) : [];
     } catch (error) {
       console.error("Error in getProductsByStore:", error);
-      throw error;
+      // Return empty array to make UI more resilient
+      return [];
     }
   },
 
