@@ -1,7 +1,7 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { Home, ShoppingCart, Bell, User, Package, Search } from "lucide-react";
-import { useUnreadNotificationsCount } from "@/pages/Notifications";
+import { useUnreadNotificationsCount } from "../hooks/useNotifications";
 import { NotificationBadge } from "@/components/ui/notification-badge";
 
 export function BottomNav() {
@@ -60,6 +60,18 @@ export function BottomNav() {
           <User className={`h-6 w-6 ${isActive("/profile") ? "text-blue-600" : "text-gray-500"}`} />
           <span className="text-xs">Profile</span>
         </Link>
+      </div>
+    </div>
+  );
+}
+
+// Add a default export for the Dashboard component
+export default function Dashboard() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
+        {/* Dashboard content */}
+        <BottomNav />
       </div>
     </div>
   );
