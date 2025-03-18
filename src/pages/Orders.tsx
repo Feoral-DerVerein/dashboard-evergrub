@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -86,7 +87,7 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
           description: `La orden ahora está ${newStatus}`,
         });
       }
-      onClose();
+      onClose(); // This will trigger a reload of orders through the parent's loadOrders function
     } catch (error) {
       console.error("Error al procesar la orden:", error);
       toast({
@@ -398,7 +399,7 @@ const Orders = () => {
           isOpen={!!selectedOrder}
           onClose={() => {
             setSelectedOrder(null);
-            loadOrders();
+            loadOrders(); // This ensures order list refreshes when modal is closed
           }}
         />
 
