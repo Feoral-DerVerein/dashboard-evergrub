@@ -31,47 +31,56 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
     try {
       setLoadingOrderIds(prev => [...prev, orderId]);
       
-      console.log(`Cambiando el estado de la orden ${orderId} a ${newStatus}`);
-      await orderService.updateOrderStatus(orderId, newStatus);
-      
-      let toastMessage = `El estado de la orden se cambió a ${newStatus}`;
-      let toastTitle = "Orden actualizada";
-      
-      if (newStatus === "accepted") {
-        toastTitle = "Orden Aceptada";
-        toastMessage = "La orden fue aceptada y se envió una notificación al marketplace";
+      if (newStatus === "rejected") {
+        // Eliminar la orden en lugar de cambiar su estado
+        console.log(`Eliminando la orden ${orderId}`);
+        await orderService.deleteOrder(orderId);
         
-        try {
-          await notificationService.createOrderNotification(
-            orderId,
-            `La orden #${orderId.substring(0, 8)} está siendo procesada`
-          );
-          console.log(`Notificación de procesamiento creada para la orden ${orderId}`);
-        } catch (notifError) {
-          console.error(`Error al crear la notificación de procesamiento para la orden ${orderId}:`, notifError);
+        toast({
+          title: "Orden Eliminada",
+          description: "La orden ha sido eliminada correctamente",
+        });
+      } else {
+        // Actualizar el estado para los otros casos
+        console.log(`Cambiando el estado de la orden ${orderId} a ${newStatus}`);
+        await orderService.updateOrderStatus(orderId, newStatus);
+        
+        let toastMessage = `El estado de la orden se cambió a ${newStatus}`;
+        let toastTitle = "Orden actualizada";
+        
+        if (newStatus === "accepted") {
+          toastTitle = "Orden Aceptada";
+          toastMessage = "La orden fue aceptada y se envió una notificación al marketplace";
+          
+          try {
+            await notificationService.createOrderNotification(
+              orderId,
+              `La orden #${orderId.substring(0, 8)} está siendo procesada`
+            );
+            console.log(`Notificación de procesamiento creada para la orden ${orderId}`);
+          } catch (notifError) {
+            console.error(`Error al crear la notificación de procesamiento para la orden ${orderId}:`, notifError);
+          }
+        } else if (newStatus === "completed") {
+          toastTitle = "Orden Completada";
+          toastMessage = "La orden ha sido marcada como completada";
         }
-      } else if (newStatus === "completed") {
-        toastTitle = "Orden Completada";
-        toastMessage = "La orden ha sido marcada como completada";
-      } else if (newStatus === "rejected") {
-        toastTitle = "Orden Rechazada";
-        toastMessage = "La orden ha sido rechazada";
+        
+        toast({
+          title: toastTitle,
+          description: toastMessage,
+        });
       }
-      
-      toast({
-        title: toastTitle,
-        description: toastMessage,
-      });
       
       // Importante: llamar a onStatusChange para actualizar la lista de órdenes
       onStatusChange();
     } catch (error) {
-      console.error("Error al actualizar el estado de la orden:", error);
+      console.error("Error al procesar la orden:", error);
       
-      const errorMessage = error instanceof Error ? error.message : "No se pudo actualizar el estado de la orden";
+      const errorMessage = error instanceof Error ? error.message : "No se pudo procesar la orden";
       
       toast({
-        title: "Error al actualizar",
+        title: "Error",
         description: errorMessage,
         variant: "destructive",
       });

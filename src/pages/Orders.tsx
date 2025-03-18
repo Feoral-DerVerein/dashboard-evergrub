@@ -73,17 +73,25 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
     
   const handleUpdateStatus = async (newStatus: "pending" | "accepted" | "completed" | "rejected") => {
     try {
-      await orderService.updateOrderStatus(order.id, newStatus);
-      toast({
-        title: "Order status updated",
-        description: `Order is now ${newStatus}`,
-      });
-      onClose(); // Close modal after successful update
+      if (newStatus === "rejected") {
+        await orderService.deleteOrder(order.id);
+        toast({
+          title: "Orden Eliminada",
+          description: "La orden ha sido eliminada correctamente",
+        });
+      } else {
+        await orderService.updateOrderStatus(order.id, newStatus);
+        toast({
+          title: "Estado actualizado",
+          description: `La orden ahora está ${newStatus}`,
+        });
+      }
+      onClose();
     } catch (error) {
-      console.error("Error updating order status:", error);
+      console.error("Error al procesar la orden:", error);
       toast({
-        title: "Status update failed",
-        description: "Could not update the order status",
+        title: "Error",
+        description: error instanceof Error ? error.message : "No se pudo procesar la orden",
         variant: "destructive",
       });
     }
@@ -390,7 +398,7 @@ const Orders = () => {
           isOpen={!!selectedOrder}
           onClose={() => {
             setSelectedOrder(null);
-            loadOrders(); // Refresh orders when modal is closed
+            loadOrders();
           }}
         />
 

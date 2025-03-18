@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Order, 
@@ -300,6 +301,57 @@ export const orderService = {
       return mapDbOrderToOrder(updatedOrder, itemsData as DbOrderItem[]);
     } catch (error) {
       console.error(`Error en updateOrderStatus para la orden ${orderId}:`, error);
+      throw error;
+    }
+  },
+  
+  // Eliminar una orden y sus items
+  async deleteOrder(orderId: string): Promise<void> {
+    try {
+      console.log(`Eliminando orden con ID: ${orderId}`);
+      
+      // Primero verificamos si la orden existe
+      const { data: existingOrder, error: checkError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single();
+      
+      if (checkError) {
+        console.error(`Error al verificar si existe la orden ${orderId}:`, checkError);
+        throw new Error(`No se pudo encontrar la orden con ID ${orderId}: ${checkError.message}`);
+      }
+      
+      if (!existingOrder) {
+        console.error(`La orden con ID ${orderId} no existe`);
+        throw new Error(`La orden con ID ${orderId} no existe`);
+      }
+      
+      // Eliminar primero los items de la orden (debido a la restricción de clave foránea)
+      const { error: deleteItemsError } = await supabase
+        .from('order_items')
+        .delete()
+        .eq('order_id', orderId);
+      
+      if (deleteItemsError) {
+        console.error(`Error al eliminar los items de la orden ${orderId}:`, deleteItemsError);
+        throw new Error(`Error al eliminar los items de la orden: ${deleteItemsError.message}`);
+      }
+      
+      // Eliminar la orden
+      const { error: deleteOrderError } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', orderId);
+      
+      if (deleteOrderError) {
+        console.error(`Error al eliminar la orden ${orderId}:`, deleteOrderError);
+        throw new Error(`Error al eliminar la orden: ${deleteOrderError.message}`);
+      }
+      
+      console.log(`Orden ${orderId} eliminada correctamente`);
+    } catch (error) {
+      console.error(`Error en deleteOrder para la orden ${orderId}:`, error);
       throw error;
     }
   }
