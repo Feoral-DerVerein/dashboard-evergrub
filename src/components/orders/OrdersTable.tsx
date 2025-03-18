@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Table,
@@ -30,7 +31,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
     try {
       setLoadingOrderIds(prev => [...prev, orderId]);
       
-      console.log(`Intentando cambiar el estado de la orden ${orderId} a ${newStatus}`);
+      console.log(`Cambiando el estado de la orden ${orderId} a ${newStatus}`);
       await orderService.updateOrderStatus(orderId, newStatus);
       
       let toastMessage = `El estado de la orden se cambió a ${newStatus}`;
@@ -62,6 +63,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
         description: toastMessage,
       });
       
+      // Importante: llamar a onStatusChange para actualizar la lista de órdenes
       onStatusChange();
     } catch (error) {
       console.error("Error al actualizar el estado de la orden:", error);
