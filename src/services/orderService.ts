@@ -207,25 +207,27 @@ export const orderService = {
         throw new Error(`La orden con ID ${orderId} no existe`);
       }
       
-      // Actualizar el estado de la orden
+      // Actualizar el estado de la orden - FIX: Remove .single() to prevent the error
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .update({ status })
         .eq('id', orderId)
-        .select()
-        .single();
+        .select();
       
       if (orderError) {
         console.error(`Error al actualizar el estado de la orden ${orderId}:`, orderError);
         throw new Error(`Error al actualizar el estado: ${orderError.message}`);
       }
       
-      if (!orderData) {
+      if (!orderData || orderData.length === 0) {
         console.error(`No se recibieron datos después de actualizar la orden ${orderId}`);
         throw new Error('No se recibieron datos después de actualizar la orden');
       }
       
       console.log(`Estado de la orden ${orderId} actualizado correctamente a ${status}`);
+      
+      // Use the first row of data since we're not using .single() anymore
+      const updatedOrder = orderData[0] as DbOrder;
       
       // Create a notification when an order is accepted or completed
       if (status === "accepted" || status === "completed") {
@@ -253,7 +255,7 @@ export const orderService = {
         throw new Error(`Error al obtener los items: ${itemsError.message}`);
       }
       
-      return mapDbOrderToOrder(orderData as DbOrder, itemsData as DbOrderItem[]);
+      return mapDbOrderToOrder(updatedOrder, itemsData as DbOrderItem[]);
     } catch (error) {
       console.error(`Error en updateOrderStatus para la orden ${orderId}:`, error);
       throw error;

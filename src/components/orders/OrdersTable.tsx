@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -24,9 +24,12 @@ interface OrdersTableProps {
 
 export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTableProps) {
   const { toast } = useToast();
+  const [loadingOrderIds, setLoadingOrderIds] = useState<string[]>([]);
   
   const handleStatusChange = async (orderId: string, newStatus: "pending" | "accepted" | "completed" | "rejected") => {
     try {
+      setLoadingOrderIds(prev => [...prev, orderId]);
+      
       console.log(`Intentando cambiar el estado de la orden ${orderId} a ${newStatus}`);
       await orderService.updateOrderStatus(orderId, newStatus);
       
@@ -70,6 +73,8 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setLoadingOrderIds(prev => prev.filter(id => id !== orderId));
     }
   };
 
@@ -127,6 +132,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                           variant="default"
                           size="sm"
                           onClick={() => handleStatusChange(order.id, "accepted")}
+                          disabled={loadingOrderIds.includes(order.id)}
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -135,6 +141,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                           variant="destructive"
                           size="sm"
                           onClick={() => handleStatusChange(order.id, "rejected")}
+                          disabled={loadingOrderIds.includes(order.id)}
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -146,6 +153,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                         variant="default"
                         size="sm"
                         onClick={() => handleStatusChange(order.id, "completed")}
+                        disabled={loadingOrderIds.includes(order.id)}
                       >
                         <Check className="h-4 w-4" />
                       </Button>
