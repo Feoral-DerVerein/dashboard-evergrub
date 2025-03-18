@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Bell, Eye, AlertTriangle, Heart, BarChart, ShoppingBag, Check } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
@@ -6,7 +7,6 @@ import { BottomNav } from "@/components/Dashboard";
 import { notificationService, Notification } from "@/services/notificationService";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useUnreadNotificationsCount } from "@/hooks/useNotifications";
 
 const NotificationIcon = ({ type }: { type: string }) => {
   const iconProps = { className: "w-6 h-6" };
@@ -31,7 +31,6 @@ const Notifications = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { toast } = useToast();
-  const unreadCount = useUnreadNotificationsCount();
   
   const totalNotifications = notifications.length;
   const currentPage = 1;
