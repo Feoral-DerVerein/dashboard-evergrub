@@ -8,6 +8,32 @@ import { notificationService, Notification } from "@/services/notificationServic
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Export this function so we can use it in other components
+export const useUnreadNotificationsCount = () => {
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const notifications = await notificationService.getMarketplaceNotifications();
+        const unread = notifications.filter(n => !n.is_read).length;
+        setUnreadCount(unread);
+      } catch (error) {
+        console.error("Error fetching unread notifications count:", error);
+      }
+    };
+    
+    fetchUnreadCount();
+    
+    // Set up polling every 30 seconds to check for new notifications
+    const intervalId = setInterval(fetchUnreadCount, 30000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  return unreadCount;
+};
+
 const NotificationIcon = ({ type }: { type: string }) => {
   const iconProps = { className: "w-6 h-6" };
   const wrapperClassName = "w-10 h-10 rounded-full flex items-center justify-center";
@@ -31,6 +57,7 @@ const Notifications = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { toast } = useToast();
+  const unreadCount = useUnreadNotificationsCount();
   
   const totalNotifications = notifications.length;
   const currentPage = 1;

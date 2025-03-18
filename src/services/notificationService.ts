@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Notification {
@@ -96,5 +95,27 @@ export const notificationService = {
       console.error("Error in markAsRead:", error);
       throw error;
     }
+  },
+  
+  // Subscribe to real-time notifications
+  subscribeToNotifications(callback: (notification: Notification) => void) {
+    const channel = supabase
+      .channel('public:notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: 'for_marketplace=eq.true',
+        },
+        (payload) => {
+          console.log('New notification received:', payload);
+          callback(payload.new as Notification);
+        }
+      )
+      .subscribe();
+      
+    return channel;
   }
 };
