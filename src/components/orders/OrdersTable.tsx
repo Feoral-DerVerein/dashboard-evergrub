@@ -123,7 +123,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
             orders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id.substring(0, 8)}</TableCell>
-                <TableCell>{order.customerName}</TableCell>
+                <TableCell>{order.customerName || "Cliente"}</TableCell>
                 <TableCell>{order.items.length}</TableCell>
                 <TableCell>${order.total.toFixed(2)}</TableCell>
                 <TableCell>{getStatusBadge(order.status)}</TableCell>
