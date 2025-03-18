@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Table,
@@ -15,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, Check, X } from "lucide-react";
 import { orderService } from "@/services/orderService";
 import { useToast } from "@/hooks/use-toast";
+import { notificationService } from "@/services/notificationService";
 
 interface OrdersTableProps {
   orders: Order[];
@@ -36,6 +36,16 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
       if (newStatus === "accepted") {
         toastTitle = "Orden Aceptada";
         toastMessage = "La orden fue aceptada y se envió una notificación al marketplace";
+        
+        try {
+          await notificationService.createOrderNotification(
+            orderId,
+            `La orden #${orderId.substring(0, 8)} está siendo procesada`
+          );
+          console.log(`Notificación de procesamiento creada para la orden ${orderId}`);
+        } catch (notifError) {
+          console.error(`Error al crear la notificación de procesamiento para la orden ${orderId}:`, notifError);
+        }
       } else if (newStatus === "completed") {
         toastTitle = "Orden Completada";
         toastMessage = "La orden ha sido marcada como completada";
@@ -53,7 +63,6 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
     } catch (error) {
       console.error("Error al actualizar el estado de la orden:", error);
       
-      // Mostrar un mensaje más específico según el error
       const errorMessage = error instanceof Error ? error.message : "No se pudo actualizar el estado de la orden";
       
       toast({
