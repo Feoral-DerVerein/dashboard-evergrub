@@ -12,7 +12,7 @@ import {
 import { Order } from "@/types/order.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Check, X } from "lucide-react";
+import { Eye, Check, X, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { orderService } from "@/services/orderService";
 import { useToast } from "@/hooks/use-toast";
 import { notificationService } from "@/services/notificationService";
@@ -92,13 +92,33 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge variant="warning">Pending</Badge>;
+        return <Badge 
+          variant="warning"
+          icon={<Clock className="h-3 w-3" />}
+        >
+          Pending
+        </Badge>;
       case "accepted":
-        return <Badge variant="info">Accepted</Badge>;
+        return <Badge 
+          variant="info"
+          icon={<CheckCircle2 className="h-3 w-3" />}
+        >
+          Accepted
+        </Badge>;
       case "completed":
-        return <Badge variant="success">Completed</Badge>;
+        return <Badge 
+          variant="success"
+          icon={<CheckCircle2 className="h-3 w-3" />}
+        >
+          Completed
+        </Badge>;
       case "rejected":
-        return <Badge variant="destructive">Rejected</Badge>;
+        return <Badge 
+          variant="destructive"
+          icon={<XCircle className="h-3 w-3" />}
+        >
+          Rejected
+        </Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }

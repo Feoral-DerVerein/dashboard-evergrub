@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Eye, X, Printer, MapPin, Phone, LayoutDashboard } from "lucide-react";
+import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
@@ -71,6 +71,41 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
     .map(n => n[0])
     .join('')
     .toUpperCase();
+  
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "pending":
+        return <Badge 
+          variant="warning"
+          icon={<Clock className="h-3 w-3" />}
+        >
+          Pending
+        </Badge>;
+      case "accepted":
+        return <Badge 
+          variant="info"
+          icon={<CheckCircle2 className="h-3 w-3" />}
+        >
+          Accepted
+        </Badge>;
+      case "completed":
+        return <Badge 
+          variant="success"
+          icon={<CheckCircle2 className="h-3 w-3" />}
+        >
+          Completed
+        </Badge>;
+      case "rejected":
+        return <Badge 
+          variant="destructive"
+          icon={<XCircle className="h-3 w-3" />}
+        >
+          Rejected
+        </Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
     
   const handleUpdateStatus = async (newStatus: "pending" | "accepted" | "completed" | "rejected") => {
     try {
@@ -115,15 +150,7 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
           <div>
             <div className="flex justify-between mb-2">
               <div className="text-gray-600">Order ID</div>
-              <Badge 
-                variant={
-                  order.status === "completed" ? "success" : 
-                  order.status === "pending" ? "warning" : 
-                  order.status === "rejected" ? "destructive" : "info"
-                }
-              >
-                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-              </Badge>
+              {getStatusBadge(order.status)}
             </div>
             <div className="font-semibold">{order.id.substring(0, 8)}</div>
           </div>
