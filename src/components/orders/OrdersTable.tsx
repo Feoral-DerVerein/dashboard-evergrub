@@ -27,14 +27,21 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
   
   const handleStatusChange = async (orderId: string, newStatus: "pending" | "accepted" | "completed" | "rejected") => {
     try {
+      console.log(`Intentando cambiar el estado de la orden ${orderId} a ${newStatus}`);
       await orderService.updateOrderStatus(orderId, newStatus);
       
-      let toastMessage = `Order status changed to ${newStatus}`;
-      let toastTitle = "Order updated";
+      let toastMessage = `El estado de la orden se cambió a ${newStatus}`;
+      let toastTitle = "Orden actualizada";
       
       if (newStatus === "accepted") {
-        toastTitle = "Order Accepted";
-        toastMessage = "Order was accepted and notification sent to marketplace";
+        toastTitle = "Orden Aceptada";
+        toastMessage = "La orden fue aceptada y se envió una notificación al marketplace";
+      } else if (newStatus === "completed") {
+        toastTitle = "Orden Completada";
+        toastMessage = "La orden ha sido marcada como completada";
+      } else if (newStatus === "rejected") {
+        toastTitle = "Orden Rechazada";
+        toastMessage = "La orden ha sido rechazada";
       }
       
       toast({
@@ -44,10 +51,14 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
       
       onStatusChange();
     } catch (error) {
-      console.error("Error updating order status:", error);
+      console.error("Error al actualizar el estado de la orden:", error);
+      
+      // Mostrar un mensaje más específico según el error
+      const errorMessage = error instanceof Error ? error.message : "No se pudo actualizar el estado de la orden";
+      
       toast({
-        title: "Update failed",
-        description: "Could not update the order status",
+        title: "Error al actualizar",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -71,15 +82,15 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
   return (
     <div className="rounded-md border">
       <Table>
-        <TableCaption>List of recent orders</TableCaption>
+        <TableCaption>Lista de órdenes recientes</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Order ID</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Items</TableHead>
+            <TableHead>ID de Orden</TableHead>
+            <TableHead>Cliente</TableHead>
+            <TableHead>Artículos</TableHead>
             <TableHead>Total</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>Estado</TableHead>
+            <TableHead className="text-right">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -137,7 +148,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
           ) : (
             <TableRow>
               <TableCell colSpan={6} className="text-center">
-                No orders found
+                No se encontraron órdenes
               </TableCell>
             </TableRow>
           )}

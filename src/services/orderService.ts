@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Order, 
@@ -188,6 +189,25 @@ export const orderService = {
   async updateOrderStatus(orderId: string, status: "pending" | "accepted" | "completed" | "rejected"): Promise<Order> {
     try {
       console.log(`Actualizando estado de la orden ${orderId} a ${status}`);
+      
+      // Verificar primero si la orden existe
+      const { data: existingOrder, error: checkError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single();
+      
+      if (checkError) {
+        console.error(`Error al verificar si existe la orden ${orderId}:`, checkError);
+        throw new Error(`No se pudo encontrar la orden con ID ${orderId}: ${checkError.message}`);
+      }
+      
+      if (!existingOrder) {
+        console.error(`La orden con ID ${orderId} no existe`);
+        throw new Error(`La orden con ID ${orderId} no existe`);
+      }
+      
+      // Actualizar el estado de la orden
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .update({ status })
@@ -196,13 +216,30 @@ export const orderService = {
         .single();
       
       if (orderError) {
-        console.error("Error al actualizar el estado de la orden:", orderError);
-        throw orderError;
+        console.error(`Error al actualizar el estado de la orden ${orderId}:`, orderError);
+        throw new Error(`Error al actualizar el estado: ${orderError.message}`);
       }
       
-      // Create a notification when an order is accepted
-      if (status === "accepted") {
-        await notificationService.createOrderNotification(orderId, `Order #${orderId.substring(0, 8)} has been accepted`);
+      if (!orderData) {
+        console.error(`No se recibieron datos después de actualizar la orden ${orderId}`);
+        throw new Error('No se recibieron datos después de actualizar la orden');
+      }
+      
+      console.log(`Estado de la orden ${orderId} actualizado correctamente a ${status}`);
+      
+      // Create a notification when an order is accepted or completed
+      if (status === "accepted" || status === "completed") {
+        try {
+          const statusText = status === "accepted" ? "aceptada" : "completada";
+          await notificationService.createOrderNotification(
+            orderId, 
+            `La orden #${orderId.substring(0, 8)} ha sido ${statusText}`
+          );
+          console.log(`Notificación creada para la orden ${orderId}`);
+        } catch (notifError) {
+          console.error(`Error al crear la notificación para la orden ${orderId}:`, notifError);
+          // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente
+        }
       }
       
       // Obtener los items de la orden actualizada
@@ -212,13 +249,13 @@ export const orderService = {
         .eq('order_id', orderId);
       
       if (itemsError) {
-        console.error("Error al obtener los items después de actualizar:", itemsError);
-        throw itemsError;
+        console.error(`Error al obtener los items después de actualizar la orden ${orderId}:`, itemsError);
+        throw new Error(`Error al obtener los items: ${itemsError.message}`);
       }
       
       return mapDbOrderToOrder(orderData as DbOrder, itemsData as DbOrderItem[]);
     } catch (error) {
-      console.error("Error en updateOrderStatus:", error);
+      console.error(`Error en updateOrderStatus para la orden ${orderId}:`, error);
       throw error;
     }
   }
