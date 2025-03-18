@@ -276,6 +276,7 @@ const Orders = () => {
     
     try {
       setLoading(true);
+      console.log("Cargando órdenes...");
       const fetchedOrders = await orderService.getUserOrders();
       console.log("Órdenes obtenidas:", fetchedOrders);
       setOrders(fetchedOrders);
@@ -298,6 +299,11 @@ const Orders = () => {
   const filteredOrders = orders.filter(
     (order) => filter === "all" || order.status === filter
   );
+
+  const handleStatusChange = () => {
+    console.log("Estado de orden cambiado, recargando órdenes...");
+    loadOrders();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -384,7 +390,7 @@ const Orders = () => {
               <OrdersTable 
                 orders={filteredOrders} 
                 onViewDetails={(order) => setSelectedOrder(order)} 
-                onStatusChange={loadOrders}
+                onStatusChange={handleStatusChange}
               />
             )
           ) : (
