@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Order, 
@@ -207,89 +206,32 @@ export const orderService = {
         throw new Error(`La orden con ID ${orderId} no existe`);
       }
       
-      // Actualizar el estado de la orden
-      const { data: updatedData, error: updateError } = await supabase
+      // Actualizar el estado de la orden sin usar select() para evitar problemas de RLS
+      const { error: updateError } = await supabase
         .from('orders')
         .update({ status })
-        .eq('id', orderId)
-        .select();
+        .eq('id', orderId);
       
       if (updateError) {
         console.error(`Error al actualizar el estado de la orden ${orderId}:`, updateError);
         throw new Error(`Error al actualizar el estado: ${updateError.message}`);
       }
       
-      console.log(`Respuesta de actualización:`, updatedData);
-      
-      if (!updatedData || updatedData.length === 0) {
-        console.error(`No se obtuvieron datos actualizados para la orden ${orderId}`);
-        
-        // En lugar de fallar, vamos a obtener la orden actualizada
-        const { data: refreshedOrder, error: refreshError } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('id', orderId)
-          .single();
+      // Obtener la orden actualizada después de la actualización
+      const { data: refreshedOrder, error: refreshError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single();
           
-        if (refreshError) {
-          console.error(`Error al recargar la orden ${orderId}:`, refreshError);
-          throw new Error(`No se pudo obtener la orden actualizada: ${refreshError.message}`);
-        }
-        
-        // Usar la orden recargada
-        console.log(`Orden ${orderId} recargada con estado ${refreshedOrder.status}`);
-        
-        // Create a notification when an order is accepted
-        if (status === "accepted") {
-          try {
-            await notificationService.createOrderNotification(
-              orderId, 
-              `La orden #${orderId.substring(0, 8)} ha sido aceptada`
-            );
-            console.log(`Notificación de aceptación creada para la orden ${orderId}`);
-          } catch (notifError) {
-            console.error(`Error al crear la notificación para la orden ${orderId}:`, notifError);
-            // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente
-          }
-        }
-        
-        // Create a notification when an order is completed and a pickup notification
-        if (status === "completed") {
-          try {
-            // Status update notification
-            await notificationService.createOrderNotification(
-              orderId, 
-              `La orden #${orderId.substring(0, 8)} ha sido completada`
-            );
-            console.log(`Notificación de completado creada para la orden ${orderId}`);
-            
-            // Create a pickup notification for marketplace orders
-            await notificationService.createPickupNotification(orderId);
-            console.log(`Notificación de retiro creada para la orden ${orderId}`);
-          } catch (notifError) {
-            console.error(`Error al crear las notificaciones para la orden ${orderId}:`, notifError);
-            // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente
-          }
-        }
-        
-        // Obtener los items de la orden actualizada
-        const { data: itemsData, error: itemsError } = await supabase
-          .from('order_items')
-          .select('*')
-          .eq('order_id', orderId);
-        
-        if (itemsError) {
-          console.error(`Error al obtener los items después de actualizar la orden ${orderId}:`, itemsError);
-          throw new Error(`Error al obtener los items: ${itemsError.message}`);
-        }
-        
-        return mapDbOrderToOrder(refreshedOrder as DbOrder, itemsData as DbOrderItem[]);
+      if (refreshError) {
+        console.error(`Error al recargar la orden ${orderId}:`, refreshError);
+        throw new Error(`No se pudo obtener la orden actualizada: ${refreshError.message}`);
       }
-      
-      // Use the first row of data
-      const updatedOrder = updatedData[0] as DbOrder;
-      console.log(`Estado de la orden ${orderId} actualizado correctamente a ${status}, nuevo estado: ${updatedOrder.status}`);
-      
+        
+      // Usar la orden recargada
+      console.log(`Orden ${orderId} actualizada correctamente a ${refreshedOrder.status}`);
+        
       // Create a notification when an order is accepted
       if (status === "accepted") {
         try {
@@ -303,7 +245,7 @@ export const orderService = {
           // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente
         }
       }
-      
+        
       // Create a notification when an order is completed and a pickup notification
       if (status === "completed") {
         try {
@@ -313,7 +255,7 @@ export const orderService = {
             `La orden #${orderId.substring(0, 8)} ha sido completada`
           );
           console.log(`Notificación de completado creada para la orden ${orderId}`);
-          
+            
           // Create a pickup notification for marketplace orders
           await notificationService.createPickupNotification(orderId);
           console.log(`Notificación de retiro creada para la orden ${orderId}`);
@@ -322,19 +264,19 @@ export const orderService = {
           // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente
         }
       }
-      
+        
       // Obtener los items de la orden actualizada
       const { data: itemsData, error: itemsError } = await supabase
         .from('order_items')
         .select('*')
         .eq('order_id', orderId);
-      
+        
       if (itemsError) {
         console.error(`Error al obtener los items después de actualizar la orden ${orderId}:`, itemsError);
         throw new Error(`Error al obtener los items: ${itemsError.message}`);
       }
-      
-      return mapDbOrderToOrder(updatedOrder, itemsData as DbOrderItem[]);
+        
+      return mapDbOrderToOrder(refreshedOrder as DbOrder, itemsData as DbOrderItem[]);
     } catch (error) {
       console.error(`Error en updateOrderStatus para la orden ${orderId}:`, error);
       throw error;

@@ -45,6 +45,7 @@ export function useNotificationsAndOrders() {
           console.log('Order change detected:', payload);
           // Store the ID of the updated order to help components react to this specific change
           if (payload.eventType === 'UPDATE' && payload.new && payload.new.id) {
+            console.log(`Detectado cambio en orden: ${payload.new.id}, nuevo estado: ${payload.new.status}`);
             setLastOrderUpdate(payload.new.id);
           }
           fetchOrderCount();

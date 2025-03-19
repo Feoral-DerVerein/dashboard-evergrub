@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
 import { Order } from "@/types/order.types";
 import { useAuth } from "@/context/AuthContext";
@@ -13,22 +13,22 @@ import { orderService } from "@/services/orderService";
 import { useToast } from "@/hooks/use-toast";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "completed": return "text-green-500";
+    case "pending": return "text-orange-500";
+    case "accepted": return "text-blue-500";
+    case "rejected": return "text-red-500";
+    default: return "text-gray-500";
+  }
+};
+
 const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (order: Order) => void }) => {
   const initials = order.customerName
     .split(' ')
     .map(n => n[0])
     .join('')
     .toUpperCase();
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed": return "text-green-500";
-      case "pending": return "text-orange-500";
-      case "accepted": return "text-blue-500";
-      case "rejected": return "text-red-500";
-      default: return "text-gray-500";
-    }
-  };
 
   return (
     <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
@@ -139,13 +139,8 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onStatusChange }: {
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
       <DialogContent className="max-w-md mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold">Order Details</h2>
-          <button className="text-gray-500">
-            <Printer className="w-5 h-5" />
-          </button>
-        </div>
-
+        <DialogTitle className="text-lg font-semibold">Order Details</DialogTitle>
+        
         <div className="space-y-6">
           <div>
             <div className="flex justify-between mb-2">
@@ -303,8 +298,10 @@ const Orders = () => {
     if (lastOrderUpdate) {
       const refreshSingleOrder = async () => {
         try {
+          console.log(`Actualizando orden específica: ${lastOrderUpdate}`);
           const updatedOrder = await orderService.getOrderById(lastOrderUpdate);
           if (updatedOrder) {
+            console.log(`Orden actualizada:`, updatedOrder);
             setOrders(prevOrders => 
               prevOrders.map(order => 
                 order.id === lastOrderUpdate ? updatedOrder : order
@@ -353,13 +350,18 @@ const Orders = () => {
         setOrders(orders.filter(o => o.id !== orderId));
         setSelectedOrder(null);
       } else {
+        console.log(`Cambiando estado de orden ${orderId} a ${status}`);
         const updatedOrder = await orderService.updateOrderStatus(orderId, status);
+        console.log(`Orden actualizada:`, updatedOrder);
+        
         toast({
           title: "Order Updated",
           description: `Order has been ${status}`,
         });
         
-        setOrders(orders.map(o => o.id === orderId ? updatedOrder : o));
+        setOrders(prevOrders => 
+          prevOrders.map(o => o.id === orderId ? updatedOrder : o)
+        );
         
         if (selectedOrder && selectedOrder.id === orderId) {
           setSelectedOrder(updatedOrder);
@@ -489,4 +491,3 @@ const Orders = () => {
 };
 
 export default Orders;
-

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -24,13 +24,16 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
   
   const handleStatusChange = (orderId: string, status: "accepted" | "completed" | "rejected") => {
     setProcessingOrders({...processingOrders, [orderId]: true});
-    onStatusChange(orderId, status);
     
-    // We'll clear the processing state after a short delay to allow for UI feedback
-    // even if the parent component refreshes the order list
+    // Llamamos al manejador de estado con un pequeño retraso para mostrar feedback visual
     setTimeout(() => {
-      setProcessingOrders(prev => ({...prev, [orderId]: false}));
-    }, 1000);
+      onStatusChange(orderId, status);
+      
+      // Limpiamos el estado de procesamiento después de un corto tiempo
+      setTimeout(() => {
+        setProcessingOrders(prev => ({...prev, [orderId]: false}));
+      }, 500);
+    }, 100);
   };
 
   const getStatusBadge = (order: Order) => {
