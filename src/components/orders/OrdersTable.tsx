@@ -26,10 +26,17 @@ interface OrdersTableProps {
 export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTableProps) {
   const { toast } = useToast();
   const [loadingOrderIds, setLoadingOrderIds] = useState<string[]>([]);
+  const [localOrderStatus, setLocalOrderStatus] = useState<Record<string, string>>({});
   
   const handleStatusChange = async (orderId: string, newStatus: "pending" | "accepted" | "completed" | "rejected") => {
     try {
       setLoadingOrderIds(prev => [...prev, orderId]);
+      
+      // Update local state immediately for a responsive UI
+      setLocalOrderStatus(prev => ({
+        ...prev,
+        [orderId]: newStatus
+      }));
       
       if (newStatus === "rejected") {
         // Eliminar la orden en lugar de cambiar su estado
@@ -77,6 +84,13 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
     } catch (error) {
       console.error("Error al procesar la orden:", error);
       
+      // Reset local status on error
+      setLocalOrderStatus(prev => {
+        const newState = {...prev};
+        delete newState[orderId];
+        return newState;
+      });
+      
       const errorMessage = error instanceof Error ? error.message : "No se pudo procesar la orden";
       
       toast({
@@ -89,7 +103,10 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (order: Order) => {
+    // Use local status if available, otherwise use order status
+    const status = localOrderStatus[order.id] || order.status;
+    
     switch (status) {
       case "pending":
         return <Badge 
@@ -146,7 +163,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                 <TableCell>{order.customerName || "Cliente"}</TableCell>
                 <TableCell>{order.items.length}</TableCell>
                 <TableCell>${order.total.toFixed(2)}</TableCell>
-                <TableCell>{getStatusBadge(order.status)}</TableCell>
+                <TableCell>{getStatusBadge(order)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button 
@@ -157,7 +174,9 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                       <Eye className="h-4 w-4" />
                     </Button>
                     
-                    {order.status === "pending" && (
+                    {/* Only show Accept/Reject if the order is pending, 
+                        and use local status for the check */}
+                    {(localOrderStatus[order.id] || order.status) === "pending" && (
                       <>
                         <Button
                           variant="default"
@@ -179,7 +198,9 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                       </>
                     )}
                     
-                    {order.status === "accepted" && (
+                    {/* Only show Complete if the order is accepted, 
+                        and use local status for the check */}
+                    {(localOrderStatus[order.id] || order.status) === "accepted" && (
                       <Button
                         variant="default"
                         size="sm"

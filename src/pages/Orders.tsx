@@ -63,6 +63,14 @@ const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (ord
 
 const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; isOpen: boolean; onClose: () => void }) => {
   const { toast } = useToast();
+  const [localStatus, setLocalStatus] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Reset local status when order changes
+    if (order) {
+      setLocalStatus(null);
+    }
+  }, [order]);
   
   if (!order) return null;
 
@@ -71,6 +79,9 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
     .map(n => n[0])
     .join('')
     .toUpperCase();
+  
+  // Use local status if available, otherwise use order status
+  const displayStatus = localStatus || order.status;
   
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -109,6 +120,9 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
     
   const handleUpdateStatus = async (newStatus: "pending" | "accepted" | "completed" | "rejected") => {
     try {
+      // Update local status immediately for responsive UI
+      setLocalStatus(newStatus);
+      
       if (newStatus === "rejected") {
         await orderService.deleteOrder(order.id);
         toast({
@@ -125,6 +139,8 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
       onClose(); // This will trigger a reload of orders through the parent's loadOrders function
     } catch (error) {
       console.error("Error al procesar la orden:", error);
+      // Reset local status on error
+      setLocalStatus(null);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "No se pudo procesar la orden",
@@ -150,14 +166,14 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
           <div>
             <div className="flex justify-between mb-2">
               <div className="text-gray-600">Order ID</div>
-              {getStatusBadge(order.status)}
+              {getStatusBadge(displayStatus)}
             </div>
             <div className="font-semibold">{order.id.substring(0, 8)}</div>
           </div>
 
-          {order.status !== "completed" && order.status !== "rejected" && (
+          {displayStatus !== "completed" && displayStatus !== "rejected" && (
             <div className="flex gap-2 justify-end">
-              {order.status === "pending" && (
+              {displayStatus === "pending" && (
                 <>
                   <Button 
                     onClick={() => handleUpdateStatus("accepted")}
@@ -173,7 +189,7 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
                   </Button>
                 </>
               )}
-              {order.status === "accepted" && (
+              {displayStatus === "accepted" && (
                 <Button
                   onClick={() => handleUpdateStatus("completed")}
                   variant="default"
