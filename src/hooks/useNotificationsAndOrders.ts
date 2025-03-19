@@ -6,6 +6,7 @@ export function useNotificationsAndOrders() {
   const [orderCount, setOrderCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
   const [lastOrderUpdate, setLastOrderUpdate] = useState<string | null>(null);
+  const [lastOrderDelete, setLastOrderDelete] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrderCount = async () => {
@@ -43,11 +44,17 @@ export function useNotificationsAndOrders() {
         { event: '*', schema: 'public', table: 'orders' },
         (payload) => {
           console.log('Order change detected:', payload);
-          // Store the ID of the updated order to help components react to this specific change
+          
           if (payload.eventType === 'UPDATE' && payload.new && payload.new.id) {
             console.log(`Detectado cambio en orden: ${payload.new.id}, nuevo estado: ${payload.new.status}`);
             setLastOrderUpdate(payload.new.id);
           }
+          
+          if (payload.eventType === 'DELETE' && payload.old && payload.old.id) {
+            console.log(`Detectada eliminación de orden: ${payload.old.id}`);
+            setLastOrderDelete(payload.old.id);
+          }
+          
           fetchOrderCount();
         }
       )
@@ -72,5 +79,5 @@ export function useNotificationsAndOrders() {
     };
   }, []);
 
-  return { orderCount, notificationCount, lastOrderUpdate };
+  return { orderCount, notificationCount, lastOrderUpdate, lastOrderDelete };
 }

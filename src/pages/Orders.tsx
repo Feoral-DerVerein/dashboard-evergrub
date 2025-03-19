@@ -323,7 +323,7 @@ const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const { user } = useAuth();
   const { toast } = useToast();
-  const { lastOrderUpdate } = useNotificationsAndOrders();
+  const { lastOrderUpdate, lastOrderDelete } = useNotificationsAndOrders();
 
   useEffect(() => {
     loadOrders();
@@ -355,6 +355,17 @@ const Orders = () => {
       refreshSingleOrder();
     }
   }, [lastOrderUpdate, selectedOrder]);
+  
+  useEffect(() => {
+    if (lastOrderDelete) {
+      console.log(`Eliminando orden del dashboard: ${lastOrderDelete}`);
+      setOrders(prevOrders => prevOrders.filter(order => order.id !== lastOrderDelete));
+      
+      if (selectedOrder && selectedOrder.id === lastOrderDelete) {
+        setSelectedOrder(null);
+      }
+    }
+  }, [lastOrderDelete, selectedOrder]);
   
   const loadOrders = async () => {
     try {
