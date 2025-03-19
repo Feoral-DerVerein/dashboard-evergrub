@@ -27,11 +27,11 @@ export const supabase = createClient<Database>(
 
 // Add RPC call for broadcasting status changes
 export const broadcastOrderStatusChange = async (orderId: string, newStatus: string) => {
-  // Use type assertion to override the strict typing
-  return await supabase.rpc('broadcast_order_status_change', {
+  // Use a more generic type that doesn't require specific type checking
+  return await (supabase.rpc as any)('broadcast_order_status_change', {
     order_id: orderId,
     new_status: newStatus
-  } as any); // Use 'any' to bypass type checking for this specific call
+  });
 };
 
 // Need to add SQL to add the column to the orders table if it doesn't exist
