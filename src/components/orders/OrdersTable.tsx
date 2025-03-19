@@ -36,28 +36,28 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
           variant="warning"
           icon={<Clock className="h-3 w-3" />}
         >
-          Pendiente
+          Pending
         </Badge>;
       case "accepted":
         return <Badge 
           variant="info"
           icon={<CheckCircle2 className="h-3 w-3" />}
         >
-          Aceptada
+          Accepted
         </Badge>;
       case "completed":
         return <Badge 
           variant="success"
           icon={<CheckCircle2 className="h-3 w-3" />}
         >
-          Completada
+          Completed
         </Badge>;
       case "rejected":
         return <Badge 
           variant="destructive"
           icon={<XCircle className="h-3 w-3" />}
         >
-          Rechazada
+          Rejected
         </Badge>;
       default:
         return <Badge variant="outline">{order.status}</Badge>;
@@ -67,15 +67,15 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
   return (
     <div className="rounded-md border">
       <Table>
-        <TableCaption>Lista de órdenes recientes</TableCaption>
+        <TableCaption>Recent Orders List</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>ID de Orden</TableHead>
-            <TableHead>Cliente</TableHead>
-            <TableHead>Artículos</TableHead>
+            <TableHead>Order ID</TableHead>
+            <TableHead>Customer</TableHead>
+            <TableHead>Items</TableHead>
             <TableHead>Total</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead className="text-right">Acciones</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -83,7 +83,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
             orders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id.substring(0, 8)}</TableCell>
-                <TableCell>{order.customerName || "Cliente"}</TableCell>
+                <TableCell>{order.customerName || "Customer"}</TableCell>
                 <TableCell>{order.items.length}</TableCell>
                 <TableCell>${order.total.toFixed(2)}</TableCell>
                 <TableCell>{getStatusBadge(order)}</TableCell>
@@ -104,7 +104,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                           size="sm"
                           disabled={processingOrders[order.id]}
                           onClick={() => handleStatusChange(order.id, "accepted")}
-                          title="Aceptar orden"
+                          title="Accept order"
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -114,7 +114,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                           size="sm"
                           disabled={processingOrders[order.id]}
                           onClick={() => handleStatusChange(order.id, "rejected")}
-                          title="Rechazar orden"
+                          title="Reject order"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -128,7 +128,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                         className="bg-green-600 hover:bg-green-700 text-white"
                         disabled={processingOrders[order.id]}
                         onClick={() => handleStatusChange(order.id, "completed")}
-                        title="Marcar como completada"
+                        title="Mark as completed"
                       >
                         <Check className="h-4 w-4" />
                       </Button>
@@ -140,7 +140,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
           ) : (
             <TableRow>
               <TableCell colSpan={6} className="text-center">
-                No se encontraron órdenes
+                No orders found
               </TableCell>
             </TableRow>
           )}

@@ -82,8 +82,8 @@ export const notificationService = {
           .from('notifications')
           .insert({
             type: 'pickup',
-            title: 'Producto Listo para Retirar',
-            description: `Tu orden #${orderId.substring(0, 8)} está completada y lista para retirar.`,
+            title: 'Product Ready for Pickup',
+            description: `Your order #${orderId.substring(0, 8)} is completed and ready for pickup.`,
             is_read: false,
             order_id: orderId,
             for_marketplace: true,

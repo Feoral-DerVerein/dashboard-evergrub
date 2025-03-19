@@ -50,7 +50,7 @@ export const BottomNav = () => {
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
-    // Cargar el conteo de órdenes pendientes
+    // Load the count of pending orders
     const fetchOrderCount = async () => {
       const { data, error } = await supabase
         .from('orders')
@@ -62,17 +62,17 @@ export const BottomNav = () => {
       }
     };
 
-    // Cargar conteo de notificaciones no leídas
+    // Load count of unread notifications
     const fetchNotificationCount = async () => {
       const { data, error } = await supabase
         .from('notifications')
         .select('id')
-        .eq('read', false);
+        .eq('is_read', false);
       
       if (!error && data) {
         setNotificationCount(data.length);
       } else {
-        // Si no hay tabla de notificaciones, usamos un valor de prueba
+        // If there is no notifications table, use a test value
         setNotificationCount(3);
       }
     };
@@ -80,7 +80,7 @@ export const BottomNav = () => {
     fetchOrderCount();
     fetchNotificationCount();
 
-    // Configurar canales en tiempo real para órdenes y notificaciones
+    // Set up real-time channels for orders and notifications
     const ordersChannel = supabase
       .channel('orders-changes')
       .on(
@@ -137,7 +137,7 @@ const Dashboard = () => {
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
-    // Cargar el conteo de órdenes pendientes
+    // Load the count of pending orders
     const fetchOrderCount = async () => {
       const { data, error } = await supabase
         .from('orders')
@@ -149,17 +149,17 @@ const Dashboard = () => {
       }
     };
 
-    // Cargar conteo de notificaciones no leídas
+    // Load count of unread notifications
     const fetchNotificationCount = async () => {
       const { data, error } = await supabase
         .from('notifications')
         .select('id')
-        .eq('read', false);
+        .eq('is_read', false);
       
       if (!error && data) {
         setNotificationCount(data.length);
       } else {
-        // Si no hay tabla de notificaciones, usamos un valor de prueba
+        // If there is no notifications table, use a test value
         setNotificationCount(3);
       }
     };
@@ -167,7 +167,7 @@ const Dashboard = () => {
     fetchOrderCount();
     fetchNotificationCount();
 
-    // Configurar canales en tiempo real para órdenes y notificaciones
+    // Set up real-time channels for orders and notifications
     const ordersChannel = supabase
       .channel('orders-changes')
       .on(
