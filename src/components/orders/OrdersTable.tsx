@@ -49,7 +49,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
           className="bg-amber-100 text-amber-800 font-medium"
           icon={<Clock className="h-3 w-3" />}
         >
-          Por aceptar
+          Pending
         </Badge>;
       case "accepted":
         return <Badge 
@@ -57,7 +57,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
           className="bg-blue-100 text-blue-800 font-medium"
           icon={<CheckCircle2 className="h-3 w-3" />}
         >
-          Aceptado
+          Accepted
         </Badge>;
       case "completed":
         return <Badge 
@@ -65,7 +65,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
           className="bg-emerald-100 text-emerald-800 font-medium"
           icon={<Package className="h-3 w-3" />}
         >
-          Completado
+          Completed
         </Badge>;
       case "rejected":
         return <Badge 
@@ -73,7 +73,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
           className="bg-red-100 text-red-800 font-medium"
           icon={<XCircle className="h-3 w-3" />}
         >
-          Rechazado
+          Rejected
         </Badge>;
       default:
         return <Badge variant="outline">{order.status}</Badge>;
@@ -96,15 +96,15 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
   return (
     <div className="rounded-md border shadow-sm overflow-hidden">
       <Table>
-        <TableCaption className="pb-4">Lista de Pedidos Recientes</TableCaption>
+        <TableCaption className="pb-4">Recent Orders List</TableCaption>
         <TableHeader className="bg-gray-50">
           <TableRow>
             <TableHead className="font-semibold">Order ID</TableHead>
-            <TableHead className="font-semibold">Cliente</TableHead>
+            <TableHead className="font-semibold">Customer</TableHead>
             <TableHead className="font-semibold">Items</TableHead>
             <TableHead className="font-semibold">Total</TableHead>
-            <TableHead className="font-semibold">Estado</TableHead>
-            <TableHead className="text-right font-semibold">Acciones</TableHead>
+            <TableHead className="font-semibold">Status</TableHead>
+            <TableHead className="text-right font-semibold">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -112,7 +112,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
             orders.map((order) => (
               <TableRow key={order.id} className={getRowClassName(order.status)}>
                 <TableCell className="font-medium">{order.id.substring(0, 8)}</TableCell>
-                <TableCell>{order.customerName || "Cliente"}</TableCell>
+                <TableCell>{order.customerName || "Customer"}</TableCell>
                 <TableCell>{order.items.length}</TableCell>
                 <TableCell className="font-medium">${order.total.toFixed(2)}</TableCell>
                 <TableCell>{getStatusBadge(order)}</TableCell>
@@ -187,7 +187,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
               <TableCell colSpan={6} className="text-center py-8">
                 <div className="flex flex-col items-center justify-center space-y-3">
                   <Package className="h-12 w-12 text-gray-300" />
-                  <p className="text-gray-500 font-medium">No se encontraron pedidos</p>
+                  <p className="text-gray-500 font-medium">No orders found</p>
                 </div>
               </TableCell>
             </TableRow>

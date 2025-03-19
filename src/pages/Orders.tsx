@@ -74,24 +74,24 @@ const Orders = () => {
               <div className="text-gray-500 font-medium">Order ID:</div>
               <div className="font-medium">{selectedOrder.id.substring(0, 8)}</div>
               
-              <div className="text-gray-500 font-medium">Cliente:</div>
-              <div>{selectedOrder.customerName || "Cliente"}</div>
+              <div className="text-gray-500 font-medium">Customer:</div>
+              <div>{selectedOrder.customerName || "Customer"}</div>
               
               <div className="text-gray-500 font-medium">Total:</div>
               <div className="font-semibold">${selectedOrder.total.toFixed(2)}</div>
               
-              <div className="text-gray-500 font-medium">Estado:</div>
+              <div className="text-gray-500 font-medium">Status:</div>
               <div className="capitalize font-medium">
-                {selectedOrder.status === "pending" && "Por aceptar"}
-                {selectedOrder.status === "accepted" && "Aceptado"}
-                {selectedOrder.status === "completed" && "Completado"}
-                {selectedOrder.status === "rejected" && "Rechazado"}
+                {selectedOrder.status === "pending" && "Pending"}
+                {selectedOrder.status === "accepted" && "Accepted"}
+                {selectedOrder.status === "completed" && "Completed"}
+                {selectedOrder.status === "rejected" && "Rejected"}
               </div>
               
-              <div className="text-gray-500 font-medium">Ubicación:</div>
+              <div className="text-gray-500 font-medium">Location:</div>
               <div>{selectedOrder.location || "N/A"}</div>
               
-              <div className="text-gray-500 font-medium">Teléfono:</div>
+              <div className="text-gray-500 font-medium">Phone:</div>
               <div>{selectedOrder.phone || "N/A"}</div>
             </div>
             
@@ -109,7 +109,7 @@ const Orders = () => {
             
             {selectedOrder.specialRequest && (
               <div className="border-t pt-4">
-                <h3 className="font-semibold mb-2 text-lg">Petición Especial:</h3>
+                <h3 className="font-semibold mb-2 text-lg">Special Request:</h3>
                 <p className="text-gray-700 bg-gray-50 p-3 rounded-md italic">
                   "{selectedOrder.specialRequest}"
                 </p>
@@ -232,7 +232,7 @@ const Orders = () => {
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
           <div className="flex items-center justify-between gap-3 mb-6">
-            <h1 className="text-2xl font-bold">Pedidos</h1>
+            <h1 className="text-2xl font-bold">Orders</h1>
             <div className="flex gap-2 bg-gray-100 p-1 rounded-md">
               <Button 
                 variant={viewMode === "cards" ? "default" : "ghost"} 
@@ -240,7 +240,7 @@ const Orders = () => {
                 onClick={() => setViewMode("cards")}
                 className={viewMode === "cards" ? "" : "bg-transparent text-gray-700"}
               >
-                Tarjetas
+                Cards
               </Button>
               <Button
                 variant={viewMode === "table" ? "default" : "ghost"}
@@ -249,12 +249,12 @@ const Orders = () => {
                 className={viewMode === "table" ? "" : "bg-transparent text-gray-700"}
               >
                 <LayoutDashboard className="h-4 w-4 mr-1" />
-                Tabla
+                Table
               </Button>
             </div>
           </div>
           <p className="text-gray-500">
-            {isLoading ? "Cargando pedidos..." : `${orders.length} Pedidos`}
+            {isLoading ? "Loading orders..." : `${orders.length} Orders`}
           </p>
         </header>
 
@@ -280,9 +280,9 @@ const Orders = () => {
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <Package className="h-16 w-16 text-gray-300 mb-4" />
-              <p className="text-gray-500 font-medium mb-2">No se encontraron pedidos</p>
+              <p className="text-gray-500 font-medium mb-2">No orders found</p>
               <p className="text-gray-400 text-sm max-w-xs">
-                Los nuevos pedidos aparecerán aquí cuando los clientes realicen compras.
+                New orders will appear here when customers make purchases.
               </p>
             </div>
           )}
