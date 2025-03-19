@@ -1,8 +1,8 @@
+
 import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package, Plus, ShoppingBasket } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 
 type QuickAccessItemProps = {
   icon: React.ComponentType<{ className?: string }>;
@@ -59,60 +59,7 @@ const RecentActivityItem = ({ title, time, amount }: RecentActivityItemProps) =>
 );
 
 export const BottomNav = () => {
-  const [orderCount, setOrderCount] = useState(0);
-  const [notificationCount, setNotificationCount] = useState(0);
-
-  useEffect(() => {
-    const fetchOrderCount = async () => {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('id')
-        .eq('status', 'pending');
-      
-      if (!error && data) {
-        setOrderCount(data.length);
-      }
-    };
-
-    const fetchNotificationCount = async () => {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('id')
-        .eq('is_read', false);
-      
-      if (!error && data) {
-        setNotificationCount(data.length);
-      } else {
-        setNotificationCount(3);
-      }
-    };
-
-    fetchOrderCount();
-    fetchNotificationCount();
-
-    const ordersChannel = supabase
-      .channel('orders-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'orders' },
-        () => fetchOrderCount()
-      )
-      .subscribe();
-
-    const notificationsChannel = supabase
-      .channel('notifications-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'notifications' },
-        () => fetchNotificationCount()
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(ordersChannel);
-      supabase.removeChannel(notificationsChannel);
-    };
-  }, []);
+  const { orderCount, notificationCount } = useNotificationsAndOrders();
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between">
@@ -142,60 +89,7 @@ export const BottomNav = () => {
 };
 
 const Dashboard = () => {
-  const [orderCount, setOrderCount] = useState(0);
-  const [notificationCount, setNotificationCount] = useState(0);
-
-  useEffect(() => {
-    const fetchOrderCount = async () => {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('id')
-        .eq('status', 'pending');
-      
-      if (!error && data) {
-        setOrderCount(data.length);
-      }
-    };
-
-    const fetchNotificationCount = async () => {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('id')
-        .eq('is_read', false);
-      
-      if (!error && data) {
-        setNotificationCount(data.length);
-      } else {
-        setNotificationCount(3);
-      }
-    };
-
-    fetchOrderCount();
-    fetchNotificationCount();
-
-    const ordersChannel = supabase
-      .channel('orders-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'orders' },
-        () => fetchOrderCount()
-      )
-      .subscribe();
-
-    const notificationsChannel = supabase
-      .channel('notifications-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'notifications' },
-        () => fetchNotificationCount()
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(ordersChannel);
-      supabase.removeChannel(notificationsChannel);
-    };
-  }, []);
+  const { orderCount, notificationCount } = useNotificationsAndOrders();
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
