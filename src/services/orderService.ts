@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Order, 
@@ -238,7 +237,7 @@ export const orderService = {
         const broadcast = await supabase.rpc('broadcast_order_status_change', {
           order_id: orderId,
           new_status: status
-        });
+        } as any);
         console.log('Broadcast result:', broadcast);
       } catch (broadcastError) {
         console.error('Failed to broadcast status change:', broadcastError);
