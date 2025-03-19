@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,14 +19,21 @@ const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (ord
     .join('')
     .toUpperCase();
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed": return "text-green-500";
+      case "pending": return "text-orange-500";
+      case "accepted": return "text-blue-500";
+      case "rejected": return "text-red-500";
+      default: return "text-gray-500";
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
       <div className="flex items-center justify-between">
         <div className="font-medium text-gray-600">{order.id.substring(0, 8)}</div>
-        <div className={`text-sm ${
-          order.status === "completed" ? "text-green-500" : 
-          order.status === "pending" ? "text-orange-500" : "text-blue-500"
-        }`}>
+        <div className={`text-sm ${getStatusColor(order.status)}`}>
           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
         </div>
       </div>
@@ -77,7 +83,6 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onStatusChange }: {
     .join('')
     .toUpperCase();
   
-  // Use local status if available, otherwise use order status
   const displayStatus = localStatus || order.status;
   
   const getStatusBadge = (status: string) => {
@@ -313,27 +318,20 @@ const Orders = () => {
   const handleStatusChange = async (orderId: string, status: "accepted" | "completed" | "rejected") => {
     try {
       if (status === "rejected") {
-        // Delete order if rejected
         await orderService.deleteOrder(orderId);
         toast({
           title: "Order Rejected",
           description: "The order has been rejected and removed",
         });
-        // Remove from local state
         setOrders(orders.filter(o => o.id !== orderId));
         setSelectedOrder(null);
       } else {
-        // Update order status
         const updatedOrder = await orderService.updateOrderStatus(orderId, status);
         toast({
           title: "Order Updated",
           description: `Order has been ${status}`,
         });
-        
-        // Update in local state
         setOrders(orders.map(o => o.id === orderId ? updatedOrder : o));
-        
-        // If the selected order is the one being updated, update it as well
         if (selectedOrder && selectedOrder.id === orderId) {
           setSelectedOrder(updatedOrder);
         }
@@ -348,7 +346,6 @@ const Orders = () => {
     }
   };
   
-  // Filter orders based on selected filter
   const filteredOrders = orders.filter(order => {
     if (filter === "all") return true;
     return order.status === filter;

@@ -34,21 +34,29 @@ export function useNotificationsAndOrders() {
     fetchOrderCount();
     fetchNotificationCount();
 
+    // Set up real-time subscription for orders table
     const ordersChannel = supabase
       .channel('orders-changes')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'orders' },
-        () => fetchOrderCount()
+        (payload) => {
+          console.log('Order change detected:', payload);
+          fetchOrderCount();
+        }
       )
       .subscribe();
 
+    // Set up real-time subscription for notifications table
     const notificationsChannel = supabase
       .channel('notifications-changes')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'notifications' },
-        () => fetchNotificationCount()
+        (payload) => {
+          console.log('Notification change detected:', payload);
+          fetchNotificationCount();
+        }
       )
       .subscribe();
 
