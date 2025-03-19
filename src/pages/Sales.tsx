@@ -21,6 +21,7 @@ const Sales = () => {
   const [totalOrders, setTotalOrders] = useState<number>(0);
   const [productSales, setProductSales] = useState<ProductSale[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [newAcceptedOrderId, setNewAcceptedOrderId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleCategoryChange = (category: string) => {
@@ -45,10 +46,26 @@ const Sales = () => {
         },
         (payload) => {
           console.log('Order status changed:', payload);
+          
+          // Highlight the new accepted order
+          if (payload.new && payload.new.status === 'accepted') {
+            setNewAcceptedOrderId(payload.new.id);
+            
+            // Clear the highlight after 5 seconds
+            setTimeout(() => {
+              setNewAcceptedOrderId(null);
+            }, 5000);
+            
+            // Show a more specific toast notification
+            toast.success(`New order accepted! Sales data updating...`, {
+              description: `Order #${payload.new.id.substring(0, 8)} has been accepted and added to sales.`,
+              duration: 4000
+            });
+          }
+          
           // Refresh data when an order is accepted or completed
           fetchProductSales();
           fetchOrdersData();
-          toast.success("Sales data updated");
         }
       )
       .on(
@@ -209,6 +226,18 @@ const Sales = () => {
         </header>
 
         <main className="px-6">
+          {newAcceptedOrderId && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 animate-pulse">
+              <div className="flex items-center">
+                <CheckCircle2 className="w-5 h-5 mr-2" />
+                <div>
+                  <p className="font-medium">New order accepted!</p>
+                  <p className="text-sm">Product sales have been updated with new data.</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Product Sales</h2>
             <p className="text-sm text-gray-500">{filteredProducts.length} products</p>

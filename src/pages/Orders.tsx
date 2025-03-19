@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Package, Eye, Check, X } from "lucide-react";
+import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
 import { Order } from "@/types/order.types";
@@ -22,7 +21,6 @@ const Orders = () => {
   const { user } = useAuth();
   const { lastOrderUpdate, lastOrderDelete } = useNotificationsAndOrders();
 
-  // Fetch orders when component mounts or when orders are updated/deleted
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -50,14 +48,24 @@ const Orders = () => {
     try {
       const updatedOrder = await orderService.updateOrderStatus(orderId, status);
       
-      // Update the order in the local state
       setOrders(prevOrders => 
         prevOrders.map(order => 
           order.id === orderId ? { ...order, status } : order
         )
       );
       
-      toast.success(`Order ${status} successfully`);
+      if (status === "accepted") {
+        toast.success(`Order accepted successfully`, {
+          description: "The order has been added to your product sales.",
+          duration: 5000,
+          icon: <CheckCircle2 className="h-5 w-5 text-green-500" />
+        });
+      } else if (status === "completed") {
+        toast.success(`Order completed successfully`);
+      } else if (status === "rejected") {
+        toast.error(`Order rejected`);
+      }
+      
     } catch (error) {
       console.error(`Error updating order status to ${status}:`, error);
       toast.error(`Failed to update order status: ${error instanceof Error ? error.message : 'Unknown error'}`);
