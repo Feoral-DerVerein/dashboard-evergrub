@@ -54,11 +54,9 @@ const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (ord
             <p className="text-sm text-gray-500">{order.items.length} items</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <p className="font-medium">${order.total.toFixed(2)}</p>
-            <p className="text-sm text-gray-500">{order.timestamp}</p>
-          </div>
+        <div className="text-right">
+          <p className="font-medium">${order.total.toFixed(2)}</p>
+          <p className="text-sm text-gray-500">{order.timestamp}</p>
           <button onClick={() => onViewDetails(order)} className="text-blue-500">
             <Eye className="w-5 h-5" />
           </button>
