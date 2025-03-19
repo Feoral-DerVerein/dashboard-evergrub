@@ -1,5 +1,4 @@
-
-import { Bell, Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2, Store } from "lucide-react";
+import { Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { Input } from "@/components/ui/input";
@@ -100,7 +99,6 @@ const Sales = () => {
             }
           }
           
-          // Make sure to update sales data right after status change
           fetchProductSales();
           fetchOrdersData();
         }
@@ -199,10 +197,6 @@ const Sales = () => {
             <div>
               <h1 className="text-2xl font-bold">Products Sales</h1>
               <p className="text-gray-500 text-sm">Daily overview</p>
-            </div>
-            <div className="relative">
-              <Bell className="w-6 h-6 text-gray-600" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">3</span>
             </div>
           </div>
           
@@ -340,3 +334,4 @@ const Sales = () => {
 };
 
 export default Sales;
+
