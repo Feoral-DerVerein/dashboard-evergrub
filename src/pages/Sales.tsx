@@ -173,7 +173,11 @@ const Sales = () => {
       setProductSales(sales);
     } catch (error) {
       console.error("Error fetching product sales:", error);
-      toast.error("Failed to load product sales data");
+      toast({
+        title: "Error",
+        description: "Failed to load product sales data",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
