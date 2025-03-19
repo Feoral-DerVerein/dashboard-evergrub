@@ -1,11 +1,13 @@
 
 import { Bell, Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 import CategoryButton from "@/components/sales/CategoryButton";
 import ProductSaleItem from "@/components/sales/ProductSaleItem";
@@ -13,6 +15,9 @@ import StatCard from "@/components/sales/StatCard";
 
 const Sales = () => {
   const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [todayRevenue, setTodayRevenue] = useState<number>(0);
+  const [totalOrders, setTotalOrders] = useState<number>(0);
+  const navigate = useNavigate();
   
   const productSales = [
     {
@@ -58,6 +63,56 @@ const Sales = () => {
     setActiveCategory(category);
   };
 
+  // Fetch orders data on component mount
+  useEffect(() => {
+    fetchOrdersData();
+  }, []);
+
+  const fetchOrdersData = async () => {
+    try {
+      // Get today's date at midnight
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Format date for Supabase query
+      const todayFormatted = format(today, "yyyy-MM-dd");
+      
+      // Query for today's orders
+      const { data: todayOrders, error: todayError } = await supabase
+        .from('orders')
+        .select('total')
+        .gte('timestamp', todayFormatted);
+      
+      if (todayError) {
+        console.error("Error fetching today's orders:", todayError);
+        return;
+      }
+      
+      // Calculate today's revenue
+      const revenue = todayOrders?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
+      setTodayRevenue(revenue);
+      
+      // Get total number of orders (all time)
+      const { count, error: countError } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true });
+      
+      if (countError) {
+        console.error("Error counting orders:", countError);
+        return;
+      }
+      
+      setTotalOrders(count || 0);
+    } catch (error) {
+      console.error("Error in fetchOrdersData:", error);
+    }
+  };
+
+  // Navigate to Orders page
+  const navigateToOrders = () => {
+    navigate('/orders');
+  };
+
   // Filter products by category if needed
   const filteredProducts = activeCategory === "All" 
     ? productSales 
@@ -81,13 +136,15 @@ const Sales = () => {
           <div className="grid grid-cols-2 gap-4 mb-6">
             <StatCard 
               label="Today's Revenue" 
-              value="$2,847" 
+              value={`$${todayRevenue.toFixed(2)}`} 
               icon={<DollarSign className="w-5 h-5 text-white" />}
+              onClick={navigateToOrders}
             />
             <StatCard 
               label="Total Orders" 
-              value="126" 
+              value={totalOrders.toString()} 
               icon={<ShoppingBag className="w-5 h-5 text-white" />}
+              onClick={navigateToOrders}
             />
           </div>
 
