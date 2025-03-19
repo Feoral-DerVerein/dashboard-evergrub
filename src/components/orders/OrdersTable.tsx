@@ -46,6 +46,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
       case "pending":
         return <Badge 
           variant="warning"
+          className="bg-amber-100 text-amber-800 font-medium"
           icon={<Clock className="h-3 w-3" />}
         >
           Por aceptar
@@ -53,6 +54,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
       case "accepted":
         return <Badge 
           variant="info"
+          className="bg-blue-100 text-blue-800 font-medium"
           icon={<CheckCircle2 className="h-3 w-3" />}
         >
           Aceptado
@@ -60,6 +62,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
       case "completed":
         return <Badge 
           variant="success"
+          className="bg-emerald-100 text-emerald-800 font-medium"
           icon={<Package className="h-3 w-3" />}
         >
           Completado
@@ -67,6 +70,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
       case "rejected":
         return <Badge 
           variant="destructive"
+          className="bg-red-100 text-red-800 font-medium"
           icon={<XCircle className="h-3 w-3" />}
         >
           Rechazado
@@ -79,26 +83,28 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
   const getRowClassName = (status: string) => {
     switch (status) {
       case "accepted":
-        return "bg-green-50";
+        return "bg-blue-50";
       case "completed":
-        return "bg-green-50";
+        return "bg-emerald-50";
+      case "rejected":
+        return "bg-red-50/30";
       default:
         return "";
     }
   };
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border shadow-sm overflow-hidden">
       <Table>
-        <TableCaption>Recent Orders List</TableCaption>
-        <TableHeader>
+        <TableCaption className="pb-4">Lista de Pedidos Recientes</TableCaption>
+        <TableHeader className="bg-gray-50">
           <TableRow>
-            <TableHead>Order ID</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Items</TableHead>
-            <TableHead>Total</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="font-semibold">Order ID</TableHead>
+            <TableHead className="font-semibold">Cliente</TableHead>
+            <TableHead className="font-semibold">Items</TableHead>
+            <TableHead className="font-semibold">Total</TableHead>
+            <TableHead className="font-semibold">Estado</TableHead>
+            <TableHead className="text-right font-semibold">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -106,9 +112,9 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
             orders.map((order) => (
               <TableRow key={order.id} className={getRowClassName(order.status)}>
                 <TableCell className="font-medium">{order.id.substring(0, 8)}</TableCell>
-                <TableCell>{order.customerName || "Customer"}</TableCell>
+                <TableCell>{order.customerName || "Cliente"}</TableCell>
                 <TableCell>{order.items.length}</TableCell>
-                <TableCell>${order.total.toFixed(2)}</TableCell>
+                <TableCell className="font-medium">${order.total.toFixed(2)}</TableCell>
                 <TableCell>{getStatusBadge(order)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
@@ -116,6 +122,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
                       variant="outline" 
                       size="sm" 
                       onClick={() => onViewDetails(order)}
+                      className="border-gray-200 hover:bg-gray-50"
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -128,6 +135,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
                           disabled={processingOrders[order.id]}
                           onClick={() => handleStatusChange(order.id, "accepted")}
                           title="Accept order"
+                          className="bg-blue-600 hover:bg-blue-700"
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -138,6 +146,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
                           disabled={processingOrders[order.id]}
                           onClick={() => handleStatusChange(order.id, "rejected")}
                           title="Reject order"
+                          className="bg-red-600 hover:bg-red-700"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -148,7 +157,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
                         disabled={processingOrders[order.id]}
                         onClick={() => handleStatusChange(order.id, "completed")}
                         title="Mark as completed"
@@ -175,8 +184,11 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center">
-                No orders found
+              <TableCell colSpan={6} className="text-center py-8">
+                <div className="flex flex-col items-center justify-center space-y-3">
+                  <Package className="h-12 w-12 text-gray-300" />
+                  <p className="text-gray-500 font-medium">No se encontraron pedidos</p>
+                </div>
               </TableCell>
             </TableRow>
           )}
