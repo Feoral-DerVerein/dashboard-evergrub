@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { OrdersTable } from "@/components/orders/OrdersTable";
 import { orderService } from "@/services/orderService";
 import { useToast } from "@/hooks/use-toast";
+import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 
 const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (order: Order) => void }) => {
   const initials = order.customerName
@@ -292,10 +293,36 @@ const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const { user } = useAuth();
   const { toast } = useToast();
+  const { lastOrderUpdate } = useNotificationsAndOrders();
 
   useEffect(() => {
     loadOrders();
   }, []);
+
+  useEffect(() => {
+    if (lastOrderUpdate) {
+      const refreshSingleOrder = async () => {
+        try {
+          const updatedOrder = await orderService.getOrderById(lastOrderUpdate);
+          if (updatedOrder) {
+            setOrders(prevOrders => 
+              prevOrders.map(order => 
+                order.id === lastOrderUpdate ? updatedOrder : order
+              )
+            );
+            
+            if (selectedOrder && selectedOrder.id === lastOrderUpdate) {
+              setSelectedOrder(updatedOrder);
+            }
+          }
+        } catch (error) {
+          console.error("Error refreshing updated order:", error);
+        }
+      };
+      
+      refreshSingleOrder();
+    }
+  }, [lastOrderUpdate, selectedOrder]);
   
   const loadOrders = async () => {
     try {
@@ -331,7 +358,9 @@ const Orders = () => {
           title: "Order Updated",
           description: `Order has been ${status}`,
         });
+        
         setOrders(orders.map(o => o.id === orderId ? updatedOrder : o));
+        
         if (selectedOrder && selectedOrder.id === orderId) {
           setSelectedOrder(updatedOrder);
         }
@@ -460,3 +489,4 @@ const Orders = () => {
 };
 
 export default Orders;
+

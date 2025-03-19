@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 export function useNotificationsAndOrders() {
   const [orderCount, setOrderCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [lastOrderUpdate, setLastOrderUpdate] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrderCount = async () => {
@@ -42,6 +43,10 @@ export function useNotificationsAndOrders() {
         { event: '*', schema: 'public', table: 'orders' },
         (payload) => {
           console.log('Order change detected:', payload);
+          // Store the ID of the updated order to help components react to this specific change
+          if (payload.eventType === 'UPDATE' && payload.new && payload.new.id) {
+            setLastOrderUpdate(payload.new.id);
+          }
           fetchOrderCount();
         }
       )
@@ -66,5 +71,5 @@ export function useNotificationsAndOrders() {
     };
   }, []);
 
-  return { orderCount, notificationCount };
+  return { orderCount, notificationCount, lastOrderUpdate };
 }
