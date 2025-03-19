@@ -48,7 +48,20 @@ const Sales = () => {
           // Refresh data when an order is accepted or completed
           fetchProductSales();
           fetchOrdersData();
-          toast.success("Order data updated");
+          toast.success("Sales data updated");
+        }
+      )
+      .on(
+        'postgres_changes',
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'order_items' 
+        },
+        (payload) => {
+          console.log('New order item added:', payload);
+          // Refresh product sales when new items are added
+          fetchProductSales();
         }
       )
       .subscribe();
@@ -102,6 +115,7 @@ const Sales = () => {
     setIsLoading(true);
     try {
       const sales = await productSalesService.getProductSales();
+      console.log("Fetched product sales:", sales);
       setProductSales(sales);
     } catch (error) {
       console.error("Error fetching product sales:", error);
@@ -219,9 +233,10 @@ const Sales = () => {
 
           <Button 
             className="w-full mt-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 shadow-md"
+            onClick={navigateToOrders}
           >
-            <Download className="w-5 h-5" />
-            Export Data
+            <ShoppingBag className="w-5 h-5" />
+            View Orders
           </Button>
         </main>
 

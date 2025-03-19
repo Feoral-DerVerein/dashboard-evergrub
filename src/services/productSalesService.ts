@@ -70,7 +70,9 @@ export const productSalesService = {
             unitsSold: item.quantity,
             revenue: Number(item.price) * item.quantity,
             // Use a default image or try to find a product image
-            image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+            image: item.product_id 
+              ? `/product-images/${item.product_id}.jpg` 
+              : "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
           });
         }
       });
