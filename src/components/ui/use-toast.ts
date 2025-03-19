@@ -1,6 +1,14 @@
 
 import { useToast as useToastOriginal, toast as toastOriginal } from "@/hooks/use-toast";
-import { ToasterToast } from "@/components/ui/toast";
+
+// Define the ToasterToast type here since it's not exported from toast.tsx
+type ToasterToast = {
+  id: string;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: React.ReactNode;
+  variant?: "default" | "destructive" | "success" | "warning" | "info";
+};
 
 // Create a wrapper for the toast function to handle different variants
 const enhancedToast = {
