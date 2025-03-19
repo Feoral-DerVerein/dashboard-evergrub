@@ -26,7 +26,7 @@ export const supabase = createClient<Database>(
 );
 
 // Add RPC call for broadcasting status changes
-export const broadcastOrderStatusChange = async (orderId: string, newStatus: "pending" | "accepted" | "completed" | "rejected") => {
+export const broadcastOrderStatusChange = async (orderId: string, newStatus: string) => {
   return await supabase.rpc('broadcast_order_status_change', {
     order_id: orderId,
     new_status: newStatus

@@ -1,4 +1,3 @@
-
 import { Bell, Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -8,7 +7,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 import CategoryButton from "@/components/sales/CategoryButton";
@@ -32,12 +31,10 @@ const Sales = () => {
     setActiveCategory(category);
   };
 
-  // Fetch orders data and product sales on component mount
   useEffect(() => {
     fetchOrdersData();
     fetchProductSales();
     
-    // Set up real-time listener for order status changes
     const channel = supabase
       .channel('orders-channel')
       .on(
@@ -51,16 +48,13 @@ const Sales = () => {
         (payload) => {
           console.log('Order status changed:', payload);
           
-          // Highlight the new accepted order
           if (payload.new && payload.new.status === 'accepted') {
             setNewAcceptedOrderId(payload.new.id);
             
-            // Clear the highlight after 5 seconds
             setTimeout(() => {
               setNewAcceptedOrderId(null);
             }, 5000);
             
-            // Show toast notification
             toast({
               title: "Nueva orden aceptada",
               description: `Orden #${payload.new.id.substring(0, 8)} ha sido aceptada y añadida a ventas.`,
@@ -68,39 +62,39 @@ const Sales = () => {
             });
           }
           
-          // Highlight and show notification for completed orders
           if (payload.new && payload.new.status === 'completed' && payload.new.total) {
             setNewCompletedOrderId(payload.new.id);
             setNewCompletedOrderAmount(payload.new.total);
             
-            // Check if it's a marketplace order (user_id is null)
             if (payload.new.user_id === null) {
               setNewMarketplaceCompletedOrder({
                 id: payload.new.id,
                 total: payload.new.total
               });
               
-              // Clear the marketplace highlight after 10 seconds
               setTimeout(() => {
                 setNewMarketplaceCompletedOrder(null);
               }, 10000);
+              
+              toast({
+                title: "¡Orden de Marketplace completada!",
+                description: `Orden #${payload.new.id.substring(0, 8)} completada con éxito. Venta: $${payload.new.total.toFixed(2)}`,
+                variant: "warning",
+              });
             } else {
-              // Clear the regular completed order highlight after 8 seconds
               setTimeout(() => {
                 setNewCompletedOrderId(null);
                 setNewCompletedOrderAmount(null);
               }, 8000);
+              
+              toast({
+                title: "¡Orden completada!",
+                description: `Orden #${payload.new.id.substring(0, 8)} completada con éxito. Venta: $${payload.new.total.toFixed(2)}`,
+                variant: "success",
+              });
             }
-            
-            // Show toast notification for completed order
-            toast({
-              title: payload.new.user_id === null ? "¡Orden de Marketplace completada!" : "¡Orden completada!",
-              description: `Orden #${payload.new.id.substring(0, 8)} completada con éxito. Venta: $${payload.new.total.toFixed(2)}`,
-              variant: "success",
-            });
           }
           
-          // Refresh data when an order is accepted or completed
           fetchProductSales();
           fetchOrdersData();
         }
@@ -114,7 +108,6 @@ const Sales = () => {
         },
         (payload) => {
           console.log('New order item added:', payload);
-          // Refresh product sales when new items are added
           fetchProductSales();
         }
       )
@@ -127,14 +120,11 @@ const Sales = () => {
 
   const fetchOrdersData = async () => {
     try {
-      // Get today's date at midnight
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Format date for Supabase query
       const todayFormatted = format(today, "yyyy-MM-dd");
       
-      // Query for today's orders
       const { data: todayOrders, error: todayError } = await supabase
         .from('orders')
         .select('total')
@@ -145,11 +135,9 @@ const Sales = () => {
         return;
       }
       
-      // Calculate today's revenue
       const revenue = todayOrders?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
       setTodayRevenue(revenue);
       
-      // Get total number of orders (all time)
       const { count, error: countError } = await supabase
         .from('orders')
         .select('*', { count: 'exact', head: true });
@@ -183,12 +171,10 @@ const Sales = () => {
     }
   };
 
-  // Navigate to Orders page
   const navigateToOrders = () => {
     navigate('/orders');
   };
 
-  // Get unique categories from product sales
   const getCategories = () => {
     const categories = new Set(['All']);
     productSales.forEach(product => {
@@ -199,7 +185,6 @@ const Sales = () => {
     return Array.from(categories);
   };
 
-  // Filter products by category if needed
   const filteredProducts = activeCategory === "All" 
     ? productSales 
     : productSales.filter(product => product.category === activeCategory);
@@ -341,3 +326,4 @@ const Sales = () => {
 };
 
 export default Sales;
+
