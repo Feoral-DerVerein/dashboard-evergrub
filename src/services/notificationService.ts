@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Notification {
@@ -99,6 +98,35 @@ export const notificationService = {
       }
     } catch (error) {
       console.error("Error in createPickupNotification:", error);
+      throw error;
+    }
+  },
+  
+  // Create a sales notification when an order is completed
+  async createSalesNotification(orderId: string, total: number): Promise<void> {
+    try {
+      console.log(`Creating sales notification for completed order ${orderId}`);
+      
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          type: 'sales',
+          title: 'New Sale Completed',
+          description: `Order #${orderId.substring(0, 8)} completed for $${total.toFixed(2)}`,
+          is_read: false,
+          order_id: orderId,
+          for_marketplace: true,
+          timestamp: new Date().toISOString()
+        });
+        
+      if (notificationError) {
+        console.error("Error creating sales notification:", notificationError);
+        throw notificationError;
+      }
+        
+      console.log("Sales notification created successfully");
+    } catch (error) {
+      console.error("Error in createSalesNotification:", error);
       throw error;
     }
   },

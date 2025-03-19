@@ -1,4 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
+
+import { supabase, broadcastOrderStatusChange } from "@/integrations/supabase/client";
 import { 
   Order, 
   DbOrder, 
@@ -7,6 +8,7 @@ import {
   mapDbOrderToOrder 
 } from "@/types/order.types";
 import { notificationService } from "@/services/notificationService";
+import { toast } from "sonner";
 
 export const orderService = {
   // Obtener todas las órdenes del usuario actual y las de marketplace
@@ -234,10 +236,7 @@ export const orderService = {
 
       // Broadcast the event to all subscribers to order status changes
       try {
-        const broadcast = await supabase.rpc('broadcast_order_status_change', {
-          order_id: orderId,
-          new_status: status
-        } as any);
+        const broadcast = await broadcastOrderStatusChange(orderId, status);
         console.log('Broadcast result:', broadcast);
       } catch (broadcastError) {
         console.error('Failed to broadcast status change:', broadcastError);
@@ -258,7 +257,7 @@ export const orderService = {
         }
       }
         
-      // Create a notification when an order is completed and a pickup notification
+      // Create notifications when an order is completed
       if (status === "completed") {
         try {
           // Status update notification
@@ -271,6 +270,17 @@ export const orderService = {
           // Create a pickup notification for marketplace orders
           await notificationService.createPickupNotification(orderId);
           console.log(`Notificación de retiro creada para la orden ${orderId}`);
+          
+          // Create a sales notification for the sales dashboard
+          if (refreshedOrder) {
+            await notificationService.createSalesNotification(orderId, refreshedOrder.total);
+            console.log(`Notificación de ventas creada para la orden ${orderId}`);
+            
+            // Show a toast notification on the current screen
+            toast.success(`Venta registrada: $${refreshedOrder.total.toFixed(2)}`, {
+              description: `La orden #${orderId.substring(0, 8)} ha sido completada y registrada como venta.`
+            });
+          }
         } catch (notifError) {
           console.error(`Error al crear las notificaciones para la orden ${orderId}:`, notifError);
           // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente

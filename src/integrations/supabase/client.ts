@@ -18,17 +18,17 @@ const supabaseOptions = {
   }
 };
 
-// Define custom function types to extend the default Supabase types
-type CustomFunctions = {
-  broadcast_order_status_change: (args: { 
-    order_id: string; 
-    new_status: "pending" | "accepted" | "completed" | "rejected"
-  }) => Promise<{ data: any; error: any }>
-}
-
-// Create the client with extended types
-export const supabase = createClient<Database, "public", CustomFunctions>(
+// Create the client
+export const supabase = createClient<Database>(
   SUPABASE_URL, 
   SUPABASE_PUBLISHABLE_KEY, 
   supabaseOptions
 );
+
+// Add RPC call for broadcasting status changes
+export const broadcastOrderStatusChange = async (orderId: string, newStatus: "pending" | "accepted" | "completed" | "rejected") => {
+  return await supabase.rpc('broadcast_order_status_change', {
+    order_id: orderId,
+    new_status: newStatus
+  });
+};
