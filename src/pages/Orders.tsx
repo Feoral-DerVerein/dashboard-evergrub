@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -280,7 +279,6 @@ const LoadingSkeleton = () => (
 );
 
 const Orders = () => {
-  const [filter, setFilter] = useState<"all" | "pending" | "accepted" | "completed" | "rejected">("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -375,12 +373,6 @@ const Orders = () => {
       });
     }
   };
-  
-  const filteredOrders = orders.filter(order => {
-    if (filter === "all") return true;
-    if (filter === "accepted") return order.status === "accepted" || order.status === "completed";
-    return order.status === filter;
-  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -407,56 +399,14 @@ const Orders = () => {
             </div>
           </div>
           <p className="text-gray-500 mb-4">Today's Orders</p>
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            <Button
-              variant={filter === "all" ? "default" : "outline"}
-              size="sm"
-              className="rounded-full whitespace-nowrap"
-              onClick={() => setFilter("all")}
-            >
-              All Orders
-            </Button>
-            <Button
-              variant={filter === "pending" ? "default" : "outline"}
-              size="sm"
-              className="rounded-full whitespace-nowrap"
-              onClick={() => setFilter("pending")}
-            >
-              Pending
-            </Button>
-            <Button
-              variant={filter === "accepted" ? "default" : "outline"}
-              size="sm"
-              className="rounded-full whitespace-nowrap"
-              onClick={() => setFilter("accepted")}
-            >
-              Accepted
-            </Button>
-            <Button
-              variant={filter === "completed" ? "default" : "outline"}
-              size="sm"
-              className="rounded-full whitespace-nowrap"
-              onClick={() => setFilter("completed")}
-            >
-              Completed
-            </Button>
-            <Button
-              variant={filter === "rejected" ? "default" : "outline"}
-              size="sm"
-              className="rounded-full whitespace-nowrap"
-              onClick={() => setFilter("rejected")}
-            >
-              Rejected
-            </Button>
-          </div>
         </header>
 
         <main className="px-6">
           {loading ? (
             <LoadingSkeleton />
-          ) : filteredOrders.length > 0 ? (
+          ) : orders.length > 0 ? (
             viewMode === "cards" ? (
-              filteredOrders.map((order) => (
+              orders.map((order) => (
                 <OrderCard
                   key={order.id}
                   order={order}
@@ -465,7 +415,7 @@ const Orders = () => {
               ))
             ) : (
               <OrdersTable 
-                orders={filteredOrders} 
+                orders={orders} 
                 onViewDetails={(order) => setSelectedOrder(order)} 
                 onStatusChange={(orderId, status) => handleStatusChange(orderId, status)}
               />
