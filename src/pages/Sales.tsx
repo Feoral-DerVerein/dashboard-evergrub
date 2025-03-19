@@ -8,64 +8,54 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 import CategoryButton from "@/components/sales/CategoryButton";
 import ProductSaleItem from "@/components/sales/ProductSaleItem";
 import StatCard from "@/components/sales/StatCard";
+import { productSalesService, ProductSale } from "@/services/productSalesService";
 
 const Sales = () => {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [todayRevenue, setTodayRevenue] = useState<number>(0);
   const [totalOrders, setTotalOrders] = useState<number>(0);
+  const [productSales, setProductSales] = useState<ProductSale[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
-  
-  const productSales = [
-    {
-      image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-      name: "Organic Sourdough Bread",
-      category: "Bakery",
-      unitsSold: 48,
-      revenue: 240
-    },
-    {
-      image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-      name: "Fresh Almond Milk",
-      category: "Dairy",
-      unitsSold: 36,
-      revenue: 180
-    },
-    {
-      image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-      name: "Vegan Protein Bowl",
-      category: "Vegan",
-      unitsSold: 24,
-      revenue: 312
-    },
-    {
-      image: "https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-      name: "Craft Kombucha",
-      category: "Beverages",
-      unitsSold: 60,
-      revenue: 300
-    },
-    {
-      image: "https://images.unsplash.com/photo-1586buffalo-1459738-5461a7633add?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-      name: "Gluten-Free Muffins",
-      category: "Bakery",
-      unitsSold: 42,
-      revenue: 168
-    }
-  ];
-
-  const categories = ["All", "Bakery", "Dairy", "Vegan", "Beverages"];
 
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
   };
 
-  // Fetch orders data on component mount
+  // Fetch orders data and product sales on component mount
   useEffect(() => {
     fetchOrdersData();
+    fetchProductSales();
+    
+    // Set up real-time listener for order status changes
+    const channel = supabase
+      .channel('orders-channel')
+      .on(
+        'postgres_changes',
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'orders',
+          filter: "status=in.(accepted,completed)"
+        },
+        (payload) => {
+          console.log('Order status changed:', payload);
+          // Refresh data when an order is accepted or completed
+          fetchProductSales();
+          fetchOrdersData();
+          toast.success("Order data updated");
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchOrdersData = async () => {
@@ -108,9 +98,33 @@ const Sales = () => {
     }
   };
 
+  const fetchProductSales = async () => {
+    setIsLoading(true);
+    try {
+      const sales = await productSalesService.getProductSales();
+      setProductSales(sales);
+    } catch (error) {
+      console.error("Error fetching product sales:", error);
+      toast.error("Failed to load product sales data");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Navigate to Orders page
   const navigateToOrders = () => {
     navigate('/orders');
+  };
+
+  // Get unique categories from product sales
+  const getCategories = () => {
+    const categories = new Set(['All']);
+    productSales.forEach(product => {
+      if (product.category) {
+        categories.add(product.category);
+      }
+    });
+    return Array.from(categories);
   };
 
   // Filter products by category if needed
@@ -169,7 +183,7 @@ const Sales = () => {
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 scrollbar-none">
-            {categories.map(category => (
+            {getCategories().map(category => (
               <CategoryButton 
                 key={category} 
                 label={category} 
@@ -186,11 +200,22 @@ const Sales = () => {
             <p className="text-sm text-gray-500">{filteredProducts.length} products</p>
           </div>
           
-          <div className="space-y-1">
-            {filteredProducts.map((product, index) => (
-              <ProductSaleItem key={index} {...product} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            </div>
+          ) : filteredProducts.length > 0 ? (
+            <div className="space-y-1">
+              {filteredProducts.map((product, index) => (
+                <ProductSaleItem key={index} {...product} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+              <ShoppingBag className="w-12 h-12 text-gray-300 mb-2" />
+              <p className="text-center">No sales data available yet.<br />Start accepting orders to see sales data.</p>
+            </div>
+          )}
 
           <Button 
             className="w-full mt-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 shadow-md"
