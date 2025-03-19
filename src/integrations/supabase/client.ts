@@ -18,7 +18,7 @@ const supabaseOptions = {
   }
 };
 
-// Create client with the correct type structure for custom RPC functions
+// Create a regular Supabase client
 export const supabase = createClient<Database>(
   SUPABASE_URL, 
   SUPABASE_PUBLISHABLE_KEY, 

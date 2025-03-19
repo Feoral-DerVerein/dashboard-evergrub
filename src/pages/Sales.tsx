@@ -8,7 +8,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 import CategoryButton from "@/components/sales/CategoryButton";
 import ProductSaleItem from "@/components/sales/ProductSaleItem";
@@ -22,6 +23,8 @@ const Sales = () => {
   const [productSales, setProductSales] = useState<ProductSale[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [newAcceptedOrderId, setNewAcceptedOrderId] = useState<string | null>(null);
+  const [newCompletedOrderId, setNewCompletedOrderId] = useState<string | null>(null);
+  const [newCompletedOrderAmount, setNewCompletedOrderAmount] = useState<number | null>(null);
   const navigate = useNavigate();
 
   const handleCategoryChange = (category: string) => {
@@ -56,10 +59,30 @@ const Sales = () => {
               setNewAcceptedOrderId(null);
             }, 5000);
             
-            // Show a more specific toast notification
-            toast.success(`New order accepted! Sales data updating...`, {
-              description: `Order #${payload.new.id.substring(0, 8)} has been accepted and added to sales.`,
-              duration: 4000
+            // Show toast notification
+            toast({
+              title: "Nueva orden aceptada",
+              description: `Orden #${payload.new.id.substring(0, 8)} ha sido aceptada y añadida a ventas.`,
+              variant: "success",
+            });
+          }
+          
+          // Highlight and show notification for completed orders
+          if (payload.new && payload.new.status === 'completed' && payload.new.total) {
+            setNewCompletedOrderId(payload.new.id);
+            setNewCompletedOrderAmount(payload.new.total);
+            
+            // Clear the highlight after 8 seconds
+            setTimeout(() => {
+              setNewCompletedOrderId(null);
+              setNewCompletedOrderAmount(null);
+            }, 8000);
+            
+            // Show toast notification for completed order
+            toast({
+              title: "¡Orden completada!",
+              description: `Orden #${payload.new.id.substring(0, 8)} completada con éxito. Venta: $${payload.new.total.toFixed(2)}`,
+              variant: "success",
             });
           }
           
@@ -226,13 +249,25 @@ const Sales = () => {
         </header>
 
         <main className="px-6">
+          {newCompletedOrderId && newCompletedOrderAmount !== null && (
+            <Alert className="mb-4 border-green-500 bg-green-50 text-green-800">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <AlertTitle className="text-green-800 font-semibold">¡Venta completada!</AlertTitle>
+              <AlertDescription className="text-green-700">
+                Se ha registrado una nueva venta por ${newCompletedOrderAmount.toFixed(2)} 
+                <br />
+                Orden #{newCompletedOrderId.substring(0, 8)}
+              </AlertDescription>
+            </Alert>
+          )}
+          
           {newAcceptedOrderId && (
             <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 animate-pulse">
               <div className="flex items-center">
                 <CheckCircle2 className="w-5 h-5 mr-2" />
                 <div>
-                  <p className="font-medium">New order accepted!</p>
-                  <p className="text-sm">Product sales have been updated with new data.</p>
+                  <p className="font-medium">Nueva orden aceptada!</p>
+                  <p className="text-sm">Los datos de ventas han sido actualizados.</p>
                 </div>
               </div>
             </div>
