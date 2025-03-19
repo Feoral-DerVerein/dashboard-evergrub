@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle, Trash2 } from "lucide-react";
+import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle, Trash2, Check } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
@@ -52,7 +52,7 @@ const OrderCard = ({ order, onViewDetails, onDelete }: {
         <div className="flex items-center gap-2">
           <div className={`text-sm ${getStatusColor(order.status)} flex items-center`}>
             {order.status === "completed" && (
-              <CheckCircle2 className="w-4 h-4 mr-1 text-green-500" />
+              <Check className="w-4 h-4 mr-1 text-green-500" />
             )}
             {order.status === "accepted" && (
               <CheckCircle2 className="w-4 h-4 mr-1 text-green-500" />
