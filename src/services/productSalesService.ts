@@ -51,6 +51,8 @@ export const productSalesService = {
         return [];
       }
 
+      console.log("Raw order items data:", orderItems);
+
       // Process order items into product sales
       const salesMap = new Map<string, ProductSale>();
       
@@ -79,6 +81,8 @@ export const productSalesService = {
       
       // Convert map to array
       const productSales = Array.from(salesMap.values());
+      
+      console.log("Processed product sales:", productSales);
       
       // Sort by revenue (highest first)
       return productSales.sort((a, b) => b.revenue - a.revenue);

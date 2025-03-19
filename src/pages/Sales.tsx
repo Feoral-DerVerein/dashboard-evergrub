@@ -1,5 +1,5 @@
 
-import { Bell, Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag } from "lucide-react";
+import { Bell, Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { Input } from "@/components/ui/input";
