@@ -32,6 +32,8 @@ export const productSalesService = {
         return [];
       }
       
+      console.log("Found orders with status accepted/completed:", orders.length);
+      
       // Get order IDs
       const orderIds = orders.map(order => order.id);
       

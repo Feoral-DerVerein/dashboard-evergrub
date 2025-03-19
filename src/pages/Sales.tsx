@@ -1,3 +1,4 @@
+
 import { Bell, Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -99,6 +100,7 @@ const Sales = () => {
             }
           }
           
+          // Make sure to update sales data right after status change
           fetchProductSales();
           fetchOrdersData();
         }
