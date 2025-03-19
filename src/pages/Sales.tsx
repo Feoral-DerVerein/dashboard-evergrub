@@ -1,5 +1,5 @@
 
-import { Bell, Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2 } from "lucide-react";
+import { Bell, Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ const Sales = () => {
   const [newAcceptedOrderId, setNewAcceptedOrderId] = useState<string | null>(null);
   const [newCompletedOrderId, setNewCompletedOrderId] = useState<string | null>(null);
   const [newCompletedOrderAmount, setNewCompletedOrderAmount] = useState<number | null>(null);
+  const [newMarketplaceCompletedOrder, setNewMarketplaceCompletedOrder] = useState<{id: string, total: number} | null>(null);
   const navigate = useNavigate();
 
   const handleCategoryChange = (category: string) => {
@@ -72,15 +73,28 @@ const Sales = () => {
             setNewCompletedOrderId(payload.new.id);
             setNewCompletedOrderAmount(payload.new.total);
             
-            // Clear the highlight after 8 seconds
-            setTimeout(() => {
-              setNewCompletedOrderId(null);
-              setNewCompletedOrderAmount(null);
-            }, 8000);
+            // Check if it's a marketplace order (user_id is null)
+            if (payload.new.user_id === null) {
+              setNewMarketplaceCompletedOrder({
+                id: payload.new.id,
+                total: payload.new.total
+              });
+              
+              // Clear the marketplace highlight after 10 seconds
+              setTimeout(() => {
+                setNewMarketplaceCompletedOrder(null);
+              }, 10000);
+            } else {
+              // Clear the regular completed order highlight after 8 seconds
+              setTimeout(() => {
+                setNewCompletedOrderId(null);
+                setNewCompletedOrderAmount(null);
+              }, 8000);
+            }
             
             // Show toast notification for completed order
             toast({
-              title: "¡Orden completada!",
+              title: payload.new.user_id === null ? "¡Orden de Marketplace completada!" : "¡Orden completada!",
               description: `Orden #${payload.new.id.substring(0, 8)} completada con éxito. Venta: $${payload.new.total.toFixed(2)}`,
               variant: "success",
             });
@@ -249,7 +263,19 @@ const Sales = () => {
         </header>
 
         <main className="px-6">
-          {newCompletedOrderId && newCompletedOrderAmount !== null && (
+          {newMarketplaceCompletedOrder && (
+            <Alert className="mb-4 border-amber-500 bg-amber-50 text-amber-800">
+              <Store className="h-5 w-5 text-amber-600" />
+              <AlertTitle className="text-amber-800 font-semibold">¡Venta de Marketplace completada!</AlertTitle>
+              <AlertDescription className="text-amber-700">
+                Se ha registrado una nueva venta de Marketplace por ${newMarketplaceCompletedOrder.total.toFixed(2)} 
+                <br />
+                Orden #{newMarketplaceCompletedOrder.id.substring(0, 8)}
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {newCompletedOrderId && newCompletedOrderAmount !== null && !newMarketplaceCompletedOrder && (
             <Alert className="mb-4 border-green-500 bg-green-50 text-green-800">
               <CheckCircle2 className="h-5 w-5 text-green-600" />
               <AlertTitle className="text-green-800 font-semibold">¡Venta completada!</AlertTitle>
