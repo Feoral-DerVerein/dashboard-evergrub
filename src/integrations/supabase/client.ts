@@ -18,8 +18,16 @@ const supabaseOptions = {
   }
 };
 
-// Create the client
-export const supabase = createClient<Database>(
+// Define custom function types to extend the default Supabase types
+type CustomFunctions = {
+  broadcast_order_status_change: (args: { 
+    order_id: string; 
+    new_status: "pending" | "accepted" | "completed" | "rejected"
+  }) => Promise<{ data: any; error: any }>
+}
+
+// Create the client with extended types
+export const supabase = createClient<Database, "public", CustomFunctions>(
   SUPABASE_URL, 
   SUPABASE_PUBLISHABLE_KEY, 
   supabaseOptions
