@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -17,11 +17,17 @@ import { Eye, Check, X, CheckCircle2, Clock, XCircle } from "lucide-react";
 interface OrdersTableProps {
   orders: Order[];
   onViewDetails: (order: Order) => void;
-  onStatusChange: () => void;
+  onStatusChange: (orderId: string, status: "accepted" | "completed" | "rejected") => void;
 }
 
 export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTableProps) {
-  // Simplified version since we're not showing any orders
+  const [processingOrders, setProcessingOrders] = useState<Record<string, boolean>>({});
+  
+  const handleStatusChange = (orderId: string, status: "accepted" | "completed" | "rejected") => {
+    setProcessingOrders({...processingOrders, [orderId]: true});
+    onStatusChange(orderId, status);
+    // We don't set processing to false because the parent component will refresh the order list
+  };
 
   const getStatusBadge = (order: Order) => {
     switch (order.status) {
@@ -96,7 +102,8 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                         <Button
                           variant="default"
                           size="sm"
-                          onClick={() => onStatusChange()}
+                          disabled={processingOrders[order.id]}
+                          onClick={() => handleStatusChange(order.id, "accepted")}
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -104,7 +111,8 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => onStatusChange()}
+                          disabled={processingOrders[order.id]}
+                          onClick={() => handleStatusChange(order.id, "rejected")}
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -115,7 +123,8 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                       <Button
                         variant="default"
                         size="sm"
-                        onClick={() => onStatusChange()}
+                        disabled={processingOrders[order.id]}
+                        onClick={() => handleStatusChange(order.id, "completed")}
                       >
                         <Check className="h-4 w-4" />
                       </Button>

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -10,6 +10,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OrdersTable } from "@/components/orders/OrdersTable";
+import { orderService } from "@/services/orderService";
+import { useToast } from "@/hooks/use-toast";
 
 const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (order: Order) => void }) => {
   const initials = order.customerName
@@ -59,7 +61,12 @@ const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (ord
   );
 };
 
-const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; isOpen: boolean; onClose: () => void }) => {
+const OrderDetailsModal = ({ order, isOpen, onClose, onStatusChange }: { 
+  order: Order | null; 
+  isOpen: boolean; 
+  onClose: () => void;
+  onStatusChange: (orderId: string, status: "accepted" | "completed" | "rejected") => void;
+}) => {
   const [localStatus, setLocalStatus] = useState<string | null>(null);
   
   if (!order) return null;
@@ -106,6 +113,21 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
+  };
+
+  const handleAccept = () => {
+    setLocalStatus("accepted");
+    onStatusChange(order.id, "accepted");
+  };
+
+  const handleComplete = () => {
+    setLocalStatus("completed");
+    onStatusChange(order.id, "completed");
+  };
+
+  const handleReject = () => {
+    setLocalStatus("rejected");
+    onStatusChange(order.id, "rejected");
   };
 
   return (
@@ -193,6 +215,35 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
               <p className="text-sm text-blue-800">{order.specialRequest}</p>
             </div>
           )}
+
+          {displayStatus === "pending" && (
+            <div className="flex gap-2">
+              <Button 
+                className="flex-1" 
+                variant="default"
+                onClick={handleAccept}
+              >
+                Accept Order
+              </Button>
+              <Button 
+                className="flex-1" 
+                variant="destructive"
+                onClick={handleReject}
+              >
+                Reject
+              </Button>
+            </div>
+          )}
+          
+          {displayStatus === "accepted" && (
+            <Button 
+              className="w-full" 
+              variant="default"
+              onClick={handleComplete}
+            >
+              Mark as Completed
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -231,15 +282,77 @@ const LoadingSkeleton = () => (
 const Orders = () => {
   const [filter, setFilter] = useState<"all" | "pending" | "accepted" | "completed" | "rejected">("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [orders] = useState<Order[]>([]);  // Empty orders array, no loading needed
-  const [loading] = useState(false);  // No loading state needed
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const { user } = useAuth();
+  const { toast } = useToast();
 
-  // No loadOrders function needed since we're not fetching orders
+  useEffect(() => {
+    loadOrders();
+  }, []);
   
-  // Empty filtered orders
-  const filteredOrders: Order[] = [];
+  const loadOrders = async () => {
+    try {
+      setLoading(true);
+      const ordersData = await orderService.getUserOrders();
+      console.log("Loaded orders:", ordersData);
+      setOrders(ordersData);
+    } catch (error) {
+      console.error("Error loading orders:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load orders",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (orderId: string, status: "accepted" | "completed" | "rejected") => {
+    try {
+      if (status === "rejected") {
+        // Delete order if rejected
+        await orderService.deleteOrder(orderId);
+        toast({
+          title: "Order Rejected",
+          description: "The order has been rejected and removed",
+        });
+        // Remove from local state
+        setOrders(orders.filter(o => o.id !== orderId));
+        setSelectedOrder(null);
+      } else {
+        // Update order status
+        const updatedOrder = await orderService.updateOrderStatus(orderId, status);
+        toast({
+          title: "Order Updated",
+          description: `Order has been ${status}`,
+        });
+        
+        // Update in local state
+        setOrders(orders.map(o => o.id === orderId ? updatedOrder : o));
+        
+        // If the selected order is the one being updated, update it as well
+        if (selectedOrder && selectedOrder.id === orderId) {
+          setSelectedOrder(updatedOrder);
+        }
+      }
+    } catch (error) {
+      console.error(`Error ${status === "rejected" ? "rejecting" : "updating"} order:`, error);
+      toast({
+        title: "Error",
+        description: `Failed to ${status === "rejected" ? "reject" : "update"} order`,
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Filter orders based on selected filter
+  const filteredOrders = orders.filter(order => {
+    if (filter === "all") return true;
+    return order.status === filter;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -326,7 +439,7 @@ const Orders = () => {
               <OrdersTable 
                 orders={filteredOrders} 
                 onViewDetails={(order) => setSelectedOrder(order)} 
-                onStatusChange={() => {}} // Empty function since we're not loading orders
+                onStatusChange={(orderId, status) => handleStatusChange(orderId, status)}
               />
             )
           ) : (
@@ -340,6 +453,7 @@ const Orders = () => {
           order={selectedOrder}
           isOpen={!!selectedOrder}
           onClose={() => setSelectedOrder(null)}
+          onStatusChange={handleStatusChange}
         />
 
         <BottomNav />
