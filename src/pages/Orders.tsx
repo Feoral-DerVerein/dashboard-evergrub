@@ -12,6 +12,7 @@ import { OrdersTable } from "@/components/orders/OrdersTable";
 import { orderService } from "@/services/orderService";
 import { useToast } from "@/hooks/use-toast";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
+import { Card } from "@/components/ui/card";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -49,7 +50,10 @@ const OrderCard = ({ order, onViewDetails, onDelete }: {
       <div className="flex items-center justify-between">
         <div className="font-medium text-gray-600">{order.id.substring(0, 8)}</div>
         <div className="flex items-center gap-2">
-          <div className={`text-sm ${getStatusColor(order.status)}`}>
+          <div className={`text-sm ${getStatusColor(order.status)} flex items-center`}>
+            {order.status === "completed" && (
+              <CheckCircle2 className="w-4 h-4 mr-1 text-green-500" />
+            )}
             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
           </div>
           <button 
