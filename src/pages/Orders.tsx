@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle, Trash2, AlertTriangle } from "lucide-react";
+import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
 import { Order } from "@/types/order.types";
 import { useAuth } from "@/context/AuthContext";
@@ -321,7 +321,6 @@ const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const { lastOrderUpdate } = useNotificationsAndOrders();
@@ -434,25 +433,6 @@ const Orders = () => {
     }
   };
 
-  const handleDeleteAllOrders = async () => {
-    try {
-      await orderService.deleteAllOrders();
-      toast({
-        title: "All Orders Deleted",
-        description: "All orders have been deleted successfully",
-      });
-      setOrders([]);
-      setShowDeleteConfirmation(false);
-    } catch (error) {
-      console.error("Error deleting all orders:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete orders",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
@@ -477,19 +457,7 @@ const Orders = () => {
               </Button>
             </div>
           </div>
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-gray-500">Today's Orders</p>
-            {orders.length > 0 && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setShowDeleteConfirmation(true)}
-              >
-                <Trash2 className="h-4 w-4 mr-1" />
-                Delete All
-              </Button>
-            )}
-          </div>
+          <p className="text-gray-500 mb-4">Today's Orders</p>
         </header>
 
         <main className="px-6">
@@ -527,32 +495,6 @@ const Orders = () => {
           onStatusChange={handleStatusChange}
           onDelete={handleDeleteOrder}
         />
-
-        <Dialog open={showDeleteConfirmation} onOpenChange={setShowDeleteConfirmation}>
-          <DialogContent className="sm:max-w-md">
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
-              Delete All Orders
-            </DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete all orders? This action cannot be undone.
-            </DialogDescription>
-            <DialogFooter className="sm:justify-end gap-2">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowDeleteConfirmation(false)}
-              >
-                Cancel
-              </Button>
-              <Button 
-                variant="destructive"
-                onClick={handleDeleteAllOrders}
-              >
-                Delete All
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
 
         <BottomNav />
       </div>
