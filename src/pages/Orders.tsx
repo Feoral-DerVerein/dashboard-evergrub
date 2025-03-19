@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle, Trash2, Check } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -400,8 +401,10 @@ const Orders = () => {
           title: "Order Rejected",
           description: "The order has been rejected and removed",
         });
-        setOrders(orders.filter(o => o.id !== orderId));
-        setSelectedOrder(null);
+        setOrders(prevOrders => prevOrders.filter(o => o.id !== orderId));
+        if (selectedOrder && selectedOrder.id === orderId) {
+          setSelectedOrder(null);
+        }
       } else {
         console.log(`Cambiando estado de orden ${orderId} a ${status}`);
         const updatedOrder = await orderService.updateOrderStatus(orderId, status);
@@ -417,10 +420,12 @@ const Orders = () => {
           description: toastMessage,
         });
         
+        // Update only the specific order in the state
         setOrders(prevOrders => 
           prevOrders.map(o => o.id === orderId ? updatedOrder : o)
         );
         
+        // If the order is selected, update the selected order state
         if (selectedOrder && selectedOrder.id === orderId) {
           setSelectedOrder(updatedOrder);
         }
@@ -442,7 +447,10 @@ const Orders = () => {
         title: "Order Deleted",
         description: "The order has been deleted successfully",
       });
-      setOrders(orders.filter(o => o.id !== orderId));
+      // Remove only the specific order from the state
+      setOrders(prevOrders => prevOrders.filter(o => o.id !== orderId));
+      
+      // If the deleted order is selected, clear the selection
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder(null);
       }

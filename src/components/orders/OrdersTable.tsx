@@ -25,13 +25,20 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
   const [processingOrders, setProcessingOrders] = useState<Record<string, boolean>>({});
   
   const handleStatusChange = (orderId: string, status: "accepted" | "completed" | "rejected") => {
-    setProcessingOrders({...processingOrders, [orderId]: true});
+    // Mark this specific order as processing
+    setProcessingOrders(prev => ({...prev, [orderId]: true}));
     
+    // Call the status change handler with a small delay to show processing state
     setTimeout(() => {
       onStatusChange(orderId, status);
       
+      // Reset the processing state after a short delay
       setTimeout(() => {
-        setProcessingOrders(prev => ({...prev, [orderId]: false}));
+        setProcessingOrders(prev => {
+          const newState = {...prev};
+          delete newState[orderId]; // Only remove this specific order from processing
+          return newState;
+        });
       }, 500);
     }, 100);
   };
