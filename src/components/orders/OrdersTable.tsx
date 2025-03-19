@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
 import { Order } from "@/types/order.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Check, X, CheckCircle2, Clock, XCircle, Trash2 } from "lucide-react";
+import { Eye, Check, X, CheckCircle2, Clock, XCircle, Trash2, Package } from "lucide-react";
 
 interface OrdersTableProps {
   orders: Order[];
@@ -28,19 +28,17 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
     // Mark this specific order as processing
     setProcessingOrders(prev => ({...prev, [orderId]: true}));
     
-    // Call the status change handler with a small delay to show processing state
+    // Call the status change handler
+    onStatusChange(orderId, status);
+    
+    // Reset the processing state after a short delay
     setTimeout(() => {
-      onStatusChange(orderId, status);
-      
-      // Reset the processing state after a short delay
-      setTimeout(() => {
-        setProcessingOrders(prev => {
-          const newState = {...prev};
-          delete newState[orderId]; // Only remove this specific order from processing
-          return newState;
-        });
-      }, 500);
-    }, 100);
+      setProcessingOrders(prev => {
+        const newState = {...prev};
+        delete newState[orderId]; // Only remove this specific order from processing
+        return newState;
+      });
+    }, 500);
   };
 
   const getStatusBadge = (order: Order) => {
@@ -62,7 +60,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
       case "completed":
         return <Badge 
           variant="success"
-          icon={<CheckCircle2 className="h-3 w-3" />}
+          icon={<Package className="h-3 w-3" />}
         >
           Completado
         </Badge>;
