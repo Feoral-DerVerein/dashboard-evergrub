@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle, Trash2 } from "lucide-react";
+import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
@@ -286,7 +286,6 @@ const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const { lastOrderUpdate } = useNotificationsAndOrders();
@@ -378,28 +377,6 @@ const Orders = () => {
     }
   };
   
-  const handleDeleteAllOrders = async () => {
-    try {
-      setLoading(true);
-      await orderService.deleteAllOrders();
-      toast({
-        title: "Orders Deleted",
-        description: "All orders have been deleted successfully",
-      });
-      setOrders([]);
-      setIsDeleteDialogOpen(false);
-    } catch (error) {
-      console.error("Error deleting all orders:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete all orders",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-  
   const filteredOrders = orders.filter(order => {
     if (filter === "all") return true;
     return order.status === filter;
@@ -426,13 +403,6 @@ const Orders = () => {
               >
                 <LayoutDashboard className="h-4 w-4 mr-1" />
                 Table
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setIsDeleteDialogOpen(true)}
-              >
-                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -513,23 +483,6 @@ const Orders = () => {
           onClose={() => setSelectedOrder(null)}
           onStatusChange={handleStatusChange}
         />
-        
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogContent>
-            <DialogTitle className="text-center">Delete All Orders</DialogTitle>
-            <div className="py-4">
-              <p className="text-center mb-4">Are you sure you want to delete all orders? This action cannot be undone.</p>
-              <div className="flex justify-center gap-4">
-                <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button variant="destructive" onClick={handleDeleteAllOrders}>
-                  Delete All
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
 
         <BottomNav />
       </div>
