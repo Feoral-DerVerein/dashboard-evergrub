@@ -36,28 +36,28 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
           variant="warning"
           icon={<Clock className="h-3 w-3" />}
         >
-          Pending
+          Pendiente
         </Badge>;
       case "accepted":
         return <Badge 
           variant="info"
           icon={<CheckCircle2 className="h-3 w-3" />}
         >
-          Accepted
+          Aceptada
         </Badge>;
       case "completed":
         return <Badge 
           variant="success"
           icon={<CheckCircle2 className="h-3 w-3" />}
         >
-          Completed
+          Completada
         </Badge>;
       case "rejected":
         return <Badge 
           variant="destructive"
           icon={<XCircle className="h-3 w-3" />}
         >
-          Rejected
+          Rechazada
         </Badge>;
       default:
         return <Badge variant="outline">{order.status}</Badge>;
@@ -104,6 +104,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                           size="sm"
                           disabled={processingOrders[order.id]}
                           onClick={() => handleStatusChange(order.id, "accepted")}
+                          title="Aceptar orden"
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -113,6 +114,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                           size="sm"
                           disabled={processingOrders[order.id]}
                           onClick={() => handleStatusChange(order.id, "rejected")}
+                          title="Rechazar orden"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -121,10 +123,12 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                     
                     {order.status === "accepted" && (
                       <Button
-                        variant="default"
+                        variant="success"
                         size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white"
                         disabled={processingOrders[order.id]}
                         onClick={() => handleStatusChange(order.id, "completed")}
+                        title="Marcar como completada"
                       >
                         <Check className="h-4 w-4" />
                       </Button>
