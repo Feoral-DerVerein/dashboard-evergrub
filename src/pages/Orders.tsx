@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,7 +18,7 @@ const getStatusColor = (status: string) => {
   switch (status) {
     case "completed": return "text-green-500";
     case "pending": return "text-orange-500";
-    case "accepted": return "text-blue-500";
+    case "accepted": return "text-green-500"; // Changed to green
     case "rejected": return "text-red-500";
     default: return "text-gray-500";
   }
@@ -29,9 +30,20 @@ const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (ord
     .map(n => n[0])
     .join('')
     .toUpperCase();
+    
+  // Get card background color based on status
+  const getCardClassName = (status: string) => {
+    switch (status) {
+      case "accepted":
+      case "completed":
+        return "bg-green-50";
+      default:
+        return "bg-white";
+    }
+  };
 
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
+    <div className={`rounded-lg p-4 shadow-sm mb-4 ${getCardClassName(order.status)}`}>
       <div className="flex items-center justify-between">
         <div className="font-medium text-gray-600">{order.id.substring(0, 8)}</div>
         <div className={`text-sm ${getStatusColor(order.status)}`}>

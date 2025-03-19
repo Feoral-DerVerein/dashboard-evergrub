@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -69,6 +70,17 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
     }
   };
 
+  const getRowClassName = (status: string) => {
+    switch (status) {
+      case "accepted":
+        return "bg-green-50";
+      case "completed":
+        return "bg-green-50";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -86,7 +98,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
         <TableBody>
           {orders.length > 0 ? (
             orders.map((order) => (
-              <TableRow key={order.id}>
+              <TableRow key={order.id} className={getRowClassName(order.status)}>
                 <TableCell className="font-medium">{order.id.substring(0, 8)}</TableCell>
                 <TableCell>{order.customerName || "Customer"}</TableCell>
                 <TableCell>{order.items.length}</TableCell>
