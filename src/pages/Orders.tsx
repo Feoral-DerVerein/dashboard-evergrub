@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -377,6 +378,7 @@ const Orders = () => {
   
   const filteredOrders = orders.filter(order => {
     if (filter === "all") return true;
+    if (filter === "accepted") return order.status === "accepted" || order.status === "completed";
     return order.status === filter;
   });
 
