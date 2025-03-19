@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Order, OrderItem } from "@/types/order.types";
+import { Order, OrderItem, mapDbOrderToOrder, DbOrder, DbOrderItem } from "@/types/order.types";
 import { toast } from "sonner";
 
 interface UpdateOrderItemParams {
@@ -107,7 +107,7 @@ export const getOrder = async (orderId: string): Promise<Order | null> => {
       customerName: data.customer_name,
       customerImage: data.customer_image || "/placeholder.svg",
       items: orderItems,
-      status: data.status,
+      status: data.status as "pending" | "accepted" | "completed" | "rejected",
       timestamp: data.timestamp,
       total: data.total,
       location: data.location || "",
@@ -120,6 +120,52 @@ export const getOrder = async (orderId: string): Promise<Order | null> => {
   } catch (error) {
     console.error("Exception fetching order:", error);
     return null;
+  }
+};
+
+export const getUserOrders = async (): Promise<Order[]> => {
+  try {
+    // Get all orders (you might want to filter by user_id if needed)
+    const { data: ordersData, error: ordersError } = await supabase
+      .from('orders')
+      .select('*')
+      .order('timestamp', { ascending: false });
+    
+    if (ordersError) {
+      console.error("Error fetching orders:", ordersError);
+      return [];
+    }
+    
+    if (!ordersData || ordersData.length === 0) {
+      return [];
+    }
+
+    // Get all order items for these orders
+    const orderIds = ordersData.map((order: DbOrder) => order.id);
+    const { data: itemsData, error: itemsError } = await supabase
+      .from('order_items')
+      .select('*')
+      .in('order_id', orderIds);
+    
+    if (itemsError) {
+      console.error("Error fetching order items:", itemsError);
+      return [];
+    }
+
+    // Map DB orders to app orders
+    const orders: Order[] = ordersData.map((dbOrder: DbOrder) => {
+      // Find items for this order
+      const orderItems = (itemsData || []).filter(
+        (item: DbOrderItem) => item.order_id === dbOrder.id
+      );
+      
+      return mapDbOrderToOrder(dbOrder, orderItems);
+    });
+
+    return orders;
+  } catch (error) {
+    console.error("Exception in getUserOrders:", error);
+    return [];
   }
 };
 
@@ -144,7 +190,7 @@ export const getOrderItems = async (orderId: string): Promise<OrderItem[]> => {
 
 export const updateOrderStatus = async (
   orderId: string, 
-  status: string,
+  status: "pending" | "accepted" | "completed" | "rejected",
   fromOrdersPage: boolean = false
 ) => {
   try {
@@ -185,4 +231,3 @@ export const updateOrderStatus = async (
 
 // Re-export broadcastOrderStatusChange from the Supabase client
 import { broadcastOrderStatusChange } from "@/integrations/supabase/client";
-

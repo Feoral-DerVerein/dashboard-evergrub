@@ -28,7 +28,9 @@ const Orders = () => {
       setIsLoading(true);
       const fetchedOrders = await orderService.getUserOrders();
       console.log("Fetched orders:", fetchedOrders);
-      setOrders(fetchedOrders);
+      // Filter out completed orders
+      const filteredOrders = fetchedOrders.filter(order => order.status !== "completed");
+      setOrders(filteredOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
       toast.error("Failed to load orders");
@@ -48,29 +50,42 @@ const Orders = () => {
 
   const handleStatusChange = async (orderId: string, status: "accepted" | "completed" | "rejected") => {
     try {
-      const updatedOrder = await orderService.updateOrderStatus(orderId, status);
+      setUpdatingOrderId(orderId);
+      await orderService.updateOrderStatus(orderId, status, true);
       
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
-          order.id === orderId ? { ...order, status } : order
-        )
-      );
-      
-      if (status === "accepted") {
+      if (status === "completed") {
+        // Remove the completed order from the orders list
+        setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
+        toast.success(`Order completed successfully`, {
+          description: "The order has been moved to Sales",
+        });
+      } else if (status === "accepted") {
+        // Update the order status in the UI
+        setOrders(prevOrders => 
+          prevOrders.map(order => 
+            order.id === orderId ? { ...order, status } : order
+          )
+        );
         toast.success(`Order accepted successfully`, {
           description: "The order has been added to your product sales.",
           duration: 5000,
           icon: <CheckCircle2 className="h-5 w-5 text-green-500" />
         });
-      } else if (status === "completed") {
-        toast.success(`Order completed successfully`);
       } else if (status === "rejected") {
+        // Update the order status in the UI
+        setOrders(prevOrders => 
+          prevOrders.map(order => 
+            order.id === orderId ? { ...order, status } : order
+          )
+        );
         toast.error(`Order rejected`);
       }
       
     } catch (error) {
       console.error(`Error updating order status to ${status}:`, error);
       toast.error(`Failed to update order status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setUpdatingOrderId(null);
     }
   };
 
