@@ -1,6 +1,7 @@
+
 import { supabase } from "@/integrations/supabase/client";
-import { Order, OrderItem, OrderStatus } from "@/types/order.types";
-import { toast } from "@/components/ui/use-toast";
+import { Order, OrderItem } from "@/types/order.types";
+import { toast } from "sonner";
 
 interface UpdateOrderItemParams {
   order_id: string;
@@ -20,11 +21,7 @@ export const createOrderItem = async (orderItem: OrderItem) => {
 
     if (error) {
       console.error("Error creating order item:", error);
-      toast({
-        title: "Error creating order item.",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Error creating order item. Something went wrong. Please try again.");
       return { success: false, error };
     }
 
@@ -32,11 +29,7 @@ export const createOrderItem = async (orderItem: OrderItem) => {
     return { success: true, data };
   } catch (error) {
     console.error("Exception creating order item:", error);
-    toast({
-      title: "Unexpected error.",
-      description: "Please check the console for details.",
-      variant: "destructive",
-    });
+    toast.error("Unexpected error. Please check the console for details.");
     return { success: false, error };
   }
 };
@@ -44,7 +37,7 @@ export const createOrderItem = async (orderItem: OrderItem) => {
 export const updateOrderItem = async (
   order_id: string,
   product_id: string,
-  updates: Partial<UpdateOrderItemParams>
+  updates: Partial<Omit<UpdateOrderItemParams, 'product_id'>>
 ) => {
   try {
     const { data, error } = await supabase
@@ -56,11 +49,7 @@ export const updateOrderItem = async (
 
     if (error) {
       console.error("Error updating order item:", error);
-      toast({
-        title: "Error updating order item.",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Error updating order item. Something went wrong. Please try again.");
       return { success: false, error };
     }
 
@@ -68,11 +57,7 @@ export const updateOrderItem = async (
     return { success: true, data };
   } catch (error) {
     console.error("Exception updating order item:", error);
-    toast({
-      title: "Unexpected error.",
-      description: "Please check the console for details.",
-      variant: "destructive",
-    });
+    toast.error("Unexpected error. Please check the console for details.");
     return { success: false, error };
   }
 };
@@ -87,11 +72,7 @@ export const deleteOrderItem = async (order_id: string, product_id: string) => {
 
     if (error) {
       console.error("Error deleting order item:", error);
-      toast({
-        title: "Error deleting order item.",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Error deleting order item. Something went wrong. Please try again.");
       return { success: false, error };
     }
 
@@ -99,11 +80,7 @@ export const deleteOrderItem = async (order_id: string, product_id: string) => {
     return { success: true, data };
   } catch (error) {
     console.error("Exception deleting order item:", error);
-    toast({
-      title: "Unexpected error.",
-      description: "Please check the console for details.",
-      variant: "destructive",
-    });
+    toast.error("Unexpected error. Please check the console for details.");
     return { success: false, error };
   }
 };
@@ -121,7 +98,25 @@ export const getOrder = async (orderId: string): Promise<Order | null> => {
       return null;
     }
 
-    return data as Order;
+    // Need to fetch order items separately
+    const orderItems = await getOrderItems(orderId);
+    
+    // Convert the database order to our application order type
+    const order: Order = {
+      id: data.id,
+      customerName: data.customer_name,
+      customerImage: data.customer_image || "/placeholder.svg",
+      items: orderItems,
+      status: data.status,
+      timestamp: data.timestamp,
+      total: data.total,
+      location: data.location || "",
+      phone: data.phone || "",
+      specialRequest: data.special_request || undefined,
+      userId: data.user_id
+    };
+
+    return order;
   } catch (error) {
     console.error("Exception fetching order:", error);
     return null;
@@ -149,10 +144,12 @@ export const getOrderItems = async (orderId: string): Promise<OrderItem[]> => {
 
 export const updateOrderStatus = async (
   orderId: string, 
-  status: OrderStatus,
+  status: string,
   fromOrdersPage: boolean = false
 ) => {
   try {
+    console.log(`Updating order ${orderId} status to ${status}, fromOrdersPage: ${fromOrdersPage}`);
+    
     const { data, error } = await supabase
       .from('orders')
       .update({ 
@@ -170,9 +167,22 @@ export const updateOrderStatus = async (
     }
     
     console.log(`Order ${orderId} status updated to ${status}`);
+    
+    // Broadcast the status change to connected clients
+    try {
+      const broadcastResult = await broadcastOrderStatusChange(orderId, status);
+      console.log("Broadcast result:", broadcastResult);
+    } catch (broadcastError) {
+      console.error("Error broadcasting status change:", broadcastError);
+    }
+    
     return { success: true, data };
   } catch (error) {
     console.error("Exception in updateOrderStatus:", error);
     return { success: false, error };
   }
 };
+
+// Re-export broadcastOrderStatusChange from the Supabase client
+import { broadcastOrderStatusChange } from "@/integrations/supabase/client";
+

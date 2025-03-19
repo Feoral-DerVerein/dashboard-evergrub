@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -7,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { OrdersTable } from "@/components/orders/OrdersTable";
-import { orderService } from "@/services/orderService";
+import * as orderService from "@/services/orderService";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
