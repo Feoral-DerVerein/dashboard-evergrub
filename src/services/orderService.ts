@@ -332,5 +332,39 @@ export const orderService = {
       console.error(`Error en deleteOrder para la orden ${orderId}:`, error);
       throw error;
     }
+  },
+
+  // Delete all orders and their items
+  async deleteAllOrders(): Promise<void> {
+    try {
+      console.log('Deleting all orders and their items');
+
+      // First delete all order items (due to foreign key constraints)
+      const { error: deleteItemsError } = await supabase
+        .from('order_items')
+        .delete()
+        .neq('order_id', null); // Delete all items related to orders
+      
+      if (deleteItemsError) {
+        console.error('Error deleting all order items:', deleteItemsError);
+        throw new Error(`Error deleting order items: ${deleteItemsError.message}`);
+      }
+      
+      // Then delete all orders
+      const { error: deleteOrdersError } = await supabase
+        .from('orders')
+        .delete()
+        .neq('id', null); // Delete all orders
+      
+      if (deleteOrdersError) {
+        console.error('Error deleting all orders:', deleteOrdersError);
+        throw new Error(`Error deleting orders: ${deleteOrdersError.message}`);
+      }
+      
+      console.log('All orders and items deleted successfully');
+    } catch (error) {
+      console.error('Error in deleteAllOrders:', error);
+      throw error;
+    }
   }
 };
