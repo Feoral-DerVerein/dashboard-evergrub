@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -26,11 +25,9 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
   const handleStatusChange = (orderId: string, status: "accepted" | "completed" | "rejected") => {
     setProcessingOrders({...processingOrders, [orderId]: true});
     
-    // Llamamos al manejador de estado con un pequeño retraso para mostrar feedback visual
     setTimeout(() => {
       onStatusChange(orderId, status);
       
-      // Limpiamos el estado de procesamiento después de un corto tiempo
       setTimeout(() => {
         setProcessingOrders(prev => ({...prev, [orderId]: false}));
       }, 500);
@@ -44,28 +41,28 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
           variant="warning"
           icon={<Clock className="h-3 w-3" />}
         >
-          Pending
+          Por aceptar
         </Badge>;
       case "accepted":
         return <Badge 
           variant="info"
           icon={<CheckCircle2 className="h-3 w-3" />}
         >
-          Accepted
+          Aceptado
         </Badge>;
       case "completed":
         return <Badge 
           variant="success"
           icon={<CheckCircle2 className="h-3 w-3" />}
         >
-          Completed
+          Completado
         </Badge>;
       case "rejected":
         return <Badge 
           variant="destructive"
           icon={<XCircle className="h-3 w-3" />}
         >
-          Rejected
+          Rechazado
         </Badge>;
       default:
         return <Badge variant="outline">{order.status}</Badge>;
