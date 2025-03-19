@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Package } from "lucide-react";
+import { LayoutDashboard, Package, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
 import { Order } from "@/types/order.types";
@@ -10,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { OrdersTable } from "@/components/orders/OrdersTable";
 import { orderService } from "@/services/orderService";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 
 const Orders = () => {
@@ -120,119 +120,108 @@ const Orders = () => {
     </Dialog>
   );
 
-  const getStatusColor = (status: string) => {
+  const getStatusLabel = (status: string) => {
     switch (status) {
-      case "pending": return "bg-amber-500";
-      case "accepted": return "bg-blue-500";
-      case "completed": return "bg-emerald-500";
-      case "rejected": return "bg-red-500";
-      default: return "bg-gray-400";
+      case "pending": return "Pending";
+      case "accepted": return "Accepted";
+      case "completed": return "Completed";
+      case "rejected": return "Rejected";
+      default: return status;
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed":
-        return <Package className="h-5 w-5 text-emerald-500" />;
-      default:
-        return <div className={`w-3 h-3 rounded-full ${getStatusColor(status)}`}></div>;
+      case "pending": return "text-amber-500";
+      case "accepted": return "text-blue-500";
+      case "completed": return "text-emerald-500";
+      case "rejected": return "text-red-500";
+      default: return "text-gray-500";
     }
   };
 
   const OrderCard = ({ order }: { order: Order }) => {
-    const getStatusBadge = () => {
-      switch (order.status) {
-        case "pending":
-          return <span className="px-2 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-medium">Por aceptar</span>;
-        case "accepted":
-          return <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">Aceptado</span>;
-        case "completed":
-          return <span className="px-2 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-medium">Completado</span>;
-        case "rejected":
-          return <span className="px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-medium">Rechazado</span>;
-        default:
-          return <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-medium">{order.status}</span>;
+    const getInitials = (name: string) => {
+      return name ? name.substr(0, 2).toUpperCase() : 'CN';
+    };
+    
+    const formatTime = (timestamp: string) => {
+      try {
+        return timestamp;
+      } catch (error) {
+        return "";
       }
     };
 
     return (
-      <Card className="mb-4 overflow-hidden border-gray-200 hover:shadow-md transition-shadow duration-200">
-        <div className={`h-1 w-full ${getStatusColor(order.status)}`}></div>
-        <CardContent className="p-0">
-          <div className="p-4 pb-2">
-            <div className="flex justify-between items-start mb-3">
+      <Card className="mb-4 border border-gray-200 hover:shadow-sm transition-shadow duration-200 overflow-hidden">
+        <div className="px-6 py-4">
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-gray-600 font-mono">
+              {order.id.substring(0, 8)}
+            </div>
+            <div className={`font-medium ${getStatusColor(order.status)}`}>
+              {getStatusLabel(order.status)}
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-12 w-12 bg-blue-100 text-blue-500">
+                <AvatarFallback>{getInitials(order.customerName)}</AvatarFallback>
+              </Avatar>
+              
               <div>
-                <h3 className="font-semibold text-lg">{order.customerName || "Cliente"}</h3>
-                <p className="text-sm text-gray-500">ID: {order.id.substring(0, 8)}</p>
-              </div>
-              <div className="flex items-center">
-                {getStatusBadge()}
+                <h3 className="font-bold text-xl">{order.customerName}</h3>
+                <p className="text-gray-500">{order.items.length} items</p>
               </div>
             </div>
-          </div>
-          
-          <div className="border-t border-gray-100 px-4 py-3 bg-gray-50">
-            <div className="text-sm">
-              {order.items.slice(0, 3).map((item, i) => (
-                <p key={i} className="truncate py-0.5">
-                  <span className="font-medium">{item.quantity}x</span> {item.name}
-                </p>
-              ))}
-              {order.items.length > 3 && (
-                <p className="text-gray-500 italic text-xs mt-1">
-                  +{order.items.length - 3} more items
-                </p>
-              )}
+
+            <div className="flex flex-col items-end">
+              <div className="font-bold text-xl">${order.total.toFixed(2)}</div>
+              <div className="text-gray-500">{formatTime(order.timestamp)}</div>
             </div>
           </div>
+        </div>
+        
+        <div className="flex border-t border-gray-100">
+          <Button 
+            variant="ghost" 
+            className="flex-1 rounded-none h-12 border-r border-gray-100 hover:bg-gray-50"
+            onClick={() => handleViewDetails(order)}
+          >
+            <Eye className="h-5 w-5 text-blue-500" />
+          </Button>
           
-          <div className="flex justify-between items-center p-4 bg-white">
-            <span className="font-bold text-lg">${order.total.toFixed(2)}</span>
-            
-            <div className="space-x-2">
+          {order.status === "pending" && (
+            <>
               <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => handleViewDetails(order)}
-                className="border-gray-200 hover:bg-gray-50"
+                variant="ghost" 
+                className="flex-1 rounded-none h-12 border-r border-gray-100 hover:bg-gray-50"
+                onClick={() => handleStatusChange(order.id, "accepted")}
               >
-                Detalles
+                <Check className="h-5 w-5 text-green-500" />
               </Button>
-              
-              {order.status === "pending" && (
-                <>
-                  <Button 
-                    variant="default" 
-                    size="sm"
-                    onClick={() => handleStatusChange(order.id, "accepted")}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    Aceptar
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => handleStatusChange(order.id, "rejected")}
-                    className="bg-red-600 hover:bg-red-700"
-                  >
-                    Rechazar
-                  </Button>
-                </>
-              )}
-              
-              {order.status === "accepted" && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                  onClick={() => handleStatusChange(order.id, "completed")}
-                >
-                  Completar
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardContent>
+              <Button 
+                variant="ghost" 
+                className="flex-1 rounded-none h-12 hover:bg-gray-50"
+                onClick={() => handleStatusChange(order.id, "rejected")}
+              >
+                <X className="h-5 w-5 text-red-500" />
+              </Button>
+            </>
+          )}
+          
+          {order.status === "accepted" && (
+            <Button 
+              variant="ghost" 
+              className="flex-1 rounded-none h-12 hover:bg-gray-50"
+              onClick={() => handleStatusChange(order.id, "completed")}
+            >
+              <Package className="h-5 w-5 text-green-500" />
+            </Button>
+          )}
+        </div>
       </Card>
     );
   };
