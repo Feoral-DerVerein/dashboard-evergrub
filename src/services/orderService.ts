@@ -239,17 +239,35 @@ export const orderService = {
         // Usar la orden recargada
         console.log(`Orden ${orderId} recargada con estado ${refreshedOrder.status}`);
         
-        // Create a notification when an order is accepted or completed
-        if (status === "accepted" || status === "completed") {
+        // Create a notification when an order is accepted
+        if (status === "accepted") {
           try {
-            const statusText = status === "accepted" ? "aceptada" : "completada";
             await notificationService.createOrderNotification(
               orderId, 
-              `La orden #${orderId.substring(0, 8)} ha sido ${statusText}`
+              `La orden #${orderId.substring(0, 8)} ha sido aceptada`
             );
-            console.log(`Notificación creada para la orden ${orderId}`);
+            console.log(`Notificación de aceptación creada para la orden ${orderId}`);
           } catch (notifError) {
             console.error(`Error al crear la notificación para la orden ${orderId}:`, notifError);
+            // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente
+          }
+        }
+        
+        // Create a notification when an order is completed and a pickup notification
+        if (status === "completed") {
+          try {
+            // Status update notification
+            await notificationService.createOrderNotification(
+              orderId, 
+              `La orden #${orderId.substring(0, 8)} ha sido completada`
+            );
+            console.log(`Notificación de completado creada para la orden ${orderId}`);
+            
+            // Create a pickup notification for marketplace orders
+            await notificationService.createPickupNotification(orderId);
+            console.log(`Notificación de retiro creada para la orden ${orderId}`);
+          } catch (notifError) {
+            console.error(`Error al crear las notificaciones para la orden ${orderId}:`, notifError);
             // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente
           }
         }
@@ -272,17 +290,35 @@ export const orderService = {
       const updatedOrder = updatedData[0] as DbOrder;
       console.log(`Estado de la orden ${orderId} actualizado correctamente a ${status}, nuevo estado: ${updatedOrder.status}`);
       
-      // Create a notification when an order is accepted or completed
-      if (status === "accepted" || status === "completed") {
+      // Create a notification when an order is accepted
+      if (status === "accepted") {
         try {
-          const statusText = status === "accepted" ? "aceptada" : "completada";
           await notificationService.createOrderNotification(
             orderId, 
-            `La orden #${orderId.substring(0, 8)} ha sido ${statusText}`
+            `La orden #${orderId.substring(0, 8)} ha sido aceptada`
           );
-          console.log(`Notificación creada para la orden ${orderId}`);
+          console.log(`Notificación de aceptación creada para la orden ${orderId}`);
         } catch (notifError) {
           console.error(`Error al crear la notificación para la orden ${orderId}:`, notifError);
+          // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente
+        }
+      }
+      
+      // Create a notification when an order is completed and a pickup notification
+      if (status === "completed") {
+        try {
+          // Status update notification
+          await notificationService.createOrderNotification(
+            orderId, 
+            `La orden #${orderId.substring(0, 8)} ha sido completada`
+          );
+          console.log(`Notificación de completado creada para la orden ${orderId}`);
+          
+          // Create a pickup notification for marketplace orders
+          await notificationService.createPickupNotification(orderId);
+          console.log(`Notificación de retiro creada para la orden ${orderId}`);
+        } catch (notifError) {
+          console.error(`Error al crear las notificaciones para la orden ${orderId}:`, notifError);
           // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente
         }
       }

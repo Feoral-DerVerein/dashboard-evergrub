@@ -59,6 +59,50 @@ export const notificationService = {
     }
   },
   
+  // Create a pickup notification when an order is completed
+  async createPickupNotification(orderId: string): Promise<void> {
+    try {
+      // Get order information
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single();
+        
+      if (orderError) {
+        console.error("Error getting order information for pickup notification:", orderError);
+        throw orderError;
+      }
+      
+      // Check if this is a marketplace order (no user_id)
+      if (orderData && orderData.user_id === null) {
+        console.log("Creating pickup notification for completed marketplace order");
+        
+        const { error: notificationError } = await supabase
+          .from('notifications')
+          .insert({
+            type: 'pickup',
+            title: 'Producto Listo para Retirar',
+            description: `Tu orden #${orderId.substring(0, 8)} está completada y lista para retirar.`,
+            is_read: false,
+            order_id: orderId,
+            for_marketplace: true,
+            timestamp: new Date().toISOString()
+          });
+          
+        if (notificationError) {
+          console.error("Error creating pickup notification:", notificationError);
+          throw notificationError;
+        }
+        
+        console.log("Pickup notification created successfully");
+      }
+    } catch (error) {
+      console.error("Error in createPickupNotification:", error);
+      throw error;
+    }
+  },
+  
   // Get marketplace notifications
   async getMarketplaceNotifications(): Promise<Notification[]> {
     try {

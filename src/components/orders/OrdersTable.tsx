@@ -123,7 +123,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                     
                     {order.status === "accepted" && (
                       <Button
-                        variant="success"
+                        variant="outline"
                         size="sm"
                         className="bg-green-600 hover:bg-green-700 text-white"
                         disabled={processingOrders[order.id]}
