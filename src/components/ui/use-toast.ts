@@ -1,30 +1,32 @@
 
-import { useToast, toast } from "@/hooks/use-toast";
+import { useToast as useToastOriginal, toast as toastOriginal } from "@/hooks/use-toast";
+import { ToasterToast } from "@/components/ui/toast";
 
 // Create a wrapper for the toast function to handle different variants
 const enhancedToast = {
-  ...toast,
-  error: (message: string) => toast({
+  ...toastOriginal,
+  error: (message: string) => toastOriginal({
     title: "Error",
     description: message,
     variant: "destructive",
   }),
-  success: (message: string) => toast({
+  success: (message: string) => toastOriginal({
     title: "Success",
     description: message,
     variant: "success",
   }),
-  info: (message: string) => toast({
+  info: (message: string) => toastOriginal({
     title: "Info",
     description: message,
     variant: "info",
   }),
-  warning: (message: string) => toast({
+  warning: (message: string) => toastOriginal({
     title: "Warning",
     description: message,
     variant: "warning",
   })
 };
 
-// Export the enhanced toast as 'toast'
-export { useToast, enhancedToast as toast };
+// Export both the original toast function and the enhanced version
+export const useToast = useToastOriginal;
+export const toast = enhancedToast;

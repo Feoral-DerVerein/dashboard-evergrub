@@ -22,21 +22,21 @@ const Orders = () => {
   const { lastOrderUpdate, lastOrderDelete } = useNotificationsAndOrders();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setIsLoading(true);
-        const fetchedOrders = await orderService.getUserOrders();
-        console.log("Fetched orders:", fetchedOrders);
-        setOrders(fetchedOrders);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        toast.error("Failed to load orders");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchOrders = async () => {
+    try {
+      setIsLoading(true);
+      const fetchedOrders = await orderService.getUserOrders();
+      console.log("Fetched orders:", fetchedOrders);
+      setOrders(fetchedOrders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      toast.error("Failed to load orders");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrders();
   }, [lastOrderUpdate, lastOrderDelete]);
 
@@ -78,18 +78,15 @@ const Orders = () => {
       setUpdatingOrderId(orderId);
       await orderService.updateOrderStatus(orderId, "accepted", true);
       
-      toast({
-        title: "Orden aceptada",
+      toast.success("Orden aceptada", {
         description: "La orden ha sido aceptada exitosamente.",
       });
       
       fetchOrders();
     } catch (error) {
       console.error("Error accepting order:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo aceptar la orden.",
-        variant: "destructive",
+      toast.error("No se pudo aceptar la orden.", {
+        description: "Ha ocurrido un error al procesar la orden.",
       });
     } finally {
       setUpdatingOrderId(null);
@@ -237,7 +234,7 @@ const Orders = () => {
               </Button>
               <Button 
                 variant="ghost" 
-                className="flex-1 rounded-none h-12 hover:bg-gray-50"
+                className="flex-1 rounded-none h-12 border-r border-gray-100 hover:bg-gray-50"
                 onClick={() => handleStatusChange(order.id, "rejected")}
               >
                 <X className="h-5 w-5 text-red-500" />
@@ -328,4 +325,3 @@ const Orders = () => {
 };
 
 export default Orders;
-
