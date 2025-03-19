@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 interface UpdateOrderItemParams {
   order_id: string;
-  product_id: string;
+  product_id: string | number; // Updated to accept both string and number
   quantity: number;
   price: number;
   name: string;
@@ -36,7 +36,7 @@ export const createOrderItem = async (orderItem: OrderItem) => {
 
 export const updateOrderItem = async (
   order_id: string,
-  product_id: string,
+  product_id: string | number, // Updated to accept both string and number
   updates: Partial<Omit<UpdateOrderItemParams, 'product_id'>>
 ) => {
   try {
@@ -62,7 +62,7 @@ export const updateOrderItem = async (
   }
 };
 
-export const deleteOrderItem = async (order_id: string, product_id: string) => {
+export const deleteOrderItem = async (order_id: string, product_id: string | number) => {
   try {
     const { data, error } = await supabase
       .from('order_items')
