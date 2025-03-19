@@ -25,6 +25,7 @@ const Sales = () => {
   const [newCompletedOrderId, setNewCompletedOrderId] = useState<string | null>(null);
   const [newCompletedOrderAmount, setNewCompletedOrderAmount] = useState<number | null>(null);
   const [newMarketplaceCompletedOrder, setNewMarketplaceCompletedOrder] = useState<{id: string, total: number} | null>(null);
+  const [newOrdersPageAccepted, setNewOrdersPageAccepted] = useState<{id: string, total: number} | null>(null);
   const navigate = useNavigate();
 
   const handleCategoryChange = (category: string) => {
@@ -49,17 +50,28 @@ const Sales = () => {
           console.log('Order status changed:', payload);
           
           if (payload.new && payload.new.status === 'accepted') {
+            const fromOrdersPage = payload.new.from_orders_page === true;
+            
             setNewAcceptedOrderId(payload.new.id);
             
-            setTimeout(() => {
-              setNewAcceptedOrderId(null);
-            }, 5000);
-            
-            toast({
-              title: "Nueva orden aceptada",
-              description: `Orden #${payload.new.id.substring(0, 8)} ha sido aceptada y añadida a ventas.`,
-              variant: "success",
-            });
+            if (fromOrdersPage && payload.new.total) {
+              setNewOrdersPageAccepted({
+                id: payload.new.id,
+                total: payload.new.total
+              });
+              
+              setTimeout(() => {
+                setNewOrdersPageAccepted(null);
+              }, 10000);
+              
+              toast.success(`Orden #${payload.new.id.substring(0, 8)} aceptada desde Órdenes`);
+            } else {
+              setTimeout(() => {
+                setNewAcceptedOrderId(null);
+              }, 5000);
+              
+              toast.success(`Orden #${payload.new.id.substring(0, 8)} ha sido aceptada y añadida a ventas.`);
+            }
           }
           
           if (payload.new && payload.new.status === 'completed' && payload.new.total) {
@@ -76,22 +88,14 @@ const Sales = () => {
                 setNewMarketplaceCompletedOrder(null);
               }, 10000);
               
-              toast({
-                title: "¡Orden de Marketplace completada!",
-                description: `Orden #${payload.new.id.substring(0, 8)} completada con éxito. Venta: $${payload.new.total.toFixed(2)}`,
-                variant: "warning",
-              });
+              toast.warning(`Orden #${payload.new.id.substring(0, 8)} completada con éxito. Venta: $${payload.new.total.toFixed(2)}`);
             } else {
               setTimeout(() => {
                 setNewCompletedOrderId(null);
                 setNewCompletedOrderAmount(null);
               }, 8000);
               
-              toast({
-                title: "¡Orden completada!",
-                description: `Orden #${payload.new.id.substring(0, 8)} completada con éxito. Venta: $${payload.new.total.toFixed(2)}`,
-                variant: "success",
-              });
+              toast.success(`Orden #${payload.new.id.substring(0, 8)} completada con éxito. Venta: $${payload.new.total.toFixed(2)}`);
             }
           }
           
@@ -252,6 +256,18 @@ const Sales = () => {
         </header>
 
         <main className="px-6">
+          {newOrdersPageAccepted && (
+            <Alert className="mb-4 border-blue-500 bg-blue-50 text-blue-800">
+              <CheckCircle2 className="h-5 w-5 text-blue-600" />
+              <AlertTitle className="text-blue-800 font-semibold">¡Orden aceptada desde página de Órdenes!</AlertTitle>
+              <AlertDescription className="text-blue-700">
+                Se ha aceptado una orden por ${newOrdersPageAccepted.total.toFixed(2)} 
+                <br />
+                Orden #{newOrdersPageAccepted.id.substring(0, 8)}
+              </AlertDescription>
+            </Alert>
+          )}
+          
           {newMarketplaceCompletedOrder && (
             <Alert className="mb-4 border-amber-500 bg-amber-50 text-amber-800">
               <Store className="h-5 w-5 text-amber-600" />
@@ -276,7 +292,7 @@ const Sales = () => {
             </Alert>
           )}
           
-          {newAcceptedOrderId && (
+          {newAcceptedOrderId && !newOrdersPageAccepted && (
             <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 animate-pulse">
               <div className="flex items-center">
                 <CheckCircle2 className="w-5 h-5 mr-2" />
@@ -326,4 +342,3 @@ const Sales = () => {
 };
 
 export default Sales;
-

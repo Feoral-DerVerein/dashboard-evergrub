@@ -1,7 +1,7 @@
 
 import { useToast, toast } from "@/hooks/use-toast";
 
-// Add additional helper methods to toast for common patterns
+// Create a wrapper for the toast function to handle different variants
 const enhancedToast = {
   ...toast,
   error: (message: string) => toast({
@@ -26,4 +26,5 @@ const enhancedToast = {
   })
 };
 
+// Export the enhanced toast as 'toast'
 export { useToast, enhancedToast as toast };

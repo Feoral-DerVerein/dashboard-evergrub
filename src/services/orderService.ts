@@ -186,7 +186,7 @@ export const orderService = {
   },
   
   // Actualizar el estado de una orden
-  async updateOrderStatus(orderId: string, status: "pending" | "accepted" | "completed" | "rejected"): Promise<Order> {
+  async updateOrderStatus(orderId: string, status: "pending" | "accepted" | "completed" | "rejected", fromOrdersPage: boolean = false): Promise<Order> {
     try {
       console.log(`Actualizando estado de la orden ${orderId} a ${status}`);
       
@@ -207,10 +207,16 @@ export const orderService = {
         throw new Error(`La orden con ID ${orderId} no existe`);
       }
       
+      // Add the fromOrdersPage flag if set to true
+      const updateData: any = { status };
+      if (fromOrdersPage && status === 'accepted') {
+        updateData.from_orders_page = true;
+      }
+      
       // Actualizar el estado de la orden sin usar select() para evitar problemas de RLS
       const { error: updateError } = await supabase
         .from('orders')
-        .update({ status })
+        .update(updateData)
         .eq('id', orderId);
       
       if (updateError) {
@@ -251,12 +257,21 @@ export const orderService = {
             `La orden #${orderId.substring(0, 8)} ha sido aceptada`
           );
           console.log(`Notificación de aceptación creada para la orden ${orderId}`);
+          
+          // Add a special notification for orders accepted from the Orders page
+          if (fromOrdersPage) {
+            await notificationService.createOrderNotification(
+              orderId, 
+              `Orden #${orderId.substring(0, 8)} aceptada desde página de Órdenes`,
+              'order_accepted_from_orders'
+            );
+          }
         } catch (notifError) {
           console.error(`Error al crear la notificación para la orden ${orderId}:`, notifError);
           // Continuamos aunque falle la notificación, ya que el estado se actualizó correctamente
         }
       }
-        
+      
       // Create notifications when an order is completed
       if (status === "completed") {
         try {

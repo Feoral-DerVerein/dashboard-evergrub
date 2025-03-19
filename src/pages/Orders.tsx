@@ -20,6 +20,7 @@ const Orders = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { lastOrderUpdate, lastOrderDelete } = useNotificationsAndOrders();
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -69,6 +70,29 @@ const Orders = () => {
     } catch (error) {
       console.error(`Error updating order status to ${status}:`, error);
       toast.error(`Failed to update order status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleAcceptOrder = async (orderId: string) => {
+    try {
+      setUpdatingOrderId(orderId);
+      await orderService.updateOrderStatus(orderId, "accepted", true);
+      
+      toast({
+        title: "Orden aceptada",
+        description: "La orden ha sido aceptada exitosamente.",
+      });
+      
+      fetchOrders();
+    } catch (error) {
+      console.error("Error accepting order:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo aceptar la orden.",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingOrderId(null);
     }
   };
 
@@ -304,3 +328,4 @@ const Orders = () => {
 };
 
 export default Orders;
+
