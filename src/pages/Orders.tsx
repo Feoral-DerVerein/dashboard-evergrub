@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
+import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
@@ -18,20 +17,23 @@ const getStatusColor = (status: string) => {
   switch (status) {
     case "completed": return "text-green-500";
     case "pending": return "text-orange-500";
-    case "accepted": return "text-green-500"; // Changed to green
+    case "accepted": return "text-green-500";
     case "rejected": return "text-red-500";
     default: return "text-gray-500";
   }
 };
 
-const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (order: Order) => void }) => {
+const OrderCard = ({ order, onViewDetails, onDelete }: { 
+  order: Order; 
+  onViewDetails: (order: Order) => void;
+  onDelete: (orderId: string) => void;
+}) => {
   const initials = order.customerName
     .split(' ')
     .map(n => n[0])
     .join('')
     .toUpperCase();
     
-  // Get card background color based on status
   const getCardClassName = (status: string) => {
     switch (status) {
       case "accepted":
@@ -46,8 +48,20 @@ const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (ord
     <div className={`rounded-lg p-4 shadow-sm mb-4 ${getCardClassName(order.status)}`}>
       <div className="flex items-center justify-between">
         <div className="font-medium text-gray-600">{order.id.substring(0, 8)}</div>
-        <div className={`text-sm ${getStatusColor(order.status)}`}>
-          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+        <div className="flex items-center gap-2">
+          <div className={`text-sm ${getStatusColor(order.status)}`}>
+            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+          </div>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(order.id);
+            }} 
+            className="text-red-500 hover:text-red-700"
+            title="Delete order"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
       </div>
       <div className="flex items-center justify-between mt-3">
@@ -78,11 +92,12 @@ const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (ord
   );
 };
 
-const OrderDetailsModal = ({ order, isOpen, onClose, onStatusChange }: { 
+const OrderDetailsModal = ({ order, isOpen, onClose, onStatusChange, onDelete }: { 
   order: Order | null; 
   isOpen: boolean; 
   onClose: () => void;
   onStatusChange: (orderId: string, status: "accepted" | "completed" | "rejected") => void;
+  onDelete: (orderId: string) => void;
 }) => {
   const [localStatus, setLocalStatus] = useState<string | null>(null);
   
@@ -255,6 +270,17 @@ const OrderDetailsModal = ({ order, isOpen, onClose, onStatusChange }: {
               Mark as Completed
             </Button>
           )}
+          
+          <Button 
+            className="w-full" 
+            variant="ghost"
+            onClick={() => {
+              onDelete(order.id);
+              onClose();
+            }}
+          >
+            <Trash2 className="w-4 h-4 mr-2" /> Delete Order
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -386,6 +412,27 @@ const Orders = () => {
     }
   };
 
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      await orderService.deleteOrder(orderId);
+      toast({
+        title: "Order Deleted",
+        description: "The order has been deleted successfully",
+      });
+      setOrders(orders.filter(o => o.id !== orderId));
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder(null);
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete order",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
@@ -423,6 +470,7 @@ const Orders = () => {
                   key={order.id}
                   order={order}
                   onViewDetails={(order) => setSelectedOrder(order)}
+                  onDelete={handleDeleteOrder}
                 />
               ))
             ) : (
@@ -430,6 +478,7 @@ const Orders = () => {
                 orders={orders} 
                 onViewDetails={(order) => setSelectedOrder(order)} 
                 onStatusChange={(orderId, status) => handleStatusChange(orderId, status)}
+                onDelete={handleDeleteOrder}
               />
             )
           ) : (
@@ -444,6 +493,7 @@ const Orders = () => {
           isOpen={!!selectedOrder}
           onClose={() => setSelectedOrder(null)}
           onStatusChange={handleStatusChange}
+          onDelete={handleDeleteOrder}
         />
 
         <BottomNav />

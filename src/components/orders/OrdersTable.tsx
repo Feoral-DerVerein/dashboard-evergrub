@@ -12,15 +12,16 @@ import {
 import { Order } from "@/types/order.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Check, X, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Eye, Check, X, CheckCircle2, Clock, XCircle, Trash2 } from "lucide-react";
 
 interface OrdersTableProps {
   orders: Order[];
   onViewDetails: (order: Order) => void;
   onStatusChange: (orderId: string, status: "accepted" | "completed" | "rejected") => void;
+  onDelete?: (orderId: string) => void;
 }
 
-export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTableProps) {
+export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }: OrdersTableProps) {
   const [processingOrders, setProcessingOrders] = useState<Record<string, boolean>>({});
   
   const handleStatusChange = (orderId: string, status: "accepted" | "completed" | "rejected") => {
@@ -148,6 +149,19 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                         title="Mark as completed"
                       >
                         <Check className="h-4 w-4" />
+                      </Button>
+                    )}
+                    
+                    {onDelete && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                        disabled={processingOrders[order.id]}
+                        onClick={() => onDelete(order.id)}
+                        title="Delete order"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     )}
                   </div>
