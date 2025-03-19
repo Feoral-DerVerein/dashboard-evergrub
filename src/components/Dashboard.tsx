@@ -1,21 +1,22 @@
-
 import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package, Plus, ShoppingBasket } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+type QuickAccessItemProps = {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  to?: string;
+  badgeCount?: number;
+};
+
 const QuickAccessItem = ({ 
   icon: Icon, 
   label, 
   to, 
   badgeCount 
-}: { 
-  icon: any; 
-  label: string; 
-  to?: string; 
-  badgeCount?: number 
-}) => (
+}: QuickAccessItemProps) => (
   <Link to={to || "/"} className="quick-access-item relative">
     <Icon className="w-6 h-6 text-gray-600 mb-2" />
     <span className="text-sm text-gray-600">{label}</span>
@@ -27,7 +28,13 @@ const QuickAccessItem = ({
   </Link>
 );
 
-const StatCard = ({ label, value, trend }: { label: string; value: string; trend?: string }) => (
+type StatCardProps = {
+  label: string;
+  value: string;
+  trend?: string;
+};
+
+const StatCard = ({ label, value, trend }: StatCardProps) => (
   <div className="stat-card">
     <h3 className="text-gray-500 text-sm mb-2">{label}</h3>
     <p className="text-2xl font-semibold mb-1">{value}</p>
@@ -35,7 +42,13 @@ const StatCard = ({ label, value, trend }: { label: string; value: string; trend
   </div>
 );
 
-const RecentActivityItem = ({ title, time, amount }: { title: string; time: string; amount?: string }) => (
+type RecentActivityItemProps = {
+  title: string;
+  time: string;
+  amount?: string;
+};
+
+const RecentActivityItem = ({ title, time, amount }: RecentActivityItemProps) => (
   <div className="recent-activity-item">
     <div>
       <p className="font-medium text-gray-900">{title}</p>
@@ -50,7 +63,6 @@ export const BottomNav = () => {
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
-    // Load the count of pending orders
     const fetchOrderCount = async () => {
       const { data, error } = await supabase
         .from('orders')
@@ -62,7 +74,6 @@ export const BottomNav = () => {
       }
     };
 
-    // Load count of unread notifications
     const fetchNotificationCount = async () => {
       const { data, error } = await supabase
         .from('notifications')
@@ -72,7 +83,6 @@ export const BottomNav = () => {
       if (!error && data) {
         setNotificationCount(data.length);
       } else {
-        // If there is no notifications table, use a test value
         setNotificationCount(3);
       }
     };
@@ -80,7 +90,6 @@ export const BottomNav = () => {
     fetchOrderCount();
     fetchNotificationCount();
 
-    // Set up real-time channels for orders and notifications
     const ordersChannel = supabase
       .channel('orders-changes')
       .on(
@@ -137,7 +146,6 @@ const Dashboard = () => {
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
-    // Load the count of pending orders
     const fetchOrderCount = async () => {
       const { data, error } = await supabase
         .from('orders')
@@ -149,7 +157,6 @@ const Dashboard = () => {
       }
     };
 
-    // Load count of unread notifications
     const fetchNotificationCount = async () => {
       const { data, error } = await supabase
         .from('notifications')
@@ -159,7 +166,6 @@ const Dashboard = () => {
       if (!error && data) {
         setNotificationCount(data.length);
       } else {
-        // If there is no notifications table, use a test value
         setNotificationCount(3);
       }
     };
@@ -167,7 +173,6 @@ const Dashboard = () => {
     fetchOrderCount();
     fetchNotificationCount();
 
-    // Set up real-time channels for orders and notifications
     const ordersChannel = supabase
       .channel('orders-changes')
       .on(
