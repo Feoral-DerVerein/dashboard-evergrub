@@ -2,11 +2,28 @@
 import { Home, Users, ShoppingCart, BarChart, Bell, Heart, User, Package, Plus, ShoppingBasket } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-const QuickAccessItem = ({ icon: Icon, label, to }: { icon: any; label: string; to?: string }) => (
-  <Link to={to || "/"} className="quick-access-item">
+const QuickAccessItem = ({ 
+  icon: Icon, 
+  label, 
+  to, 
+  badgeCount 
+}: { 
+  icon: any; 
+  label: string; 
+  to?: string; 
+  badgeCount?: number 
+}) => (
+  <Link to={to || "/"} className="quick-access-item relative">
     <Icon className="w-6 h-6 text-gray-600 mb-2" />
     <span className="text-sm text-gray-600">{label}</span>
+    {badgeCount !== undefined && badgeCount > 0 && (
+      <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+        {badgeCount > 99 ? '99+' : badgeCount}
+      </div>
+    )}
   </Link>
 );
 
@@ -28,28 +45,153 @@ const RecentActivityItem = ({ title, time, amount }: { title: string; time: stri
   </div>
 );
 
-export const BottomNav = () => (
-  <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between">
-    <Link to="/dashboard" className="bottom-nav-item">
-      <Home className="w-6 h-6" />
-      <span className="text-xs">Home</span>
-    </Link>
-    <Link to="/profile" className="bottom-nav-item">
-      <User className="w-6 h-6" />
-      <span className="text-xs">Profile</span>
-    </Link>
-    <Link to="/products/add" className="bottom-nav-item">
-      <Plus className="w-6 h-6" />
-      <span className="text-xs">Add</span>
-    </Link>
-    <Link to="/notifications" className="bottom-nav-item">
-      <Bell className="w-6 h-6" />
-      <span className="text-xs">Notifications</span>
-    </Link>
-  </div>
-);
+export const BottomNav = () => {
+  const [orderCount, setOrderCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    // Cargar el conteo de órdenes pendientes
+    const fetchOrderCount = async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('status', 'pending');
+      
+      if (!error && data) {
+        setOrderCount(data.length);
+      }
+    };
+
+    // Cargar conteo de notificaciones no leídas
+    const fetchNotificationCount = async () => {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('id')
+        .eq('read', false);
+      
+      if (!error && data) {
+        setNotificationCount(data.length);
+      } else {
+        // Si no hay tabla de notificaciones, usamos un valor de prueba
+        setNotificationCount(3);
+      }
+    };
+
+    fetchOrderCount();
+    fetchNotificationCount();
+
+    // Configurar canales en tiempo real para órdenes y notificaciones
+    const ordersChannel = supabase
+      .channel('orders-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => fetchOrderCount()
+      )
+      .subscribe();
+
+    const notificationsChannel = supabase
+      .channel('notifications-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'notifications' },
+        () => fetchNotificationCount()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(ordersChannel);
+      supabase.removeChannel(notificationsChannel);
+    };
+  }, []);
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between">
+      <Link to="/dashboard" className="bottom-nav-item">
+        <Home className="w-6 h-6" />
+        <span className="text-xs">Home</span>
+      </Link>
+      <Link to="/profile" className="bottom-nav-item">
+        <User className="w-6 h-6" />
+        <span className="text-xs">Profile</span>
+      </Link>
+      <Link to="/products/add" className="bottom-nav-item">
+        <Plus className="w-6 h-6" />
+        <span className="text-xs">Add</span>
+      </Link>
+      <Link to="/notifications" className="bottom-nav-item relative">
+        <Bell className="w-6 h-6" />
+        <span className="text-xs">Notifications</span>
+        {notificationCount > 0 && (
+          <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            {notificationCount > 99 ? '99+' : notificationCount}
+          </div>
+        )}
+      </Link>
+    </div>
+  );
+};
 
 const Dashboard = () => {
+  const [orderCount, setOrderCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    // Cargar el conteo de órdenes pendientes
+    const fetchOrderCount = async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('status', 'pending');
+      
+      if (!error && data) {
+        setOrderCount(data.length);
+      }
+    };
+
+    // Cargar conteo de notificaciones no leídas
+    const fetchNotificationCount = async () => {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('id')
+        .eq('read', false);
+      
+      if (!error && data) {
+        setNotificationCount(data.length);
+      } else {
+        // Si no hay tabla de notificaciones, usamos un valor de prueba
+        setNotificationCount(3);
+      }
+    };
+
+    fetchOrderCount();
+    fetchNotificationCount();
+
+    // Configurar canales en tiempo real para órdenes y notificaciones
+    const ordersChannel = supabase
+      .channel('orders-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => fetchOrderCount()
+      )
+      .subscribe();
+
+    const notificationsChannel = supabase
+      .channel('notifications-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'notifications' },
+        () => fetchNotificationCount()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(ordersChannel);
+      supabase.removeChannel(notificationsChannel);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto bg-white min-h-screen animate-fade-in">
@@ -77,9 +219,19 @@ const Dashboard = () => {
               <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
               <QuickAccessItem icon={Users} label="Users" to="/users" />
               <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
-              <QuickAccessItem icon={ShoppingBasket} label="Orders" to="/orders" />
+              <QuickAccessItem 
+                icon={ShoppingBasket} 
+                label="Orders" 
+                to="/orders" 
+                badgeCount={orderCount} 
+              />
               <QuickAccessItem icon={BarChart} label="Sales" to="/sales" />
-              <QuickAccessItem icon={Bell} label="Notifications" to="/notifications" />
+              <QuickAccessItem 
+                icon={Bell} 
+                label="Notifications" 
+                to="/notifications" 
+                badgeCount={notificationCount} 
+              />
               <QuickAccessItem icon={Heart} label="Wishlist" to="/wishlist" />
               <QuickAccessItem icon={Package} label="Parcel" to="/parcel" />
             </div>
