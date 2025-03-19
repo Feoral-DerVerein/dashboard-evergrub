@@ -1,4 +1,3 @@
-
 import { supabase, broadcastOrderStatusChange } from "@/integrations/supabase/client";
 import { 
   Order, 
@@ -232,17 +231,18 @@ export const orderService = {
       }
         
       // Usar la orden recargada
-      console.log(`Orden ${orderId} actualizada correctamente a ${refreshedOrder.status}`);
+      console.log(`Orden ${orderId} actualizada correctamente a ${refreshedOrder?.status}`);
 
       // Broadcast the event to all subscribers to order status changes
       try {
+        // Use the helper function instead of direct RPC call
         const broadcast = await broadcastOrderStatusChange(orderId, status);
         console.log('Broadcast result:', broadcast);
       } catch (broadcastError) {
         console.error('Failed to broadcast status change:', broadcastError);
         // Continue since the status was updated, broadcast is just an optimization
       }
-        
+      
       // Create a notification when an order is accepted
       if (status === "accepted") {
         try {
