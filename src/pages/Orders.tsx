@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -408,9 +407,14 @@ const Orders = () => {
         const updatedOrder = await orderService.updateOrderStatus(orderId, status);
         console.log(`Orden actualizada:`, updatedOrder);
         
+        let toastMessage = "Order Updated";
+        if (status === "completed") {
+          toastMessage = "Order has been completed";
+        }
+        
         toast({
           title: "Order Updated",
-          description: `Order has been ${status}`,
+          description: toastMessage,
         });
         
         setOrders(prevOrders => 
