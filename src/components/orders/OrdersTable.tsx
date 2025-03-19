@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -12,10 +12,7 @@ import {
 import { Order } from "@/types/order.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Check, X, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
-import { orderService } from "@/services/orderService";
-import { useToast } from "@/hooks/use-toast";
-import { notificationService } from "@/services/notificationService";
+import { Eye, Check, X, CheckCircle2, Clock, XCircle } from "lucide-react";
 
 interface OrdersTableProps {
   orders: Order[];
@@ -24,90 +21,10 @@ interface OrdersTableProps {
 }
 
 export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTableProps) {
-  const { toast } = useToast();
-  const [loadingOrderIds, setLoadingOrderIds] = useState<string[]>([]);
-  const [localOrderStatus, setLocalOrderStatus] = useState<Record<string, string>>({});
-  
-  const handleStatusChange = async (orderId: string, newStatus: "pending" | "accepted" | "completed" | "rejected") => {
-    try {
-      setLoadingOrderIds(prev => [...prev, orderId]);
-      
-      // Update local state immediately for a responsive UI
-      setLocalOrderStatus(prev => ({
-        ...prev,
-        [orderId]: newStatus
-      }));
-      
-      if (newStatus === "rejected") {
-        // Eliminar la orden en lugar de cambiar su estado
-        console.log(`Eliminando la orden ${orderId}`);
-        await orderService.deleteOrder(orderId);
-        
-        toast({
-          title: "Orden Eliminada",
-          description: "La orden ha sido eliminada correctamente",
-        });
-      } else {
-        // Actualizar el estado para los otros casos
-        console.log(`Cambiando el estado de la orden ${orderId} a ${newStatus}`);
-        await orderService.updateOrderStatus(orderId, newStatus);
-        
-        let toastMessage = `El estado de la orden se cambió a ${newStatus}`;
-        let toastTitle = "Orden actualizada";
-        
-        if (newStatus === "accepted") {
-          toastTitle = "Orden Aceptada";
-          toastMessage = "La orden fue aceptada y se envió una notificación al marketplace";
-          
-          try {
-            await notificationService.createOrderNotification(
-              orderId,
-              `La orden #${orderId.substring(0, 8)} está siendo procesada`
-            );
-            console.log(`Notificación de procesamiento creada para la orden ${orderId}`);
-          } catch (notifError) {
-            console.error(`Error al crear la notificación de procesamiento para la orden ${orderId}:`, notifError);
-          }
-        } else if (newStatus === "completed") {
-          toastTitle = "Orden Completada";
-          toastMessage = "La orden ha sido marcada como completada";
-        }
-        
-        toast({
-          title: toastTitle,
-          description: toastMessage,
-        });
-      }
-      
-      // Importante: llamar a onStatusChange para actualizar la lista de órdenes
-      onStatusChange();
-    } catch (error) {
-      console.error("Error al procesar la orden:", error);
-      
-      // Reset local status on error
-      setLocalOrderStatus(prev => {
-        const newState = {...prev};
-        delete newState[orderId];
-        return newState;
-      });
-      
-      const errorMessage = error instanceof Error ? error.message : "No se pudo procesar la orden";
-      
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setLoadingOrderIds(prev => prev.filter(id => id !== orderId));
-    }
-  };
+  // Simplified version since we're not showing any orders
 
   const getStatusBadge = (order: Order) => {
-    // Use local status if available, otherwise use order status
-    const status = localOrderStatus[order.id] || order.status;
-    
-    switch (status) {
+    switch (order.status) {
       case "pending":
         return <Badge 
           variant="warning"
@@ -137,7 +54,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
           Rejected
         </Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline">{order.status}</Badge>;
     }
   };
 
@@ -174,15 +91,12 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                       <Eye className="h-4 w-4" />
                     </Button>
                     
-                    {/* Only show Accept/Reject if the order is pending, 
-                        and use local status for the check */}
-                    {(localOrderStatus[order.id] || order.status) === "pending" && (
+                    {order.status === "pending" && (
                       <>
                         <Button
                           variant="default"
                           size="sm"
-                          onClick={() => handleStatusChange(order.id, "accepted")}
-                          disabled={loadingOrderIds.includes(order.id)}
+                          onClick={() => onStatusChange()}
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -190,22 +104,18 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleStatusChange(order.id, "rejected")}
-                          disabled={loadingOrderIds.includes(order.id)}
+                          onClick={() => onStatusChange()}
                         >
                           <X className="h-4 w-4" />
                         </Button>
                       </>
                     )}
                     
-                    {/* Only show Complete if the order is accepted, 
-                        and use local status for the check */}
-                    {(localOrderStatus[order.id] || order.status) === "accepted" && (
+                    {order.status === "accepted" && (
                       <Button
                         variant="default"
                         size="sm"
-                        onClick={() => handleStatusChange(order.id, "completed")}
-                        disabled={loadingOrderIds.includes(order.id)}
+                        onClick={() => onStatusChange()}
                       >
                         <Check className="h-4 w-4" />
                       </Button>

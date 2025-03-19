@@ -1,17 +1,15 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Eye, X, Printer, MapPin, Phone, LayoutDashboard, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
-import { orderService } from "@/services/orderService";
-import { Order, OrderItem } from "@/types/order.types";
+import { Order } from "@/types/order.types";
 import { useAuth } from "@/context/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
-import { OrdersTable } from "@/components/orders/OrdersTable";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { OrdersTable } from "@/components/orders/OrdersTable";
 
 const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (order: Order) => void }) => {
   const initials = order.customerName
@@ -62,15 +60,7 @@ const OrderCard = ({ order, onViewDetails }: { order: Order; onViewDetails: (ord
 };
 
 const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; isOpen: boolean; onClose: () => void }) => {
-  const { toast } = useToast();
   const [localStatus, setLocalStatus] = useState<string | null>(null);
-  
-  useEffect(() => {
-    // Reset local status when order changes
-    if (order) {
-      setLocalStatus(null);
-    }
-  }, [order]);
   
   if (!order) return null;
 
@@ -117,45 +107,11 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
         return <Badge variant="outline">{status}</Badge>;
     }
   };
-    
-  const handleUpdateStatus = async (newStatus: "pending" | "accepted" | "completed" | "rejected") => {
-    try {
-      // Update local status immediately for responsive UI
-      setLocalStatus(newStatus);
-      
-      if (newStatus === "rejected") {
-        await orderService.deleteOrder(order.id);
-        toast({
-          title: "Orden Eliminada",
-          description: "La orden ha sido eliminada correctamente",
-        });
-      } else {
-        await orderService.updateOrderStatus(order.id, newStatus);
-        toast({
-          title: "Estado actualizado",
-          description: `La orden ahora está ${newStatus}`,
-        });
-      }
-      onClose(); // This will trigger a reload of orders through the parent's loadOrders function
-    } catch (error) {
-      console.error("Error al procesar la orden:", error);
-      // Reset local status on error
-      setLocalStatus(null);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "No se pudo procesar la orden",
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
       <DialogContent className="max-w-md mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <button onClick={onClose} className="text-gray-500">
-            <X className="w-5 h-5" />
-          </button>
           <h2 className="text-lg font-semibold">Order Details</h2>
           <button className="text-gray-500">
             <Printer className="w-5 h-5" />
@@ -170,35 +126,6 @@ const OrderDetailsModal = ({ order, isOpen, onClose }: { order: Order | null; is
             </div>
             <div className="font-semibold">{order.id.substring(0, 8)}</div>
           </div>
-
-          {displayStatus !== "completed" && displayStatus !== "rejected" && (
-            <div className="flex gap-2 justify-end">
-              {displayStatus === "pending" && (
-                <>
-                  <Button 
-                    onClick={() => handleUpdateStatus("accepted")}
-                    variant="default"
-                  >
-                    Accept Order
-                  </Button>
-                  <Button 
-                    onClick={() => handleUpdateStatus("rejected")}
-                    variant="destructive"
-                  >
-                    Reject Order
-                  </Button>
-                </>
-              )}
-              {displayStatus === "accepted" && (
-                <Button
-                  onClick={() => handleUpdateStatus("completed")}
-                  variant="default"
-                >
-                  Mark as Completed
-                </Button>
-              )}
-            </div>
-          )}
 
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12">
@@ -304,49 +231,15 @@ const LoadingSkeleton = () => (
 const Orders = () => {
   const [filter, setFilter] = useState<"all" | "pending" | "accepted" | "completed" | "rejected">("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [orders] = useState<Order[]>([]);  // Empty orders array, no loading needed
+  const [loading] = useState(false);  // No loading state needed
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const { user } = useAuth();
-  const { toast } = useToast();
 
-  const loadOrders = async () => {
-    if (!user) {
-      console.log("Usuario no autenticado");
-      setLoading(false);
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      console.log("Cargando órdenes...");
-      const fetchedOrders = await orderService.getUserOrders();
-      console.log("Órdenes obtenidas:", fetchedOrders);
-      setOrders(fetchedOrders);
-    } catch (error) {
-      console.error("Error al cargar órdenes:", error);
-      toast({
-        title: "Error loading orders",
-        description: "Could not load orders. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadOrders();
-  }, [user]);
-
-  const filteredOrders = orders.filter(
-    (order) => filter === "all" || order.status === filter
-  );
-
-  const handleStatusChange = () => {
-    console.log("Estado de orden cambiado, recargando órdenes...");
-    loadOrders();
-  };
+  // No loadOrders function needed since we're not fetching orders
+  
+  // Empty filtered orders
+  const filteredOrders: Order[] = [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -433,7 +326,7 @@ const Orders = () => {
               <OrdersTable 
                 orders={filteredOrders} 
                 onViewDetails={(order) => setSelectedOrder(order)} 
-                onStatusChange={handleStatusChange}
+                onStatusChange={() => {}} // Empty function since we're not loading orders
               />
             )
           ) : (
@@ -446,10 +339,7 @@ const Orders = () => {
         <OrderDetailsModal
           order={selectedOrder}
           isOpen={!!selectedOrder}
-          onClose={() => {
-            setSelectedOrder(null);
-            loadOrders(); // This ensures order list refreshes when modal is closed
-          }}
+          onClose={() => setSelectedOrder(null)}
         />
 
         <BottomNav />
