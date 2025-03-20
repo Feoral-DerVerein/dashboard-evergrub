@@ -180,7 +180,7 @@ const Sales = () => {
               <p className="text-amber-700">No pending orders found</p>
             </div>}
 
-          <Button className="w-full mt-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 shadow-md" onClick={navigateToOrders}>
+          <Button onClick={navigateToOrders} className="text-[#3bc66d] text-[[t#3bc66d]] font-normal bg-zinc-900 hover:bg-zinc-800">
             <Package className="w-5 h-5" />
             View Orders
           </Button>
