@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2 } from "lucide-react";
+import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2, DollarSign, BarChart } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
 import { Order } from "@/types/order.types";
@@ -12,12 +12,17 @@ import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CompletedSales } from "@/components/orders/CompletedSales";
+
 const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [orders, setOrders] = useState<Order[]>([]);
+  const [completedOrders, setCompletedOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"orders" | "completed">("orders");
   const {
     user
   } = useAuth();
@@ -27,14 +32,19 @@ const Orders = () => {
   } = useNotificationsAndOrders();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const navigate = useNavigate();
+  
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
       const fetchedOrders = await orderService.getUserOrders();
       console.log("Fetched orders:", fetchedOrders);
-      // Filter out completed orders
-      const filteredOrders = fetchedOrders.filter(order => order.status !== "completed");
-      setOrders(filteredOrders);
+      
+      // Filter orders by status
+      const pendingOrders = fetchedOrders.filter(order => order.status !== "completed");
+      const salesOrders = fetchedOrders.filter(order => order.status === "completed");
+      
+      setOrders(pendingOrders);
+      setCompletedOrders(salesOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
       toast({
@@ -46,13 +56,16 @@ const Orders = () => {
       setIsLoading(false);
     }
   };
+  
   useEffect(() => {
     fetchOrders();
   }, [lastOrderUpdate, lastOrderDelete]);
+  
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsDetailOpen(true);
   };
+  
   const handleStatusChange = async (orderId: string, status: "accepted" | "completed" | "rejected") => {
     try {
       setUpdatingOrderId(orderId);
@@ -112,6 +125,7 @@ const Orders = () => {
       setUpdatingOrderId(null);
     }
   };
+  
   const handleAcceptOrder = async (orderId: string) => {
     try {
       setUpdatingOrderId(orderId);
@@ -133,10 +147,13 @@ const Orders = () => {
       setUpdatingOrderId(null);
     }
   };
-  const OrderDetailsDialog = () => <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+  
+  const OrderDetailsDialog = () => (
+    <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="text-center font-bold text-xl">Order Details</DialogTitle>
-        {selectedOrder && <div className="space-y-5">
+        {selectedOrder && (
+          <div className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
               <div className="text-gray-500 font-medium">Order ID:</div>
               <div className="font-medium">{selectedOrder.id.substring(0, 8)}</div>
@@ -165,22 +182,29 @@ const Orders = () => {
             <div className="border-t pt-4">
               <h3 className="font-semibold mb-3 text-lg">Items:</h3>
               <div className="space-y-3 bg-gray-50 p-3 rounded-md">
-                {selectedOrder.items.map((item, index) => <div key={item.id || index} className="flex justify-between py-1 border-b border-gray-100 last:border-0">
+                {selectedOrder.items.map((item, index) => (
+                  <div key={item.id || index} className="flex justify-between py-1 border-b border-gray-100 last:border-0">
                     <span className="font-medium">{item.quantity}x {item.name}</span>
                     <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
-                  </div>)}
+                  </div>
+                ))}
               </div>
             </div>
             
-            {selectedOrder.specialRequest && <div className="border-t pt-4">
+            {selectedOrder.specialRequest && (
+              <div className="border-t pt-4">
                 <h3 className="font-semibold mb-2 text-lg">Special Request:</h3>
                 <p className="text-gray-700 bg-gray-50 p-3 rounded-md italic">
                   "{selectedOrder.specialRequest}"
                 </p>
-              </div>}
-          </div>}
+              </div>
+            )}
+          </div>
+        )}
       </DialogContent>
-    </Dialog>;
+    </Dialog>
+  );
+  
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "pending":
@@ -195,6 +219,7 @@ const Orders = () => {
         return status;
     }
   };
+  
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -209,6 +234,7 @@ const Orders = () => {
         return "text-gray-500";
     }
   };
+  
   const OrderCard = ({
     order
   }: {
@@ -274,43 +300,100 @@ const Orders = () => {
         </div>
       </Card>;
   };
-  return <div className="min-h-screen bg-gray-50">
+  
+  return (
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
-          <div className="flex items-center justify-between gap-3 mb-6">
+          <div className="flex items-center justify-between gap-3 mb-4">
             <h1 className="text-2xl font-bold">Orders</h1>
             <div className="flex gap-2 bg-gray-100 p-1 rounded-md">
-              <Button variant={viewMode === "cards" ? "default" : "ghost"} size="sm" onClick={() => setViewMode("cards")} className={viewMode === "cards" ? "" : "bg-transparent text-gray-700"}>
+              <Button
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("cards")}
+                className={viewMode === "cards" ? "" : "bg-transparent text-gray-700"}
+              >
                 Cards
               </Button>
-              <Button variant={viewMode === "table" ? "default" : "ghost"} size="sm" onClick={() => setViewMode("table")} className={viewMode === "table" ? "" : "bg-transparent text-gray-700"}>
+              <Button
+                variant={viewMode === "table" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("table")}
+                className={viewMode === "table" ? "" : "bg-transparent text-gray-700"}
+              >
                 <LayoutDashboard className="h-4 w-4 mr-1" />
                 Table
               </Button>
             </div>
           </div>
-          <p className="text-gray-500">
-            {isLoading ? "Loading orders..." : `${orders.length} Orders`}
-          </p>
+          
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "orders" | "completed")} className="w-full">
+            <TabsList className="grid grid-cols-2 mb-3">
+              <TabsTrigger value="orders" className="flex items-center gap-1">
+                <Package className="h-4 w-4" />
+                <span>Active Orders</span>
+              </TabsTrigger>
+              <TabsTrigger value="completed" className="flex items-center gap-1">
+                <DollarSign className="h-4 w-4" />
+                <span>Completed Sales</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <p className="text-gray-500">
+              {isLoading 
+                ? "Loading..." 
+                : activeTab === "orders" 
+                  ? `${orders.length} Active Orders` 
+                  : `${completedOrders.length} Completed Sales`}
+            </p>
+          </Tabs>
         </header>
 
         <main className="px-6 py-4">
-          {isLoading ? <div className="flex justify-center py-10">
+          {isLoading ? (
+            <div className="flex justify-center py-10">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-            </div> : orders.length > 0 ? viewMode === "cards" ? <div className="space-y-4">
-                {orders.map(order => <OrderCard key={order.id} order={order} />)}
-              </div> : <OrdersTable orders={orders} onViewDetails={handleViewDetails} onStatusChange={handleStatusChange} /> : <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Package className="h-16 w-16 text-gray-300 mb-4" />
-              <p className="text-gray-500 font-medium mb-2">No orders found</p>
-              <p className="text-gray-400 text-sm max-w-xs">
-                New orders will appear here when customers make purchases.
-              </p>
-            </div>}
+            </div>
+          ) : (
+            <TabsContent value="orders" className="mt-0">
+              {orders.length > 0 ? (
+                viewMode === "cards" ? (
+                  <div className="space-y-4">
+                    {orders.map(order => (
+                      <OrderCard key={order.id} order={order} />
+                    ))}
+                  </div>
+                ) : (
+                  <OrdersTable orders={orders} onViewDetails={handleViewDetails} onStatusChange={handleStatusChange} />
+                )
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <Package className="h-16 w-16 text-gray-300 mb-4" />
+                  <p className="text-gray-500 font-medium mb-2">No orders found</p>
+                  <p className="text-gray-400 text-sm max-w-xs">
+                    New orders will appear here when customers make purchases.
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+          )}
+          
+          <TabsContent value="completed" className="mt-0">
+            <CompletedSales 
+              completedOrders={completedOrders} 
+              viewMode={viewMode} 
+              onViewDetails={handleViewDetails} 
+              isLoading={isLoading} 
+            />
+          </TabsContent>
         </main>
 
         <OrderDetailsDialog />
         <BottomNav />
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Orders;
