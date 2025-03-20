@@ -21,7 +21,7 @@ const SaleCard = ({ sale, onClick }: SaleCardProps) => {
   };
 
   const getInitials = (name: string) => {
-    return name ? name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 'CU';
+    return name ? name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 'CL';
   };
 
   const totalItems = sale.products ? sale.products.reduce((sum, product) => sum + product.quantity, 0) : 0;

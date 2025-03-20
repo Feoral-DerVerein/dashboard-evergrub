@@ -101,9 +101,9 @@ const Sales = () => {
     navigate('/orders');
   };
 
-  // Helper function to get initials from customer name
+  // Helper function to get initials from client name
   const getInitials = (name: string) => {
-    return name ? name.substr(0, 2).toUpperCase() : 'CU';
+    return name ? name.substr(0, 2).toUpperCase() : 'CL';
   };
   return <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen animate-fade-in pb-20">
