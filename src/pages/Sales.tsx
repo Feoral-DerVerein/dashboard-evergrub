@@ -12,23 +12,17 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Order } from "@/types/order.types";
 import * as orderService from "@/services/orderService";
 import CategoryButton from "@/components/sales/CategoryButton";
-
 const Sales = () => {
   const [todayRevenue, setTodayRevenue] = useState<number>(0);
   const [totalOrders, setTotalOrders] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
   const navigate = useNavigate();
-
-  const specificNames = [
-    "Lachlan", "Matilda", "Darcy", "Evie", "Banjo",
-    "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"
-  ];
-
   useEffect(() => {
     fetchOrdersData();
     fetchPendingOrders();
 
+    // Improved real-time subscription to specifically watch for order status changes
     const channel = supabase.channel('orders-status-changes').on('postgres_changes', {
       event: 'UPDATE',
       schema: 'public',
@@ -40,10 +34,13 @@ const Sales = () => {
         const oldStatus = payload.old.status;
         const newStatus = payload.new.status;
         if (oldStatus === 'pending' && newStatus !== 'pending') {
+          // Remove the order from pending orders list
           setPendingOrders(prev => prev.filter(order => order.id !== payload.new.id));
 
+          // Show toast notification
           if (newStatus === 'completed') {
             toast.success(`Order #${payload.new.id.substring(0, 8)} has been completed`);
+            // Refresh the revenue data
             fetchOrdersData();
           } else if (newStatus === 'accepted') {
             toast.info(`Order #${payload.new.id.substring(0, 8)} has been accepted`);
@@ -51,6 +48,7 @@ const Sales = () => {
             toast.warning(`Order #${payload.new.id.substring(0, 8)} has been rejected`);
           }
         } else if (newStatus === 'pending' && oldStatus !== 'pending') {
+          // Refresh pending orders to include newly pending orders
           fetchPendingOrders();
           toast.info(`New pending order #${payload.new.id.substring(0, 8)}`);
         }
@@ -60,15 +58,16 @@ const Sales = () => {
       supabase.removeChannel(channel);
     };
   }, []);
-
   const fetchOrdersData = async () => {
     try {
+      // Get today's revenue
       const {
         total,
         count
       } = await salesService.getTodaySales();
       setTodayRevenue(total);
 
+      // Get total completed orders count
       const {
         count: totalCount,
         error: countError
@@ -85,22 +84,12 @@ const Sales = () => {
       console.error("Error in fetchOrdersData:", error);
     }
   };
-
   const fetchPendingOrders = async () => {
     setIsLoading(true);
     try {
       const fetchedOrders = await orderService.getUserOrders();
       const filtered = fetchedOrders.filter(order => order.status === "pending");
-      
-      const ordersWithSpecificNames = filtered.map((order, index) => {
-        const nameIndex = index % specificNames.length;
-        return {
-          ...order,
-          customerName: specificNames[nameIndex]
-        };
-      });
-      
-      setPendingOrders(ordersWithSpecificNames);
+      setPendingOrders(filtered);
     } catch (error) {
       console.error("Error fetching pending orders:", error);
       toast.error("Failed to load pending orders");
@@ -108,15 +97,14 @@ const Sales = () => {
       setIsLoading(false);
     }
   };
-
   const navigateToOrders = () => {
     navigate('/orders');
   };
 
+  // Helper function to get initials from client name
   const getInitials = (name: string) => {
     return name ? name.substr(0, 2).toUpperCase() : 'CL';
   };
-
   return <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen animate-fade-in pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
@@ -191,11 +179,12 @@ const Sales = () => {
             </div> : <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
               <p className="text-amber-700">No pending orders found</p>
             </div>}
+
+          
         </main>
 
         <BottomNav />
       </div>
     </div>;
 };
-
 export default Sales;
