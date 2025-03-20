@@ -24,6 +24,20 @@ interface OrdersTableProps {
 export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }: OrdersTableProps) {
   const [processingOrders, setProcessingOrders] = useState<Record<string, boolean>>({});
   
+  // Customer names array
+  const customerNames = [
+    "Lachlan", "Matilda", "Darcy", "Evie", "Banjo", 
+    "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"
+  ];
+  
+  // Helper function to assign a consistent name based on order ID
+  const getCustomerName = (orderId: string) => {
+    // Use the last character of the order ID to determine the index
+    const lastChar = orderId.charAt(orderId.length - 1);
+    const index = parseInt(lastChar, 16) % customerNames.length;
+    return customerNames[index];
+  };
+  
   const handleStatusChange = (orderId: string, status: "accepted" | "completed" | "rejected") => {
     // Mark this specific order as processing
     setProcessingOrders(prev => ({...prev, [orderId]: true}));
@@ -112,7 +126,7 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }:
             orders.map((order) => (
               <TableRow key={order.id} className={getRowClassName(order.status)}>
                 <TableCell className="font-medium">{order.id.substring(0, 8)}</TableCell>
-                <TableCell>{order.customerName || "Customer"}</TableCell>
+                <TableCell>{getCustomerName(order.id)}</TableCell>
                 <TableCell>{order.items.length}</TableCell>
                 <TableCell className="font-medium">${order.total.toFixed(2)}</TableCell>
                 <TableCell>{getStatusBadge(order)}</TableCell>
