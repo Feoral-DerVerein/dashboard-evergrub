@@ -10,7 +10,7 @@ import { OrdersTable } from "@/components/orders/OrdersTable";
 import * as orderService from "@/services/orderService";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const Orders = () => {
@@ -34,7 +34,11 @@ const Orders = () => {
       setOrders(filteredOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
-      toast.error("Failed to load orders");
+      toast({
+        title: "Error",
+        description: "Failed to load orders",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -120,77 +124,24 @@ const Orders = () => {
       setUpdatingOrderId(orderId);
       await orderService.updateOrderStatus(orderId, "accepted", true);
       
-      toast.success("Orden aceptada", {
-        description: "La orden ha sido aceptada exitosamente.",
+      toast({
+        title: "Order accepted",
+        description: "The order has been accepted successfully.",
+        variant: "success",
       });
       
       fetchOrders();
     } catch (error) {
       console.error("Error accepting order:", error);
-      toast.error("No se pudo aceptar la orden.", {
-        description: "Ha ocurrido un error al procesar la orden.",
+      toast({
+        title: "Error",
+        description: "An error occurred while processing the order.",
+        variant: "destructive",
       });
     } finally {
       setUpdatingOrderId(null);
     }
   };
-
-  const OrderDetailsDialog = () => (
-    <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-      <DialogContent className="sm:max-w-md">
-        <DialogTitle className="text-center font-bold text-xl">Order Details</DialogTitle>
-        {selectedOrder && (
-          <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="text-gray-500 font-medium">Order ID:</div>
-              <div className="font-medium">{selectedOrder.id.substring(0, 8)}</div>
-              
-              <div className="text-gray-500 font-medium">Customer:</div>
-              <div>{selectedOrder.customerName || "Customer"}</div>
-              
-              <div className="text-gray-500 font-medium">Total:</div>
-              <div className="font-semibold">${selectedOrder.total.toFixed(2)}</div>
-              
-              <div className="text-gray-500 font-medium">Status:</div>
-              <div className="capitalize font-medium">
-                {selectedOrder.status === "pending" && "Pending"}
-                {selectedOrder.status === "accepted" && "Accepted"}
-                {selectedOrder.status === "completed" && "Completed"}
-                {selectedOrder.status === "rejected" && "Rejected"}
-              </div>
-              
-              <div className="text-gray-500 font-medium">Location:</div>
-              <div>{selectedOrder.location || "N/A"}</div>
-              
-              <div className="text-gray-500 font-medium">Phone:</div>
-              <div>{selectedOrder.phone || "N/A"}</div>
-            </div>
-            
-            <div className="border-t pt-4">
-              <h3 className="font-semibold mb-3 text-lg">Items:</h3>
-              <div className="space-y-3 bg-gray-50 p-3 rounded-md">
-                {selectedOrder.items.map((item, index) => (
-                  <div key={item.id || index} className="flex justify-between py-1 border-b border-gray-100 last:border-0">
-                    <span className="font-medium">{item.quantity}x {item.name}</span>
-                    <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {selectedOrder.specialRequest && (
-              <div className="border-t pt-4">
-                <h3 className="font-semibold mb-2 text-lg">Special Request:</h3>
-                <p className="text-gray-700 bg-gray-50 p-3 rounded-md italic">
-                  "{selectedOrder.specialRequest}"
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
 
   const getStatusLabel = (status: string) => {
     switch (status) {
