@@ -1,4 +1,3 @@
-
 import { Calendar, ChevronUp, DollarSign, Filter, Search, ShoppingBag, Package } from "lucide-react";
 import { BottomNav } from "@/components/Dashboard";
 import { Input } from "@/components/ui/input";
@@ -13,65 +12,61 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Order } from "@/types/order.types";
 import * as orderService from "@/services/orderService";
 import CategoryButton from "@/components/sales/CategoryButton";
-
 const Sales = () => {
   const [todayRevenue, setTodayRevenue] = useState<number>(0);
   const [totalOrders, setTotalOrders] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
   const navigate = useNavigate();
-
   useEffect(() => {
     fetchOrdersData();
     fetchPendingOrders();
-    
+
     // Improved real-time subscription to specifically watch for order status changes
-    const channel = supabase.channel('orders-status-changes')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'orders',
-        filter: "status=in.(accepted,completed,pending,rejected)"
-      }, payload => {
-        console.log('Order status changed:', payload);
-        if (payload.new && payload.old) {
-          const oldStatus = payload.old.status;
-          const newStatus = payload.new.status;
-          
-          if (oldStatus === 'pending' && newStatus !== 'pending') {
-            // Remove the order from pending orders list
-            setPendingOrders(prev => prev.filter(order => order.id !== payload.new.id));
-            
-            // Show toast notification
-            if (newStatus === 'completed') {
-              toast.success(`Order #${payload.new.id.substring(0, 8)} has been completed`);
-              // Refresh the revenue data
-              fetchOrdersData();
-            } else if (newStatus === 'accepted') {
-              toast.info(`Order #${payload.new.id.substring(0, 8)} has been accepted`);
-            } else if (newStatus === 'rejected') {
-              toast.warning(`Order #${payload.new.id.substring(0, 8)} has been rejected`);
-            }
-          } else if (newStatus === 'pending' && oldStatus !== 'pending') {
-            // Refresh pending orders to include newly pending orders
-            fetchPendingOrders();
-            toast.info(`New pending order #${payload.new.id.substring(0, 8)}`);
+    const channel = supabase.channel('orders-status-changes').on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'orders',
+      filter: "status=in.(accepted,completed,pending,rejected)"
+    }, payload => {
+      console.log('Order status changed:', payload);
+      if (payload.new && payload.old) {
+        const oldStatus = payload.old.status;
+        const newStatus = payload.new.status;
+        if (oldStatus === 'pending' && newStatus !== 'pending') {
+          // Remove the order from pending orders list
+          setPendingOrders(prev => prev.filter(order => order.id !== payload.new.id));
+
+          // Show toast notification
+          if (newStatus === 'completed') {
+            toast.success(`Order #${payload.new.id.substring(0, 8)} has been completed`);
+            // Refresh the revenue data
+            fetchOrdersData();
+          } else if (newStatus === 'accepted') {
+            toast.info(`Order #${payload.new.id.substring(0, 8)} has been accepted`);
+          } else if (newStatus === 'rejected') {
+            toast.warning(`Order #${payload.new.id.substring(0, 8)} has been rejected`);
           }
+        } else if (newStatus === 'pending' && oldStatus !== 'pending') {
+          // Refresh pending orders to include newly pending orders
+          fetchPendingOrders();
+          toast.info(`New pending order #${payload.new.id.substring(0, 8)}`);
         }
-      })
-      .subscribe();
-    
+      }
+    }).subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
   }, []);
-
   const fetchOrdersData = async () => {
     try {
       // Get today's revenue
-      const { total, count } = await salesService.getTodaySales();
+      const {
+        total,
+        count
+      } = await salesService.getTodaySales();
       setTodayRevenue(total);
-      
+
       // Get total completed orders count
       const {
         count: totalCount,
@@ -80,18 +75,15 @@ const Sales = () => {
         count: 'exact',
         head: true
       }).eq('status', 'completed');
-      
       if (countError) {
         console.error("Error counting orders:", countError);
         return;
       }
-      
       setTotalOrders(totalCount || 0);
     } catch (error) {
       console.error("Error in fetchOrdersData:", error);
     }
   };
-
   const fetchPendingOrders = async () => {
     setIsLoading(true);
     try {
@@ -105,7 +97,6 @@ const Sales = () => {
       setIsLoading(false);
     }
   };
-
   const navigateToOrders = () => {
     navigate('/orders');
   };
@@ -114,9 +105,7 @@ const Sales = () => {
   const getInitials = (name: string) => {
     return name ? name.substr(0, 2).toUpperCase() : 'CU';
   };
-
-  return (
-    <div className="min-h-screen bg-gray-50">
+  return <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen animate-fade-in pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
           <div className="flex justify-between items-center mb-6">
@@ -127,18 +116,8 @@ const Sales = () => {
           </div>
           
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <StatCard 
-              label="Today's Revenue" 
-              value={`$${todayRevenue.toFixed(2)}`} 
-              icon={<DollarSign className="w-5 h-5 text-white" />} 
-              onClick={navigateToOrders} 
-            />
-            <StatCard 
-              label="Total Orders" 
-              value={totalOrders.toString()} 
-              icon={<ShoppingBag className="w-5 h-5 text-white" />} 
-              onClick={navigateToOrders} 
-            />
+            <StatCard label="Today's Revenue" value={`$${todayRevenue.toFixed(2)}`} icon={<DollarSign className="w-5 h-5 text-white" />} onClick={navigateToOrders} />
+            <StatCard label="Total Orders" value={totalOrders.toString()} icon={<ShoppingBag className="w-5 h-5 text-white" />} onClick={navigateToOrders} />
           </div>
 
           <div className="flex items-center gap-2 text-gray-600 mb-4 bg-gray-50 p-3 rounded-lg">
@@ -151,16 +130,8 @@ const Sales = () => {
 
           <div className="relative mb-6">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <Input 
-              type="text" 
-              placeholder="Search products..." 
-              className="pl-10 pr-10 py-2 bg-gray-50 border-gray-200 focus-visible:ring-green-500" 
-            />
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-            >
+            <Input type="text" placeholder="Search products..." className="pl-10 pr-10 py-2 bg-gray-50 border-gray-200 focus-visible:ring-green-500" />
+            <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
               <Filter className="w-4 h-4 text-gray-500" />
             </Button>
           </div>
@@ -176,22 +147,14 @@ const Sales = () => {
             <p className="text-sm text-gray-500">{pendingOrders.length} products</p>
           </div>
           
-          {isLoading ? (
-            <div className="flex justify-center items-center py-12">
+          {isLoading ? <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-            </div>
-          ) : pendingOrders.length > 0 ? (
-            <div className="space-y-4">
-              {pendingOrders.map((order) => (
-                <div 
-                  key={order.id} 
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300"
-                  data-order-id={order.id}
-                >
+            </div> : pendingOrders.length > 0 ? <div className="space-y-4">
+              {pendingOrders.map(order => <div key={order.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300" data-order-id={order.id}>
                   <div className="p-4">
                     <div className="flex justify-between items-center mb-2">
                       <p className="font-mono text-gray-600">{order.id.substring(0, 8)}</p>
-                      <span className="text-amber-500 font-medium">Pending</span>
+                      <span className="font-medium text-emerald-500">Completed </span>
                     </div>
                     
                     <div className="flex items-center justify-between">
@@ -201,7 +164,7 @@ const Sales = () => {
                         </Avatar>
                         
                         <div>
-                          <h3 className="font-bold text-xl">{order.customerName}</h3>
+                          <h3 className="font-bold text-sm">{order.customerName}</h3>
                           <p className="text-gray-500">{order.items.length} items</p>
                         </div>
                       </div>
@@ -212,19 +175,12 @@ const Sales = () => {
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
+                </div>)}
+            </div> : <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
               <p className="text-amber-700">No pending orders found</p>
-            </div>
-          )}
+            </div>}
 
-          <Button 
-            className="w-full mt-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 shadow-md" 
-            onClick={navigateToOrders}
-          >
+          <Button className="w-full mt-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 shadow-md" onClick={navigateToOrders}>
             <Package className="w-5 h-5" />
             View Orders
           </Button>
@@ -232,8 +188,6 @@ const Sales = () => {
 
         <BottomNav />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Sales;
