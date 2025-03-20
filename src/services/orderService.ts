@@ -40,12 +40,16 @@ export const updateOrderItem = async (
   updates: Partial<Omit<UpdateOrderItemParams, 'product_id'>>
 ) => {
   try {
-    // Convert product_id to string to ensure type compatibility
+    // Convert product_id to number if it's a string and contains only digits
+    const productIdValue = typeof product_id === 'string' && /^\d+$/.test(product_id) 
+      ? parseInt(product_id, 10) 
+      : product_id;
+      
     const { data, error } = await supabase
       .from('order_items')
       .update(updates)
       .eq('order_id', order_id)
-      .eq('product_id', String(product_id))
+      .eq('product_id', productIdValue)
       .select();
 
     if (error) {
@@ -65,12 +69,16 @@ export const updateOrderItem = async (
 
 export const deleteOrderItem = async (order_id: string, product_id: string | number) => {
   try {
-    // Convert product_id to string to ensure type compatibility
+    // Convert product_id to number if it's a string and contains only digits
+    const productIdValue = typeof product_id === 'string' && /^\d+$/.test(product_id) 
+      ? parseInt(product_id, 10) 
+      : product_id;
+    
     const { data, error } = await supabase
       .from('order_items')
       .delete()
       .eq('order_id', order_id)
-      .eq('product_id', String(product_id));
+      .eq('product_id', productIdValue);
 
     if (error) {
       console.error("Error deleting order item:", error);
