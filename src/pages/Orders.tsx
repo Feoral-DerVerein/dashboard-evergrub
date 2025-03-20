@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2 } from "lucide-react";
+import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2, Receipt } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
 import { Order } from "@/types/order.types";
@@ -63,8 +63,8 @@ const Orders = () => {
         // Remove the completed order from the orders list
         setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
         
-        toast.success(`Orden completada`, {
-          description: `La orden por $${orderTotal.toFixed(2)} ha sido registrada en ventas.`,
+        toast.success(`Order completed`, {
+          description: `The order for $${orderTotal.toFixed(2)} has been recorded as a sale.`,
         });
         
         // Navigate to Sales page after a brief delay to show the toast
@@ -106,19 +106,23 @@ const Orders = () => {
       setUpdatingOrderId(orderId);
       await orderService.updateOrderStatus(orderId, "accepted", true);
       
-      toast.success("Orden aceptada", {
-        description: "La orden ha sido aceptada exitosamente.",
+      toast.success("Order accepted", {
+        description: "The order has been accepted successfully.",
       });
       
       fetchOrders();
     } catch (error) {
       console.error("Error accepting order:", error);
-      toast.error("No se pudo aceptar la orden.", {
-        description: "Ha ocurrido un error al procesar la orden.",
+      toast.error("Could not accept the order.", {
+        description: "An error occurred while processing the order.",
       });
     } finally {
       setUpdatingOrderId(null);
     }
+  };
+
+  const navigateToSales = () => {
+    navigate('/sales');
   };
 
   const OrderDetailsDialog = () => (
@@ -310,9 +314,20 @@ const Orders = () => {
               </Button>
             </div>
           </div>
-          <p className="text-gray-500">
-            {isLoading ? "Loading orders..." : `${orders.length} Orders`}
-          </p>
+          <div className="flex justify-between items-center">
+            <p className="text-gray-500">
+              {isLoading ? "Loading orders..." : `${orders.length} Orders`}
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="text-green-600 border-green-200 hover:bg-green-50"
+              onClick={navigateToSales}
+            >
+              <Receipt className="h-4 w-4 mr-1" />
+              View Sales
+            </Button>
+          </div>
         </header>
 
         <main className="px-6 py-4">
@@ -341,6 +356,14 @@ const Orders = () => {
               <p className="text-gray-400 text-sm max-w-xs">
                 New orders will appear here when customers make purchases.
               </p>
+              <Button 
+                variant="outline" 
+                className="mt-4 border-green-200 text-green-600 hover:bg-green-50"
+                onClick={navigateToSales}
+              >
+                <Receipt className="h-4 w-4 mr-2" />
+                View Sales Records
+              </Button>
             </div>
           )}
         </main>

@@ -215,6 +215,47 @@ export type Database = {
         }
         Relationships: []
       }
+      sales: {
+        Row: {
+          amount: number
+          created_at: string | null
+          customer_name: string
+          id: string
+          order_id: string | null
+          payment_method: string | null
+          products: Json | null
+          sale_date: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          customer_name: string
+          id?: string
+          order_id?: string | null
+          payment_method?: string | null
+          products?: Json | null
+          sale_date?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          customer_name?: string
+          id?: string
+          order_id?: string | null
+          payment_method?: string | null
+          products?: Json | null
+          sale_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       "Wisebite-data": {
         Row: {
           created_at: string

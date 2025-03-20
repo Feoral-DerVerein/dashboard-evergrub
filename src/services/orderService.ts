@@ -240,5 +240,52 @@ export const updateOrderStatus = async (
   }
 };
 
+// Get completed orders (sales)
+export const getCompletedOrders = async (): Promise<Order[]> => {
+  try {
+    const { data: ordersData, error: ordersError } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('status', 'completed')
+      .order('updated_at', { ascending: false });
+    
+    if (ordersError) {
+      console.error("Error fetching completed orders:", ordersError);
+      return [];
+    }
+    
+    if (!ordersData || ordersData.length === 0) {
+      return [];
+    }
+
+    // Get all order items for these orders
+    const orderIds = ordersData.map((order: DbOrder) => order.id);
+    const { data: itemsData, error: itemsError } = await supabase
+      .from('order_items')
+      .select('*')
+      .in('order_id', orderIds);
+    
+    if (itemsError) {
+      console.error("Error fetching order items for completed orders:", itemsError);
+      return [];
+    }
+
+    // Map DB orders to app orders
+    const orders: Order[] = ordersData.map((dbOrder: DbOrder) => {
+      // Find items for this order
+      const orderItems = (itemsData || []).filter(
+        (item: DbOrderItem) => item.order_id === dbOrder.id
+      );
+      
+      return mapDbOrderToOrder(dbOrder, orderItems);
+    });
+
+    return orders;
+  } catch (error) {
+    console.error("Exception in getCompletedOrders:", error);
+    return [];
+  }
+};
+
 // Re-export broadcastOrderStatusChange from the Supabase client
 import { broadcastOrderStatusChange } from "@/integrations/supabase/client";
