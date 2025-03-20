@@ -25,16 +25,41 @@ const Sales = () => {
     fetchOrdersData();
     fetchPendingOrders();
     
-    const channel = supabase.channel('orders-channel').on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'orders',
-      filter: "status=in.(accepted,completed,pending)"
-    }, payload => {
-      console.log('Order status changed:', payload);
-      fetchOrdersData();
-      fetchPendingOrders();
-    }).subscribe();
+    // Improved real-time subscription to specifically watch for order status changes
+    const channel = supabase.channel('orders-status-changes')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'orders',
+        filter: "status=in.(accepted,completed,pending,rejected)"
+      }, payload => {
+        console.log('Order status changed:', payload);
+        if (payload.new && payload.old) {
+          const oldStatus = payload.old.status;
+          const newStatus = payload.new.status;
+          
+          if (oldStatus === 'pending' && newStatus !== 'pending') {
+            // Remove the order from pending orders list
+            setPendingOrders(prev => prev.filter(order => order.id !== payload.new.id));
+            
+            // Show toast notification
+            if (newStatus === 'completed') {
+              toast.success(`Order #${payload.new.id.substring(0, 8)} has been completed`);
+              // Refresh the revenue data
+              fetchOrdersData();
+            } else if (newStatus === 'accepted') {
+              toast.info(`Order #${payload.new.id.substring(0, 8)} has been accepted`);
+            } else if (newStatus === 'rejected') {
+              toast.warning(`Order #${payload.new.id.substring(0, 8)} has been rejected`);
+            }
+          } else if (newStatus === 'pending' && oldStatus !== 'pending') {
+            // Refresh pending orders to include newly pending orders
+            fetchPendingOrders();
+            toast.info(`New pending order #${payload.new.id.substring(0, 8)}`);
+          }
+        }
+      })
+      .subscribe();
     
     return () => {
       supabase.removeChannel(channel);
@@ -158,7 +183,11 @@ const Sales = () => {
           ) : pendingOrders.length > 0 ? (
             <div className="space-y-4">
               {pendingOrders.map((order) => (
-                <div key={order.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div 
+                  key={order.id} 
+                  className="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300"
+                  data-order-id={order.id}
+                >
                   <div className="p-4">
                     <div className="flex justify-between items-center mb-2">
                       <p className="font-mono text-gray-600">{order.id.substring(0, 8)}</p>
