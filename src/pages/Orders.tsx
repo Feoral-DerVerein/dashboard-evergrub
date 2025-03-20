@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2, Receipt } from "lucide-react";
+import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
 import { Order } from "@/types/order.types";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { OrdersTable } from "@/components/orders/OrdersTable";
 import * as orderService from "@/services/orderService";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
@@ -193,15 +193,7 @@ const Orders = () => {
 
   const OrderCard = ({ order }: { order: Order }) => {
     const getInitials = (name: string) => {
-      return name ? name.substr(0, 2).toUpperCase() : 'CN';
-    };
-    
-    const formatTime = (timestamp: string) => {
-      try {
-        return timestamp;
-      } catch (error) {
-        return "";
-      }
+      return name ? name.substr(0, 2).toUpperCase() : 'CU';
     };
 
     return (
@@ -230,7 +222,7 @@ const Orders = () => {
 
             <div className="flex flex-col items-end">
               <div className="font-bold text-xl">${order.total.toFixed(2)}</div>
-              <div className="text-gray-500">{formatTime(order.timestamp)}</div>
+              <div className="text-gray-500">{order.timestamp}</div>
             </div>
           </div>
         </div>
@@ -336,14 +328,6 @@ const Orders = () => {
               <p className="text-gray-400 text-sm max-w-xs">
                 New orders will appear here when customers make purchases.
               </p>
-              <Button 
-                variant="outline" 
-                className="mt-4 border-green-200 text-green-600 hover:bg-green-50"
-                onClick={navigateToSales}
-              >
-                <Receipt className="h-4 w-4 mr-2" />
-                View Sales Records
-              </Button>
             </div>
           )}
         </main>
