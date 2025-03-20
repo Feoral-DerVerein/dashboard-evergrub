@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Order, OrderItem, mapDbOrderToOrder, DbOrder, DbOrderItem } from "@/types/order.types";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 interface UpdateOrderItemParams {
   order_id: string;
@@ -215,7 +215,7 @@ export const updateOrderStatus = async (
       
     if (orderCheckError) {
       console.error("Error checking order existence:", orderCheckError);
-      return { success: false, error: orderCheckError };
+      return { success: false, error: orderCheckError.message || "Failed to check if order exists" };
     }
     
     // Now update the order
@@ -227,12 +227,16 @@ export const updateOrderStatus = async (
         updated_at: new Date().toISOString() 
       })
       .eq('id', orderId)
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error("Error updating order status:", error);
-      return { success: false, error };
+      return { success: false, error: error.message || "Failed to update order status" };
+    }
+    
+    if (!data || data.length === 0) {
+      console.error("No data returned from update operation");
+      return { success: false, error: "No data returned from update operation" };
     }
     
     console.log(`Order ${orderId} status updated to ${status}`);
@@ -243,12 +247,14 @@ export const updateOrderStatus = async (
       console.log("Broadcast result:", broadcastResult);
     } catch (broadcastError) {
       console.error("Error broadcasting status change:", broadcastError);
+      // Don't fail the operation if just the broadcast fails
     }
     
-    return { success: true, data };
+    return { success: true, data: data[0] };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
     console.error("Exception in updateOrderStatus:", error);
-    return { success: false, error };
+    return { success: false, error: errorMessage };
   }
 };
 

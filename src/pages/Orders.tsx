@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -69,8 +68,10 @@ const Orders = () => {
         // Remove the completed order from the orders list
         setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
         
-        toast.success(`Order completed`, {
+        toast({
+          title: "Order completed",
           description: `The order for $${orderTotal.toFixed(2)} has been recorded in sales.`,
+          variant: "success",
         });
         
         // Navigate to Sales page after a brief delay to show the toast
@@ -84,10 +85,10 @@ const Orders = () => {
             order.id === orderId ? { ...order, status } : order
           )
         );
-        toast.success(`Order accepted successfully`, {
+        toast({
+          title: "Order accepted",
           description: "The order has been added to your product sales.",
-          duration: 5000,
-          icon: <CheckCircle2 className="h-5 w-5 text-green-500" />
+          variant: "success",
         });
       } else if (status === "rejected") {
         // Update the order status in the UI
@@ -96,12 +97,19 @@ const Orders = () => {
             order.id === orderId ? { ...order, status } : order
           )
         );
-        toast.error(`Order rejected`);
+        toast({
+          title: "Order rejected",
+          variant: "destructive",
+        });
       }
       
     } catch (error) {
       console.error(`Error updating order status to ${status}:`, error);
-      toast.error(`Failed to update order status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
     } finally {
       setUpdatingOrderId(null);
     }
