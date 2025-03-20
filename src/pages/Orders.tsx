@@ -12,6 +12,7 @@ import * as orderService from "@/services/orderService";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
@@ -22,6 +23,7 @@ const Orders = () => {
   const { user } = useAuth();
   const { lastOrderUpdate, lastOrderDelete } = useNotificationsAndOrders();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const fetchOrders = async () => {
     try {
@@ -59,6 +61,11 @@ const Orders = () => {
         toast.success(`Order completed successfully`, {
           description: "The order has been moved to Sales",
         });
+        
+        // Navigate to Sales page after a brief delay to show the toast
+        setTimeout(() => {
+          navigate('/sales');
+        }, 1500);
       } else if (status === "accepted") {
         // Update the order status in the UI
         setOrders(prevOrders => 

@@ -49,7 +49,7 @@ export const updateOrderItem = async (
       .from('order_items')
       .update(updates)
       .eq('order_id', order_id)
-      .eq('product_id', productIdValue)
+      .eq('product_id', productIdValue as number) // Force type assertion here
       .select();
 
     if (error) {
@@ -78,7 +78,8 @@ export const deleteOrderItem = async (order_id: string, product_id: string | num
       .from('order_items')
       .delete()
       .eq('order_id', order_id)
-      .eq('product_id', productIdValue);
+      .eq('product_id', productIdValue as number) // Force type assertion here
+      .select();
 
     if (error) {
       console.error("Error deleting order item:", error);
