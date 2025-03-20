@@ -1,17 +1,16 @@
-
 interface StatCardProps {
   label: string;
   value: string;
   icon: React.ReactNode;
   onClick?: () => void;
 }
-
-const StatCard = ({ label, value, icon, onClick }: StatCardProps) => {
-  return (
-    <div 
-      className="bg-green-200 p-4 rounded-xl text-green-800 shadow-lg transition-transform hover:scale-105 cursor-pointer"
-      onClick={onClick}
-    >
+const StatCard = ({
+  label,
+  value,
+  icon,
+  onClick
+}: StatCardProps) => {
+  return <div onClick={onClick} className="p-4 rounded-xl text-green-800 shadow-lg transition-transform hover:scale-105 cursor-pointer bg-[#3bc66d]">
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm text-green-700">{label}</p>
         <div className="bg-white/40 p-2 rounded-lg">
@@ -19,8 +18,6 @@ const StatCard = ({ label, value, icon, onClick }: StatCardProps) => {
         </div>
       </div>
       <p className="text-green-800 text-2xl font-bold">{value}</p>
-    </div>
-  );
+    </div>;
 };
-
 export default StatCard;
