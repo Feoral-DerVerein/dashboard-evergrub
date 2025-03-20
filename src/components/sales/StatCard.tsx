@@ -9,7 +9,7 @@ interface StatCardProps {
 const StatCard = ({ label, value, icon, onClick }: StatCardProps) => {
   return (
     <div 
-      className="bg-gradient-to-br from-green-100 to-green-300 p-4 rounded-xl text-green-800 shadow-lg transition-transform hover:scale-105 cursor-pointer"
+      className="bg-green-200 p-4 rounded-xl text-green-800 shadow-lg transition-transform hover:scale-105 cursor-pointer"
       onClick={onClick}
     >
       <div className="flex items-center justify-between mb-3">
