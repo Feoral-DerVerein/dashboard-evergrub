@@ -56,10 +56,15 @@ const Orders = () => {
       await orderService.updateOrderStatus(orderId, status, true);
       
       if (status === "completed") {
+        // Get the order total before removing it from the list
+        const completedOrder = orders.find(order => order.id === orderId);
+        const orderTotal = completedOrder?.total || 0;
+        
         // Remove the completed order from the orders list
         setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
-        toast.success(`Order completed successfully`, {
-          description: "The order has been moved to Sales",
+        
+        toast.success(`Orden completada`, {
+          description: `La orden por $${orderTotal.toFixed(2)} ha sido registrada en ventas.`,
         });
         
         // Navigate to Sales page after a brief delay to show the toast
