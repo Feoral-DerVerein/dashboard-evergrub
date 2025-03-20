@@ -72,6 +72,14 @@ export function CompletedSales({ completedOrders, viewMode, onViewDetails, isLoa
     );
   };
   
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-10">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
   if (completedOrders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
