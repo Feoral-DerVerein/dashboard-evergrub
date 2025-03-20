@@ -1,3 +1,4 @@
+
 import { Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2, Store, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -75,6 +76,7 @@ const Sales = () => {
           }
           
           if (payload.new && payload.new.status === 'completed' && payload.new.total) {
+            console.log('Completed order detected:', payload.new);
             setNewCompletedOrderId(payload.new.id);
             setNewCompletedOrderAmount(payload.new.total);
             
@@ -142,9 +144,11 @@ const Sales = () => {
       const revenue = todayOrders?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
       setTodayRevenue(revenue);
       
+      // Count completed orders
       const { count, error: countError } = await supabase
         .from('orders')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'completed');
       
       if (countError) {
         console.error("Error counting orders:", countError);
@@ -152,6 +156,7 @@ const Sales = () => {
       }
       
       setTotalOrders(count || 0);
+      console.log("Total completed orders:", count);
     } catch (error) {
       console.error("Error in fetchOrdersData:", error);
     }

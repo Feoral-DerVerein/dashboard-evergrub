@@ -16,11 +16,11 @@ export const productSalesService = {
     try {
       console.log("Fetching product sales data from orders...");
       
-      // Get orders that are accepted or completed
+      // Get orders that are completed (we want to see sales data from completed orders)
       const { data: orders, error: ordersError } = await supabase
         .from('orders')
         .select('id, status')
-        .in('status', ['accepted', 'completed']);
+        .eq('status', 'completed');
       
       if (ordersError) {
         console.error("Error fetching orders for product sales:", ordersError);
@@ -28,11 +28,11 @@ export const productSalesService = {
       }
       
       if (!orders || orders.length === 0) {
-        console.log("No accepted or completed orders found");
+        console.log("No completed orders found");
         return [];
       }
       
-      console.log("Found orders with status accepted/completed:", orders.length);
+      console.log("Found completed orders:", orders.length);
       
       // Get order IDs
       const orderIds = orders.map(order => order.id);
@@ -49,7 +49,7 @@ export const productSalesService = {
       }
       
       if (!orderItems || orderItems.length === 0) {
-        console.log("No order items found for the accepted/completed orders");
+        console.log("No order items found for the completed orders");
         return [];
       }
 

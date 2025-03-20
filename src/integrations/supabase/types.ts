@@ -100,6 +100,7 @@ export type Database = {
           created_at: string | null
           customer_image: string | null
           customer_name: string
+          from_orders_page: boolean | null
           id: string
           location: string | null
           phone: string | null
@@ -107,12 +108,14 @@ export type Database = {
           status: string
           timestamp: string | null
           total: number
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
           customer_image?: string | null
           customer_name: string
+          from_orders_page?: boolean | null
           id?: string
           location?: string | null
           phone?: string | null
@@ -120,12 +123,14 @@ export type Database = {
           status?: string
           timestamp?: string | null
           total: number
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
           customer_image?: string | null
           customer_name?: string
+          from_orders_page?: boolean | null
           id?: string
           location?: string | null
           phone?: string | null
@@ -133,6 +138,7 @@ export type Database = {
           status?: string
           timestamp?: string | null
           total?: number
+          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
