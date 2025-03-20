@@ -37,7 +37,22 @@ export const salesService = {
       }
       
       console.log("Fetched sales data:", data);
-      return data as Sale[];
+      
+      // Transform the data to ensure the products field is correctly typed
+      const transformedData = data.map(item => ({
+        ...item,
+        // Convert the JSON products data to the correct SaleProduct[] type
+        products: Array.isArray(item.products) 
+          ? item.products.map((product: any) => ({
+              name: product.name || '',
+              quantity: product.quantity || 0,
+              price: product.price || 0,
+              category: product.category
+            }))
+          : []
+      }));
+      
+      return transformedData as Sale[];
     } catch (error) {
       console.error("Exception in getSales:", error);
       toast.error("Unexpected error fetching sales");
