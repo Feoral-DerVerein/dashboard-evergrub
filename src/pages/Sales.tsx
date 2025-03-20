@@ -1,5 +1,5 @@
 
-import { Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2, Store, Bell, Receipt } from "lucide-react";
+import { Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2, Store, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,6 @@ import ProductSaleItem from "@/components/sales/ProductSaleItem";
 import StatCard from "@/components/sales/StatCard";
 import { productSalesService, ProductSale } from "@/services/productSalesService";
 import { salesService, Sale } from "@/services/salesService";
-import SaleCard from "@/components/sales/SaleCard";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -227,58 +226,25 @@ const Sales = () => {
             <StatCard label="Total Orders" value={totalOrders.toString()} icon={<ShoppingBag className="w-5 h-5 text-white" />} onClick={navigateToOrders} />
           </div>
 
-          <Tabs defaultValue="products" className="w-full" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 mb-4">
-              <TabsTrigger value="products" className="data-[state=active]:bg-green-100 data-[state=active]:text-green-800">
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                Products
-              </TabsTrigger>
-              <TabsTrigger value="sales" className="data-[state=active]:bg-green-100 data-[state=active]:text-green-800">
-                <Receipt className="w-4 h-4 mr-2" />
-                Sales Records
-              </TabsTrigger>
-            </TabsList>
-          
-            <TabsContent value="products" className="mt-0">
-              <div className="flex items-center gap-2 text-gray-600 mb-4 bg-gray-50 p-3 rounded-lg">
-                <Calendar className="w-4 h-4 text-gray-500" />
-                <div className="flex items-center justify-between w-full">
-                  <span className="text-sm">Last 7 Days</span>
-                  <ChevronUp className="w-4 h-4" />
-                </div>
-              </div>
+          <div className="flex items-center gap-2 text-gray-600 mb-4 bg-gray-50 p-3 rounded-lg">
+            <Calendar className="w-4 h-4 text-gray-500" />
+            <div className="flex items-center justify-between w-full">
+              <span className="text-sm">Last 7 Days</span>
+              <ChevronUp className="w-4 h-4" />
+            </div>
+          </div>
 
-              <div className="relative mb-6">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <Input type="text" placeholder="Search products..." className="pl-10 pr-10 py-2 bg-gray-50 border-gray-200 focus-visible:ring-green-500" />
-                <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
-                  <Filter className="w-4 h-4 text-gray-500" />
-                </Button>
-              </div>
+          <div className="relative mb-6">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Input type="text" placeholder="Search products..." className="pl-10 pr-10 py-2 bg-gray-50 border-gray-200 focus-visible:ring-green-500" />
+            <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
+              <Filter className="w-4 h-4 text-gray-500" />
+            </Button>
+          </div>
 
-              <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 scrollbar-none">
-                {getCategories().map(category => <CategoryButton key={category} label={category} isActive={activeCategory === category} onClick={() => handleCategoryChange(category)} />)}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="sales" className="mt-0">
-              <div className="flex items-center gap-2 text-gray-600 mb-4 bg-gray-50 p-3 rounded-lg">
-                <Calendar className="w-4 h-4 text-gray-500" />
-                <div className="flex items-center justify-between w-full">
-                  <span className="text-sm">All Sales</span>
-                  <ChevronUp className="w-4 h-4" />
-                </div>
-              </div>
-
-              <div className="relative mb-6">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <Input type="text" placeholder="Search sales..." className="pl-10 pr-10 py-2 bg-gray-50 border-gray-200 focus-visible:ring-green-500" />
-                <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
-                  <Filter className="w-4 h-4 text-gray-500" />
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 scrollbar-none">
+            {getCategories().map(category => <CategoryButton key={category} label={category} isActive={activeCategory === category} onClick={() => handleCategoryChange(category)} />)}
+          </div>
         </header>
 
         <main className="px-6">
@@ -322,67 +288,29 @@ const Sales = () => {
               </div>
             </div>}
           
-          {activeTab === "products" ? (
-            <>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Product Sales</h2>
-                <p className="text-sm text-gray-500">{filteredProducts.length} products</p>
-              </div>
-              
-              {isLoading ? <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                </div> : filteredProducts.length > 0 ? <div className="space-y-1">
-                  {filteredProducts.map((product, index) => <ProductSaleItem key={index} {...product} />)}
-                </div> : <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                  <div className="flex items-start space-x-3">
-                    <Bell className="h-5 w-5 text-amber-500 mt-0.5" />
-                    <div>
-                      <h3 className="font-medium text-amber-800">New sales notification</h3>
-                      <p className="text-sm text-amber-700 mt-1">
-                        When you complete an order, the sales information will appear here automatically.
-                      </p>
-                      <Button variant="outline" size="sm" className="mt-3 border-amber-300 text-amber-700 hover:bg-amber-100 hover:text-amber-800" onClick={navigateToOrders}>
-                        View pending orders
-                      </Button>
-                    </div>
-                  </div>
-                </div>}
-            </>
-          ) : (
-            <>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Sales Records</h2>
-                <p className="text-sm text-gray-500">{salesData.length} sales</p>
-              </div>
-              
-              {salesData.length > 0 ? (
-                <div className="space-y-2">
-                  {salesData.map((sale) => (
-                    <SaleCard 
-                      key={sale.id} 
-                      sale={sale} 
-                      onClick={() => handleViewSaleDetails(sale)}
-                    />
-                  ))}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Product Sales</h2>
+            <p className="text-sm text-gray-500">{filteredProducts.length} products</p>
+          </div>
+          
+          {isLoading ? <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            </div> : filteredProducts.length > 0 ? <div className="space-y-1">
+              {filteredProducts.map((product, index) => <ProductSaleItem key={index} {...product} />)}
+            </div> : <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="flex items-start space-x-3">
+                <Bell className="h-5 w-5 text-amber-500 mt-0.5" />
+                <div>
+                  <h3 className="font-medium text-amber-800">New sales notification</h3>
+                  <p className="text-sm text-amber-700 mt-1">
+                    When you complete an order, the sales information will appear here automatically.
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-3 border-amber-300 text-amber-700 hover:bg-amber-100 hover:text-amber-800" onClick={navigateToOrders}>
+                    View pending orders
+                  </Button>
                 </div>
-              ) : (
-                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                  <div className="flex items-start space-x-3">
-                    <Receipt className="h-5 w-5 text-amber-500 mt-0.5" />
-                    <div>
-                      <h3 className="font-medium text-amber-800">No sales records yet</h3>
-                      <p className="text-sm text-amber-700 mt-1">
-                        Completed orders will appear here as sales records.
-                      </p>
-                      <Button variant="outline" size="sm" className="mt-3 border-amber-300 text-amber-700 hover:bg-amber-100 hover:text-amber-800" onClick={navigateToOrders}>
-                        View pending orders
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+              </div>
+            </div>}
 
           <Button className="w-full mt-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 shadow-md" onClick={navigateToOrders}>
             <ShoppingBag className="w-5 h-5" />
