@@ -53,18 +53,24 @@ const Orders = () => {
   const handleStatusChange = async (orderId: string, status: "accepted" | "completed" | "rejected") => {
     try {
       setUpdatingOrderId(orderId);
-      await orderService.updateOrderStatus(orderId, status, true);
+      
+      // Get the order details before updating the status
+      const completedOrder = orders.find(order => order.id === orderId);
+      const orderTotal = completedOrder?.total || 0;
+      
+      // Update the order status
+      const result = await orderService.updateOrderStatus(orderId, status, true);
+      
+      if (!result.success) {
+        throw new Error(`Failed to update order status: ${result.error}`);
+      }
       
       if (status === "completed") {
-        // Get the order total before removing it from the list
-        const completedOrder = orders.find(order => order.id === orderId);
-        const orderTotal = completedOrder?.total || 0;
-        
         // Remove the completed order from the orders list
         setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
         
-        toast.success(`Orden completada`, {
-          description: `La orden por $${orderTotal.toFixed(2)} ha sido registrada en ventas.`,
+        toast.success(`Order completed`, {
+          description: `The order for $${orderTotal.toFixed(2)} has been recorded in sales.`,
         });
         
         // Navigate to Sales page after a brief delay to show the toast

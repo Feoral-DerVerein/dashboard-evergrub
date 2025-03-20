@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Order, OrderItem, mapDbOrderToOrder, DbOrder, DbOrderItem } from "@/types/order.types";
 import { toast } from "sonner";
@@ -207,6 +206,19 @@ export const updateOrderStatus = async (
   try {
     console.log(`Updating order ${orderId} status to ${status}, fromOrdersPage: ${fromOrdersPage}`);
     
+    // First, ensure the order exists
+    const { data: orderCheck, error: orderCheckError } = await supabase
+      .from('orders')
+      .select('id, status')
+      .eq('id', orderId)
+      .single();
+      
+    if (orderCheckError) {
+      console.error("Error checking order existence:", orderCheckError);
+      return { success: false, error: orderCheckError };
+    }
+    
+    // Now update the order
     const { data, error } = await supabase
       .from('orders')
       .update({ 

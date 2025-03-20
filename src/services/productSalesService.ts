@@ -59,20 +59,25 @@ export const productSalesService = {
       const salesMap = new Map<string, ProductSale>();
       
       orderItems.forEach((item: any) => {
+        if (!item.name) {
+          console.warn("Found order item without name:", item);
+          return;
+        }
+        
         const key = `${item.name}-${item.category || 'Uncategorized'}`;
         
         if (salesMap.has(key)) {
           // Update existing product sale
           const existing = salesMap.get(key)!;
-          existing.unitsSold += item.quantity;
-          existing.revenue += Number(item.price) * item.quantity;
+          existing.unitsSold += item.quantity || 1;
+          existing.revenue += (Number(item.price) || 0) * (item.quantity || 1);
         } else {
           // Create new product sale
           salesMap.set(key, {
             name: item.name,
             category: item.category || 'Uncategorized',
-            unitsSold: item.quantity,
-            revenue: Number(item.price) * item.quantity,
+            unitsSold: item.quantity || 1,
+            revenue: (Number(item.price) || 0) * (item.quantity || 1),
             // Use a default image or try to find a product image
             image: item.product_id 
               ? `/product-images/${item.product_id}.jpg` 
@@ -90,6 +95,7 @@ export const productSalesService = {
       return productSales.sort((a, b) => b.revenue - a.revenue);
     } catch (error) {
       console.error("Error in getProductSales:", error);
+      // Return empty array instead of throwing, to avoid breaking the UI
       return [];
     }
   }

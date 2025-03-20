@@ -109,15 +109,29 @@ const Sales = () => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayFormatted = format(today, "yyyy-MM-dd");
+      
+      // First check if we can fetch today's orders
+      const {
+        data: checkData,
+        error: checkError
+      } = await supabase.from('orders').select('id').limit(1);
+      
+      if (checkError) {
+        console.error("Error checking database connection:", checkError);
+        return;
+      }
+      
       const {
         data: todayOrders,
         error: todayError
       } = await supabase.from('orders').select('total').gte('timestamp', todayFormatted);
+      
       if (todayError) {
         console.error("Error fetching today's orders:", todayError);
         return;
       }
-      const revenue = todayOrders?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
+      
+      const revenue = todayOrders?.reduce((sum, order) => sum + Number(order.total || 0), 0) || 0;
       setTodayRevenue(revenue);
 
       const {
@@ -127,10 +141,12 @@ const Sales = () => {
         count: 'exact',
         head: true
       }).eq('status', 'completed');
+      
       if (countError) {
         console.error("Error counting orders:", countError);
         return;
       }
+      
       setTotalOrders(count || 0);
       console.log("Total completed orders:", count);
     } catch (error) {
