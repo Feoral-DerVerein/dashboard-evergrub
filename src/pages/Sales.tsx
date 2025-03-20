@@ -1,4 +1,5 @@
-import { Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2, Store } from "lucide-react";
+
+import { Calendar, ChevronUp, DollarSign, Download, Filter, Search, ShoppingBag, CheckCircle2, Store, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { Input } from "@/components/ui/input";
@@ -312,9 +313,24 @@ const Sales = () => {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-              <ShoppingBag className="w-12 h-12 text-gray-300 mb-2" />
-              <p className="text-center">No sales data available yet.<br />Start accepting orders to see sales data.</p>
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="flex items-start space-x-3">
+                <Bell className="h-5 w-5 text-amber-500 mt-0.5" />
+                <div>
+                  <h3 className="font-medium text-amber-800">Nueva notificación de venta</h3>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Cuando completes una orden, la información de la venta aparecerá aquí automáticamente.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-3 border-amber-300 text-amber-700 hover:bg-amber-100 hover:text-amber-800"
+                    onClick={navigateToOrders}
+                  >
+                    Ver órdenes pendientes
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -334,4 +350,3 @@ const Sales = () => {
 };
 
 export default Sales;
-
