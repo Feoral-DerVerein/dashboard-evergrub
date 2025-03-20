@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2, Receipt } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -30,7 +29,6 @@ const Orders = () => {
       setIsLoading(true);
       const fetchedOrders = await orderService.getUserOrders();
       console.log("Fetched orders:", fetchedOrders);
-      // Filter out completed orders
       const filteredOrders = fetchedOrders.filter(order => order.status !== "completed");
       setOrders(filteredOrders);
     } catch (error) {
@@ -56,23 +54,16 @@ const Orders = () => {
       await orderService.updateOrderStatus(orderId, status, true);
       
       if (status === "completed") {
-        // Get the order total before removing it from the list
         const completedOrder = orders.find(order => order.id === orderId);
         const orderTotal = completedOrder?.total || 0;
-        
-        // Remove the completed order from the orders list
         setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
-        
         toast.success(`Order completed`, {
           description: `The order for $${orderTotal.toFixed(2)} has been recorded as a sale.`,
         });
-        
-        // Navigate to Sales page after a brief delay to show the toast
         setTimeout(() => {
           navigate('/sales');
         }, 1500);
       } else if (status === "accepted") {
-        // Update the order status in the UI
         setOrders(prevOrders => 
           prevOrders.map(order => 
             order.id === orderId ? { ...order, status } : order
@@ -84,7 +75,6 @@ const Orders = () => {
           icon: <CheckCircle2 className="h-5 w-5 text-green-500" />
         });
       } else if (status === "rejected") {
-        // Update the order status in the UI
         setOrders(prevOrders => 
           prevOrders.map(order => 
             order.id === orderId ? { ...order, status } : order
@@ -92,7 +82,6 @@ const Orders = () => {
         );
         toast.error(`Order rejected`);
       }
-      
     } catch (error) {
       console.error(`Error updating order status to ${status}:`, error);
       toast.error(`Failed to update order status: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -318,15 +307,6 @@ const Orders = () => {
             <p className="text-gray-500">
               {isLoading ? "Loading orders..." : `${orders.length} Orders`}
             </p>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="text-green-600 border-green-200 hover:bg-green-50"
-              onClick={navigateToSales}
-            >
-              <Receipt className="h-4 w-4 mr-1" />
-              View Sales
-            </Button>
           </div>
         </header>
 
