@@ -11,6 +11,19 @@ interface SaleCardProps {
 }
 
 const SaleCard = ({ sale, onClick }: SaleCardProps) => {
+  // List of specific names to use instead of customer names
+  const specificNames = [
+    "Lachlan", "Matilda", "Darcy", "Evie", "Banjo",
+    "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"
+  ];
+
+  // Use a consistent way to map order IDs to names
+  const getNameFromId = (id: string): string => {
+    // Create a simple hash from the ID
+    const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return specificNames[hash % specificNames.length];
+  };
+
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -25,6 +38,9 @@ const SaleCard = ({ sale, onClick }: SaleCardProps) => {
   };
 
   const totalItems = sale.products ? sale.products.reduce((sum, product) => sum + product.quantity, 0) : 0;
+  
+  // Get a consistent name for this sale
+  const displayName = getNameFromId(sale.order_id);
 
   return (
     <Card 
@@ -44,11 +60,11 @@ const SaleCard = ({ sale, onClick }: SaleCardProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12 bg-green-100 text-green-600">
-              <AvatarFallback>{getInitials(sale.customer_name)}</AvatarFallback>
+              <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
             </Avatar>
             
             <div>
-              <h3 className="font-semibold">{sale.customer_name}</h3>
+              <h3 className="font-semibold">{displayName}</h3>
               <p className="text-gray-500 text-sm">{totalItems} items</p>
             </div>
           </div>
