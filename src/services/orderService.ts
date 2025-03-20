@@ -225,6 +225,11 @@ export const updateOrderStatus = async (
     
     console.log(`Order ${orderId} status updated to ${status}`);
     
+    // If the status is completed, the database trigger will automatically create a sales record
+    if (status === 'completed') {
+      console.log("Order completed, sales record will be created by database trigger");
+    }
+    
     // Broadcast the status change to connected clients
     try {
       const broadcastResult = await broadcastOrderStatusChange(orderId, status);
