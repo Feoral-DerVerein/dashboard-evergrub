@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Notification {
@@ -115,7 +116,7 @@ export const notificationService = {
           description: `Order #${orderId.substring(0, 8)} completed for $${total.toFixed(2)}`,
           is_read: false,
           order_id: orderId,
-          for_marketplace: true,
+          for_marketplace: false,
           timestamp: new Date().toISOString()
         });
         

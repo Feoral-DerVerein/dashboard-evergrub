@@ -12,6 +12,8 @@ import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { notificationService } from "@/services/notificationService";
+
 const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [orders, setOrders] = useState<Order[]>([]);
@@ -27,6 +29,7 @@ const Orders = () => {
   } = useNotificationsAndOrders();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const navigate = useNavigate();
+
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
@@ -41,42 +44,51 @@ const Orders = () => {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchOrders();
   }, [lastOrderUpdate, lastOrderDelete]);
+
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsDetailOpen(true);
   };
+
   const handleStatusChange = async (orderId: string, status: "accepted" | "completed" | "rejected") => {
     try {
       setUpdatingOrderId(orderId);
       await orderService.updateOrderStatus(orderId, status, true);
+      
       if (status === "completed") {
         const completedOrder = orders.find(order => order.id === orderId);
         const orderTotal = completedOrder?.total || 0;
+        
         setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
+        
+        await notificationService.createSalesNotification(orderId, orderTotal);
+        
         toast.success(`Order completed`, {
           description: `The order for $${orderTotal.toFixed(2)} has been recorded as a sale.`
         });
+        
         setTimeout(() => {
           navigate('/sales');
         }, 1500);
       } else if (status === "accepted") {
-        setOrders(prevOrders => prevOrders.map(order => order.id === orderId ? {
-          ...order,
-          status
-        } : order));
+        setOrders(prevOrders => prevOrders.map(order => 
+          order.id === orderId ? { ...order, status } : order
+        ));
+        
         toast.success(`Order accepted successfully`, {
           description: "The order has been added to your product sales.",
           duration: 5000,
           icon: <CheckCircle2 className="h-5 w-5 text-green-500" />
         });
       } else if (status === "rejected") {
-        setOrders(prevOrders => prevOrders.map(order => order.id === orderId ? {
-          ...order,
-          status
-        } : order));
+        setOrders(prevOrders => prevOrders.map(order => 
+          order.id === orderId ? { ...order, status } : order
+        ));
+        
         toast.error(`Order rejected`);
       }
     } catch (error) {
@@ -86,6 +98,7 @@ const Orders = () => {
       setUpdatingOrderId(null);
     }
   };
+
   const handleAcceptOrder = async (orderId: string) => {
     try {
       setUpdatingOrderId(orderId);
@@ -103,9 +116,11 @@ const Orders = () => {
       setUpdatingOrderId(null);
     }
   };
+
   const navigateToSales = () => {
     navigate('/sales');
   };
+
   const OrderDetailsDialog = () => <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="text-center font-bold text-xl">Order Details</DialogTitle>
@@ -154,6 +169,7 @@ const Orders = () => {
           </div>}
       </DialogContent>
     </Dialog>;
+
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "pending":
@@ -168,6 +184,7 @@ const Orders = () => {
         return status;
     }
   };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -182,6 +199,7 @@ const Orders = () => {
         return "text-gray-500";
     }
   };
+
   const OrderCard = ({
     order
   }: {
@@ -240,6 +258,7 @@ const Orders = () => {
         </div>
       </Card>;
   };
+
   return <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
@@ -281,4 +300,5 @@ const Orders = () => {
       </div>
     </div>;
 };
+
 export default Orders;

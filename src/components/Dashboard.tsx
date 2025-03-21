@@ -1,4 +1,5 @@
-import { Home, Users, ShoppingCart, Bell, Heart, User, Package, Plus, ShoppingBasket } from "lucide-react";
+
+import { Home, Users, ShoppingCart, Bell, Heart, User, Package, Plus, ShoppingBasket, BarChart3 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
@@ -123,6 +124,7 @@ const Dashboard = () => {
                 to="/orders" 
                 badgeCount={orderCount} 
               />
+              <QuickAccessItem icon={BarChart3} label="Sales" to="/sales" />
               <QuickAccessItem 
                 icon={Bell} 
                 label="Notifications" 

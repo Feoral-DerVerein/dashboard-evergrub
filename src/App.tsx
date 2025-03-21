@@ -24,6 +24,7 @@ import Microsoft from "./pages/Microsoft";
 import Google from "./pages/Google";
 import Apple from "./pages/Apple";
 import Phone from "./pages/Phone";
+import Sales from "./pages/Sales";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,11 @@ const AppRoutes = () => {
       <Route path="/orders" element={
         <ProtectedRoute>
           <Orders />
+        </ProtectedRoute>
+      } />
+      <Route path="/sales" element={
+        <ProtectedRoute>
+          <Sales />
         </ProtectedRoute>
       } />
       <Route path="/notifications" element={
