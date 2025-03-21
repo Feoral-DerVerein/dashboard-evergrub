@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { BarChart3, Receipt, DollarSign, Package, Calendar, CreditCard, List, Grid3X3 } from "lucide-react";
 import { BottomNav } from "@/components/Dashboard";
@@ -64,8 +63,8 @@ const Sales = () => {
           <p className="text-lg font-bold">{value}</p>
           {trend && <p className="text-xs text-green-500 mt-1">↑ {trend}</p>}
         </div>
-        <div className="bg-blue-100 p-3 rounded-full">
-          <Icon className="h-5 w-5 text-blue-700" />
+        <div className="bg-blue-100 p-2 rounded-full">
+          <Icon className="h-4 w-4 text-blue-700" />
         </div>
       </div>
     </Card>
