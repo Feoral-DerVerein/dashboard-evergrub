@@ -1,5 +1,6 @@
 
 import { useToast as useToastOriginal, toast as toastOriginal } from "@/hooks/use-toast";
+import { X, CheckCircle2, AlertCircle, Info } from "lucide-react";
 
 // Define the ToasterToast type here since it's not exported from toast.tsx
 type ToasterToast = {
