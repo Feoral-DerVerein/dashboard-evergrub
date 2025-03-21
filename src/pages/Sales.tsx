@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { BarChart3, Receipt, DollarSign, Package, Calendar, CreditCard, List, Grid3X3 } from "lucide-react";
 import { BottomNav } from "@/components/Dashboard";
@@ -9,20 +8,20 @@ import { salesService, Sale } from "@/services/salesService";
 import { format, parseISO } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
-
 const Sales = () => {
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
-  const [todaySales, setTodaySales] = useState({ count: 0, total: 0 });
-
+  const [todaySales, setTodaySales] = useState({
+    count: 0,
+    total: 0
+  });
   useEffect(() => {
     const fetchSales = async () => {
       try {
         setIsLoading(true);
         const fetchedSales = await salesService.getSales();
         setSales(fetchedSales);
-        
         const todaySummary = await salesService.getTodaySales();
         setTodaySales(todaySummary);
       } catch (error) {
@@ -32,14 +31,11 @@ const Sales = () => {
         setIsLoading(false);
       }
     };
-
     fetchSales();
   }, []);
-
   const getInitials = (name: string) => {
     return name ? name.substring(0, 2).toUpperCase() : 'CS';
   };
-
   const formatDate = (dateString: string) => {
     try {
       return format(parseISO(dateString), 'MMM dd, yyyy');
@@ -47,7 +43,6 @@ const Sales = () => {
       return dateString;
     }
   };
-
   const formatTime = (dateString: string) => {
     try {
       return format(parseISO(dateString), 'h:mm a');
@@ -55,24 +50,28 @@ const Sales = () => {
       return '';
     }
   };
-
-  const StatCard = ({ label, value, icon: Icon, trend = '' }) => (
-    <Card className="p-5">
+  const StatCard = ({
+    label,
+    value,
+    icon: Icon,
+    trend = ''
+  }) => <Card className="p-5">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-gray-500 mb-1">{label}</p>
+          <p className="text-sm text-gray-500 mb-1 text-left">{label}</p>
           <p className="text-lg font-bold">{value}</p>
           {trend && <p className="text-xs text-green-500 mt-1">↑ {trend}</p>}
         </div>
-        <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-2 rounded-lg shadow-sm">
+        <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-2 rounded-lg shadow-sm py-[9px] px-[9px]">
           <Icon className="h-4 w-4 text-blue-700" />
         </div>
       </div>
-    </Card>
-  );
-
-  const SaleCard = ({ sale }: { sale: Sale }) => (
-    <Card className="mb-4 border border-gray-200 hover:shadow-sm transition-shadow duration-200 overflow-hidden">
+    </Card>;
+  const SaleCard = ({
+    sale
+  }: {
+    sale: Sale;
+  }) => <Card className="mb-4 border border-gray-200 hover:shadow-sm transition-shadow duration-200 overflow-hidden">
       <div className="px-6 py-4">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-3">
@@ -114,31 +113,18 @@ const Sales = () => {
           </div>
         </div>
       </div>
-    </Card>
-  );
-
-  return (
-    <div className="min-h-screen bg-gray-50">
+    </Card>;
+  return <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
           <div className="flex items-center justify-between gap-3 mb-6">
             <h1 className="text-2xl font-bold">Sales</h1>
             <div className="flex gap-2 bg-gray-100 p-1 rounded-md">
-              <Button 
-                variant={viewMode === "cards" ? "default" : "ghost"} 
-                size="sm" 
-                onClick={() => setViewMode("cards")} 
-                className={viewMode === "cards" ? "" : "bg-transparent text-gray-700"}
-              >
+              <Button variant={viewMode === "cards" ? "default" : "ghost"} size="sm" onClick={() => setViewMode("cards")} className={viewMode === "cards" ? "" : "bg-transparent text-gray-700"}>
                 <List className="h-4 w-4 mr-1" />
                 Cards
               </Button>
-              <Button 
-                variant={viewMode === "table" ? "default" : "ghost"} 
-                size="sm" 
-                onClick={() => setViewMode("table")} 
-                className={viewMode === "table" ? "" : "bg-transparent text-gray-700"}
-              >
+              <Button variant={viewMode === "table" ? "default" : "ghost"} size="sm" onClick={() => setViewMode("table")} className={viewMode === "table" ? "" : "bg-transparent text-gray-700"}>
                 <Grid3X3 className="h-4 w-4 mr-1" />
                 Table
               </Button>
@@ -153,44 +139,17 @@ const Sales = () => {
 
         <main className="px-6 py-4">
           <div className="grid grid-cols-2 gap-4 mb-8">
-            <StatCard 
-              label="Today Revenue" 
-              value={`$${todaySales.total.toFixed(2)}`} 
-              icon={DollarSign}
-              trend="12.5%"
-            />
-            <StatCard 
-              label="Today Orders" 
-              value={todaySales.count} 
-              icon={Package}
-              trend="8.3%"
-            />
-            <StatCard 
-              label="Monthly Revenue" 
-              value="$4,521.30" 
-              icon={BarChart3}
-              trend="22.3%"
-            />
-            <StatCard 
-              label="Total Orders" 
-              value={sales.length} 
-              icon={Receipt}
-            />
+            <StatCard label="Today Revenue" value={`$${todaySales.total.toFixed(2)}`} icon={DollarSign} trend="12.5%" />
+            <StatCard label="Today Orders" value={todaySales.count} icon={Package} trend="8.3%" />
+            <StatCard label="Monthly Revenue" value="$4,521.30" icon={BarChart3} trend="22.3%" />
+            <StatCard label="Total Orders" value={sales.length} icon={Receipt} />
           </div>
 
-          {isLoading ? (
-            <div className="flex justify-center py-10">
+          {isLoading ? <div className="flex justify-center py-10">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-            </div>
-          ) : sales.length > 0 ? (
-            viewMode === "cards" ? (
-              <div className="space-y-4">
-                {sales.map(sale => (
-                  <SaleCard key={sale.id} sale={sale} />
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-md border overflow-hidden">
+            </div> : sales.length > 0 ? viewMode === "cards" ? <div className="space-y-4">
+                {sales.map(sale => <SaleCard key={sale.id} sale={sale} />)}
+              </div> : <div className="rounded-md border overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
@@ -200,8 +159,7 @@ const Sales = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {sales.map(sale => (
-                      <tr key={sale.id} className="hover:bg-gray-50">
+                    {sales.map(sale => <tr key={sale.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <Avatar className="h-8 w-8 mr-3 bg-blue-100 text-blue-500">
@@ -219,27 +177,20 @@ const Sales = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
                           ${Number(sale.amount).toFixed(2)}
                         </td>
-                      </tr>
-                    ))}
+                      </tr>)}
                   </tbody>
                 </table>
-              </div>
-            )
-          ) : (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
+              </div> : <div className="flex flex-col items-center justify-center py-16 text-center">
               <Receipt className="h-16 w-16 text-gray-300 mb-4" />
               <p className="text-gray-500 font-medium mb-2">No sales found</p>
               <p className="text-gray-400 text-sm max-w-xs">
                 Completed orders will appear here as sales records.
               </p>
-            </div>
-          )}
+            </div>}
         </main>
 
         <BottomNav />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Sales;
