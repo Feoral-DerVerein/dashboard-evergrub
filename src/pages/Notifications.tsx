@@ -144,9 +144,7 @@ const Notifications = () => {
                       {new Date(notification.timestamp).toLocaleString()}
                     </p>
                   </div>
-                  {!notification.is_read && <button className="p-2 hover:bg-gray-100 rounded-full" onClick={() => handleMarkAsRead(notification.id)}>
-                      <Eye className="w-5 h-5 text-gray-400" />
-                    </button>}
+                  {!notification.is_read}
                 </div>)}
             </div> : <div className="text-center py-10">
               <Bell className="w-12 h-12 mx-auto text-gray-300 mb-4" />
