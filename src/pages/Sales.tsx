@@ -1,3 +1,4 @@
+
 import { Calendar, ChevronUp, DollarSign, Filter, Search, ShoppingBag, Package } from "lucide-react";
 import { BottomNav } from "@/components/Dashboard";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Order } from "@/types/order.types";
 import * as orderService from "@/services/orderService";
 import CategoryButton from "@/components/sales/CategoryButton";
+import { productSalesService, ProductSale } from "@/services/productSalesService";
+import ProductSaleItem from "@/components/sales/ProductSaleItem";
 
 const Sales = () => {
   const [todayRevenue, setTodayRevenue] = useState<number>(0);
@@ -20,12 +23,15 @@ const Sales = () => {
   const [completedOrders, setCompletedOrders] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
+  const [productSales, setProductSales] = useState<ProductSale[]>([]);
+  const [todayProductSalesTotal, setTodayProductSalesTotal] = useState<number>(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchOrdersData();
     fetchPendingOrders();
     fetchTotalSales();
+    fetchProductSales();
 
     // Improved real-time subscription to specifically watch for order status changes
     const channel = supabase.channel('orders-status-changes').on('postgres_changes', {
@@ -47,6 +53,7 @@ const Sales = () => {
             toast.success(`Order #${payload.new.id.substring(0, 8)} has been completed`);
             // Refresh the revenue data
             fetchOrdersData();
+            fetchProductSales();
           } else if (newStatus === 'accepted') {
             toast.info(`Order #${payload.new.id.substring(0, 8)} has been accepted`);
           } else if (newStatus === 'rejected') {
@@ -63,6 +70,56 @@ const Sales = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const fetchProductSales = async () => {
+    try {
+      const sales = await productSalesService.getProductSales();
+      setProductSales(sales);
+      
+      // Calculate today's product sales total
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Get today's orders
+      const { data: todayOrders, error } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('status', 'completed')
+        .gte('timestamp', today.toISOString());
+        
+      if (error) {
+        console.error("Error fetching today's orders:", error);
+        return;
+      }
+      
+      if (todayOrders && todayOrders.length > 0) {
+        const orderIds = todayOrders.map(order => order.id);
+        
+        // Get order items for today's completed orders
+        const { data: orderItems, error: itemsError } = await supabase
+          .from('order_items')
+          .select('price, quantity')
+          .in('order_id', orderIds);
+          
+        if (itemsError) {
+          console.error("Error fetching today's order items:", itemsError);
+          return;
+        }
+        
+        // Calculate total revenue from products sold today
+        const total = orderItems?.reduce((sum, item) => {
+          return sum + (Number(item.price) * item.quantity);
+        }, 0) || 0;
+        
+        setTodayProductSalesTotal(total);
+        
+        // Update today's revenue to include product sales
+        setTodayRevenue(prev => total);
+      }
+    } catch (error) {
+      console.error("Error fetching product sales:", error);
+    }
+  };
 
   const fetchTotalSales = async () => {
     try {
@@ -89,6 +146,8 @@ const Sales = () => {
         total,
         count
       } = await salesService.getTodaySales();
+      
+      // We will update this with product sales data later
       setTodayRevenue(total);
 
       // Get total completed orders count
@@ -214,43 +273,31 @@ const Sales = () => {
         <main className="px-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Product Sales</h2>
-            <p className="text-sm text-gray-500">{pendingOrders.length} products</p>
+            <p className="text-sm text-gray-500">{productSales.length} products</p>
           </div>
           
-          {isLoading ? <div className="flex justify-center items-center py-12">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-            </div> : pendingOrders.length > 0 ? <div className="space-y-4">
-              {pendingOrders.map(order => <div key={order.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300" data-order-id={order.id}>
-                  <div className="p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="font-mono text-gray-600">{order.id.substring(0, 8)}</p>
-                      <span className="font-medium text-emerald-500">Completed </span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-12 w-12 bg-blue-100 text-blue-500">
-                          <AvatarFallback>{getInitials(order.customerName)}</AvatarFallback>
-                        </Avatar>
-                        
-                        <div>
-                          <h3 className="font-bold text-sm">{order.customerName}</h3>
-                          <p className="text-gray-500">{order.items.length} items</p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-end">
-                        <div className="font-bold text-xl">${order.total.toFixed(2)}</div>
-                        <div className="text-gray-500">{order.timestamp}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>)}
-            </div> : <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
-              <p className="text-amber-700">No pending orders found</p>
-            </div>}
-
-          
+            </div>
+          ) : productSales.length > 0 ? (
+            <div className="space-y-4">
+              {productSales.map((product, index) => (
+                <ProductSaleItem 
+                  key={index}
+                  name={product.name}
+                  category={product.category}
+                  unitsSold={product.unitsSold}
+                  revenue={product.revenue}
+                  image={product.image}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
+              <p className="text-amber-700">No product sales found</p>
+            </div>
+          )}
         </main>
 
         <BottomNav />
