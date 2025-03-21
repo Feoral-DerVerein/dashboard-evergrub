@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface Notification {
   id: string;
@@ -31,7 +32,9 @@ export const notificationService = {
       }
       
       // Check if this is a marketplace order (no user_id)
-      if (orderData && orderData.user_id === null) {
+      const isMarketplaceOrder = orderData && (orderData.user_id === null || orderData.from_orders_page === true);
+      
+      if (isMarketplaceOrder) {
         console.log("This is a marketplace order, creating notification");
         
         const { data, error: notificationError } = await supabase
@@ -49,14 +52,17 @@ export const notificationService = {
           
         if (notificationError) {
           console.error("Error creating notification:", notificationError);
-          throw notificationError;
+          toast.error("Failed to create notification");
+          return;
         }
         
         console.log("Notification created successfully for marketplace:", data);
+      } else {
+        console.log("Not a marketplace order, skipping notification creation");
       }
     } catch (error) {
       console.error("Error in createOrderNotification:", error);
-      throw error;
+      toast.error("Failed to create order notification");
     }
   },
   
@@ -72,11 +78,14 @@ export const notificationService = {
         
       if (orderError) {
         console.error("Error getting order information for pickup notification:", orderError);
-        throw orderError;
+        toast.error("Failed to create pickup notification");
+        return;
       }
       
-      // Check if this is a marketplace order (no user_id)
-      if (orderData && orderData.user_id === null) {
+      // Check if this is a marketplace order (no user_id) or from orders page
+      const isMarketplaceOrder = orderData && (orderData.user_id === null || orderData.from_orders_page === true);
+      
+      if (isMarketplaceOrder) {
         console.log("Creating pickup notification for completed marketplace order");
         
         const { data, error: notificationError } = await supabase
@@ -94,14 +103,17 @@ export const notificationService = {
           
         if (notificationError) {
           console.error("Error creating pickup notification:", notificationError);
-          throw notificationError;
+          toast.error("Failed to create pickup notification");
+          return;
         }
         
         console.log("Pickup notification created successfully:", data);
+      } else {
+        console.log("Not a marketplace order, skipping pickup notification");
       }
     } catch (error) {
       console.error("Error in createPickupNotification:", error);
-      throw error;
+      toast.error("Failed to create pickup notification");
     }
   },
   
@@ -125,13 +137,14 @@ export const notificationService = {
         
       if (notificationError) {
         console.error("Error creating sales notification:", notificationError);
-        throw notificationError;
+        toast.error("Failed to create sales notification");
+        return;
       }
         
       console.log("Sales notification created successfully:", data);
     } catch (error) {
       console.error("Error in createSalesNotification:", error);
-      throw error;
+      toast.error("Failed to create sales notification");
     }
   },
   
@@ -146,13 +159,15 @@ export const notificationService = {
         
       if (error) {
         console.error("Error fetching marketplace notifications:", error);
-        throw error;
+        toast.error("Failed to load notifications");
+        return [];
       }
       
       return data as Notification[];
     } catch (error) {
       console.error("Error in getMarketplaceNotifications:", error);
-      throw error;
+      toast.error("Failed to load notifications");
+      return [];
     }
   },
   
@@ -166,11 +181,11 @@ export const notificationService = {
         
       if (error) {
         console.error("Error marking notification as read:", error);
-        throw error;
+        toast.error("Failed to mark notification as read");
       }
     } catch (error) {
       console.error("Error in markAsRead:", error);
-      throw error;
+      toast.error("Failed to mark notification as read");
     }
   }
 };

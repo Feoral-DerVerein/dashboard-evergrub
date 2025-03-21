@@ -81,5 +81,85 @@ export const salesService = {
       console.error("Exception in getTodaySales:", error);
       return { count: 0, total: 0 };
     }
+  },
+  
+  // Manually create a sale record (backup in case trigger fails)
+  async createSaleFromOrder(orderId: string): Promise<boolean> {
+    try {
+      console.log(`Manually creating sale record for order ${orderId}`);
+      
+      // First check if a sale already exists for this order
+      const { data: existingSale, error: checkError } = await supabase
+        .from('sales')
+        .select('id')
+        .eq('order_id', orderId)
+        .maybeSingle();
+        
+      if (checkError) {
+        console.error("Error checking for existing sale:", checkError);
+        return false;
+      }
+      
+      // If sale already exists, don't create another one
+      if (existingSale) {
+        console.log(`Sale already exists for order ${orderId}, skipping creation`);
+        return true;
+      }
+      
+      // Get order details
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single();
+        
+      if (orderError) {
+        console.error("Error getting order for sale creation:", orderError);
+        return false;
+      }
+      
+      // Get order items
+      const { data: orderItems, error: itemsError } = await supabase
+        .from('order_items')
+        .select('*')
+        .eq('order_id', orderId);
+        
+      if (itemsError) {
+        console.error("Error getting order items for sale creation:", itemsError);
+        return false;
+      }
+      
+      // Format products for sales record
+      const products = orderItems.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        category: item.category
+      }));
+      
+      // Create sale record
+      const { data: saleData, error: saleError } = await supabase
+        .from('sales')
+        .insert({
+          order_id: orderId,
+          amount: orderData.total,
+          customer_name: orderData.customer_name,
+          sale_date: new Date().toISOString(),
+          products: products,
+          payment_method: 'card'
+        })
+        .select();
+        
+      if (saleError) {
+        console.error("Error creating sale record:", saleError);
+        return false;
+      }
+      
+      console.log("Sale record created successfully:", saleData);
+      return true;
+    } catch (error) {
+      console.error("Exception in createSaleFromOrder:", error);
+      return false;
+    }
   }
 };
