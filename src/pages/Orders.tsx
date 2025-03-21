@@ -31,6 +31,7 @@ const Orders = () => {
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // Updated customer names array to match OrdersTable
   const customerNames = [
     "Lachlan", "Matilda", "Darcy", "Evie", "Banjo", 
     "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Table,
@@ -24,7 +23,7 @@ interface OrdersTableProps {
 export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }: OrdersTableProps) {
   const [processingOrders, setProcessingOrders] = useState<Record<string, boolean>>({});
   
-  // Customer names array as specified
+  // Updated customer names array as requested
   const customerNames = [
     "Lachlan", "Matilda", "Darcy", "Evie", "Banjo", 
     "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"
