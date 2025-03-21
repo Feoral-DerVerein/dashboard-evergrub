@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2 } from "lucide-react";
+import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2, ShoppingBag, Clock, User } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
 import { Order } from "@/types/order.types";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { OrdersTable } from "@/components/orders/OrdersTable";
 import * as orderService from "@/services/orderService";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { notificationService } from "@/services/notificationService";
+import { Badge } from "@/components/ui/badge";
 
 const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
@@ -145,6 +146,51 @@ const Orders = () => {
     navigate('/sales');
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "Pending";
+      case "accepted":
+        return "Accepted";
+      case "completed":
+        return "Completed";
+      case "rejected":
+        return "Rejected";
+      default:
+        return status;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-amber-100 text-amber-700 border-amber-200";
+      case "accepted":
+        return "bg-blue-100 text-blue-700 border-blue-200";
+      case "completed":
+        return "bg-emerald-100 text-emerald-700 border-emerald-200";
+      case "rejected":
+        return "bg-red-100 text-red-700 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-200";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "pending":
+        return <Clock className="h-3.5 w-3.5 mr-1" />;
+      case "accepted":
+        return <CheckCircle2 className="h-3.5 w-3.5 mr-1" />;
+      case "completed":
+        return <Package className="h-3.5 w-3.5 mr-1" />;
+      case "rejected":
+        return <X className="h-3.5 w-3.5 mr-1" />;
+      default:
+        return null;
+    }
+  };
+
   const OrderDetailsDialog = () => <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="text-center font-bold text-xl">Order Details</DialogTitle>
@@ -161,10 +207,10 @@ const Orders = () => {
               
               <div className="text-gray-500 font-medium">Status:</div>
               <div className="capitalize font-medium">
-                {selectedOrder.status === "pending" && "Pending"}
-                {selectedOrder.status === "accepted" && "Accepted"}
-                {selectedOrder.status === "completed" && "Completed"}
-                {selectedOrder.status === "rejected" && "Rejected"}
+                <Badge className={`${getStatusColor(selectedOrder.status)} flex w-fit items-center`}>
+                  {getStatusIcon(selectedOrder.status)}
+                  {getStatusLabel(selectedOrder.status)}
+                </Badge>
               </div>
               
               <div className="text-gray-500 font-medium">Location:</div>
@@ -194,36 +240,6 @@ const Orders = () => {
       </DialogContent>
     </Dialog>;
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "Pending";
-      case "accepted":
-        return "Accepted";
-      case "completed":
-        return "Completed";
-      case "rejected":
-        return "Rejected";
-      default:
-        return status;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "text-amber-500";
-      case "accepted":
-        return "text-blue-500";
-      case "completed":
-        return "text-emerald-500";
-      case "rejected":
-        return "text-red-500";
-      default:
-        return "text-gray-500";
-    }
-  };
-
   const OrderCard = ({
     order
   }: {
@@ -235,55 +251,86 @@ const Orders = () => {
     
     const customerName = getCustomerName(order.id);
     
-    return <Card className="mb-4 border border-gray-200 hover:shadow-sm transition-shadow duration-200 overflow-hidden">
-        <div className="px-6 py-4">
-          <div className="flex justify-between items-center mb-2">
-            <div className="text-gray-600 font-mono">
-              {order.id.substring(0, 8)}
+    return (
+      <Card className="mb-4 overflow-hidden bg-white hover:shadow-md transition-all duration-200">
+        <CardContent className="p-0">
+          <div className="p-4 border-b border-gray-100">
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center gap-2">
+                <ShoppingBag className="h-4 w-4 text-gray-400" />
+                <span className="text-sm font-mono text-gray-500">#{order.id.substring(0, 8)}</span>
+              </div>
+              <Badge className={`${getStatusColor(order.status)} flex items-center`}>
+                {getStatusIcon(order.status)}
+                {getStatusLabel(order.status)}
+              </Badge>
             </div>
-            <div className={`font-medium ${getStatusColor(order.status)}`}>
-              {getStatusLabel(order.status)}
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-12 w-12 bg-blue-100 text-blue-500">
-                <AvatarFallback>{getInitials(customerName)}</AvatarFallback>
-              </Avatar>
+            
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10 bg-blue-100 text-blue-600">
+                  <AvatarFallback>{getInitials(customerName)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-semibold text-base">{customerName}</h3>
+                  <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
+                    <Package className="h-3.5 w-3.5" />
+                    <span>{order.items.length} items</span>
+                  </div>
+                </div>
+              </div>
               
-              <div>
-                <h3 className="font-bold text-sm">{customerName}</h3>
-                <p className="text-gray-500">{order.items.length} items</p>
+              <div className="text-right">
+                <div className="font-bold text-lg text-blue-700">${order.total.toFixed(2)}</div>
+                <div className="text-xs text-gray-500 mt-1">{order.timestamp}</div>
               </div>
             </div>
-
-            <div className="flex flex-col items-end">
-              <div className="font-bold text-xl">${order.total.toFixed(2)}</div>
-              <div className="text-gray-500">{order.timestamp}</div>
-            </div>
           </div>
-        </div>
+        </CardContent>
         
-        <div className="flex border-t border-gray-100">
-          <Button variant="ghost" className="flex-1 rounded-none h-12 border-r border-gray-100 hover:bg-gray-50" onClick={() => handleViewDetails(order)}>
-            <Eye className="h-5 w-5 text-blue-500" />
+        <CardFooter className="p-0 flex border-t border-gray-100">
+          <Button variant="ghost" className="flex-1 rounded-none h-11 border-r border-gray-100 hover:bg-gray-50 text-blue-600" onClick={() => handleViewDetails(order)}>
+            <Eye className="h-4 w-4 mr-2" />
+            Details
           </Button>
           
-          {order.status === "pending" && <>
-              <Button variant="ghost" className="flex-1 rounded-none h-12 border-r border-gray-100 hover:bg-gray-50" onClick={() => handleStatusChange(order.id, "accepted")}>
-                <Check className="h-5 w-5 text-green-500" />
+          {order.status === "pending" && (
+            <>
+              <Button 
+                variant="ghost" 
+                className="flex-1 rounded-none h-11 border-r border-gray-100 hover:bg-gray-50 text-emerald-600"
+                disabled={updatingOrderId === order.id}
+                onClick={() => handleStatusChange(order.id, "accepted")}
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Accept
               </Button>
-              <Button variant="ghost" className="flex-1 rounded-none h-12 border-r border-gray-100 hover:bg-gray-50" onClick={() => handleStatusChange(order.id, "rejected")}>
-                <X className="h-5 w-5 text-red-500" />
+              <Button 
+                variant="ghost" 
+                className="flex-1 rounded-none h-11 hover:bg-gray-50 text-red-600"
+                disabled={updatingOrderId === order.id}
+                onClick={() => handleStatusChange(order.id, "rejected")}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Reject
               </Button>
-            </>}
+            </>
+          )}
           
-          {order.status === "accepted" && <Button variant="ghost" className="flex-1 rounded-none h-12 hover:bg-gray-50" onClick={() => handleStatusChange(order.id, "completed")}>
-              <Package className="h-5 w-5 text-green-500" />
-            </Button>}
-        </div>
-      </Card>;
+          {order.status === "accepted" && (
+            <Button 
+              variant="ghost" 
+              className="flex-1 rounded-none h-11 hover:bg-gray-50 text-emerald-600"
+              disabled={updatingOrderId === order.id}
+              onClick={() => handleStatusChange(order.id, "completed")}
+            >
+              <Package className="h-4 w-4 mr-2" />
+              Complete
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
+    );
   };
 
   return <div className="min-h-screen bg-gray-50">
