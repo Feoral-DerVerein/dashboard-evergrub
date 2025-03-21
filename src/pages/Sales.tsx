@@ -12,15 +12,20 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Order } from "@/types/order.types";
 import * as orderService from "@/services/orderService";
 import CategoryButton from "@/components/sales/CategoryButton";
+
 const Sales = () => {
   const [todayRevenue, setTodayRevenue] = useState<number>(0);
+  const [totalRevenue, setTotalRevenue] = useState<number>(0);
   const [totalOrders, setTotalOrders] = useState<number>(0);
+  const [completedOrders, setCompletedOrders] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
   const navigate = useNavigate();
+
   useEffect(() => {
     fetchOrdersData();
     fetchPendingOrders();
+    fetchTotalSales();
 
     // Improved real-time subscription to specifically watch for order status changes
     const channel = supabase.channel('orders-status-changes').on('postgres_changes', {
@@ -58,6 +63,25 @@ const Sales = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const fetchTotalSales = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('sales')
+        .select('amount');
+      
+      if (error) {
+        console.error("Error fetching total sales:", error);
+        return;
+      }
+      
+      const total = data.reduce((sum, sale) => sum + Number(sale.amount), 0);
+      setTotalRevenue(total);
+    } catch (error) {
+      console.error("Error in fetchTotalSales:", error);
+    }
+  };
+
   const fetchOrdersData = async () => {
     try {
       // Get today's revenue
@@ -75,15 +99,34 @@ const Sales = () => {
         count: 'exact',
         head: true
       }).eq('status', 'completed');
+      
       if (countError) {
         console.error("Error counting orders:", countError);
         return;
       }
-      setTotalOrders(totalCount || 0);
+      
+      setCompletedOrders(totalCount || 0);
+      
+      // Get all orders count
+      const {
+        count: allOrdersCount,
+        error: allOrdersError
+      } = await supabase.from('orders').select('*', {
+        count: 'exact',
+        head: true
+      });
+      
+      if (allOrdersError) {
+        console.error("Error counting all orders:", allOrdersError);
+        return;
+      }
+      
+      setTotalOrders(allOrdersCount || 0);
     } catch (error) {
       console.error("Error in fetchOrdersData:", error);
     }
   };
+
   const fetchPendingOrders = async () => {
     setIsLoading(true);
     try {
@@ -97,6 +140,7 @@ const Sales = () => {
       setIsLoading(false);
     }
   };
+
   const navigateToOrders = () => {
     navigate('/orders');
   };
@@ -105,6 +149,7 @@ const Sales = () => {
   const getInitials = (name: string) => {
     return name ? name.substr(0, 2).toUpperCase() : 'CL';
   };
+
   return <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen animate-fade-in pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
@@ -116,8 +161,33 @@ const Sales = () => {
           </div>
           
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <StatCard label="Today's Revenue" value={`$${todayRevenue.toFixed(2)}`} icon={<DollarSign className="w-5 h-5 text-white" />} onClick={navigateToOrders} />
-            <StatCard label="Total Orders" value={totalOrders.toString()} icon={<ShoppingBag className="w-5 h-5 text-white" />} onClick={navigateToOrders} />
+            <StatCard 
+              label="Total Revenue" 
+              value={`$${totalRevenue.toFixed(2)}`} 
+              icon={<DollarSign className="w-5 h-5 text-white" />} 
+              onClick={navigateToOrders} 
+            />
+            <StatCard 
+              label="Total Orders" 
+              value={totalOrders.toString()} 
+              icon={<ShoppingBag className="w-5 h-5 text-white" />} 
+              onClick={navigateToOrders} 
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <StatCard 
+              label="Today's Revenue" 
+              value={`$${todayRevenue.toFixed(2)}`} 
+              icon={<DollarSign className="w-5 h-5 text-white" />} 
+              onClick={navigateToOrders} 
+            />
+            <StatCard 
+              label="Completed Orders" 
+              value={completedOrders.toString()} 
+              icon={<Package className="w-5 h-5 text-white" />} 
+              onClick={navigateToOrders} 
+            />
           </div>
 
           <div className="flex items-center gap-2 text-gray-600 mb-4 bg-gray-50 p-3 rounded-lg">
@@ -187,4 +257,5 @@ const Sales = () => {
       </div>
     </div>;
 };
+
 export default Sales;
