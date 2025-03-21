@@ -14,7 +14,6 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { notificationService } from "@/services/notificationService";
 import { Badge } from "@/components/ui/badge";
-
 const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [orders, setOrders] = useState<Order[]>([]);
@@ -32,17 +31,12 @@ const Orders = () => {
   const navigate = useNavigate();
 
   // Updated customer names array to match OrdersTable
-  const customerNames = [
-    "Lachlan", "Matilda", "Darcy", "Evie", "Banjo", 
-    "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"
-  ];
-
+  const customerNames = ["Lachlan", "Matilda", "Darcy", "Evie", "Banjo", "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"];
   const getCustomerName = (orderId: string) => {
     const lastChar = orderId.charAt(orderId.length - 1);
     const index = parseInt(lastChar, 16) % customerNames.length;
     return customerNames[index];
   };
-
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
@@ -57,64 +51,53 @@ const Orders = () => {
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
     fetchOrders();
   }, [lastOrderUpdate, lastOrderDelete]);
-
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsDetailOpen(true);
   };
-
   const handleStatusChange = async (orderId: string, status: "accepted" | "completed" | "rejected") => {
     try {
       setUpdatingOrderId(orderId);
-      
       console.log(`Updating order ${orderId} to status ${status}`);
-      
       const result = await orderService.updateOrderStatus(orderId, status, true);
       console.log("Update result:", result);
-      
       if (!result.success) {
         throw new Error(result.error?.message || "Unknown error");
       }
-      
       if (status === "completed") {
         const completedOrder = orders.find(order => order.id === orderId);
         const orderTotal = completedOrder?.total || 0;
-        
         setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
-        
         try {
           await notificationService.createSalesNotification(orderId, orderTotal);
           console.log("Sales notification created successfully");
         } catch (notifError) {
           console.error("Error creating sales notification:", notifError);
         }
-        
         toast.success(`Order completed`, {
           description: `The order for $${orderTotal.toFixed(2)} has been recorded as a sale.`
         });
-        
         setTimeout(() => {
           navigate('/sales');
         }, 1500);
       } else if (status === "accepted") {
-        setOrders(prevOrders => prevOrders.map(order => 
-          order.id === orderId ? { ...order, status } : order
-        ));
-        
+        setOrders(prevOrders => prevOrders.map(order => order.id === orderId ? {
+          ...order,
+          status
+        } : order));
         toast.success(`Order accepted successfully`, {
           description: "The order has been added to your product sales.",
           duration: 5000,
           icon: <CheckCircle2 className="h-5 w-5 text-green-500" />
         });
       } else if (status === "rejected") {
-        setOrders(prevOrders => prevOrders.map(order => 
-          order.id === orderId ? { ...order, status } : order
-        ));
-        
+        setOrders(prevOrders => prevOrders.map(order => order.id === orderId ? {
+          ...order,
+          status
+        } : order));
         toast.error(`Order rejected`);
       }
     } catch (error) {
@@ -124,7 +107,6 @@ const Orders = () => {
       setUpdatingOrderId(null);
     }
   };
-
   const handleAcceptOrder = async (orderId: string) => {
     try {
       setUpdatingOrderId(orderId);
@@ -142,11 +124,9 @@ const Orders = () => {
       setUpdatingOrderId(null);
     }
   };
-
   const navigateToSales = () => {
     navigate('/sales');
   };
-
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "pending":
@@ -161,7 +141,6 @@ const Orders = () => {
         return status;
     }
   };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -176,7 +155,6 @@ const Orders = () => {
         return "bg-gray-100 text-gray-700 border-gray-200";
     }
   };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
@@ -191,7 +169,6 @@ const Orders = () => {
         return null;
     }
   };
-
   const OrderDetailsDialog = () => <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="text-center font-bold text-xl">Order Details</DialogTitle>
@@ -240,7 +217,6 @@ const Orders = () => {
           </div>}
       </DialogContent>
     </Dialog>;
-
   const OrderCard = ({
     order
   }: {
@@ -249,11 +225,8 @@ const Orders = () => {
     const getInitials = (name: string) => {
       return name ? name.substr(0, 2).toUpperCase() : 'CU';
     };
-    
     const customerName = getCustomerName(order.id);
-    
-    return (
-      <Card className="mb-4 overflow-hidden bg-white hover:shadow-md transition-all duration-200">
+    return <Card className="mb-4 overflow-hidden bg-white hover:shadow-md transition-all duration-200">
         <CardContent className="p-0">
           <div className="p-4 border-b border-gray-100">
             <div className="flex justify-between items-center mb-3">
@@ -295,59 +268,30 @@ const Orders = () => {
             Details
           </Button>
           
-          {order.status === "pending" && (
-            <>
-              <Button 
-                variant="ghost" 
-                className="flex-1 rounded-none h-11 border-r border-gray-100 hover:bg-gray-50 text-emerald-600"
-                disabled={updatingOrderId === order.id}
-                onClick={() => handleStatusChange(order.id, "accepted")}
-              >
+          {order.status === "pending" && <>
+              <Button variant="ghost" className="flex-1 rounded-none h-11 border-r border-gray-100 hover:bg-gray-50 text-emerald-600" disabled={updatingOrderId === order.id} onClick={() => handleStatusChange(order.id, "accepted")}>
                 <Check className="h-4 w-4 mr-2" />
                 Accept
               </Button>
-              <Button 
-                variant="ghost" 
-                className="flex-1 rounded-none h-11 hover:bg-gray-50 text-red-600"
-                disabled={updatingOrderId === order.id}
-                onClick={() => handleStatusChange(order.id, "rejected")}
-              >
+              <Button variant="ghost" className="flex-1 rounded-none h-11 hover:bg-gray-50 text-red-600" disabled={updatingOrderId === order.id} onClick={() => handleStatusChange(order.id, "rejected")}>
                 <X className="h-4 w-4 mr-2" />
                 Reject
               </Button>
-            </>
-          )}
+            </>}
           
-          {order.status === "accepted" && (
-            <Button 
-              variant="ghost" 
-              className="flex-1 rounded-none h-11 hover:bg-gray-50 text-emerald-600"
-              disabled={updatingOrderId === order.id}
-              onClick={() => handleStatusChange(order.id, "completed")}
-            >
+          {order.status === "accepted" && <Button variant="ghost" className="flex-1 rounded-none h-11 hover:bg-gray-50 text-emerald-600" disabled={updatingOrderId === order.id} onClick={() => handleStatusChange(order.id, "completed")}>
               <Package className="h-4 w-4 mr-2" />
               Complete
-            </Button>
-          )}
+            </Button>}
         </CardFooter>
-      </Card>
-    );
+      </Card>;
   };
-
   return <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
           <div className="flex items-center justify-between gap-3 mb-6">
             <h1 className="text-2xl font-bold">Orders</h1>
-            <div className="flex gap-2 bg-gray-100 p-1 rounded-md">
-              <Button variant={viewMode === "cards" ? "default" : "ghost"} size="sm" onClick={() => setViewMode("cards")} className={viewMode === "cards" ? "" : "bg-transparent text-gray-700"}>
-                Cards
-              </Button>
-              <Button variant={viewMode === "table" ? "default" : "ghost"} size="sm" onClick={() => setViewMode("table")} className={viewMode === "table" ? "" : "bg-transparent text-gray-700"}>
-                <LayoutDashboard className="h-4 w-4 mr-1" />
-                Table
-              </Button>
-            </div>
+            
           </div>
           <div className="flex justify-between items-center">
             <p className="text-gray-500">
@@ -375,5 +319,4 @@ const Orders = () => {
       </div>
     </div>;
 };
-
 export default Orders;
