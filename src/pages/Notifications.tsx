@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Bell, Eye, AlertTriangle, Heart, BarChart, ShoppingBag, Check } from "lucide-react";
+import { Bell, Eye, AlertTriangle, Heart, BarChart, ShoppingBag, Check, Clock, DollarSign, ShoppingCart } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/Dashboard";
@@ -17,6 +17,14 @@ const NotificationIcon = ({ type }: { type: string }) => {
       return <div className={`${wrapperClassName} bg-green-100`}><ShoppingBag {...iconProps} className="text-green-600" /></div>;
     case "stock":
       return <div className={`${wrapperClassName} bg-red-100`}><AlertTriangle {...iconProps} className="text-red-600" /></div>;
+    case "pickup":
+      return <div className={`${wrapperClassName} bg-blue-100`}><ShoppingCart {...iconProps} className="text-blue-600" /></div>;
+    case "sales":
+      return <div className={`${wrapperClassName} bg-green-100`}><DollarSign {...iconProps} className="text-green-600" /></div>;
+    case "purchase":
+      return <div className={`${wrapperClassName} bg-purple-100`}><ShoppingCart {...iconProps} className="text-purple-600" /></div>;
+    case "expiration":
+      return <div className={`${wrapperClassName} bg-amber-100`}><Clock {...iconProps} className="text-amber-600" /></div>;
     case "wishlist":
       return <div className={`${wrapperClassName} bg-blue-100`}><Heart {...iconProps} className="text-blue-600" /></div>;
     case "report":
@@ -30,6 +38,7 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [viewMode, setViewMode] = useState<"marketplace" | "all">("all");
   const { toast } = useToast();
   
   const totalNotifications = notifications.length;
@@ -39,12 +48,19 @@ const Notifications = () => {
 
   useEffect(() => {
     loadNotifications();
-  }, []);
+  }, [viewMode]);
   
   const loadNotifications = async () => {
     try {
       setLoading(true);
-      const data = await notificationService.getMarketplaceNotifications();
+      let data;
+      
+      if (viewMode === "marketplace") {
+        data = await notificationService.getMarketplaceNotifications();
+      } else {
+        data = await notificationService.getAllNotifications();
+      }
+      
       setNotifications(data);
     } catch (error) {
       console.error("Error loading notifications:", error);
@@ -91,9 +107,23 @@ const Notifications = () => {
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold">Notifications</h1>
-            <button className="p-2 hover:bg-gray-100 rounded-full">
-              <Check className="w-6 h-6 text-gray-600" />
-            </button>
+            <div className="flex gap-2">
+              <button 
+                className={`px-3 py-1 rounded-full text-sm ${viewMode === "all" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}
+                onClick={() => setViewMode("all")}
+              >
+                All
+              </button>
+              <button 
+                className={`px-3 py-1 rounded-full text-sm ${viewMode === "marketplace" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}
+                onClick={() => setViewMode("marketplace")}
+              >
+                Marketplace
+              </button>
+              <button className="p-2 hover:bg-gray-100 rounded-full">
+                <Check className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
           </div>
           <div className="relative">
             <Input

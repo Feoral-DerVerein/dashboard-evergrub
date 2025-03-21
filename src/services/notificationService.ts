@@ -9,6 +9,7 @@ export interface Notification {
   description: string;
   is_read: boolean;
   order_id?: string;
+  product_id?: number;
   for_marketplace: boolean;
   timestamp: string;
 }
@@ -57,6 +58,11 @@ export const notificationService = {
         }
         
         console.log("Notification created successfully for marketplace:", data);
+        
+        // Display a toast notification
+        toast.info(message, {
+          description: `Order #${orderId.substring(0, 8)} status updated`
+        });
       } else {
         console.log("Not a marketplace order, skipping notification creation");
       }
@@ -88,12 +94,14 @@ export const notificationService = {
       if (isMarketplaceOrder) {
         console.log("Creating pickup notification for completed marketplace order");
         
+        const notificationMessage = `Your order #${orderId.substring(0, 8)} is completed and ready for pickup.`;
+        
         const { data, error: notificationError } = await supabase
           .from('notifications')
           .insert({
             type: 'pickup',
             title: 'Product Ready for Pickup',
-            description: `Your order #${orderId.substring(0, 8)} is completed and ready for pickup.`,
+            description: notificationMessage,
             is_read: false,
             order_id: orderId,
             for_marketplace: true,
@@ -108,6 +116,11 @@ export const notificationService = {
         }
         
         console.log("Pickup notification created successfully:", data);
+        
+        // Display a toast notification
+        toast.success("Order Ready for Pickup", {
+          description: notificationMessage
+        });
       } else {
         console.log("Not a marketplace order, skipping pickup notification");
       }
@@ -122,12 +135,14 @@ export const notificationService = {
     try {
       console.log(`Creating sales notification for completed order ${orderId} with total ${total}`);
       
+      const notificationMessage = `Order #${orderId.substring(0, 8)} completed for $${total.toFixed(2)}`;
+      
       const { data, error: notificationError } = await supabase
         .from('notifications')
         .insert({
           type: 'sales',
           title: 'New Sale Completed',
-          description: `Order #${orderId.substring(0, 8)} completed for $${total.toFixed(2)}`,
+          description: notificationMessage,
           is_read: false,
           order_id: orderId,
           for_marketplace: false,
@@ -142,9 +157,90 @@ export const notificationService = {
       }
         
       console.log("Sales notification created successfully:", data);
+      
+      // Display a toast notification
+      toast.success("New Sale Completed", {
+        description: notificationMessage
+      });
     } catch (error) {
       console.error("Error in createSalesNotification:", error);
       toast.error("Failed to create sales notification");
+    }
+  },
+
+  // Create a product expiration notification
+  async createProductExpirationNotification(productId: number, productName: string, daysUntilExpiry: number): Promise<void> {
+    try {
+      console.log(`Creating expiration notification for product ${productName} (ID: ${productId})`);
+      
+      const notificationMessage = `${productName} will expire in ${daysUntilExpiry} days`;
+      
+      const { data, error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          type: 'expiration',
+          title: 'Product Expiration Warning',
+          description: notificationMessage,
+          is_read: false,
+          product_id: productId,
+          for_marketplace: false,
+          timestamp: new Date().toISOString()
+        })
+        .select();
+        
+      if (notificationError) {
+        console.error("Error creating expiration notification:", notificationError);
+        toast.error("Failed to create expiration notification");
+        return;
+      }
+        
+      console.log("Expiration notification created successfully:", data);
+      
+      // Display a toast notification
+      toast.warning("Product Expiration Warning", {
+        description: notificationMessage
+      });
+    } catch (error) {
+      console.error("Error in createProductExpirationNotification:", error);
+      toast.error("Failed to create product expiration notification");
+    }
+  },
+  
+  // Create a user purchase notification
+  async createUserPurchaseNotification(orderId: string, customerName: string, total: number): Promise<void> {
+    try {
+      console.log(`Creating user purchase notification for order ${orderId}`);
+      
+      const notificationMessage = `${customerName} made a purchase of $${total.toFixed(2)}`;
+      
+      const { data, error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          type: 'purchase',
+          title: 'New Customer Purchase',
+          description: notificationMessage,
+          is_read: false,
+          order_id: orderId,
+          for_marketplace: true,
+          timestamp: new Date().toISOString()
+        })
+        .select();
+        
+      if (notificationError) {
+        console.error("Error creating purchase notification:", notificationError);
+        toast.error("Failed to create purchase notification");
+        return;
+      }
+        
+      console.log("Purchase notification created successfully:", data);
+      
+      // Display a toast notification
+      toast.info("New Customer Purchase", {
+        description: notificationMessage
+      });
+    } catch (error) {
+      console.error("Error in createUserPurchaseNotification:", error);
+      toast.error("Failed to create user purchase notification");
     }
   },
   
@@ -166,6 +262,28 @@ export const notificationService = {
       return data as Notification[];
     } catch (error) {
       console.error("Error in getMarketplaceNotifications:", error);
+      toast.error("Failed to load notifications");
+      return [];
+    }
+  },
+  
+  // Get all notifications (marketplace and non-marketplace)
+  async getAllNotifications(): Promise<Notification[]> {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .order('timestamp', { ascending: false });
+        
+      if (error) {
+        console.error("Error fetching all notifications:", error);
+        toast.error("Failed to load notifications");
+        return [];
+      }
+      
+      return data as Notification[];
+    } catch (error) {
+      console.error("Error in getAllNotifications:", error);
       toast.error("Failed to load notifications");
       return [];
     }
