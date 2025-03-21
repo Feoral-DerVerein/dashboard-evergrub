@@ -14,7 +14,6 @@ import Products from "./pages/Products";
 import AddProduct from "./pages/AddProduct";
 import Orders from "./pages/Orders";
 import Notifications from "./pages/Notifications";
-import Wishlist from "./pages/Wishlist";
 import Plus from "./pages/Plus";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
@@ -95,11 +94,6 @@ const AppRoutes = () => {
       <Route path="/notifications" element={
         <ProtectedRoute>
           <Notifications />
-        </ProtectedRoute>
-      } />
-      <Route path="/wishlist" element={
-        <ProtectedRoute>
-          <Wishlist />
         </ProtectedRoute>
       } />
       <Route path="/plus" element={
