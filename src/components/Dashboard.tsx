@@ -1,5 +1,4 @@
-
-import { Home, Users, ShoppingCart, Bell, Heart, User, Package, Plus, ShoppingBasket, BarChart3 } from "lucide-react";
+import { Home, Users, ShoppingCart, Bell, User, Package, Plus, ShoppingBasket, BarChart3 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
@@ -131,7 +130,6 @@ const Dashboard = () => {
                 to="/notifications" 
                 badgeCount={notificationCount} 
               />
-              <QuickAccessItem icon={Heart} label="Wishlist" to="/wishlist" />
               <QuickAccessItem icon={Package} label="Parcel" to="/parcel" />
             </div>
           </section>
