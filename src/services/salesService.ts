@@ -100,6 +100,29 @@ export const salesService = {
     }
   },
   
+  async getMonthlySales(): Promise<{ count: number; total: number }> {
+    const date = new Date();
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    
+    try {
+      const { data, error } = await supabase
+        .from('sales')
+        .select('amount')
+        .gte('sale_date', firstDay.toISOString());
+      
+      if (error) {
+        console.error("Error fetching monthly sales:", error);
+        return { count: 0, total: 0 };
+      }
+      
+      const total = data.reduce((sum, sale) => sum + Number(sale.amount), 0);
+      return { count: data.length, total };
+    } catch (error) {
+      console.error("Exception in getMonthlySales:", error);
+      return { count: 0, total: 0 };
+    }
+  },
+  
   // Manually create a sale record (backup in case trigger fails)
   async createSaleFromOrder(orderId: string): Promise<boolean> {
     try {

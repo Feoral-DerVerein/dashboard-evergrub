@@ -271,12 +271,112 @@ export type Database = {
         }
         Relationships: []
       }
+      wishlists: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          product_data: Json
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          product_data: Json
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          product_data?: Json
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_wishlist_item: {
+        Args: {
+          p_product_id: string
+          p_user_id: string
+          p_category_id: string
+          p_product_data: Json
+        }
+        Returns: {
+          category_id: string
+          created_at: string
+          id: string
+          product_data: Json
+          product_id: string
+          user_id: string
+        }
+      }
+      check_wishlist_item: {
+        Args: {
+          p_product_id: string
+          p_user_id: string
+        }
+        Returns: {
+          category_id: string
+          created_at: string
+          id: string
+          product_data: Json
+          product_id: string
+          user_id: string
+        }[]
+      }
+      get_wishlist_by_category: {
+        Args: {
+          p_category_id: string
+          p_user_id: string
+        }
+        Returns: {
+          category_id: string
+          created_at: string
+          id: string
+          product_data: Json
+          product_id: string
+          user_id: string
+        }[]
+      }
+      get_wishlist_categories_count: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          category_id: string
+          count: number
+        }[]
+      }
+      remove_wishlist_item: {
+        Args: {
+          p_product_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      update_wishlist_category: {
+        Args: {
+          p_id: string
+          p_category_id: string
+        }
+        Returns: {
+          category_id: string
+          created_at: string
+          id: string
+          product_data: Json
+          product_id: string
+          user_id: string
+        }
+      }
     }
     Enums: {
       [_ in never]: never
