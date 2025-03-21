@@ -24,13 +24,13 @@ interface OrdersTableProps {
 export function OrdersTable({ orders, onViewDetails, onStatusChange, onDelete }: OrdersTableProps) {
   const [processingOrders, setProcessingOrders] = useState<Record<string, boolean>>({});
   
-  // Customer names array
+  // Customer names array as specified
   const customerNames = [
     "Lachlan", "Matilda", "Darcy", "Evie", "Banjo", 
     "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"
   ];
   
-  // Helper function to assign a consistent name based on order ID
+  // Helper function to get a consistent customer name based on order ID
   const getCustomerName = (orderId: string) => {
     // Use the last character of the order ID to determine the index
     const lastChar = orderId.charAt(orderId.length - 1);
