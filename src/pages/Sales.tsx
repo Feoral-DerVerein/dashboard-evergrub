@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { BarChart3, Receipt, DollarSign, Package, Calendar, CreditCard, List, Grid3X3 } from "lucide-react";
 import { BottomNav } from "@/components/Dashboard";
@@ -23,7 +22,6 @@ const Sales = () => {
         const fetchedSales = await salesService.getSales();
         setSales(fetchedSales);
         
-        // Get today's sales summary
         const todaySummary = await salesService.getTodaySales();
         setTodaySales(todaySummary);
       } catch (error) {
@@ -37,12 +35,10 @@ const Sales = () => {
     fetchSales();
   }, []);
 
-  // Function to get initials from customer name
   const getInitials = (name: string) => {
     return name ? name.substring(0, 2).toUpperCase() : 'CS';
   };
 
-  // Format date for display
   const formatDate = (dateString: string) => {
     try {
       return format(parseISO(dateString), 'MMM dd, yyyy');
@@ -51,7 +47,6 @@ const Sales = () => {
     }
   };
 
-  // Format time for display
   const formatTime = (dateString: string) => {
     try {
       return format(parseISO(dateString), 'h:mm a');
@@ -156,7 +151,6 @@ const Sales = () => {
         </header>
 
         <main className="px-6 py-4">
-          {/* Stats Section */}
           <div className="grid grid-cols-2 gap-4 mb-8">
             <StatCard 
               label="Today Revenue" 
@@ -183,7 +177,6 @@ const Sales = () => {
             />
           </div>
 
-          {/* Sales List */}
           {isLoading ? (
             <div className="flex justify-center py-10">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>

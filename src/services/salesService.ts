@@ -20,6 +20,20 @@ export interface SaleProduct {
   category: string | null;
 }
 
+// Customer names array as specified
+const customerNames = [
+  "Lachlan", "Matilda", "Darcy", "Evie", "Banjo", 
+  "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"
+];
+
+// Helper function to get a consistent customer name based on order ID
+const getConsistentCustomerName = (orderId: string) => {
+  // Use the last character of the order ID to determine the index
+  const lastChar = orderId.charAt(orderId.length - 1);
+  const index = parseInt(lastChar, 16) % customerNames.length;
+  return customerNames[index];
+};
+
 export const salesService = {
   async getSales(): Promise<Sale[]> {
     try {
@@ -39,8 +53,11 @@ export const salesService = {
       console.log("Fetched sales data:", data);
       
       // Transform the data to ensure the products field is correctly typed
+      // and update the customer names based on order_id
       const transformedData = data.map(item => ({
         ...item,
+        // Use our custom customer name based on order_id
+        customer_name: getConsistentCustomerName(item.order_id || item.id),
         // Convert the JSON products data to the correct SaleProduct[] type
         products: Array.isArray(item.products) 
           ? item.products.map((product: any) => ({
@@ -137,13 +154,16 @@ export const salesService = {
         category: item.category
       }));
       
+      // Use our custom customer name based on order ID
+      const customerName = getConsistentCustomerName(orderId);
+      
       // Create sale record
       const { data: saleData, error: saleError } = await supabase
         .from('sales')
         .insert({
           order_id: orderId,
           amount: orderData.total,
-          customer_name: orderData.customer_name,
+          customer_name: customerName,
           sale_date: new Date().toISOString(),
           products: products,
           payment_method: 'card'
