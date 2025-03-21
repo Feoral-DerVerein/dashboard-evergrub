@@ -60,7 +60,7 @@ const Sales = () => {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-gray-500 mb-1">{label}</p>
-          <p className="text-2xl font-bold">{value}</p>
+          <p className="text-xl font-bold">{value}</p>
           {trend && <p className="text-xs text-green-500 mt-1">↑ {trend}</p>}
         </div>
         <div className="bg-blue-100 p-3 rounded-full">
