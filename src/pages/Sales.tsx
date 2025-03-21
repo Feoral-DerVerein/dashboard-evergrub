@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { BarChart3, Receipt, DollarSign, Package, Calendar, CreditCard, List, Grid3X3 } from "lucide-react";
 import { BottomNav } from "@/components/Dashboard";
@@ -60,7 +61,7 @@ const Sales = () => {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-gray-500 mb-1">{label}</p>
-          <p className="text-xl font-bold">{value}</p>
+          <p className="text-lg font-bold">{value}</p>
           {trend && <p className="text-xs text-green-500 mt-1">↑ {trend}</p>}
         </div>
         <div className="bg-blue-100 p-3 rounded-full">
@@ -108,7 +109,7 @@ const Sales = () => {
           </div>
           
           <div className="text-right">
-            <p className="font-bold text-xl">${Number(sale.amount).toFixed(2)}</p>
+            <p className="font-bold text-lg">${Number(sale.amount).toFixed(2)}</p>
             <p className="text-xs text-gray-500">{formatTime(sale.sale_date)}</p>
           </div>
         </div>
