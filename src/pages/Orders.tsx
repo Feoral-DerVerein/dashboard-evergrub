@@ -12,7 +12,6 @@ import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-
 const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [orders, setOrders] = useState<Order[]>([]);
@@ -28,17 +27,6 @@ const Orders = () => {
   } = useNotificationsAndOrders();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const navigate = useNavigate();
-  const customerNames = [
-    "Lachlan", "Matilda", "Darcy", "Evie", "Banjo", 
-    "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"
-  ];
-
-  const getCustomerName = (orderId: string) => {
-    const lastChar = orderId.charAt(orderId.length - 1);
-    const index = parseInt(lastChar, 16) % customerNames.length;
-    return customerNames[index];
-  };
-
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
@@ -53,16 +41,13 @@ const Orders = () => {
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
     fetchOrders();
   }, [lastOrderUpdate, lastOrderDelete]);
-
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsDetailOpen(true);
   };
-
   const handleStatusChange = async (orderId: string, status: "accepted" | "completed" | "rejected") => {
     try {
       setUpdatingOrderId(orderId);
@@ -101,7 +86,6 @@ const Orders = () => {
       setUpdatingOrderId(null);
     }
   };
-
   const handleAcceptOrder = async (orderId: string) => {
     try {
       setUpdatingOrderId(orderId);
@@ -119,11 +103,9 @@ const Orders = () => {
       setUpdatingOrderId(null);
     }
   };
-
   const navigateToSales = () => {
     navigate('/sales');
   };
-
   const OrderDetailsDialog = () => <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="text-center font-bold text-xl">Order Details</DialogTitle>
@@ -172,7 +154,6 @@ const Orders = () => {
           </div>}
       </DialogContent>
     </Dialog>;
-
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "pending":
@@ -187,7 +168,6 @@ const Orders = () => {
         return status;
     }
   };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -202,18 +182,14 @@ const Orders = () => {
         return "text-gray-500";
     }
   };
-
   const OrderCard = ({
     order
   }: {
     order: Order;
   }) => {
-    const customerName = getCustomerName(order.id);
-    
     const getInitials = (name: string) => {
       return name ? name.substr(0, 2).toUpperCase() : 'CU';
     };
-    
     return <Card className="mb-4 border border-gray-200 hover:shadow-sm transition-shadow duration-200 overflow-hidden">
         <div className="px-6 py-4">
           <div className="flex justify-between items-center mb-2">
@@ -228,11 +204,11 @@ const Orders = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12 bg-blue-100 text-blue-500">
-                <AvatarFallback>{getInitials(customerName)}</AvatarFallback>
+                <AvatarFallback>{getInitials(order.customerName)}</AvatarFallback>
               </Avatar>
               
               <div>
-                <h3 className="font-bold text-sm">{customerName}</h3>
+                <h3 className="font-bold text-sm">{order.customerName}</h3>
                 <p className="text-gray-500">{order.items.length} items</p>
               </div>
             </div>
@@ -264,7 +240,6 @@ const Orders = () => {
         </div>
       </Card>;
   };
-
   return <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen pb-20">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
@@ -306,5 +281,4 @@ const Orders = () => {
       </div>
     </div>;
 };
-
 export default Orders;
