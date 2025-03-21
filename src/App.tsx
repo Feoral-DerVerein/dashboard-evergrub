@@ -13,7 +13,6 @@ import Users from "./pages/Users";
 import Products from "./pages/Products";
 import AddProduct from "./pages/AddProduct";
 import Orders from "./pages/Orders";
-import Sales from "./pages/Sales";
 import Notifications from "./pages/Notifications";
 import Wishlist from "./pages/Wishlist";
 import Plus from "./pages/Plus";
@@ -85,11 +84,6 @@ const AppRoutes = () => {
       <Route path="/orders" element={
         <ProtectedRoute>
           <Orders />
-        </ProtectedRoute>
-      } />
-      <Route path="/sales" element={
-        <ProtectedRoute>
-          <Sales />
         </ProtectedRoute>
       } />
       <Route path="/notifications" element={
