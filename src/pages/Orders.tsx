@@ -281,7 +281,7 @@ const Orders = () => {
               </div>
               
               <div className="text-right">
-                <div className="font-bold text-lg text-blue-700">${order.total.toFixed(2)}</div>
+                <div className="font-bold text-lg text-emerald-700">${order.total.toFixed(2)}</div>
                 <div className="text-xs text-gray-500 mt-1">{order.timestamp}</div>
               </div>
             </div>
