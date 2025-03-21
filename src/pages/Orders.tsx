@@ -57,7 +57,15 @@ const Orders = () => {
   const handleStatusChange = async (orderId: string, status: "accepted" | "completed" | "rejected") => {
     try {
       setUpdatingOrderId(orderId);
-      await orderService.updateOrderStatus(orderId, status, true);
+      
+      console.log(`Updating order ${orderId} to status ${status}`);
+      
+      const result = await orderService.updateOrderStatus(orderId, status, true);
+      console.log("Update result:", result);
+      
+      if (!result.success) {
+        throw new Error(result.error?.message || "Unknown error");
+      }
       
       if (status === "completed") {
         const completedOrder = orders.find(order => order.id === orderId);
@@ -65,7 +73,12 @@ const Orders = () => {
         
         setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
         
-        await notificationService.createSalesNotification(orderId, orderTotal);
+        try {
+          await notificationService.createSalesNotification(orderId, orderTotal);
+          console.log("Sales notification created successfully");
+        } catch (notifError) {
+          console.error("Error creating sales notification:", notifError);
+        }
         
         toast.success(`Order completed`, {
           description: `The order for $${orderTotal.toFixed(2)} has been recorded as a sale.`

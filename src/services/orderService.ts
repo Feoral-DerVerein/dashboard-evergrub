@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Order, OrderItem, mapDbOrderToOrder, DbOrder, DbOrderItem } from "@/types/order.types";
 import { toast } from "sonner";
@@ -136,6 +135,8 @@ export const getOrder = async (orderId: string): Promise<Order | null> => {
 
 export const getUserOrders = async (): Promise<Order[]> => {
   try {
+    console.log("Fetching user orders...");
+    
     // Get all orders (you might want to filter by user_id if needed)
     const { data: ordersData, error: ordersError } = await supabase
       .from('orders')
@@ -146,6 +147,8 @@ export const getUserOrders = async (): Promise<Order[]> => {
       console.error("Error fetching orders:", ordersError);
       return [];
     }
+    
+    console.log("Orders data fetched:", ordersData);
     
     if (!ordersData || ordersData.length === 0) {
       return [];
@@ -207,6 +210,19 @@ export const updateOrderStatus = async (
   try {
     console.log(`Updating order ${orderId} status to ${status}, fromOrdersPage: ${fromOrdersPage}`);
     
+    // Verify if we can access the order first
+    const { data: checkOrder, error: checkError } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('id', orderId)
+      .single();
+      
+    if (checkError) {
+      console.error("Error checking order access:", checkError);
+      return { success: false, error: { message: "Could not access order" } };
+    }
+    
+    // Proceed with the update
     const { data, error } = await supabase
       .from('orders')
       .update({ 
@@ -215,15 +231,14 @@ export const updateOrderStatus = async (
         updated_at: new Date().toISOString() 
       })
       .eq('id', orderId)
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error("Error updating order status:", error);
       return { success: false, error };
     }
     
-    console.log(`Order ${orderId} status updated to ${status}`);
+    console.log(`Order ${orderId} status updated to ${status}, result:`, data);
     
     // If the status is completed, the database trigger will automatically create a sales record
     if (status === 'completed') {
@@ -236,6 +251,7 @@ export const updateOrderStatus = async (
       console.log("Broadcast result:", broadcastResult);
     } catch (broadcastError) {
       console.error("Error broadcasting status change:", broadcastError);
+      // Continue even if broadcast fails
     }
     
     return { success: true, data };

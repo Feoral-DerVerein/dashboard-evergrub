@@ -34,7 +34,7 @@ export const notificationService = {
       if (orderData && orderData.user_id === null) {
         console.log("This is a marketplace order, creating notification");
         
-        const { error: notificationError } = await supabase
+        const { data, error: notificationError } = await supabase
           .from('notifications')
           .insert({
             type: 'order',
@@ -44,14 +44,15 @@ export const notificationService = {
             order_id: orderId,
             for_marketplace: true,
             timestamp: new Date().toISOString()
-          });
+          })
+          .select();
           
         if (notificationError) {
           console.error("Error creating notification:", notificationError);
           throw notificationError;
         }
         
-        console.log("Notification created successfully for marketplace");
+        console.log("Notification created successfully for marketplace:", data);
       }
     } catch (error) {
       console.error("Error in createOrderNotification:", error);
@@ -78,7 +79,7 @@ export const notificationService = {
       if (orderData && orderData.user_id === null) {
         console.log("Creating pickup notification for completed marketplace order");
         
-        const { error: notificationError } = await supabase
+        const { data, error: notificationError } = await supabase
           .from('notifications')
           .insert({
             type: 'pickup',
@@ -88,14 +89,15 @@ export const notificationService = {
             order_id: orderId,
             for_marketplace: true,
             timestamp: new Date().toISOString()
-          });
+          })
+          .select();
           
         if (notificationError) {
           console.error("Error creating pickup notification:", notificationError);
           throw notificationError;
         }
         
-        console.log("Pickup notification created successfully");
+        console.log("Pickup notification created successfully:", data);
       }
     } catch (error) {
       console.error("Error in createPickupNotification:", error);
@@ -106,9 +108,9 @@ export const notificationService = {
   // Create a sales notification when an order is completed
   async createSalesNotification(orderId: string, total: number): Promise<void> {
     try {
-      console.log(`Creating sales notification for completed order ${orderId}`);
+      console.log(`Creating sales notification for completed order ${orderId} with total ${total}`);
       
-      const { error: notificationError } = await supabase
+      const { data, error: notificationError } = await supabase
         .from('notifications')
         .insert({
           type: 'sales',
@@ -118,14 +120,15 @@ export const notificationService = {
           order_id: orderId,
           for_marketplace: false,
           timestamp: new Date().toISOString()
-        });
+        })
+        .select();
         
       if (notificationError) {
         console.error("Error creating sales notification:", notificationError);
         throw notificationError;
       }
         
-      console.log("Sales notification created successfully");
+      console.log("Sales notification created successfully:", data);
     } catch (error) {
       console.error("Error in createSalesNotification:", error);
       throw error;
