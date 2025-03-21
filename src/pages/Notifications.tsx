@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Bell, Eye, AlertTriangle, Heart, BarChart, ShoppingBag, Check, Clock, DollarSign, ShoppingCart } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
@@ -7,11 +6,15 @@ import { BottomNav } from "@/components/Dashboard";
 import { notificationService, Notification } from "@/services/notificationService";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const NotificationIcon = ({ type }: { type: string }) => {
-  const iconProps = { className: "w-6 h-6" };
+const NotificationIcon = ({
+  type
+}: {
+  type: string;
+}) => {
+  const iconProps = {
+    className: "w-6 h-6"
+  };
   const wrapperClassName = "w-10 h-10 rounded-full flex items-center justify-center";
-
   switch (type) {
     case "order":
       return <div className={`${wrapperClassName} bg-green-100`}><ShoppingBag {...iconProps} className="text-green-600" /></div>;
@@ -33,34 +36,30 @@ const NotificationIcon = ({ type }: { type: string }) => {
       return <div className={`${wrapperClassName} bg-gray-100`}><Bell {...iconProps} className="text-gray-600" /></div>;
   }
 };
-
 const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [viewMode, setViewMode] = useState<"marketplace" | "all">("all");
-  const { toast } = useToast();
-  
+  const {
+    toast
+  } = useToast();
   const totalNotifications = notifications.length;
   const currentPage = 1;
   const itemsPerPage = 10;
   const totalPages = Math.ceil(totalNotifications / itemsPerPage);
-
   useEffect(() => {
     loadNotifications();
   }, [viewMode]);
-  
   const loadNotifications = async () => {
     try {
       setLoading(true);
       let data;
-      
       if (viewMode === "marketplace") {
         data = await notificationService.getMarketplaceNotifications();
       } else {
         data = await notificationService.getAllNotifications();
       }
-      
       setNotifications(data);
     } catch (error) {
       console.error("Error loading notifications:", error);
@@ -73,16 +72,16 @@ const Notifications = () => {
       setLoading(false);
     }
   };
-  
   const handleMarkAsRead = async (notificationId: string) => {
     try {
       await notificationService.markAsRead(notificationId);
-      setNotifications(notifications.map(n => 
-        n.id === notificationId ? {...n, is_read: true} : n
-      ));
+      setNotifications(notifications.map(n => n.id === notificationId ? {
+        ...n,
+        is_read: true
+      } : n));
       toast({
         title: "Success",
-        description: "Notification marked as read",
+        description: "Notification marked as read"
       });
     } catch (error) {
       console.error("Error marking notification as read:", error);
@@ -93,56 +92,24 @@ const Notifications = () => {
       });
     }
   };
-  
-  const filteredNotifications = searchQuery.trim() === "" 
-    ? notifications
-    : notifications.filter(n => 
-        n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        n.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-  return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+  const filteredNotifications = searchQuery.trim() === "" ? notifications : notifications.filter(n => n.title.toLowerCase().includes(searchQuery.toLowerCase()) || n.description.toLowerCase().includes(searchQuery.toLowerCase()));
+  return <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto bg-white min-h-screen">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold">Notifications</h1>
             <div className="flex gap-2">
-              <button 
-                className={`px-3 py-1 rounded-full text-sm ${viewMode === "all" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}
-                onClick={() => setViewMode("all")}
-              >
+              <button className={`px-3 py-1 rounded-full text-sm ${viewMode === "all" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`} onClick={() => setViewMode("all")}>
                 All
               </button>
-              <button 
-                className={`px-3 py-1 rounded-full text-sm ${viewMode === "marketplace" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}
-                onClick={() => setViewMode("marketplace")}
-              >
-                Marketplace
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-full">
-                <Check className="w-6 h-6 text-gray-600" />
-              </button>
+              
+              
             </div>
           </div>
           <div className="relative">
-            <Input
-              type="search"
-              placeholder="Search notifications..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <Input type="search" placeholder="Search notifications..." className="w-full pl-10 pr-4 py-2 border rounded-lg" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-              <svg
-                className="w-4 h-4 text-gray-400"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+              <svg className="w-4 h-4 text-gray-400" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -154,23 +121,17 @@ const Notifications = () => {
             You have {filteredNotifications.length} {filteredNotifications.length === 1 ? "notification" : "notifications"}
           </p>
 
-          {loading ? (
-            <div className="space-y-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-start space-x-4">
+          {loading ? <div className="space-y-6">
+              {[1, 2, 3].map(i => <div key={i} className="flex items-start space-x-4">
                   <Skeleton className="w-10 h-10 rounded-full" />
                   <div className="flex-1">
                     <Skeleton className="h-5 w-2/3 mb-1" />
                     <Skeleton className="h-4 w-full mb-1" />
                     <Skeleton className="h-3 w-1/3" />
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : filteredNotifications.length > 0 ? (
-            <div className="space-y-6">
-              {filteredNotifications.map((notification) => (
-                <div key={notification.id} className={`flex items-start space-x-4 p-3 rounded-lg ${!notification.is_read ? 'bg-blue-50' : ''}`}>
+                </div>)}
+            </div> : filteredNotifications.length > 0 ? <div className="space-y-6">
+              {filteredNotifications.map(notification => <div key={notification.id} className={`flex items-start space-x-4 p-3 rounded-lg ${!notification.is_read ? 'bg-blue-50' : ''}`}>
                   <NotificationIcon type={notification.type} />
                   <div className="flex-1">
                     <h3 className={`font-medium ${!notification.is_read ? 'text-blue-900' : 'text-gray-900'}`}>
@@ -183,57 +144,33 @@ const Notifications = () => {
                       {new Date(notification.timestamp).toLocaleString()}
                     </p>
                   </div>
-                  {!notification.is_read && (
-                    <button 
-                      className="p-2 hover:bg-gray-100 rounded-full"
-                      onClick={() => handleMarkAsRead(notification.id)}
-                    >
+                  {!notification.is_read && <button className="p-2 hover:bg-gray-100 rounded-full" onClick={() => handleMarkAsRead(notification.id)}>
                       <Eye className="w-5 h-5 text-gray-400" />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-10">
+                    </button>}
+                </div>)}
+            </div> : <div className="text-center py-10">
               <Bell className="w-12 h-12 mx-auto text-gray-300 mb-4" />
               <h3 className="font-medium text-gray-700 mb-1">No notifications</h3>
               <p className="text-gray-500">You don't have any notifications yet</p>
-            </div>
-          )}
+            </div>}
 
-          {filteredNotifications.length > itemsPerPage && (
-            <div className="flex justify-center items-center space-x-2 my-8">
-              <button
-                className="p-2 hover:bg-gray-100 rounded-full"
-                disabled={currentPage === 1}
-              >
+          {filteredNotifications.length > itemsPerPage && <div className="flex justify-center items-center space-x-2 my-8">
+              <button className="p-2 hover:bg-gray-100 rounded-full" disabled={currentPage === 1}>
                 &lt;
               </button>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i + 1}
-                  className={`w-8 h-8 rounded-full ${
-                    currentPage === i + 1 ? "bg-blue-600 text-white" : "hover:bg-gray-100"
-                  }`}
-                >
+              {Array.from({
+            length: totalPages
+          }, (_, i) => <button key={i + 1} className={`w-8 h-8 rounded-full ${currentPage === i + 1 ? "bg-blue-600 text-white" : "hover:bg-gray-100"}`}>
                   {i + 1}
-                </button>
-              ))}
-              <button
-                className="p-2 hover:bg-gray-100 rounded-full"
-                disabled={currentPage === totalPages}
-              >
+                </button>)}
+              <button className="p-2 hover:bg-gray-100 rounded-full" disabled={currentPage === totalPages}>
                 &gt;
               </button>
-            </div>
-          )}
+            </div>}
         </main>
 
         <BottomNav />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Notifications;
