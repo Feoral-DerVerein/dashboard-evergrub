@@ -9,7 +9,6 @@ import { useAuth } from "./context/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import KPI from "./pages/KPI";
-import Users from "./pages/Users";
 import Products from "./pages/Products";
 import AddProduct from "./pages/AddProduct";
 import Orders from "./pages/Orders";
@@ -54,16 +53,6 @@ const AppRoutes = () => {
       <Route path="/kpi" element={
         <ProtectedRoute>
           <KPI />
-        </ProtectedRoute>
-      } />
-      <Route path="/users" element={
-        <ProtectedRoute>
-          <Users />
-        </ProtectedRoute>
-      } />
-      <Route path="/users/add" element={
-        <ProtectedRoute>
-          <NotFound />
         </ProtectedRoute>
       } />
       <Route path="/products" element={
