@@ -30,6 +30,17 @@ const Orders = () => {
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  const customerNames = [
+    "Lachlan", "Matilda", "Darcy", "Evie", "Banjo", 
+    "Sienna", "Kieran", "Indi", "Heath", "Talia", "Jarrah"
+  ];
+
+  const getCustomerName = (orderId: string) => {
+    const lastChar = orderId.charAt(orderId.length - 1);
+    const index = parseInt(lastChar, 16) % customerNames.length;
+    return customerNames[index];
+  };
+
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
@@ -143,7 +154,7 @@ const Orders = () => {
               <div className="font-medium">{selectedOrder.id.substring(0, 8)}</div>
               
               <div className="text-gray-500 font-medium">Customer:</div>
-              <div>{selectedOrder.customerName || "Customer"}</div>
+              <div>{getCustomerName(selectedOrder.id)}</div>
               
               <div className="text-gray-500 font-medium">Total:</div>
               <div className="font-semibold">${selectedOrder.total.toFixed(2)}</div>
@@ -221,6 +232,9 @@ const Orders = () => {
     const getInitials = (name: string) => {
       return name ? name.substr(0, 2).toUpperCase() : 'CU';
     };
+    
+    const customerName = getCustomerName(order.id);
+    
     return <Card className="mb-4 border border-gray-200 hover:shadow-sm transition-shadow duration-200 overflow-hidden">
         <div className="px-6 py-4">
           <div className="flex justify-between items-center mb-2">
@@ -235,11 +249,11 @@ const Orders = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12 bg-blue-100 text-blue-500">
-                <AvatarFallback>{getInitials(order.customerName)}</AvatarFallback>
+                <AvatarFallback>{getInitials(customerName)}</AvatarFallback>
               </Avatar>
               
               <div>
-                <h3 className="font-bold text-sm">{order.customerName}</h3>
+                <h3 className="font-bold text-sm">{customerName}</h3>
                 <p className="text-gray-500">{order.items.length} items</p>
               </div>
             </div>
