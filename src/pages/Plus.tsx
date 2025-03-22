@@ -3,23 +3,18 @@ import { Bell, Filter, MoreVertical } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useOrders } from "@/context/OrderContext";
+import { useNavigate } from "react-router-dom";
 
 const EventOrders = () => {
+  const { marketplaceOrders, transferOrderToParcel } = useOrders();
+  const navigate = useNavigate();
   const filters = ["All Orders", "Corporate", "Nightclub", "Wedding"];
-  const orders = [
-    {
-      title: "Corporate Lunch - Tech Co",
-      time: "Today, 12:30 PM",
-      amount: "$1,240",
-      status: "Pending"
-    },
-    {
-      title: "Nightclub Event",
-      time: "Tomorrow, 8:00 PM",
-      amount: "$2,850",
-      status: "Processing"
-    }
-  ];
+
+  const handleTransferOrder = (order) => {
+    transferOrderToParcel(order);
+    navigate("/parcel");
+  };
 
   return (
     <div>
@@ -44,8 +39,8 @@ const EventOrders = () => {
 
       <h2 className="text-xl font-bold mb-4">Event Orders</h2>
       <div className="space-y-4">
-        {orders.map((order, index) => (
-          <div key={index} className="bg-white rounded-lg p-4 shadow-sm">
+        {marketplaceOrders.map((order) => (
+          <div key={order.id} className="bg-white rounded-lg p-4 shadow-sm">
             <div className="flex justify-between items-start mb-2">
               <div>
                 <h3 className="font-semibold text-lg">{order.title}</h3>
@@ -64,8 +59,11 @@ const EventOrders = () => {
               </div>
             </div>
             <div className="flex gap-2 mt-4">
-              <Button className="flex-1 bg-green-600 hover:bg-green-700">
-                Accept Order
+              <Button 
+                className="flex-1 bg-green-600 hover:bg-green-700"
+                onClick={() => handleTransferOrder(order)}
+              >
+                Transfer to Parcel
               </Button>
               <Button variant="outline" className="flex-1">
                 View Details
