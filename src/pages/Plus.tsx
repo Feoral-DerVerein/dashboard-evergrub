@@ -1,9 +1,9 @@
-
 import { BottomNav } from "@/components/Dashboard";
 import { Bell, Filter, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useOrders } from "@/context/OrderContext";
+import { toast } from "sonner";
 
 const EventOrders = () => {
   const { marketplaceOrders, removeFromMarketplace } = useOrders();
