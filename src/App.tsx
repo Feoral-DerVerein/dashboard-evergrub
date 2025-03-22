@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,8 +16,6 @@ import Notifications from "./pages/Notifications";
 import Plus from "./pages/Plus";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
-import Parcel from "./pages/Parcel";
-import ParcelDetails from "./pages/ParcelDetails";
 import Microsoft from "./pages/Microsoft";
 import Google from "./pages/Google";
 import Apple from "./pages/Apple";
@@ -94,16 +91,6 @@ const AppRoutes = () => {
       <Route path="/profile" element={
         <ProtectedRoute>
           <Profile />
-        </ProtectedRoute>
-      } />
-      <Route path="/parcel" element={
-        <ProtectedRoute>
-          <Parcel />
-        </ProtectedRoute>
-      } />
-      <Route path="/parcel/:id" element={
-        <ProtectedRoute>
-          <ParcelDetails />
         </ProtectedRoute>
       } />
       <Route path="/microsoft" element={

@@ -1,19 +1,17 @@
+
 import { BottomNav } from "@/components/Dashboard";
 import { Bell, Filter, MoreVertical } from "lucide-react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useOrders } from "@/context/OrderContext";
-import { useNavigate } from "react-router-dom";
 
 const EventOrders = () => {
-  const { marketplaceOrders, transferOrderToParcel } = useOrders();
-  const navigate = useNavigate();
+  const { marketplaceOrders, removeFromMarketplace } = useOrders();
   const filters = ["All Orders", "Corporate", "Nightclub", "Wedding"];
 
-  const handleTransferOrder = (order) => {
-    transferOrderToParcel(order);
-    navigate("/parcel");
+  const handleAcceptOrder = (orderId: string) => {
+    removeFromMarketplace(orderId);
+    toast.success("Order accepted successfully");
   };
 
   return (
@@ -61,9 +59,9 @@ const EventOrders = () => {
             <div className="flex gap-2 mt-4">
               <Button 
                 className="flex-1 bg-green-600 hover:bg-green-700"
-                onClick={() => handleTransferOrder(order)}
+                onClick={() => handleAcceptOrder(order.id)}
               >
-                Transfer to Parcel
+                Accept Order
               </Button>
               <Button variant="outline" className="flex-1">
                 View Details

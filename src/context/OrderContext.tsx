@@ -13,8 +13,6 @@ export type EventOrder = {
 
 interface OrderContextType {
   marketplaceOrders: EventOrder[];
-  transferOrderToParcel: (order: EventOrder) => void;
-  parcelOrders: EventOrder[];
   removeFromMarketplace: (orderId: string) => void;
 }
 
@@ -46,15 +44,8 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   ]);
   
-  const [parcelOrders, setParcelOrders] = useState<EventOrder[]>([]);
-  
   // Load saved orders from localStorage on initial render
   useEffect(() => {
-    const savedParcelOrders = localStorage.getItem('parcelOrders');
-    if (savedParcelOrders) {
-      setParcelOrders(JSON.parse(savedParcelOrders));
-    }
-    
     const savedMarketplaceOrders = localStorage.getItem('marketplaceOrders');
     if (savedMarketplaceOrders) {
       setMarketplaceOrders(JSON.parse(savedMarketplaceOrders));
@@ -63,23 +54,8 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   // Save orders to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('parcelOrders', JSON.stringify(parcelOrders));
     localStorage.setItem('marketplaceOrders', JSON.stringify(marketplaceOrders));
-  }, [parcelOrders, marketplaceOrders]);
-
-  const transferOrderToParcel = (order: EventOrder) => {
-    // Add order to parcel
-    setParcelOrders(prevOrders => [...prevOrders, order]);
-    
-    // Remove from marketplace
-    removeFromMarketplace(order.id);
-    
-    // Show success toast
-    toast.success(`Order "${order.title}" transferred to Parcel`);
-    
-    // Optional: save to Supabase if needed
-    // This is where you would add code to save to the database
-  };
+  }, [marketplaceOrders]);
 
   const removeFromMarketplace = (orderId: string) => {
     setMarketplaceOrders(prevOrders => 
@@ -89,9 +65,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   return (
     <OrderContext.Provider value={{ 
-      marketplaceOrders, 
-      transferOrderToParcel, 
-      parcelOrders,
+      marketplaceOrders,
       removeFromMarketplace
     }}>
       {children}
