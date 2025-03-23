@@ -106,6 +106,7 @@ export type Database = {
           phone: string | null
           special_request: string | null
           status: string
+          store_id: string | null
           timestamp: string | null
           total: number
           updated_at: string | null
@@ -121,6 +122,7 @@ export type Database = {
           phone?: string | null
           special_request?: string | null
           status?: string
+          store_id?: string | null
           timestamp?: string | null
           total: number
           updated_at?: string | null
@@ -136,10 +138,35 @@ export type Database = {
           phone?: string | null
           special_request?: string | null
           status?: string
+          store_id?: string | null
           timestamp?: string | null
           total?: number
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      point_activities: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          points: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          points: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          points?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -255,6 +282,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_points: {
+        Row: {
+          created_at: string | null
+          id: string
+          total_points: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          total_points?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          total_points?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       "Wisebite-data": {
         Row: {

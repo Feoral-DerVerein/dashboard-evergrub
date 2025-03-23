@@ -101,11 +101,11 @@ const Dashboard = () => {
                 alt="WiseBite" 
                 className="h-6 w-auto mb-1"
               />
-              <p className="text-gray-500">Welcome, Saffire</p>
+              <p className="text-gray-500">Welcome, Felipe</p>
             </div>
             <Avatar className="h-10 w-10">
               <AvatarImage src="/lovable-uploads/eb1f48af-1886-47c2-a56a-96d580f7e040.png" />
-              <AvatarFallback>S</AvatarFallback>
+              <AvatarFallback>F</AvatarFallback>
             </Avatar>
           </div>
         </header>
