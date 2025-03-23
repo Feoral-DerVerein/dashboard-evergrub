@@ -7,6 +7,7 @@ import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
+import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,6 +17,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signInWithGoogle } = useAuth();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -62,14 +64,18 @@ const Login = () => {
 
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: provider as Provider,
-        options: {
-          redirectTo: window.location.origin + '/dashboard',
-        },
-      });
+      if (provider === 'google') {
+        await signInWithGoogle();
+      } else {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: provider as Provider,
+          options: {
+            redirectTo: window.location.origin + '/dashboard',
+          },
+        });
 
-      if (error) throw error;
+        if (error) throw error;
+      }
     } catch (error: any) {
       console.error(`Error con ${provider}:`, error);
       toast({
