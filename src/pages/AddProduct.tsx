@@ -14,6 +14,7 @@ type ProductFormData = {
   description: string;
   category: string;
   brand: string;
+  customBrand: string;
   quantity: string;
   expirationDate: string;
   image: string;
@@ -30,10 +31,12 @@ const AddProduct = () => {
     description: "",
     category: "",
     brand: "",
+    customBrand: "",
     quantity: "1",
     expirationDate: "",
     image: ""
   });
+  const [showCustomBrand, setShowCustomBrand] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(isEditMode);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -52,17 +55,23 @@ const AddProduct = () => {
           const product = await productService.getProductById(parseInt(id));
           
           if (product) {
+            // Check if brand is custom
+            const isCustomBrand = !brands.includes(product.brand);
+            
             setFormData({
               name: product.name,
               price: product.price.toString(),
               discount: product.discount.toString(),
               description: product.description,
               category: product.category,
-              brand: product.brand,
+              brand: isCustomBrand ? "other" : product.brand,
+              customBrand: isCustomBrand ? product.brand : "",
               quantity: product.quantity.toString(),
               expirationDate: product.expirationDate,
               image: product.image
             });
+            
+            setShowCustomBrand(isCustomBrand);
             
             if (product.image && product.image !== '/placeholder.svg') {
               setPreviewImage(product.image);
@@ -103,6 +112,13 @@ const AddProduct = () => {
 
   const categories = ["Restaurant", "SPA Products"];
   const brands = ["Equate", "Generic", "Premium"];
+
+  // Handle brand selection change
+  const handleBrandChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const brandValue = e.target.value;
+    setShowCustomBrand(brandValue === "other");
+    setFormData({ ...formData, brand: brandValue });
+  };
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -188,8 +204,16 @@ const AddProduct = () => {
       
       // Validate required fields
       if (!formData.name || !formData.price || !formData.description || 
-          !formData.category || !formData.brand || !formData.expirationDate) {
+          !formData.category || !formData.expirationDate) {
         throw new Error("Please fill in all required fields");
+      }
+
+      // For brand, use custom brand if it's selected
+      const brandToUse = formData.brand === "other" ? formData.customBrand.trim() : formData.brand;
+      
+      // Validate brand
+      if (!brandToUse) {
+        throw new Error("Please select a brand or enter a custom brand name");
       }
 
       // Ensure price is a valid number
@@ -203,7 +227,7 @@ const AddProduct = () => {
         discount: parseFloat(formData.discount) || 0,
         description: formData.description.trim(),
         category: formData.category,
-        brand: formData.brand,
+        brand: brandToUse,
         quantity: parseInt(formData.quantity) || 1,
         expirationDate: formData.expirationDate,
         image: formData.image || "",
@@ -377,7 +401,7 @@ const AddProduct = () => {
               </label>
               <select
                 value={formData.brand}
-                onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                onChange={handleBrandChange}
                 className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 required
               >
@@ -387,7 +411,21 @@ const AddProduct = () => {
                     {brand}
                   </option>
                 ))}
+                <option value="other">Other (Custom)</option>
               </select>
+              
+              {showCustomBrand && (
+                <div className="mt-2">
+                  <Input
+                    type="text"
+                    value={formData.customBrand}
+                    onChange={(e) => setFormData({ ...formData, customBrand: e.target.value })}
+                    placeholder="Enter custom brand name"
+                    className="w-full"
+                    required={formData.brand === "other"}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
