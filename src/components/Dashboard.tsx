@@ -1,4 +1,5 @@
-import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3 } from "lucide-react";
+
+import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
@@ -113,7 +114,7 @@ const Dashboard = () => {
         <main className="px-6">
           <section className="mb-8">
             <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
               <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
               <QuickAccessItem 
@@ -128,6 +129,11 @@ const Dashboard = () => {
                 label="Notifications" 
                 to="/notifications" 
                 badgeCount={notificationCount} 
+              />
+              <QuickAccessItem 
+                icon={Megaphone} 
+                label="Ads" 
+                to="/ads" 
               />
             </div>
           </section>

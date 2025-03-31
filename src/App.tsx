@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +22,8 @@ import Google from "./pages/Google";
 import Apple from "./pages/Apple";
 import Phone from "./pages/Phone";
 import Sales from "./pages/Sales";
+import Ads from "./pages/Ads";
+import CreateAd from "./pages/CreateAd";
 
 const queryClient = new QueryClient();
 
@@ -111,6 +114,16 @@ const AppRoutes = () => {
       <Route path="/phone" element={
         <ProtectedRoute>
           <Phone />
+        </ProtectedRoute>
+      } />
+      <Route path="/ads" element={
+        <ProtectedRoute>
+          <Ads />
+        </ProtectedRoute>
+      } />
+      <Route path="/ads/create" element={
+        <ProtectedRoute>
+          <CreateAd />
         </ProtectedRoute>
       } />
       <Route path="/reports" element={
