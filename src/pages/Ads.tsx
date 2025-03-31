@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -23,8 +22,7 @@ import {
   TrendingUp,
   Users,
   MousePointerClick,
-  Share2,
-  Menu
+  Share2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -341,7 +339,6 @@ const Ads = () => {
         </header>
         
         <main className="p-4">
-          {/* Mobile Performance Overview - Stacked Cards */}
           {isMobile ? (
             <div className="mb-4 overflow-x-auto scrollbar-none -mx-4 px-4">
               <div className="flex gap-3 pb-1 w-max">
@@ -473,8 +470,6 @@ const Ads = () => {
             </div>
           )}
           
-          
-          
           {!isMobile && (
             <div className="mb-4 border-b border-gray-200">
               <div className="flex space-x-4">
@@ -514,7 +509,6 @@ const Ads = () => {
             </div>
           )}
           
-          {/* Search & Filter - Mobile Compact Version */}
           <div className={`flex flex-col ${isMobile ? 'gap-2 mb-3' : 'md:flex-row gap-4 mb-6'}`}>
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -551,30 +545,6 @@ const Ads = () => {
                   <Filter className="h-3 w-3" />
                   Filters
                 </Button>
-                
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button variant="outline" className="h-8 w-8 p-0">
-                      <Menu className="h-4 w-4" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="bottom" className="h-[40vh]">
-                    <div className="pt-6 space-y-4">
-                      <button className="flex items-center gap-2 w-full p-3 hover:bg-gray-50 rounded-md">
-                        <TableIcon className="h-4 w-4" />
-                        <span>Edit Columns</span>
-                      </button>
-                      <button className="flex items-center gap-2 w-full p-3 hover:bg-gray-50 rounded-md">
-                        <Download className="h-4 w-4" />
-                        <span>Export Data</span>
-                      </button>
-                      <button className="flex items-center gap-2 w-full p-3 hover:bg-gray-50 rounded-md">
-                        <Settings className="h-4 w-4" />
-                        <span>Settings</span>
-                      </button>
-                    </div>
-                  </SheetContent>
-                </Sheet>
               </div>
             )}
           </div>
@@ -604,7 +574,6 @@ const Ads = () => {
             </div>
           )}
           
-          {/* Modified to remove the bottom padding since we removed the fixed bottom nav */}
           <div>
             {selectedView === 'campaigns' && (
               <div className="rounded-md border">
