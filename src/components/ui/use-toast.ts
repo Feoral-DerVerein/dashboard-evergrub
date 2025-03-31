@@ -12,8 +12,7 @@ type ToasterToast = {
 };
 
 // Create a wrapper for the toast function to handle different variants
-const enhancedToast = {
-  ...toastOriginal,
+const enhancedToast = Object.assign({}, toastOriginal, {
   error: (message: string) => toastOriginal({
     title: "Error",
     description: message,
@@ -34,7 +33,7 @@ const enhancedToast = {
     description: message,
     variant: "warning",
   })
-};
+});
 
 // Export both the original toast function and the enhanced version
 export const useToast = useToastOriginal;

@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { v4 as uuidv4 } from "@supabase/supabase-js/dist/module/lib/helpers";
+import { v4 as uuidv4 } from "uuid";
 import { toast } from "@/components/ui/use-toast";
 
 export const profileImageService = {
@@ -11,11 +11,7 @@ export const profileImageService = {
       
       // Verificar el tipo de archivo
       if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Error",
-          description: "Solo se permiten archivos de imagen",
-          variant: "destructive"
-        });
+        toast.error("Solo se permiten archivos de imagen");
         return null;
       }
       
@@ -34,11 +30,7 @@ export const profileImageService = {
       
       if (error) {
         console.error("Error al subir la imagen:", error);
-        toast({
-          title: "Error",
-          description: "No se pudo subir la imagen. Inténtalo de nuevo.",
-          variant: "destructive"
-        });
+        toast.error("No se pudo subir la imagen. Inténtalo de nuevo.");
         return null;
       }
       
@@ -50,11 +42,7 @@ export const profileImageService = {
       return publicUrl.publicUrl;
     } catch (error) {
       console.error("Error al subir la imagen del perfil:", error);
-      toast({
-        title: "Error",
-        description: "Ocurrió un problema al procesar la imagen",
-        variant: "destructive"
-      });
+      toast.error("Ocurrió un problema al procesar la imagen");
       return null;
     }
   }

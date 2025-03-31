@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Camera, MapPin, Clock, Phone, Mail, Facebook, Instagram, Plus, X, Loader2 } from "lucide-react";
@@ -37,12 +36,10 @@ const Profile = () => {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   
-  // Función para manejar la eliminación de categorías
   const handleRemoveCategory = (category: string) => {
     setCategories(categories.filter(c => c !== category));
   };
 
-  // Función para manejar la subida del logo
   const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
@@ -54,24 +51,16 @@ const Profile = () => {
       const url = await profileImageService.uploadProfileImage(file, 'logo');
       if (url) {
         setLogoUrl(url);
-        toast({
-          title: "Logo actualizado",
-          description: "La imagen de logo se ha actualizado correctamente",
-        });
+        toast.success("Logo actualizado correctamente");
       }
     } catch (error) {
       console.error("Error al subir el logo:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo subir el logo",
-        variant: "destructive",
-      });
+      toast.error("No se pudo subir el logo");
     } finally {
       setUploadingLogo(false);
     }
   };
 
-  // Función para manejar la subida de la imagen de portada
   const handleCoverUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
@@ -83,29 +72,18 @@ const Profile = () => {
       const url = await profileImageService.uploadProfileImage(file, 'cover');
       if (url) {
         setCoverUrl(url);
-        toast({
-          title: "Imagen de portada actualizada",
-          description: "La imagen de portada se ha actualizado correctamente",
-        });
+        toast.success("Imagen de portada actualizada correctamente");
       }
     } catch (error) {
       console.error("Error al subir la imagen de portada:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo subir la imagen de portada",
-        variant: "destructive",
-      });
+      toast.error("No se pudo subir la imagen de portada");
     } finally {
       setUploadingCover(false);
     }
   };
 
-  // Función para guardar el perfil
   const handleSaveProfile = () => {
-    toast({
-      title: "Perfil guardado",
-      description: "Los cambios se han guardado correctamente",
-    });
+    toast.success("Los cambios se han guardado correctamente");
   };
 
   return (
@@ -123,7 +101,6 @@ const Profile = () => {
         </header>
 
         <main className="p-6 space-y-6">
-          {/* Store Logo */}
           <div className="flex flex-col items-center gap-2">
             <div className="relative">
               <Avatar className="w-24 h-24">
@@ -153,7 +130,6 @@ const Profile = () => {
             <span className="text-sm text-gray-600">Upload Store Logo</span>
           </div>
 
-          {/* Cover Photo */}
           <div className="relative h-40 bg-gray-100 rounded-lg flex items-center justify-center group overflow-hidden">
             {coverUrl ? (
               <img src={coverUrl} alt="Cover" className="w-full h-full object-cover" />
@@ -182,7 +158,6 @@ const Profile = () => {
             </label>
           </div>
 
-          {/* Store Details */}
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-gray-700">Store Name</label>
@@ -202,7 +177,6 @@ const Profile = () => {
               </div>
             </div>
 
-            {/* Business Hours */}
             <div>
               <label className="text-sm font-medium text-gray-700 mb-4 block">Business Hours</label>
               <BusinessHourRow day="Monday" />
@@ -212,7 +186,6 @@ const Profile = () => {
               <BusinessHourRow day="Friday" />
             </div>
 
-            {/* Contact Details */}
             <div>
               <label className="text-sm font-medium text-gray-700 mb-4 block">Contact Details</label>
               <div className="space-y-4">
@@ -237,7 +210,6 @@ const Profile = () => {
               </div>
             </div>
 
-            {/* Services & Categories */}
             <div>
               <label className="text-sm font-medium text-gray-700 mb-4 block">Services & Categories</label>
               <div className="mb-4">
@@ -255,7 +227,6 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Save Button */}
           <Button 
             className="w-full bg-emerald-600 hover:bg-emerald-700"
             onClick={handleSaveProfile}
