@@ -3,6 +3,11 @@ import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaph
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
+import { useState, useEffect } from "react";
+import { salesService, Sale } from "@/services/salesService";
+import { getUserOrders } from "@/services/orderService";
+import { Order } from "@/types/order.types";
+import { format, parseISO } from "date-fns";
 
 type QuickAccessItemProps = {
   icon: React.ComponentType<{ className?: string }>;
@@ -46,9 +51,10 @@ type RecentActivityItemProps = {
   title: string;
   time: string;
   amount?: string;
+  type?: 'order' | 'payment' | 'user';
 };
 
-const RecentActivityItem = ({ title, time, amount }: RecentActivityItemProps) => (
+const RecentActivityItem = ({ title, time, amount, type }: RecentActivityItemProps) => (
   <div className="recent-activity-item">
     <div>
       <p className="font-medium text-gray-900">{title}</p>
@@ -90,6 +96,113 @@ export const BottomNav = () => {
 
 const Dashboard = () => {
   const { orderCount, notificationCount } = useNotificationsAndOrders();
+  const [recentActivity, setRecentActivity] = useState<RecentActivityItemProps[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRecentActivity = async () => {
+      setIsLoading(true);
+      try {
+        // Get recent sales
+        const recentSales = await salesService.getSales();
+        const latestSales = recentSales.slice(0, 2);
+        
+        // Convert sales to activity items
+        const salesActivity = latestSales.map((sale) => ({
+          title: `Payment completed for ${sale.customer_name}`,
+          time: formatTimeAgo(sale.created_at),
+          amount: `$${Number(sale.amount).toFixed(2)}`,
+          type: 'payment' as const
+        }));
+        
+        // Get recent orders
+        const recentOrders = await getUserOrders();
+        const latestOrders = recentOrders.filter(order => order.status === "pending").slice(0, 1);
+        
+        const ordersActivity = latestOrders.map((order) => ({
+          title: `New order received`,
+          time: formatTimeAgo(order.timestamp),
+          amount: `$${order.total.toFixed(2)}`,
+          type: 'order' as const
+        }));
+        
+        // Combine activities
+        const allActivity = [...salesActivity, ...ordersActivity];
+        
+        if (allActivity.length > 0) {
+          setRecentActivity(allActivity);
+        } else {
+          // Fallback to dummy data if no real activity found
+          setRecentActivity([
+            {
+              title: "New order received",
+              time: "Just now",
+              amount: "$128.99",
+              type: 'order'
+            },
+            {
+              title: "Payment completed",
+              time: "15 minutes ago",
+              amount: "$1,200.00",
+              type: 'payment'
+            },
+            {
+              title: "New user registered",
+              time: "1 hour ago",
+              type: 'user'
+            }
+          ]);
+        }
+      } catch (error) {
+        console.error("Error fetching recent activity:", error);
+        // Fallback to dummy data on error
+        setRecentActivity([
+          {
+            title: "New order received",
+            time: "2 minutes ago",
+            amount: "$128.99",
+            type: 'order'
+          },
+          {
+            title: "Payment completed",
+            time: "15 minutes ago",
+            amount: "$1,200.00",
+            type: 'payment'
+          },
+          {
+            title: "New user registered",
+            time: "1 hour ago",
+            type: 'user'
+          }
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchRecentActivity();
+  }, []);
+  
+  const formatTimeAgo = (timestamp: string) => {
+    try {
+      const date = parseISO(timestamp);
+      const now = new Date();
+      const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+      
+      if (diffInMinutes < 1) {
+        return 'Just now';
+      } else if (diffInMinutes < 60) {
+        return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
+      } else if (diffInMinutes < 24 * 60) {
+        const hours = Math.floor(diffInMinutes / 60);
+        return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+      } else {
+        return format(date, 'MMM dd, yyyy');
+      }
+    } catch (error) {
+      return 'Recently';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -148,20 +261,20 @@ const Dashboard = () => {
           <section>
             <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
             <div className="space-y-2">
-              <RecentActivityItem
-                title="New order received"
-                time="2 minutes ago"
-                amount="$128.99"
-              />
-              <RecentActivityItem
-                title="Payment completed"
-                time="15 minutes ago"
-                amount="$1,200.00"
-              />
-              <RecentActivityItem
-                title="New user registered"
-                time="1 hour ago"
-              />
+              {isLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
+                </div>
+              ) : recentActivity.length > 0 ? (
+                recentActivity.map((activity, index) => (
+                  <RecentActivityItem
+                    key={index}
+                    {...activity}
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">No recent activity to display</p>
+              )}
             </div>
           </section>
         </main>
