@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload, X, Eye, ShoppingBasket } from "lucide-react";
@@ -150,7 +151,7 @@ const CreateAd = () => {
               onClick={togglePredictor}
               className="w-full border-dashed border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
             >
-              {showPredictor ? "Ocultar Modelo Predictivo" : "Mostrar Modelo Predictivo"}
+              {showPredictor ? "Hide Prediction Model" : "Show Prediction Model"}
             </Button>
           </div>
 

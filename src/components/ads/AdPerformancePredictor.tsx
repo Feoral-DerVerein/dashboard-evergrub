@@ -91,10 +91,10 @@ const AdPerformancePredictor = () => {
       <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
         <div className="flex items-center gap-2">
           <Calculator className="h-5 w-5 text-blue-500" />
-          <CardTitle className="text-lg">Modelo Predictivo de Rendimiento</CardTitle>
+          <CardTitle className="text-lg">Performance Prediction Model</CardTitle>
         </div>
         <CardDescription>
-          Estime el rendimiento potencial de su campaña publicitaria
+          Estimate the potential performance of your advertising campaign
         </CardDescription>
       </CardHeader>
       
@@ -111,14 +111,14 @@ const AdPerformancePredictor = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1">
-                      Presupuesto Diario ($)
+                      Daily Budget ($)
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <HelpCircle className="h-3 w-3 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            Cuánto está dispuesto a gastar por día
+                            How much you're willing to spend per day
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -142,14 +142,14 @@ const AdPerformancePredictor = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1">
-                      Días de Campaña
+                      Campaign Days
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <HelpCircle className="h-3 w-3 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            Duración de la campaña en días
+                            Duration of the campaign in days
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -172,14 +172,14 @@ const AdPerformancePredictor = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1">
-                      CPC Promedio ($)
+                      Average CPC ($)
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <HelpCircle className="h-3 w-3 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            Costo promedio por clic estimado
+                            Estimated average cost per click
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -203,14 +203,14 @@ const AdPerformancePredictor = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1">
-                      Tasa de Conversión (%)
+                      Conversion Rate (%)
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <HelpCircle className="h-3 w-3 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            Porcentaje de clics que se convierten
+                            Percentage of clicks that convert
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -235,14 +235,14 @@ const AdPerformancePredictor = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1">
-                      Valor de Conversión ($)
+                      Conversion Value ($)
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <HelpCircle className="h-3 w-3 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            Valor promedio de cada conversión
+                            Average value of each conversion
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -262,29 +262,29 @@ const AdPerformancePredictor = () => {
             </div>
             
             <Button type="submit" className="w-full">
-              Calcular Predicción
+              Calculate Prediction
             </Button>
           </form>
         </Form>
         
         {predictionResult && (
           <div className="mt-6 border-t pt-4">
-            <h4 className="font-medium text-base mb-3">Resultados Estimados:</h4>
+            <h4 className="font-medium text-base mb-3">Estimated Results:</h4>
             <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-3"} gap-3`}>
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg">
-                <p className="text-sm text-muted-foreground">Costo Total</p>
+                <p className="text-sm text-muted-foreground">Total Cost</p>
                 <p className="font-medium text-lg">${predictionResult.totalCost.toFixed(2)}</p>
               </div>
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg">
-                <p className="text-sm text-muted-foreground">Clics Estimados</p>
+                <p className="text-sm text-muted-foreground">Estimated Clicks</p>
                 <p className="font-medium text-lg">{Math.round(predictionResult.estimatedClicks)}</p>
               </div>
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg">
-                <p className="text-sm text-muted-foreground">Conversiones</p>
+                <p className="text-sm text-muted-foreground">Conversions</p>
                 <p className="font-medium text-lg">{predictionResult.estimatedConversions.toFixed(1)}</p>
               </div>
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg">
-                <p className="text-sm text-muted-foreground">Ingresos Estimados</p>
+                <p className="text-sm text-muted-foreground">Estimated Revenue</p>
                 <p className="font-medium text-lg">${predictionResult.estimatedRevenue.toFixed(2)}</p>
               </div>
               <div className={`bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg ${isMobile ? "col-span-2" : ""}`}>
@@ -296,11 +296,11 @@ const AdPerformancePredictor = () => {
             </div>
             
             <div className="mt-4 text-sm text-muted-foreground">
-              <p className="font-medium mb-1">Factores a considerar:</p>
+              <p className="font-medium mb-1">Factors to consider:</p>
               <ul className="list-disc pl-5 space-y-1">
-                <li>La calidad de su audiencia afectará la tasa de conversión real</li>
-                <li>La relevancia de los anuncios puede mejorar el CPC</li>
-                <li>Considere la estacionalidad y la competencia del mercado</li>
+                <li>The quality of your audience will affect the actual conversion rate</li>
+                <li>Ad relevance can improve your CPC</li>
+                <li>Consider seasonality and market competition</li>
               </ul>
             </div>
           </div>
@@ -309,7 +309,7 @@ const AdPerformancePredictor = () => {
       
       <CardFooter className="text-xs text-muted-foreground bg-slate-50 dark:bg-slate-800/20">
         <p>
-          Este es un modelo predictivo y los resultados reales pueden variar según múltiples factores.
+          This is a predictive model and actual results may vary depending on multiple factors.
         </p>
       </CardFooter>
     </Card>
