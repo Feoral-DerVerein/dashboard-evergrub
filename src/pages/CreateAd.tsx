@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload, X, Eye, ShoppingBasket } from "lucide-react";
@@ -16,11 +15,68 @@ import { toast } from "@/components/ui/use-toast";
 import { Switch } from "@/components/ui/switch";
 import AdPerformancePredictor from "@/components/ads/AdPerformancePredictor";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const categories = [
   { id: "1", name: "Food & Drinks", subcategories: ["Coffee", "Tea", "Pastries"] },
   { id: "2", name: "Home & Kitchen", subcategories: ["Tableware", "Appliances", "Decor"] },
   { id: "3", name: "Appliances", subcategories: ["Coffee Makers", "Grinders", "Water Heaters"] },
+];
+
+const pricingPlans = [
+  {
+    id: "basic",
+    name: "Basic",
+    price: 9.99,
+    duration: "7 days",
+    features: [
+      "Standard visibility",
+      "Basic analytics",
+      "100 estimated impressions",
+    ],
+  },
+  {
+    id: "standard",
+    name: "Standard",
+    price: 19.99,
+    duration: "14 days",
+    featured: true,
+    features: [
+      "Enhanced visibility",
+      "Detailed analytics",
+      "500 estimated impressions",
+      "Placement in marketplace banner",
+    ],
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: 39.99,
+    duration: "30 days",
+    features: [
+      "Maximum visibility",
+      "Advanced analytics",
+      "2000 estimated impressions",
+      "Placement in marketplace banner",
+      "Featured listing",
+      "Social media promotion",
+    ],
+  },
 ];
 
 const CreateAd = () => {
@@ -39,6 +95,9 @@ const CreateAd = () => {
   const [imagesPreviews, setImagesPreviews] = useState<string[]>([]);
   const [showPredictor, setShowPredictor] = useState(false);
   const [showInMarketplace, setShowInMarketplace] = useState(true);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -111,13 +170,7 @@ const CreateAd = () => {
       return;
     }
     
-    const marketplaceMessage = showInMarketplace 
-      ? "and will appear in the marketplace banner" 
-      : "but won't appear in the marketplace banner";
-    
-    toast.success(`Ad created successfully ${marketplaceMessage}!`);
-    
-    setTimeout(() => navigate("/ads"), 1500);
+    setPaymentDialogOpen(true);
   };
 
   const handleSaveDraft = () => {
@@ -132,6 +185,37 @@ const CreateAd = () => {
 
   const togglePredictor = () => {
     setShowPredictor(!showPredictor);
+  };
+
+  const handleSelectPlan = (planId: string) => {
+    setSelectedPlan(planId);
+  };
+
+  const handleProcessPayment = () => {
+    if (!selectedPlan) {
+      toast.error("Please select a payment plan");
+      return;
+    }
+
+    setProcessingPayment(true);
+
+    setTimeout(() => {
+      setProcessingPayment(false);
+      setPaymentDialogOpen(false);
+      
+      const marketplaceMessage = showInMarketplace 
+        ? "and will appear in the marketplace banner" 
+        : "but won't appear in the marketplace banner";
+      
+      toast.success(`Ad created successfully ${marketplaceMessage}!`);
+      
+      setTimeout(() => navigate("/ads"), 1500);
+    }, 2000);
+  };
+
+  const handleCancelPayment = () => {
+    setPaymentDialogOpen(false);
+    setSelectedPlan(null);
   };
 
   return (
@@ -381,6 +465,81 @@ const CreateAd = () => {
               </Button>
             </div>
           </form>
+
+          <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
+            <DialogContent className="sm:max-w-[550px]">
+              <DialogHeader>
+                <DialogTitle>Select a campaign plan</DialogTitle>
+                <DialogDescription>
+                  Choose a plan that fits your marketing needs and budget
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
+                {pricingPlans.map((plan) => (
+                  <Card 
+                    key={plan.id}
+                    className={`border cursor-pointer transition-all ${
+                      selectedPlan === plan.id 
+                        ? "border-primary ring-2 ring-primary/20" 
+                        : "hover:border-primary/30"
+                    } ${plan.featured ? "relative" : ""}`}
+                    onClick={() => handleSelectPlan(plan.id)}
+                  >
+                    {plan.featured && (
+                      <div className="absolute -top-3 left-0 right-0 flex justify-center">
+                        <span className="bg-primary text-white text-xs px-3 py-1 rounded-full">
+                          Recommended
+                        </span>
+                      </div>
+                    )}
+                    
+                    <CardHeader className={`pb-3 ${plan.featured ? "pt-6" : "pt-4"}`}>
+                      <CardTitle className="text-center">{plan.name}</CardTitle>
+                      <CardDescription className="text-center">{plan.duration}</CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent className="text-center">
+                      <p className="text-3xl font-bold mb-4">${plan.price}</p>
+                      <ul className="text-sm space-y-2">
+                        {plan.features.map((feature, index) => (
+                          <li key={index} className="flex items-center justify-center gap-2">
+                            <span className="text-green-500">✓</span> {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                    
+                    <CardFooter className="pt-0 flex justify-center">
+                      <Button 
+                        variant={selectedPlan === plan.id ? "default" : "outline"}
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handleSelectPlan(plan.id)}
+                      >
+                        {selectedPlan === plan.id ? "Selected" : "Select"}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+
+              <DialogFooter>
+                <Button 
+                  variant="outline" 
+                  onClick={handleCancelPayment}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleProcessPayment} 
+                  disabled={!selectedPlan || processingPayment}
+                >
+                  {processingPayment ? "Processing..." : "Pay & Publish Ad"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </main>
       </div>
     </div>
