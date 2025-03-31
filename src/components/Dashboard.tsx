@@ -1,4 +1,3 @@
-
 import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -35,15 +34,22 @@ const QuickAccessItem = ({
 
 type StatCardProps = {
   label: string;
-  value: string;
+  value: string | number;
   trend?: string;
+  isLoading?: boolean;
 };
 
-const StatCard = ({ label, value, trend }: StatCardProps) => (
+const StatCard = ({ label, value, trend, isLoading = false }: StatCardProps) => (
   <div className="stat-card">
     <h3 className="text-gray-500 text-sm mb-2">{label}</h3>
-    <p className="text-2xl font-semibold mb-1">{value}</p>
-    {trend && <span className="positive-trend">↑ {trend}</span>}
+    {isLoading ? (
+      <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+    ) : (
+      <>
+        <p className="text-2xl font-semibold mb-1">{value}</p>
+        {trend && <span className="positive-trend">↑ {trend}</span>}
+      </>
+    )}
   </div>
 );
 
@@ -98,6 +104,46 @@ const Dashboard = () => {
   const { orderCount, notificationCount } = useNotificationsAndOrders();
   const [recentActivity, setRecentActivity] = useState<RecentActivityItemProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalSales: 0,
+    activeUsers: 0,
+    newOrders: 0,
+    totalRevenue: 0,
+    isLoading: true
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Get sales data
+        const recentSales = await salesService.getSales();
+        
+        // Get total revenue
+        const totalRevenue = recentSales.reduce((sum, sale) => sum + Number(sale.amount), 0);
+        
+        // Get monthly sales data
+        const monthlySummary = await salesService.getMonthlySales();
+        
+        // Get orders data
+        const orders = await getUserOrders();
+        const pendingOrders = orders.filter(order => order.status === "pending").length;
+        
+        // Update stats
+        setStats({
+          totalSales: recentSales.length,
+          activeUsers: Math.floor(recentSales.length * 1.5), // Estimated active users based on sales
+          newOrders: pendingOrders || orderCount,
+          totalRevenue: totalRevenue,
+          isLoading: false
+        });
+      } catch (error) {
+        console.error("Error fetching dashboard stats:", error);
+        setStats(prev => ({ ...prev, isLoading: false }));
+      }
+    };
+    
+    fetchStats();
+  }, [orderCount]);
 
   useEffect(() => {
     const fetchRecentActivity = async () => {
@@ -252,10 +298,30 @@ const Dashboard = () => {
           </section>
 
           <section className="grid grid-cols-2 gap-4 mb-8">
-            <StatCard label="Total Sales" value="$12,845" trend="12.5%" />
-            <StatCard label="Active Users" value="8,247" trend="18.2%" />
-            <StatCard label="New Orders" value="284" trend="8.1%" />
-            <StatCard label="Revenue" value="$32,459" trend="22.3%" />
+            <StatCard 
+              label="Total Sales" 
+              value={stats.isLoading ? "" : stats.totalSales} 
+              trend="12.5%" 
+              isLoading={stats.isLoading}
+            />
+            <StatCard 
+              label="Active Users" 
+              value={stats.isLoading ? "" : stats.activeUsers}
+              trend="18.2%"
+              isLoading={stats.isLoading}
+            />
+            <StatCard 
+              label="New Orders" 
+              value={stats.isLoading ? "" : stats.newOrders}
+              trend="8.1%"
+              isLoading={stats.isLoading}
+            />
+            <StatCard 
+              label="Revenue" 
+              value={stats.isLoading ? "" : `$${stats.totalRevenue.toFixed(2)}`}
+              trend="22.3%"
+              isLoading={stats.isLoading}
+            />
           </section>
 
           <section>
