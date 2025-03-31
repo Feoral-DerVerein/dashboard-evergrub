@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload, X, Eye } from "lucide-react";
@@ -13,6 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
+import AdPerformancePredictor from "@/components/ads/AdPerformancePredictor";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Mock categories for demonstration
 const categories = [
@@ -23,6 +24,7 @@ const categories = [
 
 const CreateAd = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -34,6 +36,7 @@ const CreateAd = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
   const [imagesPreviews, setImagesPreviews] = useState<string[]>([]);
+  const [showPredictor, setShowPredictor] = useState(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -58,23 +61,19 @@ const CreateAd = () => {
     const newFiles: File[] = [];
     const newPreviews: string[] = [];
 
-    // Process each file
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
-      // Check if it's an image
       if (!file.type.startsWith("image/")) {
         toast.error("Please upload only image files");
         continue;
       }
 
-      // Check file size (limit to 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast.error("Image size should be less than 5MB");
         continue;
       }
 
-      // Create object URL for preview
       const previewUrl = URL.createObjectURL(file);
       newFiles.push(file);
       newPreviews.push(previewUrl);
@@ -85,7 +84,6 @@ const CreateAd = () => {
   };
 
   const removeImage = (index: number) => {
-    // Revoke the object URL to avoid memory leaks
     URL.revokeObjectURL(imagesPreviews[index]);
     
     setImages((prev) => prev.filter((_, i) => i !== index));
@@ -95,7 +93,6 @@ const CreateAd = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
     if (
       !formData.title ||
       !formData.description ||
@@ -112,10 +109,8 @@ const CreateAd = () => {
       return;
     }
     
-    // In a real app, this would create the ad via an API call
     toast.success("Ad created successfully!");
     
-    // Navigate back to the ads list
     setTimeout(() => navigate("/ads"), 1500);
   };
 
@@ -123,17 +118,19 @@ const CreateAd = () => {
     toast.success("Draft saved successfully!");
   };
 
-  // Get subcategories based on selected category
   const getSubcategories = () => {
     if (!selectedCategory) return [];
     const category = categories.find(c => c.name === selectedCategory);
     return category?.subcategories || [];
   };
 
+  const togglePredictor = () => {
+    setShowPredictor(!showPredictor);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto bg-white min-h-screen animate-fade-in pb-20">
-        {/* Header */}
         <header className="px-6 py-4 border-b border-gray-200 flex items-center">
           <Link to="/ads" className="text-gray-600 mr-2">
             <ArrowLeft className="w-5 h-5" />
@@ -141,10 +138,24 @@ const CreateAd = () => {
           <h1 className="text-xl font-semibold">Create New Ad</h1>
         </header>
 
-        {/* Main Form */}
         <main className="p-6">
+          <div className="mb-6">
+            <Button 
+              variant="outline" 
+              onClick={togglePredictor}
+              className="w-full border-dashed border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
+            >
+              {showPredictor ? "Ocultar Modelo Predictivo" : "Mostrar Modelo Predictivo"}
+            </Button>
+          </div>
+
+          {showPredictor && (
+            <div className="mb-6">
+              <AdPerformancePredictor />
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Information */}
             <div className="space-y-4">
               <h2 className="text-lg font-medium">Basic Information</h2>
               
@@ -204,7 +215,6 @@ const CreateAd = () => {
               </div>
             </div>
             
-            {/* Category and Location */}
             <div className="space-y-4">
               <h2 className="text-lg font-medium">Category & Location</h2>
               
@@ -266,7 +276,6 @@ const CreateAd = () => {
               </div>
             </div>
             
-            {/* Images */}
             <div className="space-y-4">
               <h2 className="text-lg font-medium">Images</h2>
               
@@ -302,7 +311,6 @@ const CreateAd = () => {
                   </div>
                 </div>
                 
-                {/* Image previews */}
                 {imagesPreviews.length > 0 && (
                   <div className="mt-4 grid grid-cols-3 md:grid-cols-4 gap-3">
                     {imagesPreviews.map((preview, index) => (
@@ -326,8 +334,7 @@ const CreateAd = () => {
               </div>
             </div>
             
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <div className={`flex ${isMobile ? "flex-col" : "flex-row"} gap-3 pt-4`}>
               <Button type="submit" className="flex-1">
                 Publish Ad
               </Button>
@@ -342,7 +349,7 @@ const CreateAd = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="flex items-center gap-1"
+                className={`${isMobile ? "w-full" : ""} flex items-center gap-1`}
               >
                 <Eye className="h-4 w-4" />
                 Preview
