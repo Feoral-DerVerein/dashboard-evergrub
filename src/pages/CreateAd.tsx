@@ -12,15 +12,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
-import {
-  Switch,
-  SwitchThumb,
-  SwitchTrack,
-} from "@/components/ui/switch";
+import { Switch } from "@/components/ui/switch";
 import AdPerformancePredictor from "@/components/ads/AdPerformancePredictor";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-// Mock categories for demonstration
 const categories = [
   { id: "1", name: "Food & Drinks", subcategories: ["Coffee", "Tea", "Pastries"] },
   { id: "2", name: "Home & Kitchen", subcategories: ["Tableware", "Appliances", "Decor"] },
@@ -236,11 +231,7 @@ const CreateAd = () => {
                     id="showInMarketplace" 
                     checked={showInMarketplace} 
                     onCheckedChange={setShowInMarketplace}
-                  >
-                    <SwitchTrack>
-                      <SwitchThumb />
-                    </SwitchTrack>
-                  </Switch>
+                  />
                 </div>
                 <p className="text-xs text-gray-500">
                   Enable this option to display your ad in the marketplace banner for increased visibility
