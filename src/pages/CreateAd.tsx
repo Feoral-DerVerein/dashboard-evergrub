@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, X, Eye } from "lucide-react";
+import { ArrowLeft, Upload, X, Eye, ShoppingBasket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +12,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
+import {
+  Switch,
+  SwitchThumb,
+  SwitchTrack,
+} from "@/components/ui/switch";
 import AdPerformancePredictor from "@/components/ads/AdPerformancePredictor";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -37,6 +42,7 @@ const CreateAd = () => {
   const [images, setImages] = useState<File[]>([]);
   const [imagesPreviews, setImagesPreviews] = useState<string[]>([]);
   const [showPredictor, setShowPredictor] = useState(false);
+  const [showInMarketplace, setShowInMarketplace] = useState(true);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -109,7 +115,11 @@ const CreateAd = () => {
       return;
     }
     
-    toast.success("Ad created successfully!");
+    const marketplaceMessage = showInMarketplace 
+      ? "and will appear in the marketplace banner" 
+      : "but won't appear in the marketplace banner";
+    
+    toast.success(`Ad created successfully ${marketplaceMessage}!`);
     
     setTimeout(() => navigate("/ads"), 1500);
   };
@@ -212,6 +222,29 @@ const CreateAd = () => {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <ShoppingBasket className="h-4 w-4 text-gray-600" />
+                    <label htmlFor="showInMarketplace" className="text-sm font-medium">
+                      Show in Marketplace Banner
+                    </label>
+                  </div>
+                  <Switch 
+                    id="showInMarketplace" 
+                    checked={showInMarketplace} 
+                    onCheckedChange={setShowInMarketplace}
+                  >
+                    <SwitchTrack>
+                      <SwitchThumb />
+                    </SwitchTrack>
+                  </Switch>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Enable this option to display your ad in the marketplace banner for increased visibility
+                </p>
               </div>
             </div>
             
