@@ -467,7 +467,7 @@ const CreateAd = () => {
           </form>
 
           <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
-            <DialogContent className="sm:max-w-[550px]">
+            <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>Select a campaign plan</DialogTitle>
                 <DialogDescription>
@@ -475,7 +475,7 @@ const CreateAd = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 py-4">
                 {pricingPlans.map((plan) => (
                   <Card 
                     key={plan.id}
@@ -487,24 +487,24 @@ const CreateAd = () => {
                     onClick={() => handleSelectPlan(plan.id)}
                   >
                     {plan.featured && (
-                      <div className="absolute -top-3 left-0 right-0 flex justify-center">
-                        <span className="bg-primary text-white text-xs px-3 py-1 rounded-full">
+                      <div className="absolute -top-2 left-0 right-0 flex justify-center">
+                        <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full text-[10px]">
                           Recommended
                         </span>
                       </div>
                     )}
                     
-                    <CardHeader className={`pb-3 ${plan.featured ? "pt-6" : "pt-4"}`}>
-                      <CardTitle className="text-center">{plan.name}</CardTitle>
-                      <CardDescription className="text-center">{plan.duration}</CardDescription>
+                    <CardHeader className={`pb-1 ${plan.featured ? "pt-5" : "pt-3"} text-center`}>
+                      <CardTitle className="text-md">{plan.name}</CardTitle>
+                      <CardDescription className="text-xs">{plan.duration}</CardDescription>
                     </CardHeader>
                     
                     <CardContent className="text-center">
-                      <p className="text-3xl font-bold mb-4">${plan.price}</p>
-                      <ul className="text-sm space-y-2">
+                      <p className="text-xl font-bold mb-2">${plan.price}</p>
+                      <ul className="text-xs space-y-1">
                         {plan.features.map((feature, index) => (
-                          <li key={index} className="flex items-center justify-center gap-2">
-                            <span className="text-green-500">✓</span> {feature}
+                          <li key={index} className="flex items-center justify-center gap-1">
+                            <span className="text-green-500 text-[10px]">✓</span> {feature}
                           </li>
                         ))}
                       </ul>
@@ -514,7 +514,7 @@ const CreateAd = () => {
                       <Button 
                         variant={selectedPlan === plan.id ? "default" : "outline"}
                         size="sm" 
-                        className="w-full"
+                        className="w-full text-xs h-7"
                         onClick={() => handleSelectPlan(plan.id)}
                       >
                         {selectedPlan === plan.id ? "Selected" : "Select"}
