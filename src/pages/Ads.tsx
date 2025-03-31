@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -473,41 +472,7 @@ const Ads = () => {
             </div>
           )}
           
-          {/* Mobile View Switcher - Bottom Fixed Tab Bar */}
-          {isMobile && (
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-20 px-1 py-1">
-              <div className="grid grid-cols-4 gap-1">
-                <button
-                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-md ${selectedView === 'campaigns' ? 'bg-gray-100' : ''}`}
-                  onClick={() => setSelectedView('campaigns')}
-                >
-                  <BriefcaseBusiness className="h-4 w-4" />
-                  <span className="text-xs mt-1">Campaigns</span>
-                </button>
-                <button
-                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-md ${selectedView === 'adSets' ? 'bg-gray-100' : ''}`}
-                  onClick={() => setSelectedView('adSets')}
-                >
-                  <Share2 className="h-4 w-4" />
-                  <span className="text-xs mt-1">Ad Sets</span>
-                </button>
-                <button
-                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-md ${selectedView === 'ads' ? 'bg-gray-100' : ''}`}
-                  onClick={() => setSelectedView('ads')}
-                >
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="text-xs mt-1">Ads</span>
-                </button>
-                <button
-                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-md ${selectedView === 'audiences' ? 'bg-gray-100' : ''}`}
-                  onClick={() => setSelectedView('audiences')}
-                >
-                  <Users className="h-4 w-4" />
-                  <span className="text-xs mt-1">Audiences</span>
-                </button>
-              </div>
-            </div>
-          )}
+          
           
           {!isMobile && (
             <div className="mb-4 border-b border-gray-200">
@@ -638,8 +603,8 @@ const Ads = () => {
             </div>
           )}
           
-          {/* Add bottom padding for mobile to account for fixed bottom nav */}
-          <div className={isMobile ? "pb-16" : ""}>
+          {/* Modified to remove the bottom padding since we removed the fixed bottom nav */}
+          <div>
             {selectedView === 'campaigns' && (
               <div className="rounded-md border">
                 <Table>
@@ -792,31 +757,4 @@ const Ads = () => {
               </div>
             )}
             
-            {selectedView === 'adSets' && (
-              <div className="rounded-md border p-8 text-center">
-                <h3 className="text-lg font-medium text-gray-600">Ad Sets View</h3>
-                <p className="text-gray-500 mt-2">This view would display all ad sets across your campaigns</p>
-              </div>
-            )}
-            
-            {selectedView === 'ads' && (
-              <div className="rounded-md border p-8 text-center">
-                <h3 className="text-lg font-medium text-gray-600">Ads View</h3>
-                <p className="text-gray-500 mt-2">This view would display all individual ads</p>
-              </div>
-            )}
-            
-            {selectedView === 'audiences' && (
-              <div className="rounded-md border p-8 text-center">
-                <h3 className="text-lg font-medium text-gray-600">Audiences View</h3>
-                <p className="text-gray-500 mt-2">This view would display all your custom and saved audiences</p>
-              </div>
-            )}
-          </div>
-        </main>
-      </div>
-    </div>
-  );
-};
-
-export default Ads;
+            {
