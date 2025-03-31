@@ -197,14 +197,12 @@ const Ads = () => {
             </Button>
           </div>
           
-          {/* Tabs */}
+          {/* Tabs - Removed "pending" and "rejected" tabs */}
           <Tabs defaultValue="all" className="mb-6" onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-5">
+            <TabsList className="grid grid-cols-3">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="active">Active</TabsTrigger>
               <TabsTrigger value="inactive">Inactive</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="rejected">Rejected</TabsTrigger>
             </TabsList>
           </Tabs>
           
