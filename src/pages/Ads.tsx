@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -757,4 +758,31 @@ const Ads = () => {
               </div>
             )}
             
-            {
+            {selectedView === 'adSets' && (
+              <div className="rounded-md border p-8 text-center">
+                <h3 className="text-lg font-medium text-gray-600">Ad Sets View</h3>
+                <p className="text-gray-500 mt-2">This view would display all ad sets across your campaigns</p>
+              </div>
+            )}
+            
+            {selectedView === 'ads' && (
+              <div className="rounded-md border p-8 text-center">
+                <h3 className="text-lg font-medium text-gray-600">Ads View</h3>
+                <p className="text-gray-500 mt-2">This view would display all individual ads</p>
+              </div>
+            )}
+            
+            {selectedView === 'audiences' && (
+              <div className="rounded-md border p-8 text-center">
+                <h3 className="text-lg font-medium text-gray-600">Audiences View</h3>
+                <p className="text-gray-500 mt-2">This view would display all your custom and saved audiences</p>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Ads;
