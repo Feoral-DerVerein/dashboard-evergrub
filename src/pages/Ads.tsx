@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -41,7 +40,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Mock data for demonstration
 const mockCampaigns = [
   {
     id: "1",
@@ -177,7 +175,6 @@ const mockCampaigns = [
   }
 ];
 
-// Status badge component
 const StatusBadge = ({ status }: { status: string }) => {
   let colorClass = "";
   
@@ -238,17 +235,14 @@ const Ads = () => {
   };
   
   const handleStatusChange = (campaignId: string, newStatus: string) => {
-    // In a real app, this would make an API call to update the campaign status
     toast.success(`Campaign status changed to ${newStatus}`);
   };
   
   const handleDeleteCampaign = (campaignId: string) => {
-    // In a real app, this would make an API call to delete the campaign
     toast.success("Campaign deleted successfully");
   };
   
   const handleDuplicateCampaign = (campaignId: string) => {
-    // In a real app, this would make an API call to duplicate the campaign
     toast.success("Campaign duplicated successfully");
   };
 
@@ -262,14 +256,12 @@ const Ads = () => {
     });
   };
   
-  // Performance metrics summary
   const totalReach = mockCampaigns.reduce((sum, campaign) => sum + campaign.reach, 0);
   const totalImpressions = mockCampaigns.reduce((sum, campaign) => sum + campaign.impressions, 0);
   const totalResults = mockCampaigns.reduce((sum, campaign) => sum + campaign.results, 0);
   const averageCost = mockCampaigns.reduce((sum, campaign) => sum + campaign.cost, 0) / mockCampaigns.length;
   const totalSpend = mockCampaigns.reduce((sum, campaign) => {
     if (campaign.budget.type === "daily") {
-      // Assuming 30 days for simplicity
       return sum + (campaign.budget.amount * 30);
     } else {
       return sum + campaign.budget.amount;
@@ -279,7 +271,6 @@ const Ads = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto bg-white min-h-screen animate-fade-in pb-20">
-        {/* Header */}
         <header className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Link to="/dashboard" className="text-gray-600">
@@ -314,75 +305,72 @@ const Ads = () => {
           </div>
         </header>
         
-        {/* Main Content */}
         <main className="p-6">
-          {/* Performance Overview */}
-          <div className="mb-6">
-            <h2 className="text-lg font-medium mb-3">Performance Overview</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-gray-500 font-normal flex items-center">
-                    <Users className="h-4 w-4 mr-1" />
+          <div className="mb-5">
+            <h2 className="text-lg font-medium mb-2">Performance Overview</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-1 pt-3 px-4">
+                  <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
+                    <Users className="h-3 w-3 mr-1" />
                     Reach
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-semibold">{totalReach.toLocaleString()}</p>
+                <CardContent className="pt-0 pb-3 px-4">
+                  <p className="text-lg font-semibold">{totalReach.toLocaleString()}</p>
                 </CardContent>
               </Card>
               
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-gray-500 font-normal flex items-center">
-                    <Eye className="h-4 w-4 mr-1" />
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-1 pt-3 px-4">
+                  <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
+                    <Eye className="h-3 w-3 mr-1" />
                     Impressions
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-semibold">{totalImpressions.toLocaleString()}</p>
+                <CardContent className="pt-0 pb-3 px-4">
+                  <p className="text-lg font-semibold">{totalImpressions.toLocaleString()}</p>
                 </CardContent>
               </Card>
               
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-gray-500 font-normal flex items-center">
-                    <MousePointerClick className="h-4 w-4 mr-1" />
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-1 pt-3 px-4">
+                  <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
+                    <MousePointerClick className="h-3 w-3 mr-1" />
                     Results
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-semibold">{totalResults}</p>
+                <CardContent className="pt-0 pb-3 px-4">
+                  <p className="text-lg font-semibold">{totalResults}</p>
                 </CardContent>
               </Card>
               
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-gray-500 font-normal flex items-center">
-                    <CircleDollarSign className="h-4 w-4 mr-1" />
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-1 pt-3 px-4">
+                  <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
+                    <CircleDollarSign className="h-3 w-3 mr-1" />
                     Cost per Result
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-semibold">${averageCost.toFixed(2)}</p>
+                <CardContent className="pt-0 pb-3 px-4">
+                  <p className="text-lg font-semibold">${averageCost.toFixed(2)}</p>
                 </CardContent>
               </Card>
               
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-gray-500 font-normal flex items-center">
-                    <Banknote className="h-4 w-4 mr-1" />
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-1 pt-3 px-4">
+                  <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
+                    <Banknote className="h-3 w-3 mr-1" />
                     Total Spend
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-semibold">${totalSpend.toLocaleString()}</p>
+                <CardContent className="pt-0 pb-3 px-4">
+                  <p className="text-lg font-semibold">${totalSpend.toLocaleString()}</p>
                 </CardContent>
               </Card>
             </div>
           </div>
           
-          {/* Tabs for View Selection */}
           <div className="mb-4 border-b border-gray-200">
             <div className="flex space-x-4">
               <button 
@@ -420,7 +408,6 @@ const Ads = () => {
             </div>
           </div>
           
-          {/* Tools Bar */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -450,7 +437,6 @@ const Ads = () => {
             </div>
           </div>
           
-          {/* Status Tabs */}
           <Tabs defaultValue="all" className="mb-6" onValueChange={setActiveTab}>
             <TabsList className="grid grid-cols-3">
               <TabsTrigger value="all">All Campaigns</TabsTrigger>
@@ -459,7 +445,6 @@ const Ads = () => {
             </TabsList>
           </Tabs>
           
-          {/* Bulk Actions */}
           {selectedCampaigns.length > 0 && (
             <div className="flex gap-2 mb-4 p-3 bg-gray-50 rounded-md">
               <span className="text-sm font-medium flex-1">
@@ -477,7 +462,6 @@ const Ads = () => {
             </div>
           )}
           
-          {/* Campaigns Table */}
           {selectedView === 'campaigns' && (
             <div className="rounded-md border">
               <Table>
@@ -565,7 +549,6 @@ const Ads = () => {
                           </TableCell>
                         </TableRow>
                         
-                        {/* Expanded AdSets if campaign is expanded */}
                         {expandedCampaigns.includes(campaign.id) && campaign.adSets.map((adSet) => (
                           <TableRow key={adSet.id} className="bg-gray-50 text-sm">
                             <TableCell></TableCell>
@@ -613,7 +596,6 @@ const Ads = () => {
             </div>
           )}
           
-          {/* Placeholder for other views */}
           {selectedView === 'adSets' && (
             <div className="rounded-md border p-8 text-center">
               <h3 className="text-lg font-medium text-gray-600">Ad Sets View</h3>
