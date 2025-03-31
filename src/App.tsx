@@ -24,6 +24,7 @@ import Phone from "./pages/Phone";
 import Sales from "./pages/Sales";
 import Ads from "./pages/Ads";
 import CreateAd from "./pages/CreateAd";
+import PaymentPortal from "./pages/PaymentPortal";
 
 const queryClient = new QueryClient();
 
@@ -124,6 +125,11 @@ const AppRoutes = () => {
       <Route path="/ads/create" element={
         <ProtectedRoute>
           <CreateAd />
+        </ProtectedRoute>
+      } />
+      <Route path="/payment-portal" element={
+        <ProtectedRoute>
+          <PaymentPortal />
         </ProtectedRoute>
       } />
       <Route path="/reports" element={

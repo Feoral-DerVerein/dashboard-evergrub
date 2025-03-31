@@ -97,7 +97,6 @@ const CreateAd = () => {
   const [showInMarketplace, setShowInMarketplace] = useState(true);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [processingPayment, setProcessingPayment] = useState(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -174,7 +173,7 @@ const CreateAd = () => {
   };
 
   const handleSaveDraft = () => {
-    toast.success("Draft saved successfully!");
+    toast.error("Draft saved successfully!");
   };
 
   const getSubcategories = () => {
@@ -197,20 +196,15 @@ const CreateAd = () => {
       return;
     }
 
-    setProcessingPayment(true);
+    const selectedPlanData = pricingPlans.find(plan => plan.id === selectedPlan);
+    if (!selectedPlanData) {
+      toast.error("Invalid plan selected");
+      return;
+    }
 
-    setTimeout(() => {
-      setProcessingPayment(false);
-      setPaymentDialogOpen(false);
-      
-      const marketplaceMessage = showInMarketplace 
-        ? "and will appear in the marketplace banner" 
-        : "but won't appear in the marketplace banner";
-      
-      toast.success(`Ad created successfully ${marketplaceMessage}!`);
-      
-      setTimeout(() => navigate("/ads"), 1500);
-    }, 2000);
+    setPaymentDialogOpen(false);
+    
+    navigate('/payment-portal', { state: { plan: selectedPlanData } });
   };
 
   const handleCancelPayment = () => {
@@ -532,10 +526,10 @@ const CreateAd = () => {
                   Cancel
                 </Button>
                 <Button 
-                  onClick={handleProcessPayment} 
-                  disabled={!selectedPlan || processingPayment}
+                  onClick={handleProcessPayment}
+                  disabled={!selectedPlan}
                 >
-                  {processingPayment ? "Processing..." : "Pay & Publish Ad"}
+                  Proceed to Payment
                 </Button>
               </DialogFooter>
             </DialogContent>
