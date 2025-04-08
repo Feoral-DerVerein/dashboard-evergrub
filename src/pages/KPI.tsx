@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
+import { useState } from "react";
 
 const salesData = [
   { day: "Mon", value: 2500 },
@@ -14,11 +15,20 @@ const salesData = [
   { day: "Sun", value: 4200 },
 ];
 
-const TimeFilterButton = ({ label, isActive = false }: { label: string; isActive?: boolean }) => (
+const TimeFilterButton = ({ 
+  label, 
+  isActive = false,
+  onClick
+}: { 
+  label: string; 
+  isActive?: boolean;
+  onClick: () => void;
+}) => (
   <button
     className={`px-4 py-1.5 rounded-full text-sm ${
       isActive ? "bg-blue-500 text-white" : "text-gray-500 hover:bg-gray-100"
     }`}
+    onClick={onClick}
   >
     {label}
   </button>
@@ -79,6 +89,12 @@ const ExpiringItem = ({ name, expires, quantity, severity }: { name: string; exp
 };
 
 const KPI = () => {
+  const [activeTimeFilter, setActiveTimeFilter] = useState<string>("Week");
+  
+  const handleTimeFilterClick = (filter: string) => {
+    setActiveTimeFilter(filter);
+  };
+  
   return (
     <div className="min-h-screen flex flex-col w-full bg-gray-50">
       <div className="flex-1">
@@ -96,11 +112,31 @@ const KPI = () => {
               </div>
             </div>
             <div className="flex gap-2 overflow-x-auto pb-2">
-              <TimeFilterButton label="Today" />
-              <TimeFilterButton label="Week" isActive={true} />
-              <TimeFilterButton label="Month" />
-              <TimeFilterButton label="Quarter" />
-              <TimeFilterButton label="Year" />
+              <TimeFilterButton 
+                label="Today" 
+                isActive={activeTimeFilter === "Today"}
+                onClick={() => handleTimeFilterClick("Today")}
+              />
+              <TimeFilterButton 
+                label="Week" 
+                isActive={activeTimeFilter === "Week"}
+                onClick={() => handleTimeFilterClick("Week")}
+              />
+              <TimeFilterButton 
+                label="Month" 
+                isActive={activeTimeFilter === "Month"}
+                onClick={() => handleTimeFilterClick("Month")}
+              />
+              <TimeFilterButton 
+                label="Quarter" 
+                isActive={activeTimeFilter === "Quarter"}
+                onClick={() => handleTimeFilterClick("Quarter")}
+              />
+              <TimeFilterButton 
+                label="Year" 
+                isActive={activeTimeFilter === "Year"}
+                onClick={() => handleTimeFilterClick("Year")}
+              />
             </div>
           </header>
 
