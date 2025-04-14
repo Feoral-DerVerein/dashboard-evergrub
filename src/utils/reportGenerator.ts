@@ -13,27 +13,23 @@ interface AutoTableOptions {
   // Add other options as needed
 }
 
-// Create a more precise internal type that includes what we need
-interface InternalJsPDF {
-  getNumberOfPages: () => number;
-  pageSize: {
-    width: number;
-    height: number;
-    getWidth?: () => number;
-    getHeight?: () => number;
-  };
-  events?: any;
-  scaleFactor?: number;
-  pages?: any[];
-  getEncryptor?: (objectId: number) => (data: string) => string;
-}
-
 // Extend the jsPDF type to include autoTable
 declare module "jspdf" {
   interface jsPDF {
     autoTable: (options: AutoTableOptions) => jsPDF;
-    // Define internal with our custom interface
-    internal: InternalJsPDF;
+    
+    // Use an indexed signature to augment the internal property
+    // This avoids conflicts with the existing type definition
+    internal: {
+      getNumberOfPages: () => number;
+      pageSize: {
+        width: number;
+        height: number;
+        getWidth?: () => number;
+        getHeight?: () => number;
+      };
+      [key: string]: any;
+    };
   }
 }
 
