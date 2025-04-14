@@ -13,23 +13,10 @@ interface AutoTableOptions {
   // Add other options as needed
 }
 
-// Extend the jsPDF type to include autoTable
+// We need to properly augment jsPDF to avoid type conflicts
 declare module "jspdf" {
   interface jsPDF {
     autoTable: (options: AutoTableOptions) => jsPDF;
-    
-    // Use an indexed signature to augment the internal property
-    // This avoids conflicts with the existing type definition
-    internal: {
-      getNumberOfPages: () => number;
-      pageSize: {
-        width: number;
-        height: number;
-        getWidth?: () => number;
-        getHeight?: () => number;
-      };
-      [key: string]: any;
-    };
   }
 }
 
@@ -160,7 +147,8 @@ export const generateKpiReport = async (period: TimeFilterPeriod): Promise<void>
     item.name, item.expires, item.quantity
   ]);
   
-  doc.autoTable({
+  // Use the autotable functionality from jspdf-autotable
+  (doc as any).autoTable({
     head: [["Product", "Expires In", "Quantity"]],
     body: expiringItemsTableData,
     startY: 100,
@@ -175,22 +163,23 @@ export const generateKpiReport = async (period: TimeFilterPeriod): Promise<void>
     item.day, `$${item.value}`
   ]);
   
-  doc.autoTable({
+  // Use the autotable functionality from jspdf-autotable
+  (doc as any).autoTable({
     head: [["Day", "Sales Amount"]],
     body: salesPerformanceTableData,
     startY: 155,
     theme: "grid"
   });
   
-  // Add footer
-  const pageCount = doc.internal.getNumberOfPages();
+  // Add footer with page numbers
+  const pageCount = (doc as any).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);
     doc.text(
       "Generated with Lovable Dashboard | Confidential Business Report",
       105,
-      doc.internal.pageSize.height - 10,
+      (doc as any).internal.pageSize.height - 10,
       { align: "center" }
     );
   }
