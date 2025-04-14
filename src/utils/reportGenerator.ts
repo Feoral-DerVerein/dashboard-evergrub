@@ -1,13 +1,20 @@
 
 import { salesService } from "@/services/salesService";
-import { orderService } from "@/services/orderService";
+import * as orderService from "@/services/orderService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-// Extend the jsPDF type to include autoTable method
+// Extend the jsPDF type to include autoTable method and internal properties
 declare module "jspdf" {
   interface jsPDF {
     autoTable: (options: any) => jsPDF;
+    internal: {
+      getNumberOfPages: () => number;
+      pageSize: {
+        height: number;
+        width: number;
+      };
+    };
   }
 }
 
