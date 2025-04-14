@@ -4,17 +4,21 @@ import * as orderService from "@/services/orderService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-// Extend the jsPDF type to include autoTable method and internal properties
+// Define the type for autoTable
+interface AutoTableOptions {
+  head: any[][];
+  body: any[][];
+  startY?: number;
+  theme?: string;
+  // Add other options as needed
+}
+
+// Extend the jsPDF type to include autoTable
 declare module "jspdf" {
   interface jsPDF {
-    autoTable: (options: any) => jsPDF;
-    internal: {
-      getNumberOfPages: () => number;
-      pageSize: {
-        height: number;
-        width: number;
-      };
-    };
+    autoTable: (options: AutoTableOptions) => jsPDF;
+    // For accessing page information
+    internal: any; // Using any to avoid conflict with built-in definitions
   }
 }
 
