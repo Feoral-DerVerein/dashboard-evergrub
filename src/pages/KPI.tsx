@@ -1,9 +1,13 @@
+
 import { Bell, Download, Lock, Home, Plus, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { useState } from "react";
+import { toast } from "sonner";
+import { generateKpiReport, TimeFilterPeriod } from "@/utils/reportGenerator";
+import { Button } from "@/components/ui/button";
 
 const salesData = [
   { day: "Mon", value: 2500 },
@@ -89,10 +93,27 @@ const ExpiringItem = ({ name, expires, quantity, severity }: { name: string; exp
 };
 
 const KPI = () => {
-  const [activeTimeFilter, setActiveTimeFilter] = useState<string>("Week");
+  const [activeTimeFilter, setActiveTimeFilter] = useState<TimeFilterPeriod>("Week");
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   
-  const handleTimeFilterClick = (filter: string) => {
+  const handleTimeFilterClick = (filter: TimeFilterPeriod) => {
     setActiveTimeFilter(filter);
+  };
+  
+  const handleDownloadReport = async () => {
+    try {
+      setIsGeneratingReport(true);
+      toast.info("Generating report...");
+      
+      await generateKpiReport(activeTimeFilter);
+      
+      toast.success("Report generated successfully!");
+    } catch (error) {
+      console.error("Error generating report:", error);
+      toast.error("Failed to generate report. Please try again.");
+    } finally {
+      setIsGeneratingReport(false);
+    }
   };
   
   return (
@@ -221,10 +242,14 @@ const KPI = () => {
               </div>
             </section>
 
-            <button className="w-full bg-emerald-600 text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 mb-6">
+            <Button 
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+              onClick={handleDownloadReport}
+              disabled={isGeneratingReport}
+            >
               <Download className="w-5 h-5" />
-              Download Report
-            </button>
+              {isGeneratingReport ? "Generating Report..." : "Download Report"}
+            </Button>
 
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
               <div className="flex items-center justify-center gap-1">
