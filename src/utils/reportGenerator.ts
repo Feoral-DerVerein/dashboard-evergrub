@@ -1,8 +1,7 @@
-
 import { salesService } from "@/services/salesService";
 import * as orderService from "@/services/orderService";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 // Define the type for autoTable
 interface AutoTableOptions {
@@ -12,15 +11,6 @@ interface AutoTableOptions {
   theme?: string;
   // Add other options as needed
 }
-
-// We need to properly augment jsPDF to avoid type conflicts
-declare module "jspdf" {
-  interface jsPDF {
-    autoTable: (options: AutoTableOptions) => jsPDF;
-  }
-}
-
-export type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
 
 // Interface for KPI data
 interface KpiReportData {
@@ -115,75 +105,80 @@ export const getKpiReportData = async (period: TimeFilterPeriod): Promise<KpiRep
 
 // Function to generate and download PDF report
 export const generateKpiReport = async (period: TimeFilterPeriod): Promise<void> => {
-  const data = await getKpiReportData(period);
-  
-  // Create new PDF document
-  const doc = new jsPDF();
-  const currentDate = new Date().toLocaleDateString();
-  
-  // Add title and header
-  doc.setFontSize(20);
-  doc.text("KPI Report", 105, 15, { align: "center" });
-  doc.setFontSize(10);
-  doc.text(`Period: ${data.period} | Generated: ${currentDate}`, 105, 22, { align: "center" });
-  
-  // Add KPI metrics section
-  doc.setFontSize(16);
-  doc.text("Key Performance Metrics", 14, 35);
-  
-  doc.setFontSize(11);
-  doc.text(`Total Sales: $${data.totalSales}`, 14, 45);
-  doc.text(`Transactions: ${data.transactionCount}`, 14, 52);
-  doc.text(`CO₂ Saved: ${data.co2Saved}`, 14, 59);
-  doc.text(`Waste Reduced: ${data.wasteReduced}`, 14, 66);
-  doc.text(`Conversion Rate: ${data.conversionRate}`, 14, 73);
-  doc.text(`Return Rate: ${data.returnRate}`, 14, 80);
-  
-  // Add expiring items section
-  doc.setFontSize(16);
-  doc.text("Expiring Soon", 14, 95);
-  
-  const expiringItemsTableData = data.expiringItems.map(item => [
-    item.name, item.expires, item.quantity
-  ]);
-  
-  // Use the autotable functionality from jspdf-autotable
-  (doc as any).autoTable({
-    head: [["Product", "Expires In", "Quantity"]],
-    body: expiringItemsTableData,
-    startY: 100,
-    theme: "grid"
-  });
-  
-  // Add sales performance section
-  doc.setFontSize(16);
-  doc.text("Sales Performance", 14, 150);
-  
-  const salesPerformanceTableData = data.salesPerformance.map(item => [
-    item.day, `$${item.value}`
-  ]);
-  
-  // Use the autotable functionality from jspdf-autotable
-  (doc as any).autoTable({
-    head: [["Day", "Sales Amount"]],
-    body: salesPerformanceTableData,
-    startY: 155,
-    theme: "grid"
-  });
-  
-  // Add footer with page numbers
-  const pageCount = (doc as any).internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    doc.setFontSize(8);
-    doc.text(
-      "Generated with Lovable Dashboard | Confidential Business Report",
-      105,
-      (doc as any).internal.pageSize.height - 10,
-      { align: "center" }
-    );
+  try {
+    const data = await getKpiReportData(period);
+    
+    // Create new PDF document
+    const doc = new jsPDF();
+    const currentDate = new Date().toLocaleDateString();
+    
+    // Add title and header
+    doc.setFontSize(20);
+    doc.text("KPI Report", 105, 15, { align: "center" });
+    doc.setFontSize(10);
+    doc.text(`Period: ${data.period} | Generated: ${currentDate}`, 105, 22, { align: "center" });
+    
+    // Add KPI metrics section
+    doc.setFontSize(16);
+    doc.text("Key Performance Metrics", 14, 35);
+    
+    doc.setFontSize(11);
+    doc.text(`Total Sales: $${data.totalSales}`, 14, 45);
+    doc.text(`Transactions: ${data.transactionCount}`, 14, 52);
+    doc.text(`CO₂ Saved: ${data.co2Saved}`, 14, 59);
+    doc.text(`Waste Reduced: ${data.wasteReduced}`, 14, 66);
+    doc.text(`Conversion Rate: ${data.conversionRate}`, 14, 73);
+    doc.text(`Return Rate: ${data.returnRate}`, 14, 80);
+    
+    // Add expiring items section
+    doc.setFontSize(16);
+    doc.text("Expiring Soon", 14, 95);
+    
+    const expiringItemsTableData = data.expiringItems.map(item => [
+      item.name, item.expires, item.quantity
+    ]);
+    
+    // Add expiring items table
+    autoTable(doc, {
+      head: [["Product", "Expires In", "Quantity"]],
+      body: expiringItemsTableData,
+      startY: 100,
+      theme: "grid"
+    });
+    
+    // Add sales performance section
+    doc.setFontSize(16);
+    doc.text("Sales Performance", 14, 150);
+    
+    const salesPerformanceTableData = data.salesPerformance.map(item => [
+      item.day, `$${item.value}`
+    ]);
+    
+    // Add sales performance table
+    autoTable(doc, {
+      head: [["Day", "Sales Amount"]],
+      body: salesPerformanceTableData,
+      startY: 155,
+      theme: "grid"
+    });
+    
+    // Add footer with page numbers
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.text(
+        "Generated with Lovable Dashboard | Confidential Business Report",
+        105,
+        doc.internal.pageSize.height - 10,
+        { align: "center" }
+      );
+    }
+    
+    // Save the PDF with a mobile-friendly name
+    doc.save(`KPI_Report_${data.period}_${currentDate.replace(/\//g, "-")}.pdf`);
+  } catch (error) {
+    console.error("Error generating report:", error);
+    throw error;
   }
-  
-  // Save the PDF
-  doc.save(`KPI_Report_${data.period}_${currentDate.replace(/\//g, "-")}.pdf`);
 };
