@@ -3,6 +3,9 @@ import * as orderService from "@/services/orderService";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+// Define TimeFilterPeriod type
+export type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
+
 // Define the type for autoTable
 interface AutoTableOptions {
   head: any[][];
@@ -163,7 +166,7 @@ export const generateKpiReport = async (period: TimeFilterPeriod): Promise<void>
     });
     
     // Add footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = (doc as any).internal.pages.length;
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);
