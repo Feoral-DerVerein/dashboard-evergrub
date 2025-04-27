@@ -115,23 +115,15 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Get sales data
         const recentSales = await salesService.getSales();
-        
-        // Get total revenue
         const totalRevenue = recentSales.reduce((sum, sale) => sum + Number(sale.amount), 0);
-        
-        // Get monthly sales data
         const monthlySummary = await salesService.getMonthlySales();
-        
-        // Get orders data
         const orders = await getUserOrders();
         const pendingOrders = orders.filter(order => order.status === "pending").length;
         
-        // Update stats
         setStats({
           totalSales: recentSales.length,
-          activeUsers: Math.floor(recentSales.length * 1.5), // Estimated active users based on sales
+          activeUsers: Math.floor(recentSales.length * 1.5),
           newOrders: pendingOrders || orderCount,
           totalRevenue: totalRevenue,
           isLoading: false
@@ -149,11 +141,9 @@ const Dashboard = () => {
     const fetchRecentActivity = async () => {
       setIsLoading(true);
       try {
-        // Get recent sales
         const recentSales = await salesService.getSales();
         const latestSales = recentSales.slice(0, 2);
         
-        // Convert sales to activity items
         const salesActivity = latestSales.map((sale) => ({
           title: `Payment completed for ${sale.customer_name}`,
           time: formatTimeAgo(sale.created_at),
@@ -161,7 +151,6 @@ const Dashboard = () => {
           type: 'payment' as const
         }));
         
-        // Get recent orders
         const recentOrders = await getUserOrders();
         const latestOrders = recentOrders.filter(order => order.status === "pending").slice(0, 1);
         
@@ -172,13 +161,11 @@ const Dashboard = () => {
           type: 'order' as const
         }));
         
-        // Combine activities
         const allActivity = [...salesActivity, ...ordersActivity];
         
         if (allActivity.length > 0) {
           setRecentActivity(allActivity);
         } else {
-          // Fallback to dummy data if no real activity found
           setRecentActivity([
             {
               title: "New order received",
@@ -201,7 +188,6 @@ const Dashboard = () => {
         }
       } catch (error) {
         console.error("Error fetching recent activity:", error);
-        // Fallback to dummy data on error
         setRecentActivity([
           {
             title: "New order received",
@@ -257,8 +243,8 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-1">
             <div>
               <img 
-                src="/lovable-uploads/a18ff71a-0b3e-4795-a638-dd589a1a82ee.png" 
-                alt="WiseBite" 
+                src="/lovable-uploads/dd7edace-28a7-4d4d-addb-d4f793708f1f.png" 
+                alt="E Logo" 
                 className="h-6 w-auto mb-1"
               />
               <p className="text-gray-500">Welcome, Felipe</p>
