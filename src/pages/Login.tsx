@@ -7,7 +7,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
 import { useAuth } from "@/context/AuthContext";
-
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
@@ -21,7 +20,6 @@ const Login = () => {
   const {
     signInWithGoogle
   } = useAuth();
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -65,7 +63,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
     try {
       if (provider === 'google') {
@@ -91,14 +88,9 @@ const Login = () => {
       });
     }
   };
-
   return <div className="min-h-screen bg-white px-6 pb-20">
       <div className="pt-10 flex justify-center">
-        <img 
-          src="/lovable-uploads/dd7edace-28a7-4d4d-addb-d4f793708f1f.png" 
-          alt="E Logo" 
-          className="h-6 w-auto" 
-        />
+        <img src="/lovable-uploads/dd7edace-28a7-4d4d-addb-d4f793708f1f.png" alt="E Logo" className="h-6 w-auto object-contain" />
       </div>
 
       <div className="mt-12">
@@ -190,5 +182,4 @@ const Login = () => {
       </div>
     </div>;
 };
-
 export default Login;
