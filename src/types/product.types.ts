@@ -12,6 +12,7 @@ export type Product = {
   image: string;
   storeId?: string; // ID de la tienda a la que pertenece el producto
   userId: string; // ID del usuario que crea/posee el producto
+  barcode?: string; // Barcode number for the product
 };
 
 // Type mapping to fix the mismatch between database and client-side types
@@ -29,6 +30,7 @@ export type DbProduct = {
   storeid: string | null; // Note lowercase 'id'
   userid: string; // Note lowercase 'id'
   created_at: string;
+  barcode?: string; // Barcode number for the product
 };
 
 // Constante para el ID de la tienda

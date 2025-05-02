@@ -41,6 +41,41 @@ export const productService = {
     }
   },
 
+  // Get product by barcode
+  async getProductByBarcode(barcode: string): Promise<Product | null> {
+    try {
+      console.log("Fetching product with barcode:", barcode);
+      // You would typically have a barcode field in your products table
+      // This is a placeholder implementation - in a real app, you'd query your database
+      
+      // Mock implementation - in a real app, this would be a database query
+      // For now, we're returning null as if no product with this barcode exists
+      return null;
+      
+      // Example of how this would work with actual barcode field:
+      // const { data, error } = await supabase
+      //   .from('products')
+      //   .select('*')
+      //   .eq('barcode', barcode)
+      //   .maybeSingle();
+      // 
+      // if (error) {
+      //   console.error("Error fetching product by barcode:", error);
+      //   throw error;
+      // }
+      // 
+      // if (!data) {
+      //   console.log("No product found with barcode:", barcode);
+      //   return null;
+      // }
+      // 
+      // return mapDbProductToProduct(data as DbProduct);
+    } catch (error) {
+      console.error("Error in getProductByBarcode:", error);
+      throw error;
+    }
+  },
+
   // Get products by user ID (store owner)
   async getProductsByUser(userId: string): Promise<Product[]> {
     try {

@@ -1,11 +1,12 @@
 
-import { ArrowLeft, Calendar, Camera } from "lucide-react";
+import { ArrowLeft, Calendar, Camera, Barcode } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { productService, Product, SAFFIRE_FREYCINET_STORE_ID } from "@/services/productService";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type ProductFormData = {
   name: string;
@@ -18,6 +19,7 @@ type ProductFormData = {
   quantity: string;
   expirationDate: string;
   image: string;
+  barcode?: string;
 };
 
 const AddProduct = () => {
@@ -34,7 +36,8 @@ const AddProduct = () => {
     customBrand: "",
     quantity: "1",
     expirationDate: "",
-    image: ""
+    image: "",
+    barcode: ""
   });
   const [showCustomBrand, setShowCustomBrand] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,7 +45,14 @@ const AddProduct = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  const [scannerInitialized, setScannerInitialized] = useState(false);
+  const [scannerError, setScannerError] = useState<string | null>(null);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -68,7 +78,8 @@ const AddProduct = () => {
               customBrand: isCustomBrand ? product.brand : "",
               quantity: product.quantity.toString(),
               expirationDate: product.expirationDate,
-              image: product.image
+              image: product.image,
+              barcode: ""
             });
             
             setShowCustomBrand(isCustomBrand);
@@ -102,6 +113,173 @@ const AddProduct = () => {
     
     fetchProduct();
   }, [id, isEditMode, navigate, toast]);
+
+  // Initialize barcode scanner
+  const initBarcodeScanner = async () => {
+    if (!videoRef.current || scannerInitialized) return;
+    
+    try {
+      setScannerError(null);
+      const constraints = {
+        video: { facingMode: "environment" }
+      };
+      
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+        setScannerInitialized(true);
+        scanBarcode();
+      }
+    } catch (error: any) {
+      console.error("Error accessing camera:", error);
+      setScannerError("Failed to access camera. Please ensure you've granted camera permissions.");
+      toast({
+        title: "Camera Error",
+        description: "Failed to access camera. Please ensure camera permissions are enabled.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Stop scanner and release camera resources
+  const stopBarcodeScanner = () => {
+    if (videoRef.current?.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+      setScannerInitialized(false);
+    }
+    setShowBarcodeScanner(false);
+  };
+
+  // Scan for barcodes in video stream
+  const scanBarcode = async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    
+    try {
+      // Try to dynamically import the barcode detection library
+      const Quagga = (await import('quagga')).default;
+      
+      // Configure Quagga to analyze video feed
+      Quagga.init({
+        inputStream: {
+          name: "Live",
+          type: "LiveStream",
+          target: videoRef.current
+        },
+        decoder: {
+          readers: [
+            "ean_reader",
+            "ean_8_reader",
+            "upc_reader",
+            "code_128_reader",
+            "code_39_reader"
+          ]
+        }
+      }, function(err) {
+        if (err) {
+          console.error("Barcode scanner initialization error:", err);
+          setScannerError("Failed to initialize barcode scanner");
+          return;
+        }
+        
+        console.log("Barcode scanner ready");
+        Quagga.start();
+      });
+      
+      Quagga.onDetected(async (result) => {
+        const code = result.codeResult.code;
+        console.log("Barcode detected:", code);
+        
+        // Play a success sound
+        const audio = new Audio('/barcode-beep.mp3');
+        audio.play().catch(e => console.log("Audio play error:", e));
+        
+        // Stop the scanner
+        Quagga.stop();
+        stopBarcodeScanner();
+        
+        // Look up the product information based on the barcode
+        await fetchProductByBarcode(code);
+      });
+    } catch (error) {
+      console.error("Error loading barcode scanner:", error);
+      setScannerError("Could not load barcode scanner. Please try again.");
+    }
+  };
+
+  // Fetch product information based on barcode
+  const fetchProductByBarcode = async (barcode: string) => {
+    try {
+      setLoading(true);
+      toast({
+        title: "Barcode Detected",
+        description: `Looking up product with barcode: ${barcode}`
+      });
+      
+      // Here we would normally call an API to look up the product
+      // For demo purposes, we'll simulate a response after a delay
+      setTimeout(() => {
+        // Mock data - in a real app, this would come from an API call
+        const mockProduct = {
+          name: `Product ${barcode.substring(0, 4)}`,
+          price: (Math.random() * 100).toFixed(2),
+          description: "Scanned product description",
+          category: "SPA Products",
+          brand: "Generic",
+          // Set expiration date to 6 months from now
+          expirationDate: new Date(
+            new Date().setMonth(new Date().getMonth() + 6)
+          ).toISOString().split("T")[0],
+          // Random discount between 0 and 30%
+          discount: (Math.random() * 30).toFixed(0)
+        };
+        
+        setFormData({
+          ...formData,
+          name: mockProduct.name,
+          price: mockProduct.price,
+          description: mockProduct.description,
+          category: mockProduct.category,
+          brand: mockProduct.brand,
+          expirationDate: mockProduct.expirationDate,
+          discount: mockProduct.discount,
+          barcode: barcode
+        });
+        
+        toast({
+          title: "Product Found",
+          description: "Product information has been loaded!"
+        });
+        setLoading(false);
+      }, 1500);
+      
+      // In a real implementation, we would do something like:
+      // const product = await productService.getProductByBarcode(barcode);
+      // if (product) {
+      //   setFormData({...});
+      // }
+      
+    } catch (error: any) {
+      console.error("Error fetching product by barcode:", error);
+      toast({
+        title: "Lookup Error",
+        description: `Could not find product information: ${error.message || "Unknown error"}`,
+        variant: "destructive"
+      });
+      setLoading(false);
+    }
+  };
+
+  // Open barcode scanner dialog
+  const handleOpenBarcodeScanner = () => {
+    setShowBarcodeScanner(true);
+    // Initialize scanner after dialog is shown
+    setTimeout(() => {
+      initBarcodeScanner();
+    }, 500);
+  };
 
   const calculateFinalPrice = () => {
     const price = parseFloat(formData.price) || 0;
@@ -311,6 +489,16 @@ const AddProduct = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Barcode scanner button */}
+          <button
+            type="button"
+            onClick={handleOpenBarcodeScanner}
+            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Barcode className="w-5 h-5" />
+            Scan Barcode
+          </button>
+
           {/* Product name input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -537,6 +725,41 @@ const AddProduct = () => {
           </button>
         </form>
       </div>
+
+      {/* Barcode Scanner Dialog */}
+      <Dialog open={showBarcodeScanner} onOpenChange={(open) => {
+        if (!open) stopBarcodeScanner();
+        setShowBarcodeScanner(open);
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Scan Barcode</DialogTitle>
+          </DialogHeader>
+          <div className="relative">
+            <video 
+              ref={videoRef} 
+              className="w-full h-64 bg-black rounded-lg" 
+              playsInline
+              muted
+            ></video>
+            <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" style={{ display: 'none' }}></canvas>
+            
+            {scannerError && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+                <p className="text-white text-center p-4">{scannerError}</p>
+              </div>
+            )}
+            
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-64 h-64 border-2 border-green-500 opacity-60"></div>
+            </div>
+            
+            <p className="mt-2 text-sm text-center text-gray-500">
+              Position the barcode within the green square
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
