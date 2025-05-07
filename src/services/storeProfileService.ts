@@ -52,14 +52,12 @@ export const storeProfileService = {
         // TypeScript now knows existingProfileData is not null in this block
         // Check if it's an object with an id property
         if (typeof existingProfileData === 'object') {
-          // First declare a variable and then safely access the id property
-          // This avoids the TypeScript error by directly checking the property
-          const id = existingProfileData && 'id' in existingProfileData 
-            ? existingProfileData.id 
-            : undefined;
+          // Use type assertion to tell TypeScript that existingProfileData is a record with an id property
+          const typedData = existingProfileData as { id: string | number };
           
-          if (id !== null && id !== undefined) {
-            existingProfile = { id: String(id) };
+          // Now we can safely access the id property
+          if (typedData.id !== null && typedData.id !== undefined) {
+            existingProfile = { id: String(typedData.id) };
           }
         }
       }
