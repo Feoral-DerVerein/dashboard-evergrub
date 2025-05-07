@@ -18,8 +18,8 @@ export const storeProfileService = {
         return null;
       }
       
-      // Only return data if it exists (it's already been checked for errors)
-      return data as StoreProfile | null;
+      // Return null if no data, otherwise return as StoreProfile
+      return data ? data as StoreProfile : null;
     } catch (error) {
       console.error("Error in getStoreProfile:", error);
       return null;
@@ -41,8 +41,8 @@ export const storeProfileService = {
         return null;
       }
       
-      // Now we can safely assert the type since we've checked for errors
-      const existingProfile = existingProfileData ? { id: existingProfileData.id as string } : null;
+      // Safely handle existingProfileData
+      const existingProfile = existingProfileData ? { id: String(existingProfileData.id) } : null;
       let result;
       
       if (existingProfile?.id) {
@@ -89,8 +89,8 @@ export const storeProfileService = {
         result = data;
       }
       
-      // We've checked for errors, so we can safely return the result
-      return result as StoreProfile;
+      // Return null if no result, otherwise return as StoreProfile
+      return result ? result as StoreProfile : null;
     } catch (error) {
       console.error("Error in saveStoreProfile:", error);
       return null;
