@@ -283,6 +283,54 @@ export type Database = {
           },
         ]
       }
+      store_profiles: {
+        Row: {
+          businessHours: Json
+          categories: string[]
+          contactEmail: string
+          contactPhone: string
+          coverUrl: string
+          description: string
+          id: string
+          location: string
+          logoUrl: string
+          name: string
+          socialFacebook: string
+          socialInstagram: string
+          userId: string
+        }
+        Insert: {
+          businessHours?: Json
+          categories?: string[]
+          contactEmail: string
+          contactPhone: string
+          coverUrl: string
+          description: string
+          id?: string
+          location: string
+          logoUrl: string
+          name: string
+          socialFacebook: string
+          socialInstagram: string
+          userId: string
+        }
+        Update: {
+          businessHours?: Json
+          categories?: string[]
+          contactEmail?: string
+          contactPhone?: string
+          coverUrl?: string
+          description?: string
+          id?: string
+          location?: string
+          logoUrl?: string
+          name?: string
+          socialFacebook?: string
+          socialInstagram?: string
+          userId?: string
+        }
+        Relationships: []
+      }
       user_points: {
         Row: {
           created_at: string | null

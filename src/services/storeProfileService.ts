@@ -6,9 +6,9 @@ export const storeProfileService = {
   // Get the user's store profile
   async getStoreProfile(userId: string): Promise<StoreProfile | null> {
     try {
-      // Using a type assertion for the table that isn't in the generated types yet
-      const { data, error } = await (supabase
-        .from('store_profiles') as any)
+      // Using a type assertion since the table is not in the generated types yet
+      const { data, error } = await supabase
+        .from('store_profiles' as any)
         .select('*')
         .eq('userId', userId)
         .maybeSingle();
@@ -29,8 +29,8 @@ export const storeProfileService = {
   async saveStoreProfile(profile: StoreProfile): Promise<StoreProfile | null> {
     try {
       // Check if a profile already exists for this user
-      const { data: existingProfile } = await (supabase
-        .from('store_profiles') as any)
+      const { data: existingProfile } = await supabase
+        .from('store_profiles' as any)
         .select('id')
         .eq('userId', profile.userId)
         .maybeSingle();
@@ -39,8 +39,8 @@ export const storeProfileService = {
       
       if (existingProfile?.id) {
         // Update existing profile
-        const { data, error } = await (supabase
-          .from('store_profiles') as any)
+        const { data, error } = await supabase
+          .from('store_profiles' as any)
           .update({
             name: profile.name,
             description: profile.description,
@@ -66,9 +66,9 @@ export const storeProfileService = {
         result = data;
       } else {
         // Create a new profile
-        const { data, error } = await (supabase
-          .from('store_profiles') as any)
-          .insert([profile])
+        const { data, error } = await supabase
+          .from('store_profiles' as any)
+          .insert([profile] as any)
           .select()
           .single();
         
