@@ -29,12 +29,13 @@ export const storeProfileService = {
   async saveStoreProfile(profile: StoreProfile): Promise<StoreProfile | null> {
     try {
       // Check if a profile already exists for this user
-      const { data: existingProfile } = await supabase
+      const { data: existingProfileData } = await supabase
         .from('store_profiles' as any)
         .select('id')
         .eq('userId', profile.userId)
         .maybeSingle();
       
+      const existingProfile = existingProfileData as { id: string } | null;
       let result;
       
       if (existingProfile?.id) {
@@ -52,7 +53,8 @@ export const storeProfileService = {
             logoUrl: profile.logoUrl,
             coverUrl: profile.coverUrl,
             categories: profile.categories,
-            businessHours: profile.businessHours
+            businessHours: profile.businessHours,
+            paymentDetails: profile.paymentDetails
           })
           .eq('id', existingProfile.id)
           .select()
@@ -68,7 +70,7 @@ export const storeProfileService = {
         // Create a new profile
         const { data, error } = await supabase
           .from('store_profiles' as any)
-          .insert([profile] as any)
+          .insert([profile])
           .select()
           .single();
         

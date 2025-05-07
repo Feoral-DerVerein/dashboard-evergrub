@@ -1,4 +1,10 @@
 
+export interface BusinessHour {
+  day: string;
+  open: string;
+  close: string;
+}
+
 export interface StoreProfile {
   id?: string;
   userId: string;
@@ -12,7 +18,7 @@ export interface StoreProfile {
   logoUrl: string;
   coverUrl: string;
   categories: string[];
-  businessHours: any[];
+  businessHours: BusinessHour[];
   paymentDetails?: {
     bankName?: string;
     accountNumber?: string;

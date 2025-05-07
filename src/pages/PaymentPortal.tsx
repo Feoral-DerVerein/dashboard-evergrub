@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, CreditCard, CheckCircle, Loader2, Bank, Globe } from "lucide-react";
+import { ArrowLeft, CreditCard, CheckCircle, Loader2, Building, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -436,7 +435,7 @@ const PaymentPortal = () => {
                                 value={merchantDetails.bankName}
                                 onChange={handleInputChange}
                               />
-                              <Bank className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                              <Building className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                             </div>
                           </div>
                           
