@@ -1,7 +1,6 @@
 
 import Dashboard from "@/components/Dashboard";
 import { BankAccountForm } from "@/components/BankAccountForm";
-import { FundsSimulator } from "@/components/FundsSimulator";
 import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
@@ -10,10 +9,7 @@ const Index = () => {
       <Dashboard />
       
       <div className="max-w-md mx-auto px-4 pb-12">
-        <div className="space-y-8">
-          <FundsSimulator />
-          <BankAccountForm />
-        </div>
+        <BankAccountForm />
       </div>
       
       <Toaster />

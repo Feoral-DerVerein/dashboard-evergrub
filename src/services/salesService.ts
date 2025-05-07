@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -201,82 +202,6 @@ export const salesService = {
       return true;
     } catch (error) {
       console.error("Exception in createSaleFromOrder:", error);
-      return false;
-    }
-  },
-
-  // Simulate a payment for testing purposes
-  async simulatePayment(
-    orderId: string, 
-    amount: number, 
-    customName?: string
-  ): Promise<boolean> {
-    try {
-      console.log(`Simulating payment of $${amount} with order ID ${orderId}`);
-      
-      // First check if a sale already exists for this order
-      const { data: existingSale, error: checkError } = await supabase
-        .from('sales')
-        .select('id')
-        .eq('order_id', orderId)
-        .maybeSingle();
-        
-      if (checkError) {
-        console.error("Error checking for existing sale:", checkError);
-        return false;
-      }
-      
-      // If sale already exists, don't create another one
-      if (existingSale) {
-        console.log(`Sale already exists for order ${orderId}, skipping simulation`);
-        return true;
-      }
-      
-      // Use our custom customer name based on order ID or use the provided one
-      const customerName = customName || getConsistentCustomerName(orderId);
-      
-      // Mock products for the simulated sale
-      const mockProducts = [
-        {
-          name: "Simulated Product",
-          quantity: 1,
-          price: amount,
-          category: "Simulation"
-        }
-      ];
-      
-      // Create simulated sale record
-      const { data: saleData, error: saleError } = await supabase
-        .from('sales')
-        .insert({
-          order_id: orderId,
-          amount: amount,
-          customer_name: customerName,
-          sale_date: new Date().toISOString(),
-          products: mockProducts,
-          payment_method: 'direct deposit'
-        })
-        .select();
-        
-      if (saleError) {
-        console.error("Error creating simulated sale record:", saleError);
-        return false;
-      }
-      
-      console.log("Simulated sale record created successfully:", saleData);
-      
-      // Refresh dashboard stats after simulation
-      try {
-        await this.getTodaySales();
-        await this.getMonthlySales();
-      } catch (refreshError) {
-        console.log("Non-critical error refreshing stats:", refreshError);
-        // Continue even if refresh fails
-      }
-      
-      return true;
-    } catch (error) {
-      console.error("Exception in simulatePayment:", error);
       return false;
     }
   }
