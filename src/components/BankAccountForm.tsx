@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Building, CreditCard, Globe, Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,9 +53,9 @@ export const BankAccountForm = () => {
   };
   
   // Load payment details when component mounts
-  useEffect(() => {
+  useState(() => {
     loadPaymentDetails();
-  }, [user?.id]);
+  });
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
