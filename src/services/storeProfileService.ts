@@ -52,8 +52,12 @@ export const storeProfileService = {
         // TypeScript now knows existingProfileData is not null in this block
         // Check if it's an object with an id property
         if (typeof existingProfileData === 'object') {
-          // Use optional chaining to safely access the id property
-          const id = existingProfileData?.id;
+          // First declare a variable and then safely access the id property
+          // This avoids the TypeScript error by directly checking the property
+          const id = existingProfileData && 'id' in existingProfileData 
+            ? existingProfileData.id 
+            : undefined;
+          
           if (id !== null && id !== undefined) {
             existingProfile = { id: String(id) };
           }
