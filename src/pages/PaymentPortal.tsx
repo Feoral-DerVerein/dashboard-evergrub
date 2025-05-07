@@ -60,7 +60,11 @@ const PaymentPortal = () => {
   
   useEffect(() => {
     if (!plan && activeTab === "customer") {
-      toast.error("No plan selected. Redirecting to ad creation page.");
+      toast({
+        title: "Error",
+        description: "No plan selected. Redirecting to ad creation page.",
+        variant: "destructive"
+      });
       navigate("/ads/create");
     }
     
@@ -144,22 +148,38 @@ const PaymentPortal = () => {
     if (activeTab === "customer") {
       // Customer payment validation
       if (!cardDetails.cardNumber || cardDetails.cardNumber.replace(/\s/g, '').length < 16) {
-        toast.error("Please enter a valid card number");
+        toast({
+          title: "Error",
+          description: "Please enter a valid card number",
+          variant: "destructive"
+        });
         return;
       }
       
       if (!cardDetails.cardName) {
-        toast.error("Please enter the name on the card");
+        toast({
+          title: "Error",
+          description: "Please enter the name on the card",
+          variant: "destructive"
+        });
         return;
       }
       
       if (!cardDetails.expiryDate || cardDetails.expiryDate.length < 5) {
-        toast.error("Please enter a valid expiry date");
+        toast({
+          title: "Error",
+          description: "Please enter a valid expiry date",
+          variant: "destructive"
+        });
         return;
       }
       
       if (!cardDetails.cvc || cardDetails.cvc.length < 3) {
-        toast.error("Please enter a valid CVC");
+        toast({
+          title: "Error",
+          description: "Please enter a valid CVC",
+          variant: "destructive"
+        });
         return;
       }
       
@@ -173,27 +193,47 @@ const PaymentPortal = () => {
       // Merchant payment details validation
       if (merchantDetails.paymentMethod === "bank") {
         if (!merchantDetails.bankName) {
-          toast.error("Please enter a bank name");
+          toast({
+            title: "Error",
+            description: "Please enter a bank name",
+            variant: "destructive"
+          });
           return;
         }
         
         if (!merchantDetails.accountNumber) {
-          toast.error("Please enter an account number");
+          toast({
+            title: "Error",
+            description: "Please enter an account number",
+            variant: "destructive"
+          });
           return;
         }
         
         if (!merchantDetails.accountHolder) {
-          toast.error("Please enter the account holder name");
+          toast({
+            title: "Error",
+            description: "Please enter the account holder name",
+            variant: "destructive"
+          });
           return;
         }
         
         if (!merchantDetails.routingNumber) {
-          toast.error("Please enter a routing number");
+          toast({
+            title: "Error",
+            description: "Please enter a BSB number",
+            variant: "destructive"
+          });
           return;
         }
       } else if (merchantDetails.paymentMethod === "paypal") {
         if (!merchantDetails.paypalEmail) {
-          toast.error("Please enter your PayPal email");
+          toast({
+            title: "Error",
+            description: "Please enter your PayPal email",
+            variant: "destructive"
+          });
           return;
         }
       }
@@ -205,7 +245,11 @@ const PaymentPortal = () => {
   
   const saveMerchantDetails = async () => {
     if (!user?.id) {
-      toast.error("You must be logged in to save payment details");
+      toast({
+        title: "Error",
+        description: "You must be logged in to save payment details",
+        variant: "destructive"
+      });
       return;
     }
     
@@ -242,16 +286,27 @@ const PaymentPortal = () => {
       if (result) {
         setTimeout(() => {
           setPaymentStep("success");
-          toast.success("Payment information saved successfully");
+          toast({
+            title: "Success",
+            description: "Payment information saved successfully"
+          });
         }, 1000);
       } else {
         setPaymentStep("details");
-        toast.error("Failed to save payment information");
+        toast({
+          title: "Error",
+          description: "Failed to save payment information",
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error("Error saving merchant details:", error);
       setPaymentStep("details");
-      toast.error("An error occurred while saving payment information");
+      toast({
+        title: "Error",
+        description: "An error occurred while saving payment information",
+        variant: "destructive"
+      });
     }
   };
   
@@ -418,7 +473,8 @@ const PaymentPortal = () => {
                           <SelectContent>
                             <SelectItem value="USD">USD - US Dollar</SelectItem>
                             <SelectItem value="EUR">EUR - Euro</SelectItem>
-                            <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                            <SelectItem value="MXN">MXN - Mexican Peso</SelectItem>
+                            <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -428,14 +484,23 @@ const PaymentPortal = () => {
                           <div>
                             <Label htmlFor="bankName">Bank Name</Label>
                             <div className="relative">
-                              <Input
-                                id="bankName"
-                                name="bankName"
-                                placeholder="Your Bank"
+                              <Select
                                 value={merchantDetails.bankName}
-                                onChange={handleInputChange}
-                              />
-                              <Building className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                                onValueChange={(value) => handleSelectChange("bankName", value)}
+                              >
+                                <SelectTrigger className="pl-10">
+                                  <SelectValue placeholder="Select your bank" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="ANZ">ANZ Bank</SelectItem>
+                                  <SelectItem value="Commonwealth">Commonwealth Bank</SelectItem>
+                                  <SelectItem value="Westpac">Westpac</SelectItem>
+                                  <SelectItem value="NAB">National Australia Bank</SelectItem>
+                                  <SelectItem value="Bendigo">Bendigo Bank</SelectItem>
+                                  <SelectItem value="Other">Other Bank</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                             </div>
                           </div>
                           
@@ -444,7 +509,7 @@ const PaymentPortal = () => {
                             <Input
                               id="accountHolder"
                               name="accountHolder"
-                              placeholder="John Doe"
+                              placeholder="John Smith"
                               value={merchantDetails.accountHolder}
                               onChange={handleInputChange}
                             />
@@ -452,21 +517,25 @@ const PaymentPortal = () => {
                           
                           <div>
                             <Label htmlFor="accountNumber">Account Number</Label>
-                            <Input
-                              id="accountNumber"
-                              name="accountNumber"
-                              placeholder="123456789"
-                              value={merchantDetails.accountNumber}
-                              onChange={handleInputChange}
-                            />
+                            <div className="relative">
+                              <Input
+                                id="accountNumber"
+                                name="accountNumber"
+                                placeholder="123456789"
+                                value={merchantDetails.accountNumber}
+                                onChange={handleInputChange}
+                                className="pl-10"
+                              />
+                              <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                            </div>
                           </div>
                           
                           <div>
-                            <Label htmlFor="routingNumber">Routing Number</Label>
+                            <Label htmlFor="routingNumber">BSB Number</Label>
                             <Input
                               id="routingNumber"
                               name="routingNumber"
-                              placeholder="123456789"
+                              placeholder="123456"
                               value={merchantDetails.routingNumber}
                               onChange={handleInputChange}
                             />
@@ -484,8 +553,9 @@ const PaymentPortal = () => {
                               placeholder="your-email@example.com"
                               value={merchantDetails.paypalEmail}
                               onChange={handleInputChange}
+                              className="pl-10"
                             />
-                            <Globe className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                            <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                           </div>
                         </div>
                       )}
