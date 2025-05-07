@@ -19,7 +19,7 @@ export const storeProfileService = {
       }
       
       // Return null if no data, otherwise return as StoreProfile
-      return data ? data as StoreProfile : null;
+      return data as StoreProfile | null;
     } catch (error) {
       console.error("Error in getStoreProfile:", error);
       return null;
@@ -41,8 +41,12 @@ export const storeProfileService = {
         return null;
       }
       
-      // Safely handle existingProfileData
-      const existingProfile = existingProfileData ? { id: String(existingProfileData.id) } : null;
+      // Safely handle existingProfileData - make sure it exists before using it
+      let existingProfile = null;
+      if (existingProfileData && typeof existingProfileData === 'object' && 'id' in existingProfileData) {
+        existingProfile = { id: String(existingProfileData.id) };
+      }
+
       let result;
       
       if (existingProfile?.id) {
@@ -90,7 +94,7 @@ export const storeProfileService = {
       }
       
       // Return null if no result, otherwise return as StoreProfile
-      return result ? result as StoreProfile : null;
+      return result as StoreProfile | null;
     } catch (error) {
       console.error("Error in saveStoreProfile:", error);
       return null;
