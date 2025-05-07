@@ -3,10 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { StoreProfile } from "@/types/store.types";
 
 export const storeProfileService = {
-  // Obtener el perfil de la tienda del usuario
+  // Get the user's store profile
   async getStoreProfile(userId: string): Promise<StoreProfile | null> {
     try {
-      // Using a type assertion to bypass TypeScript's strict table typing
+      // Using a type assertion for the table that isn't in the generated types yet
       const { data, error } = await (supabase
         .from('store_profiles') as any)
         .select('*')
@@ -25,10 +25,10 @@ export const storeProfileService = {
     }
   },
   
-  // Crear o actualizar el perfil de la tienda
+  // Create or update the store profile
   async saveStoreProfile(profile: StoreProfile): Promise<StoreProfile | null> {
     try {
-      // Verificar si ya existe un perfil para este usuario
+      // Check if a profile already exists for this user
       const { data: existingProfile } = await (supabase
         .from('store_profiles') as any)
         .select('id')
@@ -38,7 +38,7 @@ export const storeProfileService = {
       let result;
       
       if (existingProfile?.id) {
-        // Actualizar el perfil existente
+        // Update existing profile
         const { data, error } = await (supabase
           .from('store_profiles') as any)
           .update({
@@ -65,7 +65,7 @@ export const storeProfileService = {
         
         result = data;
       } else {
-        // Crear un nuevo perfil
+        // Create a new profile
         const { data, error } = await (supabase
           .from('store_profiles') as any)
           .insert([profile])

@@ -60,7 +60,7 @@ const Profile = () => {
   const [showAddCategoryDialog, setShowAddCategoryDialog] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   
-  // Datos del perfil de la tienda
+  // Store profile data
   const [profile, setProfile] = useState<StoreProfile>({
     userId: user?.id || '',
     name: '',
@@ -82,7 +82,7 @@ const Profile = () => {
     ]
   });
 
-  // Cargar el perfil al iniciar
+  // Load profile on start
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.id) {
@@ -105,12 +105,12 @@ const Profile = () => {
     fetchProfile();
   }, [user]);
 
-  // Manejar cambios en los campos del perfil
+  // Handle changes in profile fields
   const handleInputChange = (field: keyof StoreProfile, value: string) => {
     setProfile({ ...profile, [field]: value });
   };
   
-  // Manejar cambios en los horarios comerciales
+  // Handle changes in business hours
   const handleBusinessHourChange = (index: number, field: keyof BusinessHour, value: string) => {
     const updatedHours = [...profile.businessHours];
     updatedHours[index] = { ...updatedHours[index], [field]: value };
@@ -147,15 +147,15 @@ const Profile = () => {
       if (url) {
         setProfile({...profile, logoUrl: url});
         toast({
-          title: "Éxito",
-          description: "Logo actualizado correctamente"
+          title: "Success",
+          description: "Logo updated successfully"
         });
       }
     } catch (error) {
-      console.error("Error al subir el logo:", error);
+      console.error("Error uploading logo:", error);
       toast({
         title: "Error",
-        description: "No se pudo subir el logo",
+        description: "Could not upload logo",
         variant: "destructive"
       });
     } finally {
@@ -175,15 +175,15 @@ const Profile = () => {
       if (url) {
         setProfile({...profile, coverUrl: url});
         toast({
-          title: "Éxito",
-          description: "Imagen de portada actualizada correctamente"
+          title: "Success",
+          description: "Cover image updated successfully"
         });
       }
     } catch (error) {
-      console.error("Error al subir la imagen de portada:", error);
+      console.error("Error uploading cover image:", error);
       toast({
         title: "Error",
-        description: "No se pudo subir la imagen de portada",
+        description: "Could not upload cover image",
         variant: "destructive"
       });
     } finally {
@@ -195,7 +195,7 @@ const Profile = () => {
     if (!user?.id) {
       toast({
         title: "Error",
-        description: "Debes iniciar sesión para guardar tu perfil",
+        description: "You must be logged in to save your profile",
         variant: "destructive"
       });
       return;
@@ -203,7 +203,7 @@ const Profile = () => {
     
     setSaving(true);
     try {
-      // Guardar el perfil
+      // Save the profile
       const result = await storeProfileService.saveStoreProfile({
         ...profile,
         userId: user.id
@@ -211,17 +211,17 @@ const Profile = () => {
       
       if (result) {
         toast({
-          title: "Éxito",
-          description: "Perfil guardado correctamente"
+          title: "Success",
+          description: "Profile saved successfully"
         });
       } else {
-        throw new Error("No se pudo guardar el perfil");
+        throw new Error("Could not save profile");
       }
     } catch (error) {
-      console.error("Error al guardar el perfil:", error);
+      console.error("Error saving profile:", error);
       toast({
         title: "Error",
-        description: "No se pudo guardar el perfil",
+        description: "Could not save profile",
         variant: "destructive"
       });
     } finally {
@@ -233,7 +233,7 @@ const Profile = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
-        <span className="ml-2">Cargando perfil...</span>
+        <span className="ml-2">Loading profile...</span>
       </div>
     );
   }
@@ -242,7 +242,7 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto bg-white min-h-screen">
         <header className="px-6 py-4 border-b sticky top-0 bg-white z-10 flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Perfil de la Tienda</h1>
+          <h1 className="text-xl font-semibold">Store Profile</h1>
           <Button 
             variant="ghost" 
             className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
@@ -250,7 +250,7 @@ const Profile = () => {
             disabled={saving}
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Guardar
+            Save
           </Button>
         </header>
 
@@ -281,7 +281,7 @@ const Profile = () => {
                 />
               </label>
             </div>
-            <span className="text-sm text-gray-600">Subir Logo de la Tienda</span>
+            <span className="text-sm text-gray-600">Upload Store Logo</span>
           </div>
 
           <div className="relative h-40 bg-gray-100 rounded-lg flex items-center justify-center group overflow-hidden">
@@ -290,7 +290,7 @@ const Profile = () => {
             ) : (
               <div className="flex flex-col items-center text-gray-400 group-hover:text-gray-600">
                 <Camera className="w-8 h-8 mb-2" />
-                <span className="text-sm">Agregar Foto de Portada</span>
+                <span className="text-sm">Add Cover Photo</span>
               </div>
             )}
             <label htmlFor="cover-upload" className="absolute bottom-4 right-4 cursor-pointer">
@@ -314,18 +314,18 @@ const Profile = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">Nombre de la Tienda</label>
+              <label className="text-sm font-medium text-gray-700">Store Name</label>
               <Input 
-                placeholder="Ingrese el nombre de su tienda" 
+                placeholder="Enter your store name" 
                 value={profile.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Descripción</label>
+              <label className="text-sm font-medium text-gray-700">Description</label>
               <Textarea 
-                placeholder="Cuéntele a sus clientes sobre su negocio..." 
+                placeholder="Tell customers about your business..." 
                 className="h-24"
                 value={profile.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
@@ -333,11 +333,11 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Ubicación</label>
+              <label className="text-sm font-medium text-gray-700">Location</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                 <Input 
-                  placeholder="Agregue la dirección de su tienda" 
+                  placeholder="Add your store location" 
                   className="pl-10"
                   value={profile.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
@@ -346,7 +346,7 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-4 block">Horario Comercial</label>
+              <label className="text-sm font-medium text-gray-700 mb-4 block">Business Hours</label>
               {profile.businessHours.map((hour, index) => (
                 <BusinessHourRow 
                   key={hour.day} 
@@ -360,12 +360,12 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-4 block">Detalles de Contacto</label>
+              <label className="text-sm font-medium text-gray-700 mb-4 block">Contact Details</label>
               <div className="space-y-4">
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <Input 
-                    placeholder="Número de teléfono" 
+                    placeholder="Phone number" 
                     className="pl-10"
                     value={profile.contactPhone}
                     onChange={(e) => handleInputChange('contactPhone', e.target.value)}
@@ -374,7 +374,7 @@ const Profile = () => {
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <Input 
-                    placeholder="Dirección de correo electrónico" 
+                    placeholder="Email address" 
                     className="pl-10"
                     value={profile.contactEmail}
                     onChange={(e) => handleInputChange('contactEmail', e.target.value)}
@@ -404,7 +404,7 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-4 block">Servicios y Categorías</label>
+              <label className="text-sm font-medium text-gray-700 mb-4 block">Services and Categories</label>
               <div className="mb-4">
                 {profile.categories.map((category) => (
                   <ServiceTag
@@ -419,7 +419,7 @@ const Profile = () => {
                 className="text-blue-600 hover:text-blue-700 pl-0"
                 onClick={() => setShowAddCategoryDialog(true)}
               >
-                + Agregar más categorías
+                + Add more categories
               </Button>
             </div>
           </div>
@@ -432,10 +432,10 @@ const Profile = () => {
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                Guardando Perfil...
+                Saving Profile...
               </>
             ) : (
-              "Guardar Perfil"
+              "Save Profile"
             )}
           </Button>
         </main>
@@ -443,26 +443,26 @@ const Profile = () => {
         <BottomNav />
       </div>
 
-      {/* Diálogo para agregar nueva categoría */}
+      {/* Dialog for adding a new category */}
       <Dialog open={showAddCategoryDialog} onOpenChange={setShowAddCategoryDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Agregar Categoría</DialogTitle>
+            <DialogTitle>Add Category</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="new-category">Nombre de la categoría</Label>
+              <Label htmlFor="new-category">Category name</Label>
               <Input 
                 id="new-category"
-                placeholder="Ej. Panadería, Lácteos, etc."
+                placeholder="E.g. Bakery, Dairy, etc."
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddCategoryDialog(false)}>Cancelar</Button>
-            <Button onClick={handleAddCategory}>Agregar</Button>
+            <Button variant="outline" onClick={() => setShowAddCategoryDialog(false)}>Cancel</Button>
+            <Button onClick={handleAddCategory}>Add</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
