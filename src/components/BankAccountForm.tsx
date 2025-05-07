@@ -16,6 +16,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { storeProfileService } from "@/services/storeProfileService";
 import { PaymentDetails, StoreProfile } from "@/types/store.types";
+import { useEffect } from "react";
 
 export const BankAccountForm = () => {
   const { user } = useAuth();
@@ -53,9 +54,9 @@ export const BankAccountForm = () => {
   };
   
   // Load payment details when component mounts
-  useState(() => {
+  useEffect(() => {
     loadPaymentDetails();
-  });
+  }, [user]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
