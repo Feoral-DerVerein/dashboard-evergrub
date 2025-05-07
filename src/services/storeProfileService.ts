@@ -47,11 +47,11 @@ export const storeProfileService = {
       // Safely handle existingProfileData
       let existingProfile = null;
       
-      // Only attempt to use existingProfileData if it exists and has the expected structure
-      // TypeScript still complains about existingProfileData possibly being null, so we need an explicit null check
+      // Explicitly check if existingProfileData is not null before accessing properties
       if (existingProfileData !== null && 
           typeof existingProfileData === 'object' && 
-          'id' in existingProfileData) {
+          'id' in existingProfileData && 
+          existingProfileData.id !== null) {
         existingProfile = { id: String(existingProfileData.id) };
       }
 
