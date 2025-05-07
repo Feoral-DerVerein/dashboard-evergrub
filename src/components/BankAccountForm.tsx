@@ -78,7 +78,7 @@ export const BankAccountForm = () => {
     if (!user?.id) {
       toast({
         title: "Error",
-        description: "Debes iniciar sesión para guardar los datos de pago",
+        description: "You must be logged in to save payment details",
         variant: "destructive"
       });
       return;
@@ -89,7 +89,7 @@ export const BankAccountForm = () => {
       if (!merchantDetails.bankName) {
         toast({
           title: "Error", 
-          description: "Ingresa el nombre del banco",
+          description: "Please enter bank name",
           variant: "destructive"
         });
         return;
@@ -98,7 +98,7 @@ export const BankAccountForm = () => {
       if (!merchantDetails.accountNumber) {
         toast({
           title: "Error", 
-          description: "Ingresa el número de cuenta",
+          description: "Please enter account number",
           variant: "destructive"
         });
         return;
@@ -107,7 +107,7 @@ export const BankAccountForm = () => {
       if (!merchantDetails.accountHolder) {
         toast({
           title: "Error", 
-          description: "Ingresa el nombre del titular de la cuenta",
+          description: "Please enter account holder name",
           variant: "destructive"
         });
         return;
@@ -116,7 +116,7 @@ export const BankAccountForm = () => {
       if (!merchantDetails.routingNumber) {
         toast({
           title: "Error", 
-          description: "Ingresa el número de routing",
+          description: "Please enter BSB number",
           variant: "destructive"
         });
         return;
@@ -125,7 +125,7 @@ export const BankAccountForm = () => {
       if (!merchantDetails.paypalEmail) {
         toast({
           title: "Error", 
-          description: "Ingresa tu correo electrónico de PayPal",
+          description: "Please enter your PayPal email",
           variant: "destructive"
         });
         return;
@@ -164,17 +164,17 @@ export const BankAccountForm = () => {
       
       if (result) {
         toast({
-          title: "Éxito",
-          description: "La información de pago se guardó correctamente"
+          title: "Success",
+          description: "Payment information saved successfully"
         });
       } else {
-        throw new Error("No se pudo guardar la información de pago");
+        throw new Error("Could not save payment information");
       }
     } catch (error) {
-      console.error("Error al guardar detalles de pago:", error);
+      console.error("Error saving payment details:", error);
       toast({
         title: "Error",
-        description: "Ocurrió un error al guardar la información de pago",
+        description: "An error occurred while saving payment information",
         variant: "destructive"
       });
     } finally {
@@ -186,7 +186,7 @@ export const BankAccountForm = () => {
     return (
       <div className="flex items-center justify-center p-6">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        <span className="ml-2">Cargando datos de pago...</span>
+        <span className="ml-2">Loading payment data...</span>
       </div>
     );
   }
@@ -194,42 +194,43 @@ export const BankAccountForm = () => {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle>Datos de Cuenta Bancaria</CardTitle>
+        <CardTitle>Bank Account Details</CardTitle>
         <CardDescription>
-          Configura tu cuenta para recibir pagos del marketplace
+          Set up your account to receive payments from the marketplace
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-4">
           <div>
-            <Label htmlFor="paymentMethod">Método de Pago</Label>
+            <Label htmlFor="paymentMethod">Payment Method</Label>
             <Select 
               value={merchantDetails.paymentMethod} 
               onValueChange={(value) => handleSelectChange("paymentMethod", value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecciona método de pago" />
+                <SelectValue placeholder="Select payment method" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="bank">Cuenta Bancaria</SelectItem>
+                <SelectItem value="bank">Bank Account</SelectItem>
                 <SelectItem value="paypal">PayPal</SelectItem>
               </SelectContent>
             </Select>
           </div>
           
           <div>
-            <Label htmlFor="currency">Moneda</Label>
+            <Label htmlFor="currency">Currency</Label>
             <Select 
               value={merchantDetails.currency} 
               onValueChange={(value) => handleSelectChange("currency", value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecciona moneda" />
+                <SelectValue placeholder="Select currency" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="USD">USD - Dólar Americano</SelectItem>
+                <SelectItem value="USD">USD - US Dollar</SelectItem>
                 <SelectItem value="EUR">EUR - Euro</SelectItem>
-                <SelectItem value="MXN">MXN - Peso Mexicano</SelectItem>
+                <SelectItem value="MXN">MXN - Mexican Peso</SelectItem>
+                <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -237,33 +238,41 @@ export const BankAccountForm = () => {
           {merchantDetails.paymentMethod === "bank" && (
             <>
               <div>
-                <Label htmlFor="bankName">Nombre del Banco</Label>
+                <Label htmlFor="bankName">Bank Name</Label>
                 <div className="relative">
-                  <Input
-                    id="bankName"
-                    name="bankName"
-                    placeholder="Tu Banco"
+                  <Select
                     value={merchantDetails.bankName}
-                    onChange={handleInputChange}
-                    className="pl-10"
-                  />
+                    onValueChange={(value) => handleSelectChange("bankName", value)}
+                  >
+                    <SelectTrigger className="pl-10">
+                      <SelectValue placeholder="Select your bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ANZ">ANZ Bank</SelectItem>
+                      <SelectItem value="Commonwealth">Commonwealth Bank</SelectItem>
+                      <SelectItem value="Westpac">Westpac</SelectItem>
+                      <SelectItem value="NAB">National Australia Bank</SelectItem>
+                      <SelectItem value="Bendigo">Bendigo Bank</SelectItem>
+                      <SelectItem value="Other">Other Bank</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 </div>
               </div>
               
               <div>
-                <Label htmlFor="accountHolder">Nombre del Titular</Label>
+                <Label htmlFor="accountHolder">Account Holder Name</Label>
                 <Input
                   id="accountHolder"
                   name="accountHolder"
-                  placeholder="Juan Pérez"
+                  placeholder="John Smith"
                   value={merchantDetails.accountHolder}
                   onChange={handleInputChange}
                 />
               </div>
               
               <div>
-                <Label htmlFor="accountNumber">Número de Cuenta</Label>
+                <Label htmlFor="accountNumber">Account Number</Label>
                 <div className="relative">
                   <Input
                     id="accountNumber"
@@ -278,11 +287,11 @@ export const BankAccountForm = () => {
               </div>
               
               <div>
-                <Label htmlFor="routingNumber">Número de Routing</Label>
+                <Label htmlFor="routingNumber">BSB Number</Label>
                 <Input
                   id="routingNumber"
                   name="routingNumber"
-                  placeholder="123456789"
+                  placeholder="123456"
                   value={merchantDetails.routingNumber}
                   onChange={handleInputChange}
                 />
@@ -292,12 +301,12 @@ export const BankAccountForm = () => {
           
           {merchantDetails.paymentMethod === "paypal" && (
             <div>
-              <Label htmlFor="paypalEmail">Correo Electrónico de PayPal</Label>
+              <Label htmlFor="paypalEmail">PayPal Email</Label>
               <div className="relative">
                 <Input
                   id="paypalEmail"
                   name="paypalEmail"
-                  placeholder="tu-correo@ejemplo.com"
+                  placeholder="your-email@example.com"
                   value={merchantDetails.paypalEmail}
                   onChange={handleInputChange}
                   className="pl-10"
@@ -316,18 +325,18 @@ export const BankAccountForm = () => {
             {saving ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Guardando...
+                Saving...
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                Guardar Información de Pago
+                Save Payment Information
               </>
             )}
           </Button>
           
           <p className="text-xs text-gray-500 text-center mt-2">
-            Tu información de pago está segura y encriptada. Esta información se utilizará para procesar los pagos del marketplace.
+            Your payment information is secure and encrypted. This information will be used to process marketplace payments.
           </p>
         </form>
       </CardContent>
