@@ -6,11 +6,12 @@ export const storeProfileService = {
   // Obtener el perfil de la tienda del usuario
   async getStoreProfile(userId: string): Promise<StoreProfile | null> {
     try {
-      const { data, error } = await supabase
-        .from('store_profiles')
+      // Using a type assertion to bypass TypeScript's strict table typing
+      const { data, error } = await (supabase
+        .from('store_profiles') as any)
         .select('*')
         .eq('userId', userId)
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error("Error fetching store profile:", error);
@@ -28,8 +29,8 @@ export const storeProfileService = {
   async saveStoreProfile(profile: StoreProfile): Promise<StoreProfile | null> {
     try {
       // Verificar si ya existe un perfil para este usuario
-      const { data: existingProfile } = await supabase
-        .from('store_profiles')
+      const { data: existingProfile } = await (supabase
+        .from('store_profiles') as any)
         .select('id')
         .eq('userId', profile.userId)
         .maybeSingle();
@@ -38,8 +39,8 @@ export const storeProfileService = {
       
       if (existingProfile?.id) {
         // Actualizar el perfil existente
-        const { data, error } = await supabase
-          .from('store_profiles')
+        const { data, error } = await (supabase
+          .from('store_profiles') as any)
           .update({
             name: profile.name,
             description: profile.description,
@@ -65,8 +66,8 @@ export const storeProfileService = {
         result = data;
       } else {
         // Crear un nuevo perfil
-        const { data, error } = await supabase
-          .from('store_profiles')
+        const { data, error } = await (supabase
+          .from('store_profiles') as any)
           .insert([profile])
           .select()
           .single();
