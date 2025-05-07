@@ -47,13 +47,15 @@ export const storeProfileService = {
       // Safely handle existingProfileData
       let existingProfile = null;
       
-      // First check if existingProfileData is not null before trying to access properties
+      // Need to check if existingProfileData exists before accessing properties
       if (existingProfileData !== null) {
-        // Now we can safely check properties since we know existingProfileData is not null
-        if (typeof existingProfileData === 'object' && 'id' in existingProfileData) {
-          // Additional check to ensure id is not null before assigning
-          if (existingProfileData.id !== null) {
-            existingProfile = { id: String(existingProfileData.id) };
+        // TypeScript now knows existingProfileData is not null in this block
+        // Check if it's an object with an id property
+        if (typeof existingProfileData === 'object') {
+          // Use optional chaining to safely access the id property
+          const id = existingProfileData?.id;
+          if (id !== null && id !== undefined) {
+            existingProfile = { id: String(id) };
           }
         }
       }
