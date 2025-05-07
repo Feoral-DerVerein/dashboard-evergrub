@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -202,6 +201,77 @@ export const salesService = {
       return true;
     } catch (error) {
       console.error("Exception in createSaleFromOrder:", error);
+      return false;
+    }
+  },
+  
+  // Simulate receiving a payment from the marketplace
+  async simulatePayment(amount: number): Promise<boolean> {
+    try {
+      console.log(`Simulando pago por $${amount.toFixed(2)}`);
+      
+      // Generate a random order ID
+      const orderId = `sim-${Math.random().toString(36).substring(2, 10)}`;
+      
+      // Get a random customer name
+      const customerIndex = Math.floor(Math.random() * customerNames.length);
+      const customerName = customerNames[customerIndex];
+      
+      // Generate random products
+      const productCategories = ['Groceries', 'Electronics', 'Clothing', 'Home', 'Beauty'];
+      const productNames = ['Premium Product', 'Standard Item', 'Daily Essentials', 'Marketplace Item', 'Special Selection'];
+      
+      const numProducts = Math.floor(Math.random() * 3) + 1; // 1 to 3 products
+      const products = [];
+      let productTotal = 0;
+      
+      for (let i = 0; i < numProducts; i++) {
+        const productPrice = parseFloat((amount / numProducts).toFixed(2));
+        const productQuantity = Math.floor(Math.random() * 2) + 1;
+        const categoryIndex = Math.floor(Math.random() * productCategories.length);
+        const nameIndex = Math.floor(Math.random() * productNames.length);
+        
+        products.push({
+          name: `${productNames[nameIndex]} ${i+1}`,
+          quantity: productQuantity,
+          price: productPrice,
+          category: productCategories[categoryIndex]
+        });
+        
+        productTotal += productPrice * productQuantity;
+      }
+      
+      // Adjust the last product's price if needed to match total amount
+      if (products.length > 0) {
+        const diff = amount - productTotal;
+        if (Math.abs(diff) > 0.01) {
+          const lastProduct = products[products.length - 1];
+          lastProduct.price = parseFloat((lastProduct.price + diff / lastProduct.quantity).toFixed(2));
+        }
+      }
+      
+      // Create the sale record
+      const { data: saleData, error: saleError } = await supabase
+        .from('sales')
+        .insert({
+          order_id: orderId,
+          amount: amount,
+          customer_name: customerName,
+          sale_date: new Date().toISOString(),
+          products: products,
+          payment_method: 'marketplace'
+        })
+        .select();
+        
+      if (saleError) {
+        console.error("Error creating simulated sale:", saleError);
+        return false;
+      }
+      
+      console.log("Simulated payment recorded successfully:", saleData);
+      return true;
+    } catch (error) {
+      console.error("Exception in simulatePayment:", error);
       return false;
     }
   }
