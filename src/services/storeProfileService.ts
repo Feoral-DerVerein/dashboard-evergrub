@@ -18,7 +18,7 @@ export const storeProfileService = {
         return null;
       }
       
-      // Only return data as StoreProfile if it exists
+      // Only return data if it exists (it's already been checked for errors)
       return data as StoreProfile | null;
     } catch (error) {
       console.error("Error in getStoreProfile:", error);
@@ -41,8 +41,8 @@ export const storeProfileService = {
         return null;
       }
       
-      // Safe type assertion now that we've checked for errors
-      const existingProfile = existingProfileData as { id: string } | null;
+      // Now we can safely assert the type since we've checked for errors
+      const existingProfile = existingProfileData ? { id: existingProfileData.id as string } : null;
       let result;
       
       if (existingProfile?.id) {
@@ -89,7 +89,7 @@ export const storeProfileService = {
         result = data;
       }
       
-      // Safe type assertion now that we've checked for errors
+      // We've checked for errors, so we can safely return the result
       return result as StoreProfile;
     } catch (error) {
       console.error("Error in saveStoreProfile:", error);

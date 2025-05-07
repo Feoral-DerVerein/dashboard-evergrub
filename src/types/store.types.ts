@@ -5,6 +5,16 @@ export interface BusinessHour {
   close: string;
 }
 
+export interface PaymentDetails {
+  bankName?: string;
+  accountNumber?: string;
+  accountHolder?: string;
+  routingNumber?: string;
+  paymentMethod: string;
+  paypalEmail?: string;
+  currency: string;
+}
+
 export interface StoreProfile {
   id?: string;
   userId: string;
@@ -19,13 +29,5 @@ export interface StoreProfile {
   coverUrl: string;
   categories: string[];
   businessHours: BusinessHour[];
-  paymentDetails?: {
-    bankName?: string;
-    accountNumber?: string;
-    accountHolder?: string;
-    routingNumber?: string;
-    paymentMethod: string;
-    paypalEmail?: string;
-    currency: string;
-  };
+  paymentDetails?: PaymentDetails;
 }
