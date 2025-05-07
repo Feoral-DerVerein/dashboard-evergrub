@@ -18,8 +18,11 @@ export const storeProfileService = {
         return null;
       }
       
-      // Return null if no data, otherwise return as StoreProfile
-      return data as StoreProfile | null;
+      // Only return as StoreProfile if we actually have data
+      if (!data) return null;
+      
+      // Safely convert to StoreProfile
+      return data as unknown as StoreProfile;
     } catch (error) {
       console.error("Error in getStoreProfile:", error);
       return null;
@@ -41,15 +44,20 @@ export const storeProfileService = {
         return null;
       }
       
-      // Safely handle existingProfileData - make sure it exists before using it
+      // Safely handle existingProfileData
       let existingProfile = null;
-      if (existingProfileData && typeof existingProfileData === 'object' && 'id' in existingProfileData) {
+      
+      // Only attempt to use existingProfileData if it exists and has the expected structure
+      if (existingProfileData && 
+          typeof existingProfileData === 'object' && 
+          existingProfileData !== null && 
+          'id' in existingProfileData) {
         existingProfile = { id: String(existingProfileData.id) };
       }
 
       let result;
       
-      if (existingProfile?.id) {
+      if (existingProfile && existingProfile.id) {
         // Update existing profile
         const { data, error } = await supabase
           .from('store_profiles' as any)
@@ -93,8 +101,11 @@ export const storeProfileService = {
         result = data;
       }
       
-      // Return null if no result, otherwise return as StoreProfile
-      return result as StoreProfile | null;
+      // Only return as StoreProfile if we actually have a result
+      if (!result) return null;
+      
+      // Safely convert to StoreProfile
+      return result as unknown as StoreProfile;
     } catch (error) {
       console.error("Error in saveStoreProfile:", error);
       return null;
