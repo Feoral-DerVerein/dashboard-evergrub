@@ -18,6 +18,7 @@ export const storeProfileService = {
         return null;
       }
       
+      // Only return data as StoreProfile if it exists
       return data as StoreProfile | null;
     } catch (error) {
       console.error("Error in getStoreProfile:", error);
@@ -29,12 +30,18 @@ export const storeProfileService = {
   async saveStoreProfile(profile: StoreProfile): Promise<StoreProfile | null> {
     try {
       // Check if a profile already exists for this user
-      const { data: existingProfileData } = await supabase
+      const { data: existingProfileData, error: fetchError } = await supabase
         .from('store_profiles' as any)
         .select('id')
         .eq('userId', profile.userId)
         .maybeSingle();
       
+      if (fetchError) {
+        console.error("Error checking for existing profile:", fetchError);
+        return null;
+      }
+      
+      // Safe type assertion now that we've checked for errors
       const existingProfile = existingProfileData as { id: string } | null;
       let result;
       
@@ -82,7 +89,8 @@ export const storeProfileService = {
         result = data;
       }
       
-      return result as StoreProfile | null;
+      // Safe type assertion now that we've checked for errors
+      return result as StoreProfile;
     } catch (error) {
       console.error("Error in saveStoreProfile:", error);
       return null;
