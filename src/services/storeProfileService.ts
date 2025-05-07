@@ -18,7 +18,7 @@ export const storeProfileService = {
         return null;
       }
       
-      return data as StoreProfile;
+      return data as StoreProfile | null;
     } catch (error) {
       console.error("Error in getStoreProfile:", error);
       return null;
@@ -80,7 +80,7 @@ export const storeProfileService = {
         result = data;
       }
       
-      return result as StoreProfile;
+      return result as StoreProfile | null;
     } catch (error) {
       console.error("Error in saveStoreProfile:", error);
       return null;

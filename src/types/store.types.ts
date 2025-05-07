@@ -1,5 +1,5 @@
 
-export type StoreProfile = {
+export interface StoreProfile {
   id?: string;
   userId: string;
   name: string;
@@ -12,11 +12,14 @@ export type StoreProfile = {
   logoUrl: string;
   coverUrl: string;
   categories: string[];
-  businessHours: BusinessHour[];
-};
-
-export type BusinessHour = {
-  day: string;
-  open: string;
-  close: string;
-};
+  businessHours: any[];
+  paymentDetails?: {
+    bankName?: string;
+    accountNumber?: string;
+    accountHolder?: string;
+    routingNumber?: string;
+    paymentMethod: string;
+    paypalEmail?: string;
+    currency: string;
+  };
+}
