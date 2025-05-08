@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 type BusinessHourRowProps = {
   day: string;
   open: string;
@@ -356,53 +355,50 @@ const Profile = () => {
       <div className="max-w-md mx-auto bg-white min-h-screen">
         <header className="px-6 py-4 border-b sticky top-0 bg-white z-10 flex items-center justify-between">
           <h1 className="text-xl font-semibold">Store Profile</h1>
-          <Button variant="ghost" className="text-blue-600 hover:text-blue-700 flex items-center gap-1" onClick={handleSaveProfile} disabled={saving}>
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Save
-          </Button>
+          
         </header>
 
         {/* Display saved profile card if showSavedCard is true */}
-        {showSavedCard && (
-          <Card className="border-green-200 bg-green-50 mt-6">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center">
-                <div className="bg-green-500 p-1 rounded-full mr-2">
-                  <Save className="h-4 w-4 text-white" />
-                </div>
-                Changes Saved Successfully
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={profile.logoUrl} />
-                    <AvatarFallback>{profile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-medium">{profile.name}</h3>
-                    <p className="text-sm text-gray-500">{profile.categories.join(", ")}</p>
+        {showSavedCard && <div className="p-4">
+            <Card className="border-green-200 bg-green-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center">
+                  <div className="bg-green-500 p-1 rounded-full mr-2">
+                    <Save className="h-4 w-4 text-white" />
                   </div>
+                  Changes Saved Successfully
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={profile.logoUrl} />
+                      <AvatarFallback>{profile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-medium">{profile.name}</h3>
+                      <p className="text-sm text-gray-500">{profile.categories.join(", ")}</p>
+                    </div>
+                  </div>
+                  
+                  {profile.location && <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-4 w-4 text-gray-500" />
+                      <span>{profile.location}</span>
+                    </div>}
+                  
+                  {profile.contactPhone && <div className="flex items-center gap-2 text-sm">
+                      <Phone className="h-4 w-4 text-gray-500" />
+                      <span>{profile.contactPhone}</span>
+                    </div>}
                 </div>
                 
-                {profile.location && <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <span>{profile.location}</span>
-                  </div>}
-                
-                {profile.contactPhone && <div className="flex items-center gap-2 text-sm">
-                    <Phone className="h-4 w-4 text-gray-500" />
-                    <span>{profile.contactPhone}</span>
-                  </div>}
-              </div>
-              
-              <Button variant="outline" size="sm" className="w-full mt-4" onClick={() => setShowSavedCard(false)}>
-                Continue Editing
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+                <Button variant="outline" size="sm" className="w-full mt-4" onClick={() => setShowSavedCard(false)}>
+                  Continue Editing
+                </Button>
+              </CardContent>
+            </Card>
+          </div>}
 
         <div className="flex border-b">
           <button className={`flex-1 py-3 text-center ${activeTab === 'profile' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`} onClick={() => setActiveTab('profile')}>
@@ -508,48 +504,6 @@ const Profile = () => {
                   Saving...
                 </> : "Save Profile"}
             </Button>
-            
-            {/* Show saved message card below the form */}
-            {showSavedCard && (
-              <Card className="border-green-200 bg-green-50 mt-6">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
-                    <div className="bg-green-500 p-1 rounded-full mr-2">
-                      <Save className="h-4 w-4 text-white" />
-                    </div>
-                    Changes Saved Successfully
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-3">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={profile.logoUrl} />
-                        <AvatarFallback>{profile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-medium">{profile.name}</h3>
-                        <p className="text-sm text-gray-500">{profile.categories.join(", ")}</p>
-                      </div>
-                    </div>
-                    
-                    {profile.location && <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <span>{profile.location}</span>
-                      </div>}
-                    
-                    {profile.contactPhone && <div className="flex items-center gap-2 text-sm">
-                        <Phone className="h-4 w-4 text-gray-500" />
-                        <span>{profile.contactPhone}</span>
-                      </div>}
-                  </div>
-                  
-                  <Button variant="outline" size="sm" className="w-full mt-4" onClick={() => setShowSavedCard(false)}>
-                    Continue Editing
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
           </main> : <main className="p-6 space-y-6">
             <div className="space-y-4">
               <div>
@@ -651,64 +605,6 @@ const Profile = () => {
                 Your payment information is secure and encrypted. This information will be used to process marketplace payments.
               </p>
             </div>
-            
-            {/* Show saved message card below the form for payment tab too */}
-            {showSavedCard && (
-              <Card className="border-green-200 bg-green-50 mt-6">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
-                    <div className="bg-green-500 p-1 rounded-full mr-2">
-                      <Save className="h-4 w-4 text-white" />
-                    </div>
-                    Changes Saved Successfully
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      {profile.paymentDetails?.paymentMethod === "bank" ? (
-                        <Building className="h-5 w-5 text-gray-500" />
-                      ) : (
-                        <Globe className="h-5 w-5 text-gray-500" />
-                      )}
-                      <div>
-                        <h3 className="font-medium">
-                          {profile.paymentDetails?.paymentMethod === "bank" 
-                            ? `${profile.paymentDetails?.bankName} Bank` 
-                            : "PayPal Account"}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {profile.paymentDetails?.paymentMethod === "bank" 
-                            ? profile.paymentDetails?.accountHolder
-                            : profile.paymentDetails?.paypalEmail}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {profile.paymentDetails?.paymentMethod === "bank" && profile.paymentDetails?.accountNumber && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <CreditCard className="h-4 w-4 text-gray-500" />
-                        <span>Account: •••• {profile.paymentDetails?.accountNumber.slice(-4)}</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="font-medium">Currency:</span>
-                      <span>{profile.paymentDetails?.currency}</span>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full mt-4"
-                    onClick={() => setShowSavedCard(false)}
-                  >
-                    Continue Editing
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
           </main>}
 
         <BottomNav />
