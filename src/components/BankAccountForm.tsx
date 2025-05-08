@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { storeProfileService } from "@/services/storeProfileService";
 import { PaymentDetails, StoreProfile } from "@/types/store.types";
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const BankAccountForm = () => {
+  const { toast } = useToast();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);

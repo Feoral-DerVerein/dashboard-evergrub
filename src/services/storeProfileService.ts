@@ -20,9 +20,16 @@ export const storeProfileService = {
       
       // Only return as StoreProfile if we actually have data
       if (!data) return null;
+
+      // Convert payment_details to paymentDetails if it exists
+      const profile = data as any;
+      if (profile.payment_details) {
+        profile.paymentDetails = profile.payment_details;
+        delete profile.payment_details;
+      }
       
       // Safely convert to StoreProfile
-      return data as unknown as StoreProfile;
+      return profile as unknown as StoreProfile;
     } catch (error) {
       console.error("Error in getStoreProfile:", error);
       return null;
@@ -32,6 +39,15 @@ export const storeProfileService = {
   // Create or update the store profile
   async saveStoreProfile(profile: StoreProfile): Promise<StoreProfile | null> {
     try {
+      // Create a copy of the profile to be sent to the database
+      const profileToSave = { ...profile };
+      
+      // Convert paymentDetails to payment_details for the database
+      if (profileToSave.paymentDetails) {
+        (profileToSave as any).payment_details = profileToSave.paymentDetails;
+        delete (profileToSave as any).paymentDetails;
+      }
+
       // Check if a profile already exists for this user
       const { data: existingProfileData, error: fetchError } = await supabase
         .from('store_profiles' as any)
@@ -69,18 +85,18 @@ export const storeProfileService = {
         const { data, error } = await supabase
           .from('store_profiles' as any)
           .update({
-            name: profile.name,
-            description: profile.description,
-            location: profile.location,
-            contactPhone: profile.contactPhone,
-            contactEmail: profile.contactEmail,
-            socialFacebook: profile.socialFacebook,
-            socialInstagram: profile.socialInstagram,
-            logoUrl: profile.logoUrl,
-            coverUrl: profile.coverUrl,
-            categories: profile.categories,
-            businessHours: profile.businessHours,
-            paymentDetails: profile.paymentDetails
+            name: profileToSave.name,
+            description: profileToSave.description,
+            location: profileToSave.location,
+            contactPhone: profileToSave.contactPhone,
+            contactEmail: profileToSave.contactEmail,
+            socialFacebook: profileToSave.socialFacebook,
+            socialInstagram: profileToSave.socialInstagram,
+            logoUrl: profileToSave.logoUrl,
+            coverUrl: profileToSave.coverUrl,
+            categories: profileToSave.categories,
+            businessHours: profileToSave.businessHours,
+            payment_details: (profileToSave as any).payment_details
           })
           .eq('id', existingProfile.id)
           .select()
@@ -96,7 +112,7 @@ export const storeProfileService = {
         // Create a new profile
         const { data, error } = await supabase
           .from('store_profiles' as any)
-          .insert([profile])
+          .insert([profileToSave])
           .select()
           .single();
         
@@ -110,6 +126,12 @@ export const storeProfileService = {
       
       // Only return as StoreProfile if we actually have a result
       if (!result) return null;
+      
+      // Convert payment_details back to paymentDetails if it exists
+      if ((result as any).payment_details) {
+        (result as any).paymentDetails = (result as any).payment_details;
+        delete (result as any).payment_details;
+      }
       
       // Safely convert to StoreProfile
       return result as unknown as StoreProfile;

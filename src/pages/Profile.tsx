@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BottomNav } from "@/components/Dashboard";
 import { useAuth } from "@/context/AuthContext";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { profileImageService } from "@/services/profileImageService";
 import { storeProfileService } from "@/services/storeProfileService";
 import { StoreProfile, BusinessHour, PaymentDetails } from "@/types/store.types";
@@ -49,9 +49,8 @@ const ServiceTag = ({
     </button>
   </div>;
 const Profile = () => {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [deleting, setDeleting] = useState<boolean>(false);
