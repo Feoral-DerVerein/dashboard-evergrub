@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Building, CreditCard, Globe, Loader2, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -188,10 +187,12 @@ export const BankAccountForm = () => {
           title: "Success",
           description: "Payment details saved successfully"
         });
-        console.log("Setting showSavedCard to true");
-        setShowSavedCard(true); // Show the saved data card after successful save
         
-        // Actualiza los detalles del comerciante para reflejar lo guardado
+        // Set showSavedCard to true to display the saved card state
+        console.log("Setting showSavedCard to true after successful save");
+        setShowSavedCard(true);
+        
+        // Update the merchant details to reflect what was saved
         if (result.paymentDetails) {
           setMerchantDetails(result.paymentDetails);
         }
@@ -349,7 +350,6 @@ export const BankAccountForm = () => {
           </Card>
         )}
 
-        {/* Formulario siempre visible, incluso después de guardar */}
         <form className="space-y-4">
           <div>
             <Label htmlFor="paymentMethod">Payment Method</Label>
