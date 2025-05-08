@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 type BusinessHourRowProps = {
   day: string;
   open: string;
@@ -49,8 +48,12 @@ const ServiceTag = ({
     </button>
   </div>;
 const Profile = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
+  const {
+    user
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [deleting, setDeleting] = useState<boolean>(false);
@@ -359,8 +362,7 @@ const Profile = () => {
         </header>
 
         {/* Display saved profile card if showSavedCard is true */}
-        {showSavedCard && (
-          <div className="p-4">
+        {showSavedCard && <div className="p-4">
             <Card className="border-green-200 bg-green-50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center">
@@ -383,41 +385,29 @@ const Profile = () => {
                     </div>
                   </div>
                   
-                  {profile.location && (
-                    <div className="flex items-center gap-2 text-sm">
+                  {profile.location && <div className="flex items-center gap-2 text-sm">
                       <MapPin className="h-4 w-4 text-gray-500" />
                       <span>{profile.location}</span>
-                    </div>
-                  )}
+                    </div>}
                   
-                  {profile.contactPhone && (
-                    <div className="flex items-center gap-2 text-sm">
+                  {profile.contactPhone && <div className="flex items-center gap-2 text-sm">
                       <Phone className="h-4 w-4 text-gray-500" />
                       <span>{profile.contactPhone}</span>
-                    </div>
-                  )}
+                    </div>}
                 </div>
                 
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full mt-4"
-                  onClick={() => setShowSavedCard(false)}
-                >
+                <Button variant="outline" size="sm" className="w-full mt-4" onClick={() => setShowSavedCard(false)}>
                   Continue Editing
                 </Button>
               </CardContent>
             </Card>
-          </div>
-        )}
+          </div>}
 
         <div className="flex border-b">
           <button className={`flex-1 py-3 text-center ${activeTab === 'profile' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`} onClick={() => setActiveTab('profile')}>
             Store Profile
           </button>
-          <button className={`flex-1 py-3 text-center ${activeTab === 'payment' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`} onClick={() => setActiveTab('payment')}>
-            Payment Details
-          </button>
+          <button className={`flex-1 py-3 text-center ${activeTab === 'payment' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`} onClick={() => setActiveTab('payment')}>Payment </button>
         </div>
 
         {activeTab === 'profile' ? <main className="p-6 space-y-6">
