@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Building, CreditCard, Globe, Loader2, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,11 +12,10 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { storeProfileService } from "@/services/storeProfileService";
 import { PaymentDetails, StoreProfile } from "@/types/store.types";
-import { useEffect } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,7 +29,6 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const BankAccountForm = () => {
-  const { toast } = useToast();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -46,6 +44,11 @@ export const BankAccountForm = () => {
     paypalEmail: "",
     currency: "USD",
   });
+  
+  // Log when showSavedCard changes for debugging
+  useEffect(() => {
+    console.log("showSavedCard state:", showSavedCard);
+  }, [showSavedCard]);
   
   // Load existing payment details if available
   const loadPaymentDetails = async () => {
@@ -176,6 +179,8 @@ export const BankAccountForm = () => {
         storeProfile.paymentDetails = merchantDetails;
       }
       
+      console.log("Saving profile with payment details:", JSON.stringify(storeProfile.paymentDetails));
+      
       const result = await storeProfileService.saveStoreProfile(storeProfile);
       
       if (result) {
@@ -183,6 +188,7 @@ export const BankAccountForm = () => {
           title: "Success",
           description: "Payment details saved successfully"
         });
+        console.log("Setting showSavedCard to true");
         setShowSavedCard(true); // Show the saved data card after successful save
       } else {
         throw new Error("Could not save payment information");

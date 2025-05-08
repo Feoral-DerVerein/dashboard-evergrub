@@ -295,6 +295,7 @@ export type Database = {
           location: string
           logoUrl: string
           name: string
+          payment_details: Json | null
           socialFacebook: string
           socialInstagram: string
           userId: string
@@ -310,6 +311,7 @@ export type Database = {
           location: string
           logoUrl: string
           name: string
+          payment_details?: Json | null
           socialFacebook: string
           socialInstagram: string
           userId: string
@@ -325,6 +327,7 @@ export type Database = {
           location?: string
           logoUrl?: string
           name?: string
+          payment_details?: Json | null
           socialFacebook?: string
           socialInstagram?: string
           userId?: string
