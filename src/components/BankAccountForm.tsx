@@ -34,7 +34,7 @@ export const BankAccountForm = () => {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showSavedCard, setShowSavedCard] = useState(false);
+  // Removing the state that controls the success message card
   const [merchantDetails, setMerchantDetails] = useState<PaymentDetails>({
     bankName: "",
     accountNumber: "",
@@ -44,11 +44,6 @@ export const BankAccountForm = () => {
     paypalEmail: "",
     currency: "USD",
   });
-  
-  // Log when showSavedCard changes for debugging
-  useEffect(() => {
-    console.log("showSavedCard state:", showSavedCard);
-  }, [showSavedCard]);
   
   // Load existing payment details if available
   const loadPaymentDetails = async () => {
@@ -197,10 +192,6 @@ export const BankAccountForm = () => {
           description: "Payment details saved successfully"
         });
         
-        // Explicitly set showSavedCard to true to display the saved card state
-        console.log("Setting showSavedCard to true after successful save");
-        setShowSavedCard(true);
-        
         // Update the merchant details to reflect what was saved
         if (result.paymentDetails) {
           setMerchantDetails(result.paymentDetails);
@@ -264,7 +255,6 @@ export const BankAccountForm = () => {
           });
           
           setShowDeleteDialog(false);
-          setShowSavedCard(false);
           
           toast({
             title: "Success",
@@ -488,65 +478,7 @@ export const BankAccountForm = () => {
           </p>
         </form>
         
-        {/* Moved success message card below the questionnaire form */}
-        {showSavedCard && (
-          <div className="mt-6">
-            <Card className="border-green-200 bg-green-50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center">
-                  <div className="bg-green-500 p-1 rounded-full mr-2">
-                    <Save className="h-4 w-4 text-white" />
-                  </div>
-                  Changes Saved Successfully
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex items-start gap-2">
-                    {merchantDetails.paymentMethod === "bank" ? (
-                      <Building className="h-5 w-5 text-gray-500" />
-                    ) : (
-                      <Globe className="h-5 w-5 text-gray-500" />
-                    )}
-                    <div>
-                      <h3 className="font-medium">
-                        {merchantDetails.paymentMethod === "bank" 
-                          ? `${merchantDetails.bankName} Bank` 
-                          : "PayPal Account"}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {merchantDetails.paymentMethod === "bank" 
-                          ? merchantDetails.accountHolder
-                          : merchantDetails.paypalEmail}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {merchantDetails.paymentMethod === "bank" && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <CreditCard className="h-4 w-4 text-gray-500" />
-                      <span>Account: •••• {merchantDetails.accountNumber?.slice(-4)}</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium">Currency:</span>
-                    <span>{merchantDetails.currency}</span>
-                  </div>
-                </div>
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full mt-4"
-                  onClick={() => setShowSavedCard(false)}
-                >
-                  Continue Editing
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        {/* Removed the success message card that was here */}
       </CardContent>
     </Card>
   );
