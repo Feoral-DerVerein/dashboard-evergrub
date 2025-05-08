@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   Camera, MapPin, Clock, Phone, Mail, Facebook, Instagram, 
-  Plus, X, Loader2, Save, Building, CreditCard, Globe 
+  Plus, X, Loader2, Save, Building, CreditCard, Globe, Trash2 
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +23,16 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type BusinessHourRowProps = {
   day: string;
@@ -65,9 +74,11 @@ const Profile = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [showAddCategoryDialog, setShowAddCategoryDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [activeTab, setActiveTab] = useState<'profile' | 'payment'>('profile');
   
@@ -285,6 +296,58 @@ const Profile = () => {
     }
   };
 
+  const handleDeletePaymentDetails = async () => {
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete payment details",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setDeleting(true);
+    try {
+      // Make a copy of the profile without the payment details
+      const updatedProfile = {
+        ...profile,
+        userId: user.id,
+        paymentDetails: {
+          bankName: "",
+          accountNumber: "",
+          accountHolder: "",
+          routingNumber: "",
+          paymentMethod: "bank",
+          paypalEmail: "",
+          currency: "USD"
+        }
+      };
+      
+      // Save the updated profile
+      const result = await storeProfileService.saveStoreProfile(updatedProfile);
+      
+      if (result) {
+        setProfile(updatedProfile);
+        setShowDeleteDialog(false);
+        toast({
+          title: "Success",
+          description: "Payment details removed successfully"
+        });
+      } else {
+        throw new Error("Could not remove payment details");
+      }
+    } catch (error) {
+      console.error("Error removing payment details:", error);
+      toast({
+        title: "Error",
+        description: "Could not remove payment details",
+        variant: "destructive"
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -306,7 +369,7 @@ const Profile = () => {
             disabled={saving}
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Save
+            Guardar
           </Button>
         </header>
 
@@ -504,10 +567,10 @@ const Profile = () => {
               {saving ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                  Saving Profile...
+                  Guardando...
                 </>
               ) : (
-                "Save Profile"
+                "Guardar Datos Bancarios"
               )}
             </Button>
           </main>
@@ -629,20 +692,44 @@ const Profile = () => {
                 </div>
               )}
               
-              <Button 
-                className="w-full bg-emerald-600 hover:bg-emerald-700 mt-6"
-                onClick={handleSaveProfile}
-                disabled={saving}
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                    Saving Payment Details...
-                  </>
-                ) : (
-                  "Save Payment Details"
-                )}
-              </Button>
+              <div className="flex gap-4 mt-6">
+                <Button 
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                  onClick={handleSaveProfile}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
+                      Guardando...
+                    </>
+                  ) : (
+                    "Guardar Datos Bancarios"
+                  )}
+                </Button>
+                
+                <Button 
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                  variant="destructive"
+                  onClick={() => setShowDeleteDialog(true)}
+                  disabled={
+                    deleting || 
+                    (!profile.paymentDetails?.bankName && !profile.paymentDetails?.paypalEmail)
+                  }
+                >
+                  {deleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
+                      Eliminando...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Eliminar Datos
+                    </>
+                  )}
+                </Button>
+              </div>
               
               <p className="text-xs text-gray-500 text-center mt-2">
                 Your payment information is secure and encrypted. This information will be used to process marketplace payments.
@@ -677,6 +764,34 @@ const Profile = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      {/* Alert dialog for deleting payment details */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará tus datos bancarios. No podrás deshacer esta acción.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeletePaymentDetails}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
+                  Eliminando...
+                </>
+              ) : (
+                "Eliminar"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

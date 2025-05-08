@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Building, CreditCard, Globe, Loader2, Save } from "lucide-react";
+import { Building, CreditCard, Globe, Loader2, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,11 +17,24 @@ import { useAuth } from "@/context/AuthContext";
 import { storeProfileService } from "@/services/storeProfileService";
 import { PaymentDetails, StoreProfile } from "@/types/store.types";
 import { useEffect } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const BankAccountForm = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [merchantDetails, setMerchantDetails] = useState<PaymentDetails>({
     bankName: "",
     accountNumber: "",
@@ -166,7 +179,7 @@ export const BankAccountForm = () => {
       if (result) {
         toast({
           title: "Success",
-          description: "Payment information saved successfully"
+          description: "Datos bancarios guardados exitosamente"
         });
       } else {
         throw new Error("Could not save payment information");
@@ -180,6 +193,70 @@ export const BankAccountForm = () => {
       });
     } finally {
       setSaving(false);
+    }
+  };
+  
+  const handleDelete = async () => {
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete payment details",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setDeleting(true);
+    
+    try {
+      // Get existing profile
+      let storeProfile = await storeProfileService.getStoreProfile(user.id);
+      
+      if (storeProfile) {
+        // Reset payment details
+        storeProfile.paymentDetails = {
+          bankName: "",
+          accountNumber: "",
+          accountHolder: "",
+          routingNumber: "",
+          paymentMethod: "bank",
+          paypalEmail: "",
+          currency: "USD"
+        };
+        
+        const result = await storeProfileService.saveStoreProfile(storeProfile);
+        
+        if (result) {
+          // Reset form state
+          setMerchantDetails({
+            bankName: "",
+            accountNumber: "",
+            accountHolder: "",
+            routingNumber: "",
+            paymentMethod: "bank",
+            paypalEmail: "",
+            currency: "USD"
+          });
+          
+          setShowDeleteDialog(false);
+          
+          toast({
+            title: "Success",
+            description: "Datos bancarios eliminados exitosamente"
+          });
+        } else {
+          throw new Error("Could not delete payment information");
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting payment details:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while deleting payment information",
+        variant: "destructive"
+      });
+    } finally {
+      setDeleting(false);
     }
   };
   
@@ -317,24 +394,68 @@ export const BankAccountForm = () => {
             </div>
           )}
           
-          <Button 
-            type="button" 
-            className="w-full mt-4" 
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" />
-                Save Payment Information
-              </>
-            )}
-          </Button>
+          <div className="flex gap-4 mt-4">
+            <Button 
+              type="button" 
+              className="flex-1" 
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Guardar Datos Bancarios
+                </>
+              )}
+            </Button>
+            
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  type="button" 
+                  variant="destructive"
+                  className="flex-1" 
+                  onClick={() => setShowDeleteDialog(true)}
+                  disabled={
+                    deleting || 
+                    (!merchantDetails.bankName && !merchantDetails.paypalEmail)
+                  }
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Eliminar Datos
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta acción eliminará tus datos bancarios. No podrás deshacer esta acción.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDelete}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {deleting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Eliminando...
+                      </>
+                    ) : (
+                      "Eliminar"
+                    )}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
           
           <p className="text-xs text-gray-500 text-center mt-2">
             Your payment information is secure and encrypted. This information will be used to process marketplace payments.
