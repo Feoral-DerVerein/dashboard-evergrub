@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 type BusinessHourRowProps = {
   day: string;
   open: string;
@@ -279,7 +280,7 @@ const Profile = () => {
       if (result) {
         toast({
           title: "Success",
-          description: "Profile saved successfully"
+          description: "Changes saved successfully"
         });
         setShowSavedCard(true); // Show the saved data card after successful save
       } else {
@@ -369,7 +370,7 @@ const Profile = () => {
                   <div className="bg-green-500 p-1 rounded-full mr-2">
                     <Save className="h-4 w-4 text-white" />
                   </div>
-                  Profile Saved Successfully
+                  Changes Saved Successfully
                 </CardTitle>
               </CardHeader>
               <CardContent>
