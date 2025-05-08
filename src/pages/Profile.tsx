@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Camera, MapPin, Clock, Phone, Mail, Facebook, Instagram, Plus, X, Loader2, Save, Building, CreditCard, Globe, Trash2 } from "lucide-react";
+import { Camera, MapPin, Clock, Phone, Mail, Facebook, Instagram, Plus, X, Loader2, Save, Building, CreditCard, Globe, Trash2, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -62,6 +62,7 @@ const Profile = () => {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [showAddCategoryDialog, setShowAddCategoryDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showSuccessCard, setShowSuccessCard] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [activeTab, setActiveTab] = useState<'profile' | 'payment'>('profile');
   
@@ -281,6 +282,14 @@ const Profile = () => {
           title: "Success",
           description: "Changes saved successfully"
         });
+        
+        // Show success card
+        setShowSuccessCard(true);
+        
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+          setShowSuccessCard(false);
+        }, 5000);
       } else {
         throw new Error("Could not save profile");
       }
@@ -460,6 +469,17 @@ const Profile = () => {
                   Saving...
                 </> : "Save Profile"}
             </Button>
+            
+            {/* Success card that appears after saving */}
+            {showSuccessCard && (
+              <div className="mt-4 bg-green-50 border border-green-200 rounded-md p-4 flex items-center">
+                <CheckCircle2 className="h-5 w-5 text-green-500 mr-3" />
+                <div>
+                  <h3 className="text-sm font-medium text-green-800">Changes Saved Successfully</h3>
+                  <p className="text-xs text-green-700 mt-1">Your profile has been updated.</p>
+                </div>
+              </div>
+            )}
           </main> : <main className="p-6 space-y-6">
             <div className="space-y-4">
               <div>
@@ -556,6 +576,17 @@ const Profile = () => {
                     </>}
                 </Button>
               </div>
+              
+              {/* Success card that appears after saving */}
+              {showSuccessCard && (
+                <div className="mt-4 bg-green-50 border border-green-200 rounded-md p-4 flex items-center">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-medium text-green-800">Changes Saved Successfully</h3>
+                    <p className="text-xs text-green-700 mt-1">Your payment details have been updated.</p>
+                  </div>
+                </div>
+              )}
               
               <p className="text-xs text-gray-500 text-center mt-2">
                 Your payment information is secure and encrypted. This information will be used to process marketplace payments.

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Building, CreditCard, Globe, Loader2, Save, Trash2 } from "lucide-react";
+import { Building, CreditCard, Globe, Loader2, Save, Trash2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,7 +34,7 @@ export const BankAccountForm = () => {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  // Removing the state that controls the success message card
+  const [showSuccessCard, setShowSuccessCard] = useState(false);
   const [merchantDetails, setMerchantDetails] = useState<PaymentDetails>({
     bankName: "",
     accountNumber: "",
@@ -191,6 +191,14 @@ export const BankAccountForm = () => {
           title: "Success",
           description: "Payment details saved successfully"
         });
+        
+        // Show success card
+        setShowSuccessCard(true);
+        
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+          setShowSuccessCard(false);
+        }, 5000);
         
         // Update the merchant details to reflect what was saved
         if (result.paymentDetails) {
@@ -478,7 +486,16 @@ export const BankAccountForm = () => {
           </p>
         </form>
         
-        {/* Removed the success message card that was here */}
+        {/* Success card that appears after saving */}
+        {showSuccessCard && (
+          <div className="mt-6 bg-green-50 border border-green-200 rounded-md p-4 flex items-center">
+            <CheckCircle2 className="h-5 w-5 text-green-500 mr-3" />
+            <div>
+              <h3 className="text-sm font-medium text-green-800">Changes Saved Successfully</h3>
+              <p className="text-xs text-green-700 mt-1">Your payment details have been updated.</p>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
