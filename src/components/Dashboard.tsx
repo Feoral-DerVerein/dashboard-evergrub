@@ -1,4 +1,5 @@
-import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone } from "lucide-react";
+
+import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
@@ -279,6 +280,11 @@ const Dashboard = () => {
                 icon={Megaphone} 
                 label="Ads" 
                 to="/ads" 
+              />
+              <QuickAccessItem 
+                icon={Heart} 
+                label="Donate" 
+                to="/donate" 
               />
             </div>
           </section>
