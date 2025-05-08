@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { StoreProfile } from "@/types/store.types";
+import { toast } from "@/components/ui/use-toast";
 
 export const storeProfileService = {
   // Get the user's store profile
@@ -17,6 +18,7 @@ export const storeProfileService = {
       
       if (error) {
         console.error("Error fetching store profile:", error);
+        toast.error("Error fetching store profile");
         return null;
       }
       
@@ -37,6 +39,7 @@ export const storeProfileService = {
       return profile as unknown as StoreProfile;
     } catch (error) {
       console.error("Error in getStoreProfile:", error);
+      toast.error("Error loading profile data");
       return null;
     }
   },
@@ -65,6 +68,7 @@ export const storeProfileService = {
       
       if (fetchError) {
         console.error("Error checking for existing profile:", fetchError);
+        toast.error("Error checking for existing profile");
         return null;
       }
       
@@ -115,11 +119,13 @@ export const storeProfileService = {
         
         if (error) {
           console.error("Error updating store profile:", error);
+          toast.error("Error updating store profile");
           return null;
         }
         
         result = data;
         console.log("Profile updated successfully:", result);
+        toast.success("Profile updated successfully");
       } else {
         // Create a new profile
         console.log("Creating new profile");
@@ -131,11 +137,13 @@ export const storeProfileService = {
         
         if (error) {
           console.error("Error creating store profile:", error);
+          toast.error("Error creating store profile");
           return null;
         }
         
         result = data;
         console.log("Profile created successfully:", result);
+        toast.success("Profile created successfully");
       }
       
       // Only return as StoreProfile if we actually have a result
@@ -152,6 +160,7 @@ export const storeProfileService = {
       return result as unknown as StoreProfile;
     } catch (error) {
       console.error("Error in saveStoreProfile:", error);
+      toast.error("Error saving profile");
       return null;
     }
   }
