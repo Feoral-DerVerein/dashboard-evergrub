@@ -197,7 +197,7 @@ export const BankAccountForm = () => {
           description: "Payment details saved successfully"
         });
         
-        // Set showSavedCard to true to display the saved card state
+        // Explicitly set showSavedCard to true to display the saved card state
         console.log("Setting showSavedCard to true after successful save");
         setShowSavedCard(true);
         
