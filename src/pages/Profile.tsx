@@ -369,7 +369,7 @@ const Profile = () => {
             disabled={saving}
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Guardar
+            Save
           </Button>
         </header>
 
@@ -567,10 +567,10 @@ const Profile = () => {
               {saving ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                  Guardando...
+                  Saving...
                 </>
               ) : (
-                "Guardar Datos Bancarios"
+                "Save Profile"
               )}
             </Button>
           </main>
@@ -701,10 +701,10 @@ const Profile = () => {
                   {saving ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                      Guardando...
+                      Saving...
                     </>
                   ) : (
-                    "Guardar Datos Bancarios"
+                    "Save Payment Details"
                   )}
                 </Button>
                 
@@ -720,12 +720,12 @@ const Profile = () => {
                   {deleting ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                      Eliminando...
+                      Deleting...
                     </>
                   ) : (
                     <>
                       <Trash2 className="w-4 h-4 mr-2" />
-                      Eliminar Datos
+                      Remove Details
                     </>
                   )}
                 </Button>
@@ -769,13 +769,13 @@ const Profile = () => {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción eliminará tus datos bancarios. No podrás deshacer esta acción.
+              This action will delete your payment details. You cannot undo this action.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeletePaymentDetails}
               className="bg-red-600 hover:bg-red-700 text-white"
@@ -783,10 +783,10 @@ const Profile = () => {
               {deleting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                  Eliminando...
+                  Deleting...
                 </>
               ) : (
-                "Eliminar"
+                "Delete"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

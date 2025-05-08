@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Building, CreditCard, Globe, Loader2, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -179,7 +178,7 @@ export const BankAccountForm = () => {
       if (result) {
         toast({
           title: "Success",
-          description: "Datos bancarios guardados exitosamente"
+          description: "Payment details saved successfully"
         });
       } else {
         throw new Error("Could not save payment information");
@@ -242,7 +241,7 @@ export const BankAccountForm = () => {
           
           toast({
             title: "Success",
-            description: "Datos bancarios eliminados exitosamente"
+            description: "Payment details deleted successfully"
           });
         } else {
           throw new Error("Could not delete payment information");
@@ -404,12 +403,12 @@ export const BankAccountForm = () => {
               {saving ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Guardando...
+                  Saving...
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  Guardar Datos Bancarios
+                  Save Payment Details
                 </>
               )}
             </Button>
@@ -427,18 +426,18 @@ export const BankAccountForm = () => {
                   }
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Eliminar Datos
+                  Remove Details
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Esta acción eliminará tus datos bancarios. No podrás deshacer esta acción.
+                    This action will delete your payment details. You cannot undo this action.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDelete}
                     className="bg-red-600 hover:bg-red-700 text-white"
@@ -446,10 +445,10 @@ export const BankAccountForm = () => {
                     {deleting ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Eliminando...
+                        Deleting...
                       </>
                     ) : (
-                      "Eliminar"
+                      "Delete"
                     )}
                   </AlertDialogAction>
                 </AlertDialogFooter>
