@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type BusinessHourRowProps = {
   day: string;
@@ -60,6 +61,7 @@ const Profile = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [activeTab, setActiveTab] = useState<'profile' | 'payment'>('profile');
+  const [showSavedCard, setShowSavedCard] = useState(false);
 
   // Store profile data
   const [profile, setProfile] = useState<StoreProfile>({
@@ -277,6 +279,7 @@ const Profile = () => {
           title: "Success",
           description: "Profile saved successfully"
         });
+        setShowSavedCard(true); // Show the saved data card after successful save
       } else {
         throw new Error("Could not save profile");
       }
@@ -355,6 +358,59 @@ const Profile = () => {
             Save
           </Button>
         </header>
+
+        {/* Display saved profile card if showSavedCard is true */}
+        {showSavedCard && (
+          <div className="p-4">
+            <Card className="border-green-200 bg-green-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center">
+                  <div className="bg-green-500 p-1 rounded-full mr-2">
+                    <Save className="h-4 w-4 text-white" />
+                  </div>
+                  Profile Saved Successfully
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={profile.logoUrl} />
+                      <AvatarFallback>{profile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-medium">{profile.name}</h3>
+                      <p className="text-sm text-gray-500">{profile.categories.join(", ")}</p>
+                    </div>
+                  </div>
+                  
+                  {profile.location && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-4 w-4 text-gray-500" />
+                      <span>{profile.location}</span>
+                    </div>
+                  )}
+                  
+                  {profile.contactPhone && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Phone className="h-4 w-4 text-gray-500" />
+                      <span>{profile.contactPhone}</span>
+                    </div>
+                  )}
+                </div>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full mt-4"
+                  onClick={() => setShowSavedCard(false)}
+                >
+                  Continue Editing
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <div className="flex border-b">
           <button className={`flex-1 py-3 text-center ${activeTab === 'profile' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`} onClick={() => setActiveTab('profile')}>
@@ -545,7 +601,7 @@ const Profile = () => {
                   {saving ? <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
                       Saving...
-                    </> : "Save Payment Details"}
+                    </> : "Save"}
                 </Button>
                 
                 <Button className="flex-1 bg-red-600 hover:bg-red-700" variant="destructive" onClick={() => setShowDeleteDialog(true)} disabled={deleting || !profile.paymentDetails?.bankName && !profile.paymentDetails?.paypalEmail}>
