@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+
 type BusinessHourRowProps = {
   day: string;
   open: string;
@@ -351,7 +352,7 @@ const Profile = () => {
           <h1 className="text-xl font-semibold">Store Profile</h1>
           <Button variant="ghost" className="text-blue-600 hover:text-blue-700 flex items-center gap-1" onClick={handleSaveProfile} disabled={saving}>
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Guardar
+            Save
           </Button>
         </header>
 
@@ -458,8 +459,8 @@ const Profile = () => {
             <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={handleSaveProfile} disabled={saving}>
               {saving ? <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                  Guardando...
-                </> : "Guardar Datos Bancarios"}
+                  Saving...
+                </> : "Save Profile"}
             </Button>
           </main> : <main className="p-6 space-y-6">
             <div className="space-y-4">
@@ -543,17 +544,17 @@ const Profile = () => {
                 <Button onClick={handleSaveProfile} disabled={saving} className="flex-1 bg-emerald-600 hover:bg-emerald-700 px-[9px] mx-px">
                   {saving ? <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                      Guardando...
-                    </> : "Guardar Datos Bancarios"}
+                      Saving...
+                    </> : "Save Payment Details"}
                 </Button>
                 
                 <Button className="flex-1 bg-red-600 hover:bg-red-700" variant="destructive" onClick={() => setShowDeleteDialog(true)} disabled={deleting || !profile.paymentDetails?.bankName && !profile.paymentDetails?.paypalEmail}>
                   {deleting ? <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                      Eliminando...
+                      Deleting...
                     </> : <>
                       <Trash2 className="w-4 h-4 mr-2" />
-                      Eliminar Datos
+                      Delete
                     </>}
                 </Button>
               </div>
@@ -590,18 +591,18 @@ const Profile = () => {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción eliminará tus datos bancarios. No podrás deshacer esta acción.
+              This action will delete your payment details. You cannot undo this action.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeletePaymentDetails} className="bg-red-600 hover:bg-red-700 text-white">
               {deleting ? <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" /> 
-                  Eliminando...
-                </> : "Eliminar"}
+                  Deleting...
+                </> : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
