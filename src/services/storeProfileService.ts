@@ -6,6 +6,8 @@ export const storeProfileService = {
   // Get the user's store profile
   async getStoreProfile(userId: string): Promise<StoreProfile | null> {
     try {
+      console.log("Fetching store profile for userId:", userId);
+      
       // Using a type assertion since the table is not in the generated types yet
       const { data, error } = await supabase
         .from('store_profiles' as any)
@@ -21,11 +23,14 @@ export const storeProfileService = {
       // Only return as StoreProfile if we actually have data
       if (!data) return null;
 
+      console.log("Fetched store profile:", data);
+
       // Convert payment_details to paymentDetails if it exists
       const profile = data as any;
       if (profile.payment_details) {
         profile.paymentDetails = profile.payment_details;
         delete profile.payment_details;
+        console.log("Converted payment_details to paymentDetails:", profile.paymentDetails);
       }
       
       // Safely convert to StoreProfile
@@ -39,11 +44,14 @@ export const storeProfileService = {
   // Create or update the store profile
   async saveStoreProfile(profile: StoreProfile): Promise<StoreProfile | null> {
     try {
+      console.log("Saving store profile:", JSON.stringify(profile));
+      
       // Create a copy of the profile to be sent to the database
       const profileToSave = { ...profile };
       
       // Convert paymentDetails to payment_details for the database
       if (profileToSave.paymentDetails) {
+        console.log("Converting paymentDetails to payment_details:", profileToSave.paymentDetails);
         (profileToSave as any).payment_details = profileToSave.paymentDetails;
         delete (profileToSave as any).paymentDetails;
       }
@@ -78,10 +86,13 @@ export const storeProfileService = {
         }
       }
 
+      console.log("Existing profile:", existingProfile);
+      
       let result;
       
       if (existingProfile && existingProfile.id) {
         // Update existing profile
+        console.log("Updating existing profile with ID:", existingProfile.id);
         const { data, error } = await supabase
           .from('store_profiles' as any)
           .update({
@@ -108,8 +119,10 @@ export const storeProfileService = {
         }
         
         result = data;
+        console.log("Profile updated successfully:", result);
       } else {
         // Create a new profile
+        console.log("Creating new profile");
         const { data, error } = await supabase
           .from('store_profiles' as any)
           .insert([profileToSave])
@@ -122,6 +135,7 @@ export const storeProfileService = {
         }
         
         result = data;
+        console.log("Profile created successfully:", result);
       }
       
       // Only return as StoreProfile if we actually have a result
@@ -131,6 +145,7 @@ export const storeProfileService = {
       if ((result as any).payment_details) {
         (result as any).paymentDetails = (result as any).payment_details;
         delete (result as any).payment_details;
+        console.log("Converted back payment_details to paymentDetails:", (result as any).paymentDetails);
       }
       
       // Safely convert to StoreProfile

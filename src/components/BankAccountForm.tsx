@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Building, CreditCard, Globe, Loader2, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -55,9 +56,13 @@ export const BankAccountForm = () => {
     
     setLoading(true);
     try {
+      console.log("Loading payment details for user:", user.id);
       const storeProfile = await storeProfileService.getStoreProfile(user.id);
       
+      console.log("Store profile loaded:", storeProfile);
+      
       if (storeProfile?.paymentDetails) {
+        console.log("Found payment details:", storeProfile.paymentDetails);
         setMerchantDetails({
           ...merchantDetails,
           ...storeProfile.paymentDetails
@@ -153,8 +158,12 @@ export const BankAccountForm = () => {
     setSaving(true);
     
     try {
+      console.log("Starting to save payment details...");
+      
       // Get existing profile or create minimal one
       let storeProfile = await storeProfileService.getStoreProfile(user.id);
+      
+      console.log("Retrieved store profile:", storeProfile);
       
       if (!storeProfile) {
         // Create a basic profile with payment details
@@ -195,6 +204,7 @@ export const BankAccountForm = () => {
         // Update the merchant details to reflect what was saved
         if (result.paymentDetails) {
           setMerchantDetails(result.paymentDetails);
+          console.log("Updated merchant details after save:", result.paymentDetails);
         }
       } else {
         throw new Error("Could not save payment information");
@@ -254,6 +264,7 @@ export const BankAccountForm = () => {
           });
           
           setShowDeleteDialog(false);
+          setShowSavedCard(false);
           
           toast({
             title: "Success",
