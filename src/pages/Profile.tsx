@@ -376,7 +376,7 @@ const Profile = () => {
             <div className="flex flex-col items-center gap-2">
               <div className="relative">
                 <Avatar className="w-24 h-24">
-                  <AvatarImage src={profile.logoUrl} />
+                  <AvatarImage src={profile.logoUrl || "/lovable-uploads/c3d68019-76c1-4a73-baa5-34a0faf8881c.png"} />
                   <AvatarFallback>
                     <Camera className="w-8 h-8 text-gray-400" />
                   </AvatarFallback>
