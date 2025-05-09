@@ -90,7 +90,7 @@ const Login = () => {
   };
   return <div className="min-h-screen bg-white px-6 pb-20">
       <div className="pt-10 flex justify-center">
-        <img src="/lovable-uploads/dd7edace-28a7-4d4d-addb-d4f793708f1f.png" alt="E Logo" className="h-6 w-auto object-contain" />
+        
       </div>
 
       <div className="mt-12">
