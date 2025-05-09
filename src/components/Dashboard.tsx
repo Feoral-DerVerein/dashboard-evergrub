@@ -220,7 +220,7 @@ const Dashboard = () => {
               <p className="text-gray-500">Welcome, Felipe</p>
             </div>
             <Avatar className="h-10 w-10">
-              <AvatarImage src="/lovable-uploads/c3d68019-76c1-4a73-baa5-34a0faf8881c.png" />
+              <AvatarImage src="/lovable-uploads/c3d68019-76c1-4a73-baa5-34a0faf8881c.png" className="h-25 object-fill" />
               <AvatarFallback>F</AvatarFallback>
             </Avatar>
           </div>
