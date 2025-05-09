@@ -218,6 +218,7 @@ const Dashboard = () => {
             <div>
               <img src="/lovable-uploads/c2838629-bdf2-4760-8826-643a77ae6840.png" alt="Delivery Truck Logo" className="h-24 w-auto mb-0" />
               <p className="text-gray-500">Welcome, Felipe</p>
+              <p className="text-gray-400 text-sm">Ortega's account</p>
             </div>
             <Avatar className="h-10 w-10">
               <AvatarImage src="/lovable-uploads/c3d68019-76c1-4a73-baa5-34a0faf8881c.png" className="h-25 object-fill" />
