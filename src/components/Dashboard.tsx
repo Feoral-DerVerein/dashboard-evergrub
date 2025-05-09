@@ -1,4 +1,3 @@
-
 import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -244,9 +243,9 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-1">
             <div>
               <img 
-                src="/lovable-uploads/dd7edace-28a7-4d4d-addb-d4f793708f1f.png" 
-                alt="E Logo" 
-                className="h-6 w-auto mb-1"
+                src="/lovable-uploads/9624f216-fb9d-4df0-add4-f891b85c1dba.png" 
+                alt="Q Logo" 
+                className="h-8 w-auto mb-1"
               />
               <p className="text-gray-500">Welcome, Felipe</p>
             </div>
