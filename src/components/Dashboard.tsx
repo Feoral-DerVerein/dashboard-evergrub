@@ -1,3 +1,4 @@
+
 import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -245,7 +246,7 @@ const Dashboard = () => {
               <img 
                 src="/lovable-uploads/c2838629-bdf2-4760-8826-643a77ae6840.png" 
                 alt="Delivery Truck Logo" 
-                className="h-8 w-auto mb-1"
+                className="h-14 w-auto mb-2"
               />
               <p className="text-gray-500">Welcome, Felipe</p>
             </div>
