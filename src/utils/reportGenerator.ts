@@ -1,6 +1,6 @@
 import { salesService } from "@/services/salesService";
 import * as orderService from "@/services/orderService";
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
 // Define TimeFilterPeriod type
