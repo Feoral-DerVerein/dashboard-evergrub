@@ -225,7 +225,7 @@ const Dashboard = () => {
         <header className="px-6 pt-8 pb-6">
           <div className="flex justify-between items-center mb-1">
             <div>
-              <img src="/lovable-uploads/a68c025a-979f-446d-a9be-8bd55b21893c.png" alt="Delivery Truck Logo" className="h-24 w-auto mb-0" />
+              <img src="/lovable-uploads/1c48db0a-9b3e-4db3-a681-d07587f74d17.png" alt="Evergrub Logo" className="h-24 w-auto mb-0" />
               <p className="text-gray-500">Welcome, Felipe</p>
               <p className="text-gray-400 text-sm">Ortega's account</p>
             </div>

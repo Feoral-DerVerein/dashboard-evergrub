@@ -94,7 +94,7 @@ const Login = () => {
 
   return <div className="min-h-screen bg-white px-6 pb-20">
       <div className="pt-10 flex justify-center">
-        <img src="/lovable-uploads/826e3eba-e84f-40b6-9d83-2606f9e02a3b.png" alt="Evergrub Logo" className="h-32 w-auto" />
+        <img src="/lovable-uploads/1c48db0a-9b3e-4db3-a681-d07587f74d17.png" alt="Evergrub Logo" className="h-32 w-auto" />
       </div>
 
       <div className="mt-8">
