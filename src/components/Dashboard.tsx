@@ -1,3 +1,4 @@
+
 import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -230,7 +231,7 @@ const Dashboard = () => {
               <p className="text-gray-400 text-sm">Ortega's account</p>
             </div>
             <Avatar className="h-12 w-12">
-              <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
+              <AvatarImage src="/lovable-uploads/f673a44d-f3d9-4dae-848a-5d7f82c04b01.png" alt="Ortega's logo" className="object-cover" />
               <AvatarFallback>O</AvatarFallback>
             </Avatar>
           </div>
