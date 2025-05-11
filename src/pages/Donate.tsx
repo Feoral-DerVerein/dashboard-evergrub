@@ -62,7 +62,7 @@ const CharityCard = ({
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Donar a {charity.name}</DialogTitle>
+            <DialogTitle>Donate to {charity.name}</DialogTitle>
           </DialogHeader>
           <DonationForm onClose={() => setIsFormOpen(false)} />
         </DialogContent>
