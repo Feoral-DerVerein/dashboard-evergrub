@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
 import { useAuth } from "@/context/AuthContext";
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
@@ -20,6 +21,7 @@ const Login = () => {
   const {
     signInWithGoogle
   } = useAuth();
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -63,6 +65,7 @@ const Login = () => {
       setLoading(false);
     }
   };
+
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
     try {
       if (provider === 'google') {
@@ -88,9 +91,10 @@ const Login = () => {
       });
     }
   };
+
   return <div className="min-h-screen bg-white px-6 pb-20">
       <div className="pt-10 flex justify-center">
-        
+        <img src="/lovable-uploads/33cb00f3-3fd6-4357-9976-3db12a4c11a6.png" alt="Evergrub Logo" className="h-16 w-auto" />
       </div>
 
       <div className="mt-8">
@@ -182,4 +186,5 @@ const Login = () => {
       </div>
     </div>;
 };
+
 export default Login;
