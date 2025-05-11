@@ -1,4 +1,3 @@
-
 import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -8,7 +7,6 @@ import { salesService, Sale } from "@/services/salesService";
 import { getUserOrders } from "@/services/orderService";
 import { Order } from "@/types/order.types";
 import { format, parseISO } from "date-fns";
-
 type QuickAccessItemProps = {
   icon: React.ComponentType<{
     className?: string;
@@ -29,7 +27,6 @@ const QuickAccessItem = ({
         {badgeCount > 99 ? '99+' : badgeCount}
       </div>}
   </Link>;
-
 type StatCardProps = {
   label: string;
   value: string | number;
@@ -48,7 +45,6 @@ const StatCard = ({
         {trend && <span className="positive-trend">↑ {trend}</span>}
       </>}
   </div>;
-
 type RecentActivityItemProps = {
   title: string;
   time: string;
@@ -67,7 +63,6 @@ const RecentActivityItem = ({
     </div>
     {amount && <span className="font-medium">{amount}</span>}
   </div>;
-
 export const BottomNav = () => {
   const {
     orderCount,
@@ -95,7 +90,6 @@ export const BottomNav = () => {
       </Link>
     </div>;
 };
-
 const Dashboard = () => {
   const {
     orderCount,
@@ -110,7 +104,6 @@ const Dashboard = () => {
     totalRevenue: 0,
     isLoading: true
   });
-
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -136,7 +129,6 @@ const Dashboard = () => {
     };
     fetchStats();
   }, [orderCount]);
-
   useEffect(() => {
     const fetchRecentActivity = async () => {
       setIsLoading(true);
@@ -200,7 +192,6 @@ const Dashboard = () => {
     };
     fetchRecentActivity();
   }, []);
-
   const formatTimeAgo = (timestamp: string) => {
     try {
       const date = parseISO(timestamp);
@@ -220,13 +211,12 @@ const Dashboard = () => {
       return 'Recently';
     }
   };
-
   return <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto bg-white min-h-screen animate-fade-in">
         <header className="px-6 pt-8 pb-6">
           <div className="flex justify-between items-center mb-1">
             <div>
-              <img src="/lovable-uploads/222d24fa-0e60-4355-b451-27d97df4af1f.png" alt="Evergrub Logo" className="h-24 w-auto mb-0" />
+              <img src="/lovable-uploads/1c48db0a-9b3e-4db3-a681-d07587f74d17.png" alt="Evergrub Logo" className="h-9 w-auto mb-0" />
               <p className="text-gray-500">Welcome, Felipe</p>
               <p className="text-gray-400 text-sm">Ortega's account</p>
             </div>
@@ -272,5 +262,4 @@ const Dashboard = () => {
       </div>
     </div>;
 };
-
 export default Dashboard;
