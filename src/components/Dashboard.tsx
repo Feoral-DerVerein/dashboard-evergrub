@@ -225,12 +225,12 @@ const Dashboard = () => {
         <header className="px-6 pt-8 pb-6">
           <div className="flex justify-between items-center mb-1">
             <div>
-              <img src="/lovable-uploads/3c1df9d1-adad-4a33-90f4-830da0edf247.png" alt="Evergrub Logo" className="h-9 w-auto mb-0" />
+              <img src="/lovable-uploads/f673a44d-f3d9-4dae-848a-5d7f82c04b01.png" alt="Evergrub Logo" className="h-9 w-auto mb-0" />
               <p className="text-gray-500">Welcome, Felipe</p>
               <p className="text-gray-400 text-sm">Ortega's account</p>
             </div>
             <Avatar className="h-12 w-12">
-              <AvatarImage src="/lovable-uploads/f673a44d-f3d9-4dae-848a-5d7f82c04b01.png" alt="Ortega's logo" className="object-cover" />
+              <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
               <AvatarFallback>O</AvatarFallback>
             </Avatar>
           </div>
