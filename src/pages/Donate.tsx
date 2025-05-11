@@ -1,13 +1,19 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { BottomNav } from "@/components/Dashboard";
 import { ArrowLeft, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DonationForm } from "@/components/DonationForm";
+
 type CharityProps = {
   name: string;
   description: string;
 };
+
 const charities: CharityProps[] = [{
   name: "Foodbank Australia",
   description: "Australia's largest food relief organization, providing over 70 million meals annually to people in need."
@@ -24,32 +30,47 @@ const charities: CharityProps[] = [{
   name: "Loaves and Fishes Tasmania",
   description: "Collects and distributes food to Tasmanians in need through a network of community organizations."
 }];
+
 const CharityCard = ({
   charity
 }: {
   charity: CharityProps;
 }) => {
-  const handleDonate = () => {
-    toast.success(`Thank you for supporting ${charity.name}!`, {
-      description: "Your donation makes a difference.",
-      duration: 5000
-    });
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  
+  const handleOpenForm = () => {
+    setIsFormOpen(true);
   };
-  return <Card className="mb-4">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Heart className="h-5 w-5 text-red-500" />
-          {charity.name}
-        </CardTitle>
-        <CardDescription>{charity.description}</CardDescription>
-      </CardHeader>
-      <CardFooter>
-        <Button onClick={handleDonate} className="w-full bg-emerald-700 hover:bg-emerald-600">
-          Donate
-        </Button>
-      </CardFooter>
-    </Card>;
+
+  return (
+    <>
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Heart className="h-5 w-5 text-red-500" />
+            {charity.name}
+          </CardTitle>
+          <CardDescription>{charity.description}</CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Button onClick={handleOpenForm} className="w-full bg-emerald-700 hover:bg-emerald-600">
+            Donate
+          </Button>
+        </CardFooter>
+      </Card>
+      
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Donar a {charity.name}</DialogTitle>
+          </DialogHeader>
+          <DonationForm onClose={() => setIsFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 };
+
 const Donate = () => {
   return <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto bg-white min-h-screen">
@@ -79,4 +100,5 @@ const Donate = () => {
       </div>
     </div>;
 };
+
 export default Donate;
