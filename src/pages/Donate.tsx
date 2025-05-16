@@ -14,21 +14,10 @@ type CharityProps = {
   description: string;
 };
 
+// Reduced to only include OzHarvest
 const charities: CharityProps[] = [{
-  name: "Foodbank Australia",
-  description: "Australia's largest food relief organization, providing over 70 million meals annually to people in need."
-}, {
   name: "OzHarvest",
   description: "Rescues quality surplus food and delivers it to charities that feed vulnerable Australians."
-}, {
-  name: "SecondBite",
-  description: "Rescues fresh, nutritious food that would otherwise go to waste and redistributes it to people in need."
-}, {
-  name: "FareShare",
-  description: "Rescues surplus food and cooks free, nutritious meals for people experiencing food insecurity."
-}, {
-  name: "Loaves and Fishes Tasmania",
-  description: "Collects and distributes food to Tasmanians in need through a network of community organizations."
 }];
 
 const CharityCard = ({
@@ -85,9 +74,9 @@ const Donate = () => {
 
         <main className="px-6 py-4">
           <div className="mb-6">
-            <h2 className="text-lg font-medium mb-2">Support Food Charity Organizations</h2>
+            <h2 className="text-lg font-medium mb-2">Support Food Charity</h2>
             <p className="text-gray-600 text-sm">
-              Help those in need by donating to these food charity organizations making a difference.
+              Help those in need by donating to OzHarvest making a difference.
             </p>
           </div>
 
