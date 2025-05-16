@@ -11,7 +11,7 @@ type AuthContextType = {
   signInWithGoogle: () => Promise<void>;
 };
 
-// Create default context to avoid errors
+// Crear el contexto con un valor por defecto para evitar errores
 const defaultAuthContext: AuthContextType = {
   session: null,
   user: null,
@@ -30,44 +30,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log("AuthProvider: initializing");
     
-    // Important: Set up listener first, then check session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
-      console.log("Auth state changed:", event, currentSession?.user?.email || "No session");
-      
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      
-      // Only set loading to false after initial session check
-      if (event === 'INITIAL_SESSION') {
-        setLoading(false);
-      }
-    });
-
-    // Check for existing session
-    const getSession = async () => {
+    // Verificar primero si ya hay una sesión activa
+    const getInitialSession = async () => {
       try {
-        const { data } = await supabase.auth.getSession();
-        console.log("Initial session check:", data.session?.user?.email || "No session");
-        
-        // Only update if we don't already have a session from the listener
-        if (loading) {
-          setSession(data.session);
-          setUser(data.session?.user ?? null);
-          setLoading(false);
-        }
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        console.log("Initial session check:", currentSession?.user?.email || "No session");
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
       } catch (error) {
-        console.error("Error getting session:", error);
+        console.error("Error getting initial session:", error);
+      } finally {
         setLoading(false);
       }
     };
 
-    getSession();
+    getInitialSession();
     
+    // Configurar el detector de cambios de estado de autenticación
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.email || "No session");
+        
+        // Sincronizar state con la sesión actual
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+      }
+    );
+
     return () => {
       console.log("AuthProvider: cleanup");
       subscription.unsubscribe();
     };
-  }, []);  // Don't include loading in dependencies
+  }, []);
 
   const signOut = async () => {
     console.log("Signing out");
@@ -98,7 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
   }
   return context;
 }
