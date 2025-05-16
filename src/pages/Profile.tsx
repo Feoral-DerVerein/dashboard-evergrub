@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogoutButton } from "@/components/LogoutButton";
 
 type BusinessHourRowProps = {
   day: string;
@@ -471,9 +470,6 @@ const Profile = () => {
                 </> : "Save Profile"}
             </Button>
             
-            {/* Add the logout button here */}
-            <LogoutButton />
-            
             {/* Success card that appears after saving */}
             {showSuccessCard && (
               <div className="mt-4 bg-green-50 border border-green-200 rounded-md p-4 flex items-center">
@@ -579,11 +575,6 @@ const Profile = () => {
                       Delete
                     </>}
                 </Button>
-              </div>
-              
-              {/* Add the logout button here too */}
-              <div className="mt-4">
-                <LogoutButton />
               </div>
               
               {/* Success card that appears after saving */}
