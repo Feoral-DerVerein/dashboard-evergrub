@@ -605,14 +605,14 @@ const Ads = () => {
                       filteredCampaigns.map((campaign) => (
                         <>
                           <TableRow key={campaign.id} className={expandedCampaigns.includes(campaign.id) ? "bg-gray-50" : ""}>
-                            <TableCell className={isMobile ? "p-2" : ""}>
+                            <TableCell className="p-2">
                               <Checkbox 
                                 checked={selectedCampaigns.includes(campaign.id)} 
                                 onCheckedChange={() => handleSelectCampaign(campaign.id)}
                                 className="h-4 w-4" 
                               />
                             </TableCell>
-                            <TableCell className={isMobile ? "p-2" : ""}>
+                            <TableCell className="p-2">
                               <button 
                                 onClick={() => toggleCampaignExpansion(campaign.id)}
                                 className="w-5 h-5 flex items-center justify-center"
@@ -620,24 +620,30 @@ const Ads = () => {
                                 {expandedCampaigns.includes(campaign.id) ? "-" : "+"}
                               </button>
                             </TableCell>
-                            <TableCell className={isMobile ? "p-2" : ""}>
-                              <div>
-                                <p className={`${isMobile ? "text-sm" : "font-medium"}`}>{campaign.name}</p>
-                                {!isMobile && <p className="text-xs text-gray-500">ID: {campaign.id}</p>}
-                              </div>
+                            <TableCell className="p-2">
+                              {isMobile ? (
+                                <div className="truncate max-w-[120px]">
+                                  <p className="text-sm font-medium truncate">{campaign.name}</p>
+                                </div>
+                              ) : (
+                                <div>
+                                  <p className="font-medium">{campaign.name}</p>
+                                  <p className="text-xs text-gray-500">ID: {campaign.id}</p>
+                                </div>
+                              )}
                             </TableCell>
                             {!isMobile && <TableCell>{campaign.objective}</TableCell>}
-                            <TableCell className={isMobile ? "p-2" : ""}>
-                              <div>
-                                <p className={isMobile ? "text-sm" : ""}>${campaign.budget.amount.toFixed(2)}</p>
+                            <TableCell className="p-2">
+                              <div className="whitespace-nowrap">
+                                <p className="text-sm">${campaign.budget.amount.toFixed(2)}</p>
                                 {!isMobile && <p className="text-xs text-gray-500">{campaign.budget.type}</p>}
                               </div>
                             </TableCell>
-                            <TableCell className={`text-right font-medium ${isMobile ? "p-2" : ""}`}>{campaign.results}</TableCell>
+                            <TableCell className="text-right p-2 font-medium">{campaign.results}</TableCell>
                             {!isMobile && <TableCell className="hidden md:table-cell text-right">{campaign.reach.toLocaleString()}</TableCell>}
                             {!isMobile && <TableCell className="hidden lg:table-cell text-right">{campaign.impressions.toLocaleString()}</TableCell>}
                             {!isMobile && <TableCell className="text-right">${campaign.cost.toFixed(2)}</TableCell>}
-                            <TableCell className={isMobile ? "p-2" : ""}>
+                            <TableCell className="p-2">
                               <StatusBadge status={campaign.status} />
                             </TableCell>
                             {!isMobile && (
@@ -648,7 +654,7 @@ const Ads = () => {
                                 </div>
                               </TableCell>
                             )}
-                            <TableCell className={`text-right ${isMobile ? "p-2" : ""}`}>
+                            <TableCell className="text-right p-2">
                               {isMobile ? (
                                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                                   <Edit className="h-3 w-3" />
@@ -674,20 +680,20 @@ const Ads = () => {
                           
                           {expandedCampaigns.includes(campaign.id) && campaign.adSets.map((adSet) => (
                             <TableRow key={adSet.id} className="bg-gray-50 text-sm">
-                              <TableCell className={isMobile ? "p-2" : ""}></TableCell>
-                              <TableCell className={isMobile ? "p-2" : ""}></TableCell>
-                              <TableCell colSpan={isMobile ? 1 : 2} className={isMobile ? "p-2" : ""}>
+                              <TableCell className="p-2"></TableCell>
+                              <TableCell className="p-2"></TableCell>
+                              <TableCell colSpan={isMobile ? 1 : 2} className="p-2">
                                 <div className="pl-4 border-l-2 border-gray-300">
-                                  <p className={`${isMobile ? "text-xs" : "font-medium"}`}>{adSet.name}</p>
+                                  <p className={`${isMobile ? "text-xs truncate max-w-[120px]" : "font-medium"}`}>{adSet.name}</p>
                                   {!isMobile && <p className="text-xs text-gray-500">ID: {adSet.id}</p>}
                                 </div>
                               </TableCell>
-                              <TableCell className={isMobile ? "p-2" : ""}>${adSet.budget.toFixed(2)}</TableCell>
-                              <TableCell className={`text-right ${isMobile ? "p-2" : ""}`}>{adSet.results}</TableCell>
+                              <TableCell className="p-2 whitespace-nowrap">${adSet.budget.toFixed(2)}</TableCell>
+                              <TableCell className="text-right p-2">{adSet.results}</TableCell>
                               {!isMobile && <TableCell className="hidden md:table-cell text-right">{adSet.reach.toLocaleString()}</TableCell>}
                               {!isMobile && <TableCell className="hidden lg:table-cell text-right">{adSet.impressions.toLocaleString()}</TableCell>}
                               {!isMobile && <TableCell className="text-right">${adSet.cost.toFixed(2)}</TableCell>}
-                              <TableCell className={isMobile ? "p-2" : ""}>
+                              <TableCell className="p-2">
                                 <StatusBadge status={adSet.status} />
                               </TableCell>
                               {!isMobile && (
@@ -695,7 +701,7 @@ const Ads = () => {
                                   <p className="text-xs">{adSet.schedule}</p>
                                 </TableCell>
                               )}
-                              <TableCell className={`text-right ${isMobile ? "p-2" : ""}`}>
+                              <TableCell className="text-right p-2">
                                 {isMobile ? (
                                   <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                                     <Edit className="h-3 w-3" />
