@@ -19,74 +19,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("AuthProvider mounted - setting up auth state listener");
-    
-    // Set up the auth state listener first to ensure no events are missed
+    // Obtener la sesión inicial
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Escuchar los cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        console.log("Auth state changed:", _event, session ? "User logged in" : "No session");
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
       }
     );
 
-    // Then check for an existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session check:", session ? "Session found" : "No session");
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => {
-      console.log("AuthProvider unmounting - unsubscribing");
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const signOut = async () => {
-    try {
-      setLoading(true);
-      console.log("Signing out user");
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Error al cerrar sesión:", error);
-        throw error;
-      }
-      console.log("User signed out successfully");
-      
-      // Clear state explicitly after signout
-      setSession(null);
-      setUser(null);
-    } catch (error) {
-      console.error("Error in signOut function:", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+    await supabase.auth.signOut();
   };
 
   const signInWithGoogle = async () => {
-    try {
-      console.log("Initiating Google sign in");
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/dashboard',
-        },
-      });
-      
-      if (error) {
-        console.error("Error al iniciar sesión con Google:", error);
-        throw error;
-      }
-      
-      console.log("Google sign in initiated successfully");
-    } catch (error) {
-      console.error("Error in signInWithGoogle function:", error);
-      throw error;
-    }
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/dashboard',
+      },
+    });
   };
 
   const value = {

@@ -3,10 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
 import { OrderProvider } from "./context/OrderContext"; 
+import { useAuth } from "./context/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import KPI from "./pages/KPI";
@@ -32,23 +32,18 @@ const queryClient = new QueryClient();
 // Componente para proteger rutas que requieren autenticación
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    if (!loading && !user) {
-      console.log("User not authenticated, redirecting to login page");
-      navigate("/", { replace: true });
-    }
-  }, [user, loading, navigate]);
   
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Cargando...</div>;
   }
   
-  return user ? children : null;
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
 };
 
-// AppRoutes component to handle all routes with proper context
 const AppRoutes = () => {
   return (
     <Routes>
@@ -173,19 +168,18 @@ const AppRoutes = () => {
   );
 };
 
-// Main App component with correctly structured providers
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <OrderProvider>
-            <Toaster />
-            <Sonner />
+      <AuthProvider>
+        <OrderProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
             <AppRoutes />
-          </OrderProvider>
-        </AuthProvider>
-      </BrowserRouter>
+          </BrowserRouter>
+        </OrderProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

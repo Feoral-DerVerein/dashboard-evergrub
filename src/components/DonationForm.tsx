@@ -11,11 +11,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name is required" }),
-  email: z.string().email({ message: "Invalid email" }),
-  phone: z.string().min(5, { message: "Invalid phone number" }),
-  amount: z.string().min(1, { message: "Amount is required" }),
-  foodType: z.string().min(1, { message: "Food type is required" }),
+  name: z.string().min(2, { message: "El nombre es requerido" }),
+  email: z.string().email({ message: "Email inválido" }),
+  phone: z.string().min(5, { message: "Teléfono inválido" }),
+  amount: z.string().min(1, { message: "La cantidad es requerida" }),
+  foodType: z.string().min(1, { message: "El tipo de comida es requerido" }),
   message: z.string().optional(),
 });
 
@@ -35,8 +35,8 @@ export function DonationForm({ onClose }: { onClose: () => void }) {
   });
 
   function onSubmit(data: FormValues) {
-    toast.success("Thank you for your donation!", {
-      description: `We will contact you soon about your donation of ${data.amount} of ${data.foodType}.`,
+    toast.success("¡Gracias por tu donación!", {
+      description: `Nos pondremos en contacto contigo pronto sobre tu donación de ${data.amount} de ${data.foodType}.`,
       duration: 5000,
     });
     onClose();
@@ -50,9 +50,9 @@ export function DonationForm({ onClose }: { onClose: () => void }) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Nombre</FormLabel>
               <FormControl>
-                <Input placeholder="Your name" {...field} />
+                <Input placeholder="Tu nombre" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,7 +66,7 @@ export function DonationForm({ onClose }: { onClose: () => void }) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="your@email.com" {...field} />
+                <Input placeholder="tu@email.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -78,9 +78,9 @@ export function DonationForm({ onClose }: { onClose: () => void }) {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone</FormLabel>
+              <FormLabel>Teléfono</FormLabel>
               <FormControl>
-                <Input placeholder="Your phone number" {...field} />
+                <Input placeholder="Tu número de teléfono" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -92,9 +92,9 @@ export function DonationForm({ onClose }: { onClose: () => void }) {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>Cantidad</FormLabel>
               <FormControl>
-                <Input placeholder="How much food can you donate?" {...field} />
+                <Input placeholder="¿Cuánta comida puedes donar?" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -106,9 +106,9 @@ export function DonationForm({ onClose }: { onClose: () => void }) {
           name="foodType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Food Type</FormLabel>
+              <FormLabel>Tipo de comida</FormLabel>
               <FormControl>
-                <Input placeholder="Type of food you want to donate" {...field} />
+                <Input placeholder="Tipo de comida que quieres donar" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -120,9 +120,9 @@ export function DonationForm({ onClose }: { onClose: () => void }) {
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Additional Message (optional)</FormLabel>
+              <FormLabel>Mensaje adicional (opcional)</FormLabel>
               <FormControl>
-                <Textarea placeholder="Additional information about your donation" {...field} />
+                <Textarea placeholder="Información adicional sobre tu donación" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -130,8 +130,8 @@ export function DonationForm({ onClose }: { onClose: () => void }) {
         />
 
         <div className="flex gap-2 justify-end">
-          <Button variant="outline" type="button" onClick={onClose}>Cancel</Button>
-          <Button type="submit">Submit</Button>
+          <Button variant="outline" type="button" onClick={onClose}>Cancelar</Button>
+          <Button type="submit">Enviar</Button>
         </div>
       </form>
     </Form>
