@@ -30,7 +30,7 @@ import Donate from "./pages/Donate";
 const queryClient = new QueryClient();
 
 // Componente para proteger rutas que requieren autenticación
-// This component must be used inside the AuthProvider
+// Este componente DEBE usarse dentro del AuthProvider
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
   
@@ -47,7 +47,24 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   return user ? children : <Navigate to="/" replace />;
 };
 
-// Main Routes component that will be wrapped with AuthProvider
+// Componente principal de la aplicación que proporciona todos los providers
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <OrderProvider>
+            <AppRoutes />
+            <Toaster />
+            <Sonner />
+          </OrderProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+// Componente de rutas separado, garantizando que esté dentro de AuthProvider
 const AppRoutes = () => {
   return (
     <Routes>
@@ -171,22 +188,5 @@ const AppRoutes = () => {
     </Routes>
   );
 };
-
-// Main App Component
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <OrderProvider>
-            <Toaster />
-            <Sonner />
-            <AppRoutes />
-          </OrderProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
 
 export default App;

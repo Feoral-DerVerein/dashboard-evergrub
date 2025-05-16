@@ -11,7 +11,16 @@ type AuthContextType = {
   signInWithGoogle: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Crear el contexto con un valor por defecto para evitar errores
+const defaultAuthContext: AuthContextType = {
+  session: null,
+  user: null,
+  loading: true,
+  signOut: async () => {},
+  signInWithGoogle: async () => {},
+};
+
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -73,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth debe ser usado dentro de un AuthProvider');
   }
   return context;
