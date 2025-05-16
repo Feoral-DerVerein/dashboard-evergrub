@@ -13,11 +13,16 @@ export const LogoutButton = () => {
   const handleLogout = async () => {
     try {
       await signOut();
+      
       toast({
         title: "Sesión cerrada",
         description: "Has cerrado sesión correctamente",
       });
-      navigate("/");
+      
+      // Asegurarnos de que la navegación ocurra después de que se complete el proceso de cierre de sesión
+      setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 100);
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       toast({

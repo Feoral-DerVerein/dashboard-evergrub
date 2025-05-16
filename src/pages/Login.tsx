@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
 import { useAuth } from "@/context/AuthContext";
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
@@ -14,35 +15,32 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
-  const {
-    signInWithGoogle
-  } = useAuth();
+  const { toast } = useToast();
+  const { signInWithGoogle } = useAuth();
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       if (activeTab === 'login') {
-        const {
-          data,
-          error
-        } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
         if (error) throw error;
+        
+        // The redirection should happen here
         toast({
           title: "Login successful",
           description: "Welcome back!"
         });
-        navigate("/dashboard");
+        
+        // Add a short delay before redirecting to make sure the toast is visible
+        setTimeout(() => {
+          navigate("/dashboard", { replace: true });
+        }, 500);
       } else {
-        const {
-          data,
-          error
-        } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password
         });
@@ -63,15 +61,13 @@ const Login = () => {
       setLoading(false);
     }
   };
+
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
     try {
       if (provider === 'google') {
         await signInWithGoogle();
       } else {
-        const {
-          data,
-          error
-        } = await supabase.auth.signInWithOAuth({
+        const { data, error } = await supabase.auth.signInWithOAuth({
           provider: provider as Provider,
           options: {
             redirectTo: window.location.origin + '/dashboard'
@@ -88,7 +84,9 @@ const Login = () => {
       });
     }
   };
-  return <div className="min-h-screen bg-white px-6 pb-20">
+
+  return (
+    <div className="min-h-screen bg-white px-6 pb-20">
       <div className="pt-10 flex justify-center">
         <img src="/lovable-uploads/33cb00f3-3fd6-4357-9976-3db12a4c11a6.png" alt="Evergrub Logo" className="h-16 w-auto" />
       </div>
@@ -180,6 +178,8 @@ const Login = () => {
           </Link>
         </p>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Login;
