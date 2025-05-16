@@ -12,17 +12,21 @@ export const LogoutButton = () => {
 
   const handleLogout = async () => {
     try {
+      console.log("Logging out...");
       await signOut();
+      
       toast({
-        title: "Sesión cerrada",
-        description: "Has cerrado sesión correctamente",
+        title: "Session closed",
+        description: "You have successfully logged out",
       });
-      navigate("/");
+      
+      console.log("Redirecting to login page");
+      navigate("/", { replace: true });
     } catch (error) {
-      console.error("Error al cerrar sesión:", error);
+      console.error("Error logging out:", error);
       toast({
         title: "Error",
-        description: "Hubo un problema al cerrar la sesión",
+        description: "There was a problem logging out",
         variant: "destructive",
       });
     }

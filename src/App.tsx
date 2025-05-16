@@ -3,10 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { OrderProvider } from "./context/OrderContext"; 
-import { useAuth } from "./context/AuthContext";
+import { useEffect } from "react";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import KPI from "./pages/KPI";
@@ -32,18 +32,23 @@ const queryClient = new QueryClient();
 // Componente para proteger rutas que requieren autenticación
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!loading && !user) {
+      console.log("ProtectedRoute: No user, redirecting to login");
+      navigate("/", { replace: true });
+    }
+  }, [user, loading, navigate]);
   
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Cargando...</div>;
   }
   
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return children;
+  return user ? children : null;
 };
 
+// Separate component for routes to ensure everything is wrapped by AuthProvider
 const AppRoutes = () => {
   return (
     <Routes>
@@ -171,15 +176,15 @@ const AppRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <OrderProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
+          <OrderProvider>
+            <Toaster />
+            <Sonner />
             <AppRoutes />
-          </BrowserRouter>
-        </OrderProvider>
-      </AuthProvider>
+          </OrderProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

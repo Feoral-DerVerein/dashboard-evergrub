@@ -1,4 +1,4 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
 import { useAuth } from "@/context/AuthContext";
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
@@ -14,81 +15,95 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
-  const {
-    signInWithGoogle
-  } = useAuth();
+  const { toast } = useToast();
+  const { signInWithGoogle, user } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    console.log("Login page: checking if user is logged in", user);
+    if (user) {
+      console.log("User already logged in, redirecting to dashboard");
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     try {
+      console.log(`Attempting to ${activeTab} with email: ${email}`);
+      
       if (activeTab === 'login') {
-        const {
-          data,
-          error
-        } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
+        
         if (error) throw error;
+        
+        console.log("Login successful", data);
         toast({
           title: "Login successful",
           description: "Welcome back!"
         });
-        navigate("/dashboard");
+        
+        navigate("/dashboard", { replace: true });
       } else {
-        const {
-          data,
-          error
-        } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password
         });
+        
         if (error) throw error;
+        
+        console.log("Registration successful", data);
         toast({
           title: "Registration successful",
           description: "Your account has been created. Check your email to verify it."
         });
       }
     } catch (error: any) {
-      console.error("Error de autenticación:", error);
+      console.error("Authentication error:", error);
       toast({
         title: "Error",
-        description: error.message || "Ocurrió un problema durante la autenticación",
+        description: error.message || "An error occurred during authentication",
         variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
+
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
     try {
+      console.log(`Attempting login with ${provider}`);
+      
       if (provider === 'google') {
         await signInWithGoogle();
       } else {
-        const {
-          data,
-          error
-        } = await supabase.auth.signInWithOAuth({
+        const { data, error } = await supabase.auth.signInWithOAuth({
           provider: provider as Provider,
           options: {
             redirectTo: window.location.origin + '/dashboard'
           }
         });
+        
         if (error) throw error;
+        console.log(`${provider} login initiated`, data);
       }
     } catch (error: any) {
-      console.error(`Error con ${provider}:`, error);
+      console.error(`Error with ${provider}:`, error);
       toast({
         title: "Error",
-        description: error.message || `Hubo un problema con el inicio de sesión de ${provider}`,
+        description: error.message || `There was a problem with ${provider} login`,
         variant: "destructive"
       });
     }
   };
-  return <div className="min-h-screen bg-white px-6 pb-20">
+
+  return (
+    <div className="min-h-screen bg-white px-6 pb-20">
       <div className="pt-10 flex justify-center">
         <img src="/lovable-uploads/33cb00f3-3fd6-4357-9976-3db12a4c11a6.png" alt="Evergrub Logo" className="h-16 w-auto" />
       </div>
@@ -121,7 +136,7 @@ const Login = () => {
             </Link>
           </div>
           <Button type="submit" className="w-full bg-[#4C956C] hover:bg-[#3d7857] text-white py-6" disabled={loading}>
-            {loading ? "Procesando..." : activeTab === 'login' ? 'Log In' : 'Sign Up'}
+            {loading ? "Processing..." : activeTab === 'login' ? 'Log In' : 'Sign Up'}
           </Button>
         </form>
 
@@ -180,6 +195,8 @@ const Login = () => {
           </Link>
         </p>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Login;
