@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -22,7 +23,10 @@ import {
   TrendingUp,
   Users,
   MousePointerClick,
-  Share2
+  ChevronDown,
+  ChevronRight,
+  Share2,
+  MoreHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +45,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Badge } from "@/components/ui/badge";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import AdPerformancePredictor from "@/components/ads/AdPerformancePredictor";
 
 const mockCampaigns = [
   {
@@ -178,23 +190,23 @@ const mockCampaigns = [
 ];
 
 const StatusBadge = ({ status }: { status: string }) => {
-  let colorClass = "";
+  let variant = "outline";
   
   switch (status) {
     case "active":
-      colorClass = "bg-green-100 text-green-800";
+      variant = "success";
       break;
     case "inactive":
-      colorClass = "bg-gray-100 text-gray-800";
+      variant = "secondary";
       break;
     default:
-      colorClass = "bg-blue-100 text-blue-800";
+      variant = "outline";
   }
   
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>
+    <Badge variant={variant} className="text-xs font-medium">
       {status.charAt(0).toUpperCase() + status.slice(1)}
-    </span>
+    </Badge>
   );
 };
 
@@ -205,6 +217,7 @@ const Ads = () => {
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState("last30days");
   const [expandedCampaigns, setExpandedCampaigns] = useState<string[]>([]);
+  const [showAdPredictor, setShowAdPredictor] = useState(false);
   const isMobile = useIsMobile();
   
   const filteredCampaigns = mockCampaigns.filter(campaign => {
@@ -238,15 +251,27 @@ const Ads = () => {
   };
   
   const handleStatusChange = (campaignId: string, newStatus: string) => {
-    toast.success(`Campaign status changed to ${newStatus}`);
+    toast({
+      title: "Status Updated",
+      description: `Campaign status changed to ${newStatus}`,
+      variant: "default",
+    });
   };
   
   const handleDeleteCampaign = (campaignId: string) => {
-    toast.success("Campaign deleted successfully");
+    toast({
+      title: "Campaign Deleted",
+      description: "Campaign deleted successfully",
+      variant: "default",
+    });
   };
   
   const handleDuplicateCampaign = (campaignId: string) => {
-    toast.success("Campaign duplicated successfully");
+    toast({
+      title: "Campaign Duplicated",
+      description: "Campaign duplicated successfully",
+      variant: "default",
+    });
   };
 
   const toggleCampaignExpansion = (campaignId: string) => {
@@ -272,21 +297,22 @@ const Ads = () => {
   }, 0);
   
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto bg-white min-h-screen animate-fade-in pb-20">
-        <header className="px-4 py-3 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-          <div className="flex items-center gap-1">
-            <Link to="/dashboard" className="text-gray-600">
-              <ArrowLeft className="w-4 h-4" />
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="max-w-7xl mx-auto bg-white min-h-screen animate-fade-in pb-20 shadow-sm">
+        {/* Header */}
+        <header className="px-4 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10 shadow-sm">
+          <div className="flex items-center gap-3">
+            <Link to="/dashboard" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <ArrowLeft className="w-5 h-5" />
             </Link>
-            <h1 className="text-lg font-semibold">Ads</h1>
+            <h1 className="text-xl font-semibold">Ad Campaigns</h1>
           </div>
           
           <div className="flex items-center gap-2">
             {isMobile ? (
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                  <Button variant="outline" size="sm" className="h-9 w-9 p-0">
                     <Calendar className="h-4 w-4" />
                   </Button>
                 </SheetTrigger>
@@ -314,7 +340,7 @@ const Ads = () => {
             ) : (
               <Select defaultValue="last30days">
                 <SelectTrigger className="w-[180px] h-9">
-                  <Calendar className="mr-2 h-4 w-4" />
+                  <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder="Date Range" />
                 </SelectTrigger>
                 <SelectContent>
@@ -330,177 +356,122 @@ const Ads = () => {
             )}
             
             <Link to="/ads/create">
-              <Button size="sm" className="h-8 w-8 p-0 md:w-auto md:px-2">
+              <Button size="sm" className="h-9 gap-1 shadow-sm">
                 <Plus className="h-4 w-4" />
-                <span className="hidden md:inline ml-1">Create</span>
+                <span className={isMobile ? "hidden" : "inline"}>Create Campaign</span>
               </Button>
             </Link>
+
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className={`h-9 gap-1 ${!isMobile ? "ml-1" : ""}`}
+              onClick={() => setShowAdPredictor(!showAdPredictor)}
+            >
+              <BarChart className="h-4 w-4" />
+              <span className="hidden md:inline">Performance Predictor</span>
+            </Button>
           </div>
         </header>
         
-        <main className="p-4">
-          {isMobile ? (
-            <div className="mb-4 overflow-x-auto scrollbar-none -mx-4 px-4">
-              <div className="flex gap-3 pb-1 w-max">
-                <Card className="shadow-sm w-[140px] flex-shrink-0">
-                  <CardHeader className="pb-1 pt-2 px-3">
-                    <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
-                      <Users className="h-3 w-3 mr-1" />
-                      Reach
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-2 px-3">
-                    <p className="text-sm font-semibold">{totalReach.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="shadow-sm w-[140px] flex-shrink-0">
-                  <CardHeader className="pb-1 pt-2 px-3">
-                    <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
-                      <Eye className="h-3 w-3 mr-1" />
-                      Impressions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-2 px-3">
-                    <p className="text-sm font-semibold">{totalImpressions.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="shadow-sm w-[140px] flex-shrink-0">
-                  <CardHeader className="pb-1 pt-2 px-3">
-                    <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
-                      <MousePointerClick className="h-3 w-3 mr-1" />
-                      Results
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-2 px-3">
-                    <p className="text-sm font-semibold">{totalResults}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="shadow-sm w-[140px] flex-shrink-0">
-                  <CardHeader className="pb-1 pt-2 px-3">
-                    <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
-                      <CircleDollarSign className="h-3 w-3 mr-1" />
-                      Cost/Result
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-2 px-3">
-                    <p className="text-sm font-semibold">${averageCost.toFixed(2)}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="shadow-sm w-[140px] flex-shrink-0">
-                  <CardHeader className="pb-1 pt-2 px-3">
-                    <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
-                      <Banknote className="h-3 w-3 mr-1" />
-                      Total Spend
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-2 px-3">
-                    <p className="text-sm font-semibold">${totalSpend.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          ) : (
-            <div className="mb-5">
-              <h2 className="text-lg font-medium mb-2">Performance Overview</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                <Card className="shadow-sm hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-1 pt-3 px-4">
-                    <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
-                      <Users className="h-3 w-3 mr-1" />
-                      Reach
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-3 px-4">
-                    <p className="text-lg font-semibold">{totalReach.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="shadow-sm hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-1 pt-3 px-4">
-                    <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
-                      <Eye className="h-3 w-3 mr-1" />
-                      Impressions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-3 px-4">
-                    <p className="text-lg font-semibold">{totalImpressions.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="shadow-sm hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-1 pt-3 px-4">
-                    <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
-                      <MousePointerClick className="h-3 w-3 mr-1" />
-                      Results
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-3 px-4">
-                    <p className="text-lg font-semibold">{totalResults}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="shadow-sm hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-1 pt-3 px-4">
-                    <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
-                      <CircleDollarSign className="h-3 w-3 mr-1" />
-                      Cost per Result
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-3 px-4">
-                    <p className="text-lg font-semibold">${averageCost.toFixed(2)}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="shadow-sm hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-1 pt-3 px-4">
-                    <CardTitle className="text-xs text-gray-500 font-normal flex items-center">
-                      <Banknote className="h-3 w-3 mr-1" />
-                      Total Spend
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-3 px-4">
-                    <p className="text-lg font-semibold">${totalSpend.toLocaleString()}</p>
-                  </CardContent>
-                </Card>
-              </div>
+        <main className="p-4 space-y-5">
+          {/* Stats Overview Cards */}
+          <div className={`grid gap-3 ${isMobile ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+            <Card className="shadow-sm hover:shadow transition-shadow bg-gradient-to-br from-card to-background">
+              <CardHeader className="pb-1 pt-3 px-4 flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-xs text-muted-foreground font-normal">Reach</CardTitle>
+                <Users className="h-3 w-3 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pt-0 pb-3 px-4">
+                <p className="text-lg font-semibold">{totalReach.toLocaleString()}</p>
+                <p className="text-[10px] text-muted-foreground">Total audience reach</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-sm hover:shadow transition-shadow bg-gradient-to-br from-card to-background">
+              <CardHeader className="pb-1 pt-3 px-4 flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-xs text-muted-foreground font-normal">Impressions</CardTitle>
+                <Eye className="h-3 w-3 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pt-0 pb-3 px-4">
+                <p className="text-lg font-semibold">{totalImpressions.toLocaleString()}</p>
+                <p className="text-[10px] text-muted-foreground">Total ad views</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-sm hover:shadow transition-shadow bg-gradient-to-br from-card to-background">
+              <CardHeader className="pb-1 pt-3 px-4 flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-xs text-muted-foreground font-normal">Results</CardTitle>
+                <MousePointerClick className="h-3 w-3 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pt-0 pb-3 px-4">
+                <p className="text-lg font-semibold">{totalResults}</p>
+                <p className="text-[10px] text-muted-foreground">Conversions & clicks</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-sm hover:shadow transition-shadow bg-gradient-to-br from-card to-background">
+              <CardHeader className="pb-1 pt-3 px-4 flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-xs text-muted-foreground font-normal">Cost/Result</CardTitle>
+                <CircleDollarSign className="h-3 w-3 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pt-0 pb-3 px-4">
+                <p className="text-lg font-semibold">${averageCost.toFixed(2)}</p>
+                <p className="text-[10px] text-muted-foreground">Average cost per result</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-sm hover:shadow transition-shadow bg-gradient-to-br from-card to-background">
+              <CardHeader className="pb-1 pt-3 px-4 flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-xs text-muted-foreground font-normal">Total Spend</CardTitle>
+                <Banknote className="h-3 w-3 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pt-0 pb-3 px-4">
+                <p className="text-lg font-semibold">${totalSpend.toLocaleString()}</p>
+                <p className="text-[10px] text-muted-foreground">Estimated 30-day spend</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Performance Predictor (Collapsible) */}
+          {showAdPredictor && (
+            <div className="mb-5 animate-fade-in">
+              <AdPerformancePredictor />
             </div>
           )}
           
+          {/* View Selector - Desktop Only */}
           {!isMobile && (
-            <div className="mb-4 border-b border-gray-200">
-              <div className="flex space-x-4">
+            <div className="mb-2">
+              <div className="inline-flex rounded-md shadow-sm bg-gray-50/80">
                 <button 
-                  className={`pb-2 px-1 ${selectedView === 'campaigns' 
-                    ? 'border-b-2 border-primary text-primary font-medium' 
-                    : 'text-gray-600'}`}
+                  className={`px-4 py-2 text-sm ${selectedView === 'campaigns' 
+                    ? 'bg-white rounded-l-md shadow-sm font-medium' 
+                    : 'text-gray-600 hover:bg-gray-50'}`}
                   onClick={() => setSelectedView('campaigns')}
                 >
                   Campaigns
                 </button>
                 <button 
-                  className={`pb-2 px-1 ${selectedView === 'adSets' 
-                    ? 'border-b-2 border-primary text-primary font-medium' 
-                    : 'text-gray-600'}`}
+                  className={`px-4 py-2 text-sm ${selectedView === 'adSets' 
+                    ? 'bg-white shadow-sm font-medium' 
+                    : 'text-gray-600 hover:bg-gray-50'}`}
                   onClick={() => setSelectedView('adSets')}
                 >
                   Ad Sets
                 </button>
                 <button 
-                  className={`pb-2 px-1 ${selectedView === 'ads' 
-                    ? 'border-b-2 border-primary text-primary font-medium' 
-                    : 'text-gray-600'}`}
+                  className={`px-4 py-2 text-sm ${selectedView === 'ads' 
+                    ? 'bg-white shadow-sm font-medium' 
+                    : 'text-gray-600 hover:bg-gray-50'}`}
                   onClick={() => setSelectedView('ads')}
                 >
                   Ads
                 </button>
                 <button 
-                  className={`pb-2 px-1 ${selectedView === 'audiences' 
-                    ? 'border-b-2 border-primary text-primary font-medium' 
-                    : 'text-gray-600'}`}
+                  className={`px-4 py-2 text-sm ${selectedView === 'audiences' 
+                    ? 'bg-white rounded-r-md shadow-sm font-medium' 
+                    : 'text-gray-600 hover:bg-gray-50'}`}
                   onClick={() => setSelectedView('audiences')}
                 >
                   Audiences
@@ -509,31 +480,32 @@ const Ads = () => {
             </div>
           )}
           
-          <div className={`flex flex-col ${isMobile ? 'gap-2 mb-3' : 'md:flex-row gap-4 mb-6'}`}>
+          {/* Search & Filter Bar */}
+          <div className={`flex flex-col ${isMobile ? 'gap-2' : 'md:flex-row'} justify-between`}>
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Search campaigns..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-9"
+                className="pl-10 h-9 bg-gray-50/50 border-gray-200"
               />
             </div>
             
             {!isMobile && (
               <div className="flex gap-2">
-                <Button variant="outline" className="gap-1 h-9 text-xs">
-                  <Filter className="h-3 w-3" />
+                <Button variant="outline" size="sm" className="gap-1 h-9 bg-gray-50/50 border-gray-200">
+                  <Filter className="h-3.5 w-3.5" />
                   Filters
                 </Button>
                 
-                <Button variant="outline" className="gap-1 h-9 text-xs">
-                  <TableIcon className="h-3 w-3" />
+                <Button variant="outline" size="sm" className="gap-1 h-9 bg-gray-50/50 border-gray-200">
+                  <TableIcon className="h-3.5 w-3.5" />
                   Columns
                 </Button>
                 
-                <Button variant="outline" className="gap-1 h-9 text-xs">
-                  <Download className="h-3 w-3" />
+                <Button variant="outline" size="sm" className="gap-1 h-9 bg-gray-50/50 border-gray-200">
+                  <Download className="h-3.5 w-3.5" />
                   Export
                 </Button>
               </div>
@@ -541,7 +513,7 @@ const Ads = () => {
             
             {isMobile && (
               <div className="flex gap-2">
-                <Button variant="outline" className="gap-1 h-8 text-xs flex-1">
+                <Button variant="outline" size="sm" className="gap-1 h-8 text-xs flex-1">
                   <Filter className="h-3 w-3" />
                   Filters
                 </Button>
@@ -549,17 +521,19 @@ const Ads = () => {
             )}
           </div>
           
-          <Tabs defaultValue="all" className="mb-3" onValueChange={setActiveTab}>
-            <TabsList className={`grid ${isMobile ? 'grid-cols-3 text-xs' : 'grid-cols-3'}`}>
+          {/* Tabs */}
+          <Tabs defaultValue="all" className="mb-1" onValueChange={setActiveTab}>
+            <TabsList className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-3 w-[300px]'}`}>
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="active">Active</TabsTrigger>
               <TabsTrigger value="inactive">Inactive</TabsTrigger>
             </TabsList>
           </Tabs>
           
+          {/* Bulk Action Bar */}
           {selectedCampaigns.length > 0 && (
-            <div className={`flex gap-2 mb-3 p-2 bg-gray-50 rounded-md ${isMobile ? 'flex-wrap' : ''}`}>
-              <span className={`text-xs font-medium flex-1 flex items-center ${isMobile ? 'w-full mb-1' : ''}`}>
+            <div className={`flex gap-2 mb-3 p-2 bg-gray-50 rounded-md items-center ${isMobile ? 'flex-wrap' : ''}`}>
+              <span className={`text-xs font-medium flex items-center ${isMobile ? 'w-full mb-1' : ''}`}>
                 {selectedCampaigns.length} selected
               </span>
               <Button variant="outline" size="sm" className="h-7 text-xs px-2" onClick={() => handleStatusChange(selectedCampaigns[0], "active")}>
@@ -568,17 +542,18 @@ const Ads = () => {
               <Button variant="outline" size="sm" className="h-7 text-xs px-2" onClick={() => handleStatusChange(selectedCampaigns[0], "inactive")}>
                 <EyeOff className="h-3 w-3 mr-1" /> Pause
               </Button>
-              <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-red-600" onClick={() => handleDeleteCampaign(selectedCampaigns[0])}>
+              <Button variant="outline" size="sm" className="h-7 text-xs px-2 text-destructive hover:bg-destructive/10" onClick={() => handleDeleteCampaign(selectedCampaigns[0])}>
                 <Trash2 className="h-3 w-3 mr-1" /> Delete
               </Button>
             </div>
           )}
           
+          {/* Campaign Table */}
           <div>
             {selectedView === 'campaigns' && (
-              <div className="rounded-md border">
+              <div className="rounded-lg border border-gray-100 overflow-hidden shadow-sm bg-white">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-gray-50/80">
                     <TableRow>
                       <TableHead className="w-10">
                         <Checkbox 
@@ -594,7 +569,7 @@ const Ads = () => {
                       <TableHead className="text-right">Results</TableHead>
                       {!isMobile && <TableHead className="hidden md:table-cell text-right">Reach</TableHead>}
                       {!isMobile && <TableHead className="hidden lg:table-cell text-right">Impressions</TableHead>}
-                      {!isMobile && <TableHead className="text-right">Cost per Result</TableHead>}
+                      {!isMobile && <TableHead className="text-right">Cost</TableHead>}
                       <TableHead>Status</TableHead>
                       {!isMobile && <TableHead className="hidden md:table-cell">Dates</TableHead>}
                       <TableHead className="text-right">{isMobile ? '' : 'Actions'}</TableHead>
@@ -604,8 +579,8 @@ const Ads = () => {
                     {filteredCampaigns.length > 0 ? (
                       filteredCampaigns.map((campaign) => (
                         <>
-                          <TableRow key={campaign.id} className={expandedCampaigns.includes(campaign.id) ? "bg-gray-50" : ""}>
-                            <TableCell className={isMobile ? "p-2" : ""}>
+                          <TableRow key={campaign.id} className={`${expandedCampaigns.includes(campaign.id) ? "bg-gray-50/50" : "hover:bg-gray-50/30"} border-b border-gray-100`}>
+                            <TableCell className={`${isMobile ? "p-2" : ""} align-middle`}>
                               <Checkbox 
                                 checked={selectedCampaigns.includes(campaign.id)} 
                                 onCheckedChange={() => handleSelectCampaign(campaign.id)}
@@ -615,14 +590,18 @@ const Ads = () => {
                             <TableCell className={isMobile ? "p-2" : ""}>
                               <button 
                                 onClick={() => toggleCampaignExpansion(campaign.id)}
-                                className="w-5 h-5 flex items-center justify-center"
+                                className="w-5 h-5 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded"
                               >
-                                {expandedCampaigns.includes(campaign.id) ? "-" : "+"}
+                                {expandedCampaigns.includes(campaign.id) ? 
+                                  <ChevronDown className="h-4 w-4" /> : 
+                                  <ChevronRight className="h-4 w-4" />}
                               </button>
                             </TableCell>
                             <TableCell className={isMobile ? "p-2" : ""}>
                               <div>
-                                <p className={`${isMobile ? "text-sm" : "font-medium"}`}>{campaign.name}</p>
+                                <p className={`${isMobile ? "text-sm" : "font-medium"} line-clamp-1`}>
+                                  {campaign.name}
+                                </p>
                                 {!isMobile && <p className="text-xs text-gray-500">ID: {campaign.id}</p>}
                               </div>
                             </TableCell>
@@ -630,7 +609,7 @@ const Ads = () => {
                             <TableCell className={isMobile ? "p-2" : ""}>
                               <div>
                                 <p className={isMobile ? "text-sm" : ""}>${campaign.budget.amount.toFixed(2)}</p>
-                                {!isMobile && <p className="text-xs text-gray-500">{campaign.budget.type}</p>}
+                                {!isMobile && <p className="text-xs text-gray-500 capitalize">{campaign.budget.type}</p>}
                               </div>
                             </TableCell>
                             <TableCell className={`text-right font-medium ${isMobile ? "p-2" : ""}`}>{campaign.results}</TableCell>
@@ -643,28 +622,46 @@ const Ads = () => {
                             {!isMobile && (
                               <TableCell className="hidden md:table-cell">
                                 <div className="text-xs">
-                                  <p>Start: {campaign.startDate}</p>
-                                  <p>End: {campaign.endDate}</p>
+                                  <p>{campaign.startDate}</p>
+                                  <p className="text-muted-foreground">{campaign.endDate}</p>
                                 </div>
                               </TableCell>
                             )}
                             <TableCell className={`text-right ${isMobile ? "p-2" : ""}`}>
                               {isMobile ? (
-                                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                                  <Edit className="h-3 w-3" />
-                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-36">
+                                    <DropdownMenuItem className="flex items-center">
+                                      <Edit className="h-3.5 w-3.5 mr-2" /> Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="flex items-center" onClick={() => handleDuplicateCampaign(campaign.id)}>
+                                      <Copy className="h-3.5 w-3.5 mr-2" /> Duplicate
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="flex items-center">
+                                      <BarChart className="h-3.5 w-3.5 mr-2" /> Analytics
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="flex items-center text-destructive">
+                                      <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               ) : (
                                 <div className="flex justify-end gap-1">
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Edit">
                                     <Edit className="h-4 w-4" />
                                   </Button>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleDuplicateCampaign(campaign.id)}>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleDuplicateCampaign(campaign.id)} title="Duplicate">
                                     <Copy className="h-4 w-4" />
                                   </Button>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Analytics">
                                     <BarChart className="h-4 w-4" />
                                   </Button>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Settings">
                                     <Settings className="h-4 w-4" />
                                   </Button>
                                 </div>
@@ -673,17 +670,21 @@ const Ads = () => {
                           </TableRow>
                           
                           {expandedCampaigns.includes(campaign.id) && campaign.adSets.map((adSet) => (
-                            <TableRow key={adSet.id} className="bg-gray-50 text-sm">
+                            <TableRow key={adSet.id} className="bg-gray-50/30 border-b border-gray-100">
                               <TableCell className={isMobile ? "p-2" : ""}></TableCell>
                               <TableCell className={isMobile ? "p-2" : ""}></TableCell>
                               <TableCell colSpan={isMobile ? 1 : 2} className={isMobile ? "p-2" : ""}>
                                 <div className="pl-4 border-l-2 border-gray-300">
-                                  <p className={`${isMobile ? "text-xs" : "font-medium"}`}>{adSet.name}</p>
+                                  <p className={`${isMobile ? "text-xs" : "text-sm font-medium"}`}>{adSet.name}</p>
                                   {!isMobile && <p className="text-xs text-gray-500">ID: {adSet.id}</p>}
                                 </div>
                               </TableCell>
-                              <TableCell className={isMobile ? "p-2" : ""}>${adSet.budget.toFixed(2)}</TableCell>
-                              <TableCell className={`text-right ${isMobile ? "p-2" : ""}`}>{adSet.results}</TableCell>
+                              <TableCell className={isMobile ? "p-2" : ""}>
+                                <p className="text-sm">${adSet.budget.toFixed(2)}</p>
+                              </TableCell>
+                              <TableCell className={`text-right ${isMobile ? "p-2" : ""}`}>
+                                {adSet.results}
+                              </TableCell>
                               {!isMobile && <TableCell className="hidden md:table-cell text-right">{adSet.reach.toLocaleString()}</TableCell>}
                               {!isMobile && <TableCell className="hidden lg:table-cell text-right">{adSet.impressions.toLocaleString()}</TableCell>}
                               {!isMobile && <TableCell className="text-right">${adSet.cost.toFixed(2)}</TableCell>}
@@ -698,7 +699,7 @@ const Ads = () => {
                               <TableCell className={`text-right ${isMobile ? "p-2" : ""}`}>
                                 {isMobile ? (
                                   <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                                    <Edit className="h-3 w-3" />
+                                    <Edit className="h-3.5 w-3.5" />
                                   </Button>
                                 ) : (
                                   <div className="flex justify-end gap-1">
@@ -728,24 +729,48 @@ const Ads = () => {
             )}
             
             {selectedView === 'adSets' && (
-              <div className="rounded-md border p-8 text-center">
-                <h3 className="text-lg font-medium text-gray-600">Ad Sets View</h3>
-                <p className="text-gray-500 mt-2">This view would display all ad sets across your campaigns</p>
-              </div>
+              <Card className="shadow-sm">
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="bg-gray-50 rounded-full p-4 mb-4">
+                    <TableIcon className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-600 mb-1">Ad Sets View</h3>
+                  <p className="text-gray-500 max-w-md text-center">
+                    View and manage all your ad sets across campaigns. This view allows for deeper analysis of performance by audience segment.
+                  </p>
+                  <Button className="mt-4">View Ad Sets</Button>
+                </div>
+              </Card>
             )}
             
             {selectedView === 'ads' && (
-              <div className="rounded-md border p-8 text-center">
-                <h3 className="text-lg font-medium text-gray-600">Ads View</h3>
-                <p className="text-gray-500 mt-2">This view would display all individual ads</p>
-              </div>
+              <Card className="shadow-sm">
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="bg-gray-50 rounded-full p-4 mb-4">
+                    <LineChart className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-600 mb-1">Ads View</h3>
+                  <p className="text-gray-500 max-w-md text-center">
+                    Review individual ad performance, creative elements, and targeting effectiveness in one consolidated view.
+                  </p>
+                  <Button className="mt-4">View Ads</Button>
+                </div>
+              </Card>
             )}
             
             {selectedView === 'audiences' && (
-              <div className="rounded-md border p-8 text-center">
-                <h3 className="text-lg font-medium text-gray-600">Audiences View</h3>
-                <p className="text-gray-500 mt-2">This view would display all your custom and saved audiences</p>
-              </div>
+              <Card className="shadow-sm">
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="bg-gray-50 rounded-full p-4 mb-4">
+                    <Users className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-600 mb-1">Audiences View</h3>
+                  <p className="text-gray-500 max-w-md text-center">
+                    Manage your saved audiences, create new audience segments, and analyze audience overlap and performance.
+                  </p>
+                  <Button className="mt-4">View Audiences</Button>
+                </div>
+              </Card>
             )}
           </div>
         </main>
