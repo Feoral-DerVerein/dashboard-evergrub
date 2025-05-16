@@ -5,9 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { OrderProvider } from "./context/OrderContext"; 
-import { useAuth } from "./context/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import KPI from "./pages/KPI";
@@ -49,7 +48,132 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   return user ? children : null;
 };
 
-// Move AppRoutes inside AuthProvider so useAuth works correctly
+// AppRoutes component to handle all routes with proper context
+const AppRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
+          <Index />
+        </ProtectedRoute>
+      } />
+      <Route path="/kpi" element={
+        <ProtectedRoute>
+          <KPI />
+        </ProtectedRoute>
+      } />
+      <Route path="/products" element={
+        <ProtectedRoute>
+          <Products />
+        </ProtectedRoute>
+      } />
+      <Route path="/products/add" element={
+        <ProtectedRoute>
+          <AddProduct />
+        </ProtectedRoute>
+      } />
+      <Route path="/products/edit/:id" element={
+        <ProtectedRoute>
+          <AddProduct />
+        </ProtectedRoute>
+      } />
+      <Route path="/orders" element={
+        <ProtectedRoute>
+          <Orders />
+        </ProtectedRoute>
+      } />
+      <Route path="/sales" element={
+        <ProtectedRoute>
+          <Sales />
+        </ProtectedRoute>
+      } />
+      <Route path="/notifications" element={
+        <ProtectedRoute>
+          <Notifications />
+        </ProtectedRoute>
+      } />
+      <Route path="/plus" element={
+        <ProtectedRoute>
+          <Plus />
+        </ProtectedRoute>
+      } />
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      } />
+      <Route path="/microsoft" element={
+        <ProtectedRoute>
+          <Microsoft />
+        </ProtectedRoute>
+      } />
+      <Route path="/google" element={
+        <ProtectedRoute>
+          <Google />
+        </ProtectedRoute>
+      } />
+      <Route path="/apple" element={
+        <ProtectedRoute>
+          <Apple />
+        </ProtectedRoute>
+      } />
+      <Route path="/phone" element={
+        <ProtectedRoute>
+          <Phone />
+        </ProtectedRoute>
+      } />
+      <Route path="/ads" element={
+        <ProtectedRoute>
+          <Ads />
+        </ProtectedRoute>
+      } />
+      <Route path="/ads/create" element={
+        <ProtectedRoute>
+          <CreateAd />
+        </ProtectedRoute>
+      } />
+      <Route path="/payment-portal" element={
+        <ProtectedRoute>
+          <PaymentPortal />
+        </ProtectedRoute>
+      } />
+      <Route path="/donate" element={
+        <ProtectedRoute>
+          <Donate />
+        </ProtectedRoute>
+      } />
+      <Route path="/reports" element={
+        <ProtectedRoute>
+          <NotFound />
+        </ProtectedRoute>
+      } />
+      <Route path="/analytics" element={
+        <ProtectedRoute>
+          <NotFound />
+        </ProtectedRoute>
+      } />
+      <Route path="/support" element={
+        <ProtectedRoute>
+          <NotFound />
+        </ProtectedRoute>
+      } />
+      <Route path="/settings" element={
+        <ProtectedRoute>
+          <NotFound />
+        </ProtectedRoute>
+      } />
+      <Route path="/help" element={
+        <ProtectedRoute>
+          <NotFound />
+        </ProtectedRoute>
+      } />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
+// Main App component with correctly structured providers
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -58,125 +182,7 @@ const App = () => (
           <OrderProvider>
             <Toaster />
             <Sonner />
-            <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              } />
-              <Route path="/kpi" element={
-                <ProtectedRoute>
-                  <KPI />
-                </ProtectedRoute>
-              } />
-              <Route path="/products" element={
-                <ProtectedRoute>
-                  <Products />
-                </ProtectedRoute>
-              } />
-              <Route path="/products/add" element={
-                <ProtectedRoute>
-                  <AddProduct />
-                </ProtectedRoute>
-              } />
-              <Route path="/products/edit/:id" element={
-                <ProtectedRoute>
-                  <AddProduct />
-                </ProtectedRoute>
-              } />
-              <Route path="/orders" element={
-                <ProtectedRoute>
-                  <Orders />
-                </ProtectedRoute>
-              } />
-              <Route path="/sales" element={
-                <ProtectedRoute>
-                  <Sales />
-                </ProtectedRoute>
-              } />
-              <Route path="/notifications" element={
-                <ProtectedRoute>
-                  <Notifications />
-                </ProtectedRoute>
-              } />
-              <Route path="/plus" element={
-                <ProtectedRoute>
-                  <Plus />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } />
-              <Route path="/microsoft" element={
-                <ProtectedRoute>
-                  <Microsoft />
-                </ProtectedRoute>
-              } />
-              <Route path="/google" element={
-                <ProtectedRoute>
-                  <Google />
-                </ProtectedRoute>
-              } />
-              <Route path="/apple" element={
-                <ProtectedRoute>
-                  <Apple />
-                </ProtectedRoute>
-              } />
-              <Route path="/phone" element={
-                <ProtectedRoute>
-                  <Phone />
-                </ProtectedRoute>
-              } />
-              <Route path="/ads" element={
-                <ProtectedRoute>
-                  <Ads />
-                </ProtectedRoute>
-              } />
-              <Route path="/ads/create" element={
-                <ProtectedRoute>
-                  <CreateAd />
-                </ProtectedRoute>
-              } />
-              <Route path="/payment-portal" element={
-                <ProtectedRoute>
-                  <PaymentPortal />
-                </ProtectedRoute>
-              } />
-              <Route path="/donate" element={
-                <ProtectedRoute>
-                  <Donate />
-                </ProtectedRoute>
-              } />
-              <Route path="/reports" element={
-                <ProtectedRoute>
-                  <NotFound />
-                </ProtectedRoute>
-              } />
-              <Route path="/analytics" element={
-                <ProtectedRoute>
-                  <NotFound />
-                </ProtectedRoute>
-              } />
-              <Route path="/support" element={
-                <ProtectedRoute>
-                  <NotFound />
-                </ProtectedRoute>
-              } />
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <NotFound />
-                </ProtectedRoute>
-              } />
-              <Route path="/help" element={
-                <ProtectedRoute>
-                  <NotFound />
-                </ProtectedRoute>
-              } />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AppRoutes />
           </OrderProvider>
         </AuthProvider>
       </BrowserRouter>

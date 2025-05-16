@@ -1,4 +1,3 @@
-
 import { useState, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,13 +17,20 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { signInWithGoogle, user } = useAuth();
-
-  // If already logged in, redirect to dashboard
+  
+  // Check if user is already logged in
   useEffect(() => {
-    if (user) {
-      console.log("User already logged in, redirecting to dashboard");
-      navigate("/dashboard", { replace: true });
-    }
+    const checkAuthStatus = () => {
+      console.log("Checking auth status:", user ? "User is logged in" : "No user found");
+      if (user) {
+        console.log("User already logged in, redirecting to dashboard");
+        navigate("/dashboard", { replace: true });
+      }
+    };
+    
+    // Short delay to ensure auth state is properly loaded
+    const timer = setTimeout(checkAuthStatus, 100);
+    return () => clearTimeout(timer);
   }, [user, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -43,17 +49,13 @@ const Login = () => {
         
         if (error) throw error;
         
-        console.log("Login successful, showing toast");
+        console.log("Login successful, showing toast", data);
         toast({
           title: "Login successful",
           description: "Welcome back!"
         });
         
-        // Wait a short moment and then redirect
-        console.log("Redirecting to dashboard");
-        setTimeout(() => {
-          navigate("/dashboard", { replace: true });
-        }, 300);
+        // Let the useEffect handle the redirect
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,

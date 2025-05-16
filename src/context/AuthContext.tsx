@@ -19,6 +19,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("AuthProvider mounted - setting up auth state listener");
+    
     // Set up the auth state listener first to ensure no events are missed
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -37,11 +39,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("AuthProvider unmounting - unsubscribing");
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
     try {
+      setLoading(true);
       console.log("Signing out user");
       const { error } = await supabase.auth.signOut();
       if (error) {
@@ -49,9 +55,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw error;
       }
       console.log("User signed out successfully");
+      
+      // Clear state explicitly after signout
+      setSession(null);
+      setUser(null);
     } catch (error) {
       console.error("Error in signOut function:", error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 

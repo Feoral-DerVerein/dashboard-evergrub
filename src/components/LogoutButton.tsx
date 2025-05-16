@@ -19,10 +19,9 @@ export const LogoutButton = () => {
         description: "Has cerrado sesión correctamente",
       });
       
-      // Asegurarnos de que la navegación ocurra después de que se complete el proceso de cierre de sesión
-      setTimeout(() => {
-        navigate("/", { replace: true });
-      }, 100);
+      // Ensure navigation happens after signout is complete
+      console.log("Redirecting to login page after logout");
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       toast({
