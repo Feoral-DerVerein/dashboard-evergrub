@@ -50,19 +50,15 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isChecking, setIsChecking] = useState(true);
   
   useEffect(() => {
-    if (!loading) {
-      setIsChecking(false);
-      if (!user && location.pathname !== '/') {
-        console.log("ProtectedRoute: No user, redirecting to /");
-        navigate("/", { replace: true });
-      }
+    if (!loading && !user && location.pathname !== '/') {
+      console.log("ProtectedRoute: No user, redirecting to /");
+      navigate("/", { replace: true });
     }
   }, [user, loading, navigate, location.pathname]);
   
-  if (loading || isChecking) {
+  if (loading) {
     return <div className="flex items-center justify-center h-screen">Cargando...</div>;
   }
   
@@ -73,19 +69,15 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 const AuthRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [isChecking, setIsChecking] = useState(true);
   
   useEffect(() => {
-    if (!loading) {
-      setIsChecking(false);
-      if (user) {
-        console.log("AuthRoute: User found, redirecting to /dashboard");
-        navigate("/dashboard", { replace: true });
-      }
+    if (!loading && user) {
+      console.log("AuthRoute: User found, redirecting to /dashboard");
+      navigate("/dashboard", { replace: true });
     }
   }, [user, loading, navigate]);
   
-  if (loading || isChecking) {
+  if (loading) {
     return <div className="flex items-center justify-center h-screen">Cargando...</div>;
   }
   
@@ -216,7 +208,7 @@ const AppContent = () => {
           <NotFound />
         </ProtectedRoute>
       } />
-      <Route path="*" element={<NotFound />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

@@ -30,7 +30,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log("AuthProvider: initializing");
     
-    // Verificar primero si ya hay una sesión activa
+    // First set up the auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.email || "No session");
+        
+        // Synchronize state with current session
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        // Only update loading state on initial auth state change
+        if (loading && event === 'INITIAL_SESSION') {
+          setLoading(false);
+        }
+      }
+    );
+
+    // Then check for existing session
     const getInitialSession = async () => {
       try {
         const { data: { session: currentSession } } = await supabase.auth.getSession();
@@ -40,28 +56,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         console.error("Error getting initial session:", error);
       } finally {
+        // Make sure we set loading to false even if there's an error
         setLoading(false);
       }
     };
 
     getInitialSession();
     
-    // Configurar el detector de cambios de estado de autenticación
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
-        console.log("Auth state changed:", event, currentSession?.user?.email || "No session");
-        
-        // Sincronizar state con la sesión actual
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-      }
-    );
-
     return () => {
       console.log("AuthProvider: cleanup");
       subscription.unsubscribe();
     };
-  }, []);
+  }, [loading]);
 
   const signOut = async () => {
     console.log("Signing out");
