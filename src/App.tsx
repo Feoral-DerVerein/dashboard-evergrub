@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,16 +31,20 @@ const queryClient = new QueryClient();
 // Componente para proteger rutas que requieren autenticación
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!loading && !user) {
+      console.log("User not authenticated, redirecting to login page");
+      navigate("/", { replace: true });
+    }
+  }, [user, loading, navigate]);
   
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Cargando...</div>;
   }
   
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return children;
+  return user ? children : null;
 };
 
 const AppRoutes = () => {

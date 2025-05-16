@@ -1,4 +1,5 @@
-import { useState, FormEvent } from "react";
+
+import { useState, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,42 +17,59 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, user } = useAuth();
+
+  // If already logged in, redirect to dashboard
+  useEffect(() => {
+    if (user) {
+      console.log("User already logged in, redirecting to dashboard");
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+    
     setLoading(true);
     try {
+      console.log(`Attempting to ${activeTab === 'login' ? 'log in' : 'sign up'} with email: ${email}`);
+      
       if (activeTab === 'login') {
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
+        
         if (error) throw error;
         
-        // The redirection should happen here
+        console.log("Login successful, showing toast");
         toast({
           title: "Login successful",
           description: "Welcome back!"
         });
         
-        // Add a short delay before redirecting to make sure the toast is visible
+        // Wait a short moment and then redirect
+        console.log("Redirecting to dashboard");
         setTimeout(() => {
           navigate("/dashboard", { replace: true });
-        }, 500);
+        }, 300);
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
           password
         });
+        
         if (error) throw error;
+        
+        console.log("Sign up successful, showing toast");
         toast({
           title: "Registration successful",
           description: "Your account has been created. Check your email to verify it."
         });
       }
     } catch (error: any) {
-      console.error("Error de autenticación:", error);
+      console.error("Authentication error:", error);
       toast({
         title: "Error",
         description: error.message || "Ocurrió un problema durante la autenticación",
@@ -64,6 +82,7 @@ const Login = () => {
 
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
     try {
+      console.log(`Initiating ${provider} login`);
       if (provider === 'google') {
         await signInWithGoogle();
       } else {
@@ -76,7 +95,7 @@ const Login = () => {
         if (error) throw error;
       }
     } catch (error: any) {
-      console.error(`Error con ${provider}:`, error);
+      console.error(`Error with ${provider}:`, error);
       toast({
         title: "Error",
         description: error.message || `Hubo un problema con el inicio de sesión de ${provider}`,
