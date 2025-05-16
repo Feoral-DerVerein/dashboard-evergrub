@@ -29,32 +29,14 @@ import Donate from "./pages/Donate";
 
 const queryClient = new QueryClient();
 
-// Componente para proteger rutas que requieren autenticación
-// Este componente DEBE usarse dentro del AuthProvider
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const { user, loading } = useAuth();
-  
-  useEffect(() => {
-    if (!loading && !user) {
-      console.log("ProtectedRoute: No user, redirecting to login");
-    }
-  }, [user, loading]);
-  
-  if (loading) {
-    return <div className="flex items-center justify-center h-screen">Cargando...</div>;
-  }
-  
-  return user ? children : <Navigate to="/" replace />;
-};
-
-// Componente principal de la aplicación que proporciona todos los providers
+// Aplicación principal que configura los providers
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <BrowserRouter>
         <AuthProvider>
           <OrderProvider>
-            <AppRoutes />
+            <AppContent />
             <Toaster />
             <Sonner />
           </OrderProvider>
@@ -64,8 +46,21 @@ const App = () => (
   </QueryClientProvider>
 );
 
-// Componente de rutas separado, garantizando que esté dentro de AuthProvider
-const AppRoutes = () => {
+// Componente para proteger rutas que requieren autenticación
+// Este componente está dentro del AuthProvider a través de AppContent
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Cargando...</div>;
+  }
+  
+  return user ? children : <Navigate to="/" replace />;
+};
+
+// Componente de contenido que maneja las rutas
+// Se asegura de que todo esté dentro del AuthProvider
+const AppContent = () => {
   return (
     <Routes>
       <Route path="/" element={<Login />} />

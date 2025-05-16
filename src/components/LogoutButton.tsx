@@ -4,14 +4,19 @@ import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export const LogoutButton = () => {
   const { signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    if (isLoggingOut) return; // Prevenir clicks múltiples
+    
     try {
+      setIsLoggingOut(true);
       console.log("Logging out...");
       await signOut();
       
@@ -29,6 +34,7 @@ export const LogoutButton = () => {
         description: "There was a problem logging out",
         variant: "destructive",
       });
+      setIsLoggingOut(false);
     }
   };
 
@@ -36,6 +42,7 @@ export const LogoutButton = () => {
     <Button 
       variant="ghost" 
       onClick={handleLogout}
+      disabled={isLoggingOut}
       className="flex items-center gap-2"
     >
       <LogOut className="h-4 w-4" />

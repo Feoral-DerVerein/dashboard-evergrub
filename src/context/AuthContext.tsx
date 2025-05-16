@@ -30,23 +30,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log("AuthProvider: initializing");
     
-    // Set up the auth state listener first
+    // Verificar primero si ya hay una sesión (importante hacerlo primero)
+    const getInitialSession = async () => {
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        console.log("Initial session check:", currentSession?.user?.email || "No session");
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+      } catch (error) {
+        console.error("Error getting initial session:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getInitialSession();
+    
+    // Configurar el detector de cambios de estado de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
-        console.log("Auth state changed:", event, currentSession?.user?.email);
+        console.log("Auth state changed:", event, currentSession?.user?.email || "No session");
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setLoading(false);
       }
     );
-
-    // Then check for existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      console.log("Initial session check:", currentSession?.user?.email);
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      setLoading(false);
-    });
 
     return () => {
       console.log("AuthProvider: cleanup");

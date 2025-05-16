@@ -1,3 +1,4 @@
+
 import { useState, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,21 +15,24 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { signInWithGoogle, user } = useAuth();
 
-  // Redirect if already logged in
+  // Redirigir si ya está autenticado
   useEffect(() => {
-    console.log("Login page: checking if user is logged in", user);
-    if (user) {
-      console.log("User already logged in, redirecting to dashboard");
+    if (user && !redirecting) {
+      console.log("Login page: user already logged in, redirecting to dashboard");
+      setRedirecting(true);
       navigate("/dashboard", { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, redirecting]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (redirecting) return; // Evitar múltiples intentos durante la redirección
+    
     setLoading(true);
     
     try {
@@ -48,6 +52,7 @@ const Login = () => {
           description: "Welcome back!"
         });
         
+        setRedirecting(true);
         navigate("/dashboard", { replace: true });
       } else {
         const { data, error } = await supabase.auth.signUp({
@@ -76,6 +81,8 @@ const Login = () => {
   };
 
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
+    if (redirecting) return; // Evitar múltiples intentos durante la redirección
+    
     try {
       console.log(`Attempting login with ${provider}`);
       
@@ -101,6 +108,11 @@ const Login = () => {
       });
     }
   };
+
+  // Si estamos redirigiendo o hay un usuario, mostrar pantalla de carga
+  if (redirecting) {
+    return <div className="flex items-center justify-center h-screen">Redirecting...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-white px-6 pb-20">
