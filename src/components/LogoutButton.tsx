@@ -34,6 +34,7 @@ export const LogoutButton = () => {
         description: "There was a problem logging out",
         variant: "destructive",
       });
+    } finally {
       setIsLoggingOut(false);
     }
   };

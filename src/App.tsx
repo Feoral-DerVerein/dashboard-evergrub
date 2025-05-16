@@ -3,8 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { OrderProvider } from "./context/OrderContext"; 
 import Index from "./pages/Index";
@@ -47,23 +47,61 @@ const App = () => (
 );
 
 // Componente para proteger rutas que requieren autenticación
-// Este componente está dentro del AuthProvider a través de AppContent
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isChecking, setIsChecking] = useState(true);
   
-  if (loading) {
+  useEffect(() => {
+    if (!loading) {
+      setIsChecking(false);
+      if (!user && location.pathname !== '/') {
+        console.log("ProtectedRoute: No user, redirecting to /");
+        navigate("/", { replace: true });
+      }
+    }
+  }, [user, loading, navigate, location.pathname]);
+  
+  if (loading || isChecking) {
     return <div className="flex items-center justify-center h-screen">Cargando...</div>;
   }
   
-  return user ? children : <Navigate to="/" replace />;
+  return user ? children : null;
+};
+
+// Componente para redireccionar al dashboard si ya está autenticado
+const AuthRoute = ({ children }: { children: JSX.Element }) => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const [isChecking, setIsChecking] = useState(true);
+  
+  useEffect(() => {
+    if (!loading) {
+      setIsChecking(false);
+      if (user) {
+        console.log("AuthRoute: User found, redirecting to /dashboard");
+        navigate("/dashboard", { replace: true });
+      }
+    }
+  }, [user, loading, navigate]);
+  
+  if (loading || isChecking) {
+    return <div className="flex items-center justify-center h-screen">Cargando...</div>;
+  }
+  
+  return !user ? children : null;
 };
 
 // Componente de contenido que maneja las rutas
-// Se asegura de que todo esté dentro del AuthProvider
 const AppContent = () => {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={
+        <AuthRoute>
+          <Login />
+        </AuthRoute>
+      } />
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Index />

@@ -7,7 +7,6 @@ import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
-import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,23 +14,11 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [redirecting, setRedirecting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { signInWithGoogle, user } = useAuth();
-
-  // Redirigir si ya está autenticado
-  useEffect(() => {
-    if (user && !redirecting) {
-      console.log("Login page: user already logged in, redirecting to dashboard");
-      setRedirecting(true);
-      navigate("/dashboard", { replace: true });
-    }
-  }, [user, navigate, redirecting]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (redirecting) return; // Evitar múltiples intentos durante la redirección
     
     setLoading(true);
     
@@ -52,7 +39,6 @@ const Login = () => {
           description: "Welcome back!"
         });
         
-        setRedirecting(true);
         navigate("/dashboard", { replace: true });
       } else {
         const { data, error } = await supabase.auth.signUp({
@@ -81,24 +67,18 @@ const Login = () => {
   };
 
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
-    if (redirecting) return; // Evitar múltiples intentos durante la redirección
-    
     try {
       console.log(`Attempting login with ${provider}`);
       
-      if (provider === 'google') {
-        await signInWithGoogle();
-      } else {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: provider as Provider,
-          options: {
-            redirectTo: window.location.origin + '/dashboard'
-          }
-        });
-        
-        if (error) throw error;
-        console.log(`${provider} login initiated`, data);
-      }
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: provider as Provider,
+        options: {
+          redirectTo: window.location.origin + '/dashboard'
+        }
+      });
+      
+      if (error) throw error;
+      console.log(`${provider} login initiated`, data);
     } catch (error: any) {
       console.error(`Error with ${provider}:`, error);
       toast({
@@ -108,11 +88,6 @@ const Login = () => {
       });
     }
   };
-
-  // Si estamos redirigiendo o hay un usuario, mostrar pantalla de carga
-  if (redirecting) {
-    return <div className="flex items-center justify-center h-screen">Redirecting...</div>;
-  }
 
   return (
     <div className="min-h-screen bg-white px-6 pb-20">
