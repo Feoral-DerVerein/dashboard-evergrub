@@ -14,15 +14,15 @@ export const LogoutButton = () => {
     try {
       await signOut();
       toast({
-        title: "Sesión cerrada",
-        description: "Has cerrado sesión correctamente",
+        title: "Session closed",
+        description: "You have successfully logged out",
       });
       navigate("/");
     } catch (error) {
-      console.error("Error al cerrar sesión:", error);
+      console.error("Error during logout:", error);
       toast({
         title: "Error",
-        description: "Hubo un problema al cerrar la sesión",
+        description: "There was a problem logging out",
         variant: "destructive",
       });
     }
@@ -30,12 +30,12 @@ export const LogoutButton = () => {
 
   return (
     <Button 
-      variant="ghost" 
+      variant="outline"
       onClick={handleLogout}
-      className="flex items-center gap-2"
+      className="w-full flex items-center justify-center gap-2 text-gray-700 border-gray-300 hover:bg-gray-100"
     >
       <LogOut className="h-4 w-4" />
-      <span>Cerrar sesión</span>
+      <span>Log out</span>
     </Button>
   );
 };
