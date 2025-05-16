@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from
 import { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { OrderProvider } from "./context/OrderContext"; 
-import Index from "./pages/Index";
+import Dashboard from "./components/Dashboard";
 import Login from "./pages/Login";
 import KPI from "./pages/KPI";
 import Products from "./pages/Products";
@@ -29,7 +28,7 @@ import Donate from "./pages/Donate";
 
 const queryClient = new QueryClient();
 
-// Aplicación principal que configura los providers
+// Main application that configures providers
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -46,7 +45,7 @@ const App = () => (
   </QueryClientProvider>
 );
 
-// Componente para proteger rutas que requieren autenticación
+// Component to protect routes that require authentication
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -70,7 +69,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   return user ? children : null;
 };
 
-// Componente para redireccionar al dashboard si ya está autenticado
+// Component to redirect to dashboard if already authenticated
 const AuthRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -93,7 +92,7 @@ const AuthRoute = ({ children }: { children: JSX.Element }) => {
   return !user ? children : null;
 };
 
-// Componente de contenido que maneja las rutas
+// Content component that handles routes
 const AppContent = () => {
   return (
     <Routes>
@@ -104,7 +103,7 @@ const AppContent = () => {
       } />
       <Route path="/dashboard" element={
         <ProtectedRoute>
-          <Index />
+          <Dashboard />
         </ProtectedRoute>
       } />
       <Route path="/kpi" element={
