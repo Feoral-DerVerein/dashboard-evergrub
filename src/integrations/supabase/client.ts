@@ -34,6 +34,14 @@ export const broadcastOrderStatusChange = async (orderId: string, newStatus: str
   });
 };
 
+// Add RPC call for broadcasting wishlist product availability
+export const broadcastWishlistProductAvailable = async (productId: number) => {
+  // Use a more generic type that doesn't require specific type checking
+  return await (supabase.rpc as any)('broadcast_product_available', {
+    product_id: productId
+  });
+};
+
 // Need to add SQL to add the column to the orders table if it doesn't exist
 // This would be run in a separate lov-sql block:
 // ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS from_orders_page BOOLEAN DEFAULT FALSE;

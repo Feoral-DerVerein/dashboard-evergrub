@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Heart } from "lucide-react";
 
 export interface Notification {
   id: string;
@@ -241,6 +242,45 @@ export const notificationService = {
     } catch (error) {
       console.error("Error in createUserPurchaseNotification:", error);
       toast.error("Failed to create user purchase notification");
+    }
+  },
+  
+  // Create a wishlist notification
+  async createWishlistNotification(productId: number, productName: string): Promise<void> {
+    try {
+      console.log(`Creating wishlist notification for product ${productName} (ID: ${productId})`);
+      
+      const notificationMessage = `A user added ${productName} to their wishlist`;
+      
+      const { data, error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          type: 'wishlist',
+          title: 'New Wishlist Addition',
+          description: notificationMessage,
+          is_read: false,
+          product_id: productId,
+          for_marketplace: false,
+          timestamp: new Date().toISOString()
+        })
+        .select();
+        
+      if (notificationError) {
+        console.error("Error creating wishlist notification:", notificationError);
+        toast.error("Failed to create wishlist notification");
+        return;
+      }
+        
+      console.log("Wishlist notification created successfully:", data);
+      
+      // Display a toast notification
+      toast({
+        title: "Product Added to Wishlist",
+        description: notificationMessage
+      });
+    } catch (error) {
+      console.error("Error in createWishlistNotification:", error);
+      toast.error("Failed to create wishlist notification");
     }
   },
   

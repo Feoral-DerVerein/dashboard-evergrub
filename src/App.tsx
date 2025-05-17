@@ -25,6 +25,7 @@ import Ads from "./pages/Ads";
 import CreateAd from "./pages/CreateAd";
 import PaymentPortal from "./pages/PaymentPortal";
 import Donate from "./pages/Donate";
+import Wishlist from "./pages/Wishlist";
 
 const queryClient = new QueryClient();
 
@@ -139,6 +140,11 @@ const AppContent = () => {
       <Route path="/notifications" element={
         <ProtectedRoute>
           <Notifications />
+        </ProtectedRoute>
+      } />
+      <Route path="/wishlist" element={
+        <ProtectedRoute>
+          <Wishlist />
         </ProtectedRoute>
       } />
       <Route path="/plus" element={
