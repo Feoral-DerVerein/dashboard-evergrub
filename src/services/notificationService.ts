@@ -92,5 +92,26 @@ export const notificationService = {
     } catch (error) {
       console.error("Error in createWishlistNotification:", error);
     }
+  },
+  
+  // Add the missing createSalesNotification method
+  async createSalesNotification(orderId: string, amount: number): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .insert({
+          title: `New sale recorded`,
+          description: `A sale for $${amount.toFixed(2)} has been completed`,
+          order_id: orderId,
+          type: 'sales'
+        });
+      
+      if (error) {
+        console.error("Error creating sales notification:", error);
+        throw error;
+      }
+    } catch (error) {
+      console.error("Error in createSalesNotification:", error);
+    }
   }
 };
