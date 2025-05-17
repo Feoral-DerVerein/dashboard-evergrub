@@ -10,46 +10,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { wishlistService } from "@/services/wishlistService";
-
-const NotificationIcon = ({
-  type
-}: {
-  type: string;
-}) => {
-  const iconProps = {
-    className: "w-6 h-6"
-  };
-  const wrapperClassName = "w-10 h-10 rounded-full flex items-center justify-center";
-  switch (type) {
-    case "order":
-      return <div className={`${wrapperClassName} bg-green-100`}><ShoppingBag {...iconProps} className="text-green-600" /></div>;
-    case "stock":
-      return <div className={`${wrapperClassName} bg-red-100`}><AlertTriangle {...iconProps} className="text-red-600" /></div>;
-    case "pickup":
-      return <div className={`${wrapperClassName} bg-blue-100`}><ShoppingCart {...iconProps} className="text-blue-600" /></div>;
-    case "sales":
-      return <div className={`${wrapperClassName} bg-green-100`}><DollarSign {...iconProps} className="text-green-600" /></div>;
-    case "purchase":
-      return <div className={`${wrapperClassName} bg-purple-100`}><ShoppingCart {...iconProps} className="text-purple-600" /></div>;
-    case "expiration":
-      return <div className={`${wrapperClassName} bg-amber-100`}><Clock {...iconProps} className="text-amber-600" /></div>;
-    case "wishlist":
-      return <div className={`${wrapperClassName} bg-red-100`}><Heart {...iconProps} className="text-red-600" /></div>;
-    case "report":
-      return <div className={`${wrapperClassName} bg-purple-100`}><BarChart {...iconProps} className="text-purple-600" /></div>;
-    default:
-      return <div className={`${wrapperClassName} bg-gray-100`}><Bell {...iconProps} className="text-gray-600" /></div>;
-  }
-};
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import NotificationIcon from "@/components/notifications/NotificationIcon";
+import WishlistNotificationCard from "@/components/notifications/WishlistNotificationCard";
+import StandardNotification from "@/components/notifications/StandardNotification";
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [viewMode, setViewMode] = useState<"all" | "admin" | "wishlist">("all");
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const totalNotifications = notifications.length;
   const currentPage = 1;
   const itemsPerPage = 10;
@@ -162,79 +133,66 @@ const Notifications = () => {
             You have {filteredNotifications.length} {filteredNotifications.length === 1 ? "notification" : "notifications"}
           </p>
 
-          {loading ? <div className="space-y-6">
-              {[1, 2, 3].map(i => <div key={i} className="flex items-start space-x-4">
+          {loading ? (
+            <div className="space-y-6">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="flex items-start space-x-4">
                   <Skeleton className="w-10 h-10 rounded-full" />
                   <div className="flex-1">
                     <Skeleton className="h-5 w-2/3 mb-1" />
                     <Skeleton className="h-4 w-full mb-1" />
                     <Skeleton className="h-3 w-1/3" />
                   </div>
-                </div>)}
-            </div> : filteredNotifications.length > 0 ? <div className="space-y-6">
-              {filteredNotifications.map(notification => {
-                const isWishlistItem = notification.type === 'wishlist';
-                
-                return (
-                  <div key={notification.id} className={`flex items-start space-x-4 p-3 rounded-lg ${!notification.is_read ? 'bg-blue-50' : ''}`}>
-                    <NotificationIcon type={notification.type} />
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h3 className={`font-medium ${!notification.is_read ? 'text-blue-900' : 'text-gray-900'}`}>
-                          {notification.title}
-                        </h3>
-                        {isWishlistItem && <Badge variant="outline" className="ml-2 bg-red-50 text-red-600">Wishlist</Badge>}
-                      </div>
-                      <p className={`${!notification.is_read ? 'text-blue-700' : 'text-gray-500'}`}>
-                        {notification.description}
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <p className="text-sm text-gray-400">
-                          {new Date(notification.timestamp).toLocaleString()}
-                        </p>
-                        <div className="flex gap-2">
-                          {!notification.is_read && (
-                            <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => handleMarkAsRead(notification.id)}>
-                              <Eye className="w-3 h-3 mr-1" />
-                              Mark as read
-                            </Button>
-                          )}
-                          {isWishlistItem && notification.product_id && (
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-8 text-xs bg-blue-50 text-blue-700 hover:bg-blue-100" 
-                              onClick={() => notification.product_id && handleNotifyWishlistUsers(notification.product_id)}
-                            >
-                              <Bookmark className="w-3 h-3 mr-1" />
-                              Notify Users
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div> : <div className="text-center py-10">
+                </div>
+              ))}
+            </div>
+          ) : filteredNotifications.length > 0 ? (
+            <div className="space-y-6">
+              {viewMode === "wishlist" ? (
+                <div className="grid grid-cols-1 gap-4">
+                  {filteredNotifications.map(notification => (
+                    <WishlistNotificationCard 
+                      key={notification.id}
+                      notification={notification}
+                      onNotifyUsers={handleNotifyWishlistUsers}
+                      onMarkAsRead={handleMarkAsRead}
+                    />
+                  ))}
+                </div>
+              ) : (
+                filteredNotifications.map(notification => (
+                  <StandardNotification 
+                    key={notification.id}
+                    notification={notification}
+                    onNotifyUsers={handleNotifyWishlistUsers}
+                    onMarkAsRead={handleMarkAsRead}
+                  />
+                ))
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-10">
               <Bell className="w-12 h-12 mx-auto text-gray-300 mb-4" />
               <h3 className="font-medium text-gray-700 mb-1">No notifications</h3>
               <p className="text-gray-500">You don't have any notifications yet</p>
-            </div>}
+            </div>
+          )}
 
-          {filteredNotifications.length > itemsPerPage && <div className="flex justify-center items-center space-x-2 my-8">
+          {filteredNotifications.length > itemsPerPage && (
+            <div className="flex justify-center items-center space-x-2 my-8">
               <button className="p-2 hover:bg-gray-100 rounded-full" disabled={currentPage === 1}>
                 &lt;
               </button>
-              {Array.from({
-            length: totalPages
-          }, (_, i) => <button key={i + 1} className={`w-8 h-8 rounded-full ${currentPage === i + 1 ? "bg-blue-600 text-white" : "hover:bg-gray-100"}`}>
+              {Array.from({length: totalPages}, (_, i) => (
+                <button key={i + 1} className={`w-8 h-8 rounded-full ${currentPage === i + 1 ? "bg-blue-600 text-white" : "hover:bg-gray-100"}`}>
                   {i + 1}
-                </button>)}
+                </button>
+              ))}
               <button className="p-2 hover:bg-gray-100 rounded-full" disabled={currentPage === totalPages}>
                 &gt;
               </button>
-            </div>}
+            </div>
+          )}
         </main>
 
         <BottomNav />
