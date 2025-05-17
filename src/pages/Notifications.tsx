@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { Bell, Eye, AlertTriangle, Heart, BarChart, ShoppingBag, Check, Clock, DollarSign, ShoppingCart } from "lucide-react";
+import { Bell, Eye, AlertTriangle, Heart, BarChart, ShoppingBag, Check, Clock, DollarSign, ShoppingCart, Bookmark } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/Dashboard";
@@ -9,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { wishlistService } from "@/services/wishlistService";
+
 const NotificationIcon = ({
   type
 }: {
@@ -39,11 +41,12 @@ const NotificationIcon = ({
       return <div className={`${wrapperClassName} bg-gray-100`}><Bell {...iconProps} className="text-gray-600" /></div>;
   }
 };
+
 const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [viewMode, setViewMode] = useState<"marketplace" | "all" | "admin">("all");
+  const [viewMode, setViewMode] = useState<"marketplace" | "all" | "admin" | "wishlist">("all");
   const {
     toast
   } = useToast();
@@ -51,20 +54,30 @@ const Notifications = () => {
   const currentPage = 1;
   const itemsPerPage = 10;
   const totalPages = Math.ceil(totalNotifications / itemsPerPage);
+
   useEffect(() => {
     loadNotifications();
   }, [viewMode]);
+
   const loadNotifications = async () => {
     try {
       setLoading(true);
       let data;
+      
       if (viewMode === "marketplace") {
         data = await notificationService.getMarketplaceNotifications();
       } else if (viewMode === "admin") {
-        data = await notificationService.getAllNotifications().then(allNotifications => allNotifications.filter(n => !n.for_marketplace));
+        data = await notificationService.getAllNotifications().then(allNotifications => 
+          allNotifications.filter(n => !n.for_marketplace)
+        );
+      } else if (viewMode === "wishlist") {
+        data = await notificationService.getAllNotifications().then(allNotifications => 
+          allNotifications.filter(n => n.type === 'wishlist')
+        );
       } else {
         data = await notificationService.getAllNotifications();
       }
+      
       setNotifications(data);
     } catch (error) {
       console.error("Error loading notifications:", error);
@@ -77,6 +90,7 @@ const Notifications = () => {
       setLoading(false);
     }
   };
+
   const handleMarkAsRead = async (notificationId: string) => {
     try {
       await notificationService.markAsRead(notificationId);
@@ -97,7 +111,29 @@ const Notifications = () => {
       });
     }
   };
-  const filteredNotifications = searchQuery.trim() === "" ? notifications : notifications.filter(n => n.title.toLowerCase().includes(searchQuery.toLowerCase()) || n.description.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const handleNotifyWishlistUsers = async (productId: number) => {
+    try {
+      await wishlistService.notifyWishlistUsers(productId);
+      toast({
+        title: "Success",
+        description: "Wishlist users have been notified"
+      });
+    } catch (error) {
+      console.error("Error notifying wishlist users:", error);
+      toast({
+        title: "Error",
+        description: "Failed to notify wishlist users",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const filteredNotifications = searchQuery.trim() === "" ? notifications : notifications.filter(n => 
+    n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    n.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto bg-white min-h-screen">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
@@ -107,8 +143,13 @@ const Notifications = () => {
               <button className={`px-3 py-1 rounded-full text-sm ${viewMode === "all" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`} onClick={() => setViewMode("all")}>
                 All
               </button>
-              <button className={`px-3 py-1 rounded-full text-sm ${viewMode === "marketplace" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`} onClick={() => setViewMode("marketplace")}>Wishlist</button>
-              
+              <button className={`px-3 py-1 rounded-full text-sm ${viewMode === "marketplace" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`} onClick={() => setViewMode("marketplace")}>
+                Marketplace
+              </button>
+              <button className={`px-3 py-1 rounded-full text-sm ${viewMode === "wishlist" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`} onClick={() => setViewMode("wishlist")}>
+                <Heart className="w-3 h-3 inline-block mr-1" />
+                Wishlist
+              </button>
             </div>
           </div>
           <div className="relative">
@@ -136,39 +177,50 @@ const Notifications = () => {
                   </div>
                 </div>)}
             </div> : filteredNotifications.length > 0 ? <div className="space-y-6">
-              {filteredNotifications.map(notification => <div key={notification.id} className={`flex items-start space-x-4 p-3 rounded-lg ${!notification.is_read ? 'bg-blue-50' : ''}`}>
-                  <NotificationIcon type={notification.type} />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <h3 className={`font-medium ${!notification.is_read ? 'text-blue-900' : 'text-gray-900'}`}>
-                        {notification.title}
-                      </h3>
-                      {notification.type === 'wishlist' && !notification.for_marketplace && <Badge variant="info" className="ml-2">Wishlist Item</Badge>}
-                    </div>
-                    <p className={`${!notification.is_read ? 'text-blue-700' : 'text-gray-500'}`}>
-                      {notification.description}
-                    </p>
-                    <div className="flex justify-between items-center mt-2">
-                      <p className="text-sm text-gray-400">
-                        {new Date(notification.timestamp).toLocaleString()}
+              {filteredNotifications.map(notification => {
+                const isWishlistItem = notification.type === 'wishlist';
+                
+                return (
+                  <div key={notification.id} className={`flex items-start space-x-4 p-3 rounded-lg ${!notification.is_read ? 'bg-blue-50' : ''}`}>
+                    <NotificationIcon type={notification.type} />
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <h3 className={`font-medium ${!notification.is_read ? 'text-blue-900' : 'text-gray-900'}`}>
+                          {notification.title}
+                        </h3>
+                        {isWishlistItem && <Badge variant="outline" className="ml-2 bg-red-50 text-red-600">Wishlist</Badge>}
+                      </div>
+                      <p className={`${!notification.is_read ? 'text-blue-700' : 'text-gray-500'}`}>
+                        {notification.description}
                       </p>
-                      <div className="flex gap-2">
-                        {!notification.is_read && <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => handleMarkAsRead(notification.id)}>
-                            <Eye className="w-3 h-3 mr-1" />
-                            Mark as read
-                          </Button>}
-                        {notification.type === 'wishlist' && !notification.for_marketplace && notification.product_id && <Button variant="outline" size="sm" className="h-8 text-xs bg-blue-50 text-blue-700 hover:bg-blue-100" onClick={() => {
-                    if (notification.product_id) {
-                      wishlistService.notifyWishlistUsers(notification.product_id);
-                    }
-                  }}>
-                            <Bell className="w-3 h-3 mr-1" />
-                            Notify Users
-                          </Button>}
+                      <div className="flex justify-between items-center mt-2">
+                        <p className="text-sm text-gray-400">
+                          {new Date(notification.timestamp).toLocaleString()}
+                        </p>
+                        <div className="flex gap-2">
+                          {!notification.is_read && (
+                            <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => handleMarkAsRead(notification.id)}>
+                              <Eye className="w-3 h-3 mr-1" />
+                              Mark as read
+                            </Button>
+                          )}
+                          {isWishlistItem && notification.product_id && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 text-xs bg-blue-50 text-blue-700 hover:bg-blue-100" 
+                              onClick={() => notification.product_id && handleNotifyWishlistUsers(notification.product_id)}
+                            >
+                              <Bookmark className="w-3 h-3 mr-1" />
+                              Notify Users
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>)}
+                );
+              })}
             </div> : <div className="text-center py-10">
               <Bell className="w-12 h-12 mx-auto text-gray-300 mb-4" />
               <h3 className="font-medium text-gray-700 mb-1">No notifications</h3>
@@ -194,4 +246,5 @@ const Notifications = () => {
       </div>
     </div>;
 };
+
 export default Notifications;
