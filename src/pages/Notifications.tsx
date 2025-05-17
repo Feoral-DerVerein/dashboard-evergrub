@@ -11,7 +11,6 @@ import NotificationIcon from "@/components/notifications/NotificationIcon";
 import WishlistNotificationCard from "@/components/notifications/WishlistNotificationCard";
 import StandardNotification from "@/components/notifications/StandardNotification";
 import ProductNotificationList from "@/components/notifications/ProductNotificationList";
-
 const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -24,13 +23,11 @@ const Notifications = () => {
   const currentPage = 1;
   const itemsPerPage = 10;
   const totalPages = Math.ceil(totalNotifications / itemsPerPage);
-  
   useEffect(() => {
     if (viewMode !== "products") {
       loadNotifications();
     }
   }, [viewMode]);
-  
   const loadNotifications = async () => {
     try {
       console.log("Loading notifications, viewMode:", viewMode);
@@ -54,7 +51,6 @@ const Notifications = () => {
       setLoading(false);
     }
   };
-  
   const handleMarkAsRead = async (notificationId: string) => {
     try {
       await notificationService.markAsRead(notificationId);
@@ -75,7 +71,6 @@ const Notifications = () => {
       });
     }
   };
-  
   const handleNotifyWishlistUsers = async (productId: number) => {
     try {
       await wishlistService.notifyWishlistUsers(productId);
@@ -92,7 +87,6 @@ const Notifications = () => {
       });
     }
   };
-  
   const handleAddSampleProducts = async () => {
     try {
       setLoading(true);
@@ -113,9 +107,7 @@ const Notifications = () => {
       setLoading(false);
     }
   };
-  
   const filteredNotifications = searchQuery.trim() === "" ? notifications : notifications.filter(n => n.title.toLowerCase().includes(searchQuery.toLowerCase()) || n.description.toLowerCase().includes(searchQuery.toLowerCase()));
-  
   const renderContent = () => {
     if (viewMode === "products") {
       return <ProductNotificationList />;
@@ -145,7 +137,6 @@ const Notifications = () => {
           </div> : filteredNotifications.map(notification => <StandardNotification key={notification.id} notification={notification} onNotifyUsers={handleNotifyWishlistUsers} onMarkAsRead={handleMarkAsRead} />)}
       </div>;
   };
-  
   return <div className="min-h-screen bg-gray-50 pb-20">
       <div className="max-w-md mx-auto bg-white min-h-screen">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
@@ -172,9 +163,7 @@ const Notifications = () => {
             </div>
           </div>
           <div className="mt-4">
-            <Button variant="outline" size="sm" onClick={handleAddSampleProducts} className="w-full border-dashed border-blue-300 text-blue-600 hover:bg-blue-50">
-              + Add Sample Product Notifications
-            </Button>
+            
           </div>
         </header>
 
@@ -204,5 +193,4 @@ const Notifications = () => {
       </div>
     </div>;
 };
-
 export default Notifications;
