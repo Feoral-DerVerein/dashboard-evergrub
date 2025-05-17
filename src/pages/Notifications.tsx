@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Bell, Eye, AlertTriangle, Heart, BarChart, ShoppingBag, Check, Clock, DollarSign, ShoppingCart } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
@@ -9,6 +8,7 @@ import { notificationService, Notification } from "@/services/notificationServic
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { wishlistService } from "@/services/wishlistService";
 
 const NotificationIcon = ({
   type
@@ -214,10 +214,7 @@ const Notifications = () => {
                             className="h-8 text-xs bg-blue-50 text-blue-700 hover:bg-blue-100"
                             onClick={() => {
                               if (notification.product_id) {
-                                import('@/services/wishlistService')
-                                  .then(module => {
-                                    module.wishlistService.notifyWishlistUsers(notification.product_id);
-                                  });
+                                wishlistService.notifyWishlistUsers(notification.product_id);
                               }
                             }}
                           >

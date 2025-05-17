@@ -190,7 +190,7 @@ const mockCampaigns = [
 ];
 
 const StatusBadge = ({ status }: { status: string }) => {
-  let variant = "outline";
+  let variant: "default" | "outline" | "secondary" | "destructive" | "success" | "warning" | "info" = "outline";
   
   switch (status) {
     case "active":

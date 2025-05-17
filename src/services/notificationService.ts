@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Heart } from "lucide-react";
@@ -275,8 +274,7 @@ export const notificationService = {
       
       // Display a toast notification
       toast({
-        title: "Product Added to Wishlist",
-        description: notificationMessage
+        description: notificationMessage,
       });
     } catch (error) {
       console.error("Error in createWishlistNotification:", error);

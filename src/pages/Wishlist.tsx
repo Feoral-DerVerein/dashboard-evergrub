@@ -1,13 +1,14 @@
-
 import { useState, useEffect } from 'react';
 import { Heart, ShoppingBag, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { wishlistService, WishlistItem } from '@/services/wishlistService';
+import { wishlistService } from '@/services/wishlistService';
+import type { WishlistItem } from '@/services/wishlistService';
 import { BottomNav } from '@/components/Dashboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 const Wishlist = () => {
   const [items, setItems] = useState<WishlistItem[]>([]);
@@ -33,9 +34,14 @@ const Wishlist = () => {
   };
 
   const handleRemoveFromWishlist = async (productId: number) => {
-    const success = await wishlistService.removeFromWishlist(productId);
-    if (success) {
-      setItems(items.filter(item => Number(item.product_id) !== productId));
+    try {
+      const success = await wishlistService.removeFromWishlist(productId);
+      if (success) {
+        setItems(items.filter(item => Number(item.product_id) !== productId));
+      }
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      toast.error("Failed to remove item from wishlist");
     }
   };
 
