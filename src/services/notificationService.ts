@@ -273,9 +273,7 @@ export const notificationService = {
       console.log("Wishlist notification created successfully:", data);
       
       // Display a toast notification
-      toast({
-        description: notificationMessage,
-      });
+      toast(notificationMessage);
     } catch (error) {
       console.error("Error in createWishlistNotification:", error);
       toast.error("Failed to create wishlist notification");

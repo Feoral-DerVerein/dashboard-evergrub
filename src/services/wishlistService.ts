@@ -141,7 +141,11 @@ export const wishlistService = {
       }
       
       // For each user, create a notification
-      const productName = wishlistItems[0]?.product_data?.name || 'Product';
+      // Access product name safely using type assertion
+      const productData = wishlistItems[0]?.product_data;
+      const productName = typeof productData === 'object' && productData !== null 
+        ? (productData as Record<string, any>).name || 'Product' 
+        : 'Product';
       
       toast.success(`${wishlistItems.length} users notified about ${productName}`);
       
