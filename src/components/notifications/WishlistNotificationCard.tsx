@@ -2,7 +2,7 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bookmark, Eye, Heart } from "lucide-react";
+import { Bookmark, Eye, Heart, User } from "lucide-react";
 import { Notification } from "@/services/notificationService";
 
 interface WishlistNotificationCardProps {
@@ -19,6 +19,7 @@ const WishlistNotificationCard = ({
   const productImageUrl = notification.product_image || '/placeholder.svg';
   const productName = notification.title.replace('New wishlist item:', '').trim();
   const productPrice = notification.product_price || '0.00';
+  const customerName = notification.customer_name || 'Anonymous Customer';
   
   return (
     <Card className={`overflow-hidden ${!notification.is_read ? 'border-l-4 border-l-red-500' : ''}`}>
@@ -44,7 +45,11 @@ const WishlistNotificationCard = ({
             <span className="font-bold text-lg">${parseFloat(productPrice).toFixed(2)}</span>
           </div>
         )}
-        <p className="text-xs text-gray-400 mt-2">
+        <div className="flex items-center mt-2 text-xs text-gray-500">
+          <User className="w-3 h-3 mr-1" />
+          <span>{customerName}</span>
+        </div>
+        <p className="text-xs text-gray-400 mt-1">
           {new Date(notification.timestamp).toLocaleString()}
         </p>
       </CardContent>
@@ -70,7 +75,7 @@ const WishlistNotificationCard = ({
             className="flex-1 bg-blue-600 hover:bg-blue-700"
           >
             <Bookmark className="w-4 h-4 mr-1" />
-            Notify Users
+            Notify
           </Button>
         )}
       </CardFooter>

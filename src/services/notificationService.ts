@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Notification {
@@ -13,6 +12,7 @@ export interface Notification {
   product_id?: number;
   product_image?: string;
   product_price?: string;
+  customer_name?: string;
 }
 
 export const notificationService = {
@@ -72,7 +72,7 @@ export const notificationService = {
     }
   },
   
-  async createWishlistNotification(productId: number, productName: string, productImage?: string, productPrice?: string): Promise<void> {
+  async createWishlistNotification(productId: number, productName: string, productImage?: string, productPrice?: string, customerName?: string): Promise<void> {
     try {
       const { error } = await supabase
         .from('notifications')
@@ -82,7 +82,8 @@ export const notificationService = {
           type: 'wishlist',
           product_id: productId,
           product_image: productImage,
-          product_price: productPrice
+          product_price: productPrice,
+          customer_name: customerName || 'Anonymous Customer'
         });
       
       if (error) {
@@ -94,7 +95,6 @@ export const notificationService = {
     }
   },
   
-  // Add the missing createSalesNotification method
   async createSalesNotification(orderId: string, amount: number): Promise<void> {
     try {
       const { error } = await supabase
@@ -115,7 +115,6 @@ export const notificationService = {
     }
   },
   
-  // Add method to create sample product notifications with example data
   async createSampleProductNotifications(): Promise<void> {
     const sampleProducts = [
       {
@@ -123,35 +122,40 @@ export const notificationService = {
         name: "Organic Fresh Avocado",
         price: "3.99",
         image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?q=80&w=400&auto=format",
-        description: "Locally sourced fresh avocados"
+        description: "Locally sourced fresh avocados",
+        customer: "Maria Rodriguez"
       },
       {
         id: 1002,
         name: "Premium Coffee Beans",
         price: "12.50",
         image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?q=80&w=400&auto=format",
-        description: "Premium roasted coffee beans, direct from Colombia"
+        description: "Premium roasted coffee beans, direct from Colombia",
+        customer: "James Wilson"
       },
       {
         id: 1003,
         name: "Whole Grain Bread",
         price: "4.25",
         image: "https://images.unsplash.com/photo-1608198093002-ad4e005484ec?q=80&w=400&auto=format",
-        description: "Freshly baked artisan whole grain bread"
+        description: "Freshly baked artisan whole grain bread",
+        customer: "Sarah Johnson"
       },
       {
         id: 1004,
         name: "Organic Strawberries",
         price: "5.99",
         image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=400&auto=format",
-        description: "Sweet organic strawberries, perfect for desserts"
+        description: "Sweet organic strawberries, perfect for desserts",
+        customer: "Michael Thompson"
       },
       {
         id: 1005,
         name: "Free Range Eggs (12-pack)",
         price: "6.49",
         image: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?q=80&w=400&auto=format",
-        description: "Farm fresh free-range eggs, sustainably produced"
+        description: "Farm fresh free-range eggs, sustainably produced",
+        customer: "Emily Parker"
       }
     ];
     
@@ -161,7 +165,8 @@ export const notificationService = {
           product.id, 
           product.name, 
           product.image, 
-          product.price
+          product.price,
+          product.customer
         );
         console.log(`Created notification for product: ${product.name}`);
       }

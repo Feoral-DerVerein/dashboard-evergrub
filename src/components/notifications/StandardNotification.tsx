@@ -1,5 +1,5 @@
 
-import { Eye, Bookmark, Heart } from "lucide-react";
+import { Eye, Bookmark, Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Notification } from "@/services/notificationService";
@@ -31,6 +31,12 @@ const StandardNotification = ({
         <p className={`${!notification.is_read ? 'text-blue-700' : 'text-gray-500'}`}>
           {notification.description}
         </p>
+        {notification.customer_name && (
+          <div className="flex items-center mt-1 text-xs text-gray-500">
+            <User className="w-3 h-3 mr-1" />
+            <span>{notification.customer_name}</span>
+          </div>
+        )}
         <div className="flex justify-between items-center mt-2">
           <p className="text-sm text-gray-400">
             {new Date(notification.timestamp).toLocaleString()}
@@ -50,7 +56,7 @@ const StandardNotification = ({
                 onClick={() => notification.product_id && onNotifyUsers(notification.product_id)}
               >
                 <Bookmark className="w-3 h-3 mr-1" />
-                Notify Users
+                Notify
               </Button>
             )}
           </div>
