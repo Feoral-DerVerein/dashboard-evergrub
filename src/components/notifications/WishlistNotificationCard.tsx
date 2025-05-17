@@ -47,7 +47,7 @@ const WishlistNotificationCard = ({
         )}
         <div className="flex items-center mt-2 text-xs text-gray-500">
           <User className="w-3 h-3 mr-1" />
-          <span>{customerName}</span>
+          <span>Added by: {customerName}</span>
         </div>
         <p className="text-xs text-gray-400 mt-1">
           {new Date(notification.timestamp).toLocaleString()}
@@ -75,7 +75,7 @@ const WishlistNotificationCard = ({
             className="flex-1 bg-blue-600 hover:bg-blue-700"
           >
             <Bookmark className="w-4 h-4 mr-1" />
-            Notify
+            Notify Users
           </Button>
         )}
       </CardFooter>

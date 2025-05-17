@@ -34,7 +34,7 @@ const StandardNotification = ({
         {notification.customer_name && (
           <div className="flex items-center mt-1 text-xs text-gray-500">
             <User className="w-3 h-3 mr-1" />
-            <span>{notification.customer_name}</span>
+            <span>Added by: {notification.customer_name}</span>
           </div>
         )}
         <div className="flex justify-between items-center mt-2">
@@ -56,7 +56,7 @@ const StandardNotification = ({
                 onClick={() => notification.product_id && onNotifyUsers(notification.product_id)}
               >
                 <Bookmark className="w-3 h-3 mr-1" />
-                Notify
+                Notify Users
               </Button>
             )}
           </div>
