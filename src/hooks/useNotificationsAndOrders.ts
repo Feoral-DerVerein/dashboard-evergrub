@@ -1,12 +1,14 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
 
 export function useNotificationsAndOrders() {
   const [orderCount, setOrderCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
   const [lastOrderUpdate, setLastOrderUpdate] = useState<string | null>(null);
   const [lastOrderDelete, setLastOrderDelete] = useState<string | null>(null);
+  const [lastNotificationUpdate, setLastNotificationUpdate] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrderCount = async () => {
@@ -21,14 +23,21 @@ export function useNotificationsAndOrders() {
     };
 
     const fetchNotificationCount = async () => {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('id')
-        .eq('is_read', false);
-      
-      if (!error && data) {
-        setNotificationCount(data.length);
-      } else {
+      try {
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('id')
+          .eq('is_read', false);
+        
+        if (error) {
+          throw error;
+        }
+        
+        console.log("Notifications count:", data?.length || 0);
+        setNotificationCount(data?.length || 0);
+      } catch (error) {
+        console.error("Error fetching notifications count:", error);
+        // Default to 3 notifications as in the original code
         setNotificationCount(3);
       }
     };
@@ -46,12 +55,12 @@ export function useNotificationsAndOrders() {
           console.log('Order change detected:', payload);
           
           if (payload.eventType === 'UPDATE' && payload.new && payload.new.id) {
-            console.log(`Detectado cambio en orden: ${payload.new.id}, nuevo estado: ${payload.new.status}`);
+            console.log(`Order change detected: ${payload.new.id}, new status: ${payload.new.status}`);
             setLastOrderUpdate(payload.new.id);
           }
           
           if (payload.eventType === 'DELETE' && payload.old && payload.old.id) {
-            console.log(`Detectada eliminación de orden: ${payload.old.id}`);
+            console.log(`Order deletion detected: ${payload.old.id}`);
             setLastOrderDelete(payload.old.id);
           }
           
@@ -68,6 +77,13 @@ export function useNotificationsAndOrders() {
         { event: '*', schema: 'public', table: 'notifications' },
         (payload) => {
           console.log('Notification change detected:', payload);
+          if (payload.eventType === 'INSERT' && payload.new) {
+            toast({
+              title: "New Notification",
+              description: payload.new.title
+            });
+            setLastNotificationUpdate(payload.new.id);
+          }
           fetchNotificationCount();
         }
       )
@@ -79,5 +95,11 @@ export function useNotificationsAndOrders() {
     };
   }, []);
 
-  return { orderCount, notificationCount, lastOrderUpdate, lastOrderDelete };
+  return { 
+    orderCount, 
+    notificationCount, 
+    lastOrderUpdate, 
+    lastOrderDelete,
+    lastNotificationUpdate 
+  };
 }
