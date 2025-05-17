@@ -113,5 +113,62 @@ export const notificationService = {
     } catch (error) {
       console.error("Error in createSalesNotification:", error);
     }
+  },
+  
+  // Add method to create sample product notifications with example data
+  async createSampleProductNotifications(): Promise<void> {
+    const sampleProducts = [
+      {
+        id: 1001,
+        name: "Organic Fresh Avocado",
+        price: "3.99",
+        image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?q=80&w=400&auto=format",
+        description: "Locally sourced fresh avocados"
+      },
+      {
+        id: 1002,
+        name: "Premium Coffee Beans",
+        price: "12.50",
+        image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?q=80&w=400&auto=format",
+        description: "Premium roasted coffee beans, direct from Colombia"
+      },
+      {
+        id: 1003,
+        name: "Whole Grain Bread",
+        price: "4.25",
+        image: "https://images.unsplash.com/photo-1608198093002-ad4e005484ec?q=80&w=400&auto=format",
+        description: "Freshly baked artisan whole grain bread"
+      },
+      {
+        id: 1004,
+        name: "Organic Strawberries",
+        price: "5.99",
+        image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=400&auto=format",
+        description: "Sweet organic strawberries, perfect for desserts"
+      },
+      {
+        id: 1005,
+        name: "Free Range Eggs (12-pack)",
+        price: "6.49",
+        image: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?q=80&w=400&auto=format",
+        description: "Farm fresh free-range eggs, sustainably produced"
+      }
+    ];
+    
+    try {
+      for (const product of sampleProducts) {
+        await this.createWishlistNotification(
+          product.id, 
+          product.name, 
+          product.image, 
+          product.price
+        );
+        console.log(`Created notification for product: ${product.name}`);
+      }
+      
+      console.log("Sample product notifications created successfully");
+    } catch (error) {
+      console.error("Error creating sample product notifications:", error);
+    }
   }
 };

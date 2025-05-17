@@ -1,16 +1,13 @@
 
 import { useState, useEffect } from "react";
-import { Bell, Eye, AlertTriangle, Heart, BarChart, ShoppingBag, Check, Clock, DollarSign, ShoppingCart, Bookmark } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
+import { Bell, Eye, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/Dashboard";
 import { Button } from "@/components/ui/button";
 import { notificationService, Notification } from "@/services/notificationService";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { wishlistService } from "@/services/wishlistService";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import NotificationIcon from "@/components/notifications/NotificationIcon";
 import WishlistNotificationCard from "@/components/notifications/WishlistNotificationCard";
 import StandardNotification from "@/components/notifications/StandardNotification";
@@ -19,7 +16,7 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [viewMode, setViewMode] = useState<"all" | "admin" | "wishlist">("all");
+  const [viewMode, setViewMode] = useState<"all" | "wishlist">("all");
   const { toast } = useToast();
   const totalNotifications = notifications.length;
   const currentPage = 1;
@@ -35,11 +32,7 @@ const Notifications = () => {
       setLoading(true);
       let data;
       
-      if (viewMode === "admin") {
-        data = await notificationService.getAllNotifications().then(allNotifications => 
-          allNotifications.filter(n => !n.for_marketplace)
-        );
-      } else if (viewMode === "wishlist") {
+      if (viewMode === "wishlist") {
         data = await notificationService.getAllNotifications().then(allNotifications => 
           allNotifications.filter(n => n.type === 'wishlist')
         );
@@ -97,6 +90,27 @@ const Notifications = () => {
       });
     }
   };
+  
+  const handleAddSampleProducts = async () => {
+    try {
+      setLoading(true);
+      await notificationService.createSampleProductNotifications();
+      toast({
+        title: "Success",
+        description: "Sample product notifications added"
+      });
+      await loadNotifications();
+    } catch (error) {
+      console.error("Error adding sample products:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add sample products",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredNotifications = searchQuery.trim() === "" ? notifications : notifications.filter(n => 
     n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -125,6 +139,16 @@ const Notifications = () => {
                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
+          </div>
+          <div className="mt-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleAddSampleProducts}
+              className="w-full border-dashed border-blue-300 text-blue-600 hover:bg-blue-50"
+            >
+              + Add Sample Product Notifications
+            </Button>
           </div>
         </header>
 
