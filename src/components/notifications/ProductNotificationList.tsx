@@ -100,7 +100,7 @@ const ProductNotificationList = () => {
                 className="w-full h-full object-cover"
               />
               <Badge
-                className="absolute top-2 right-2 bg-blue-500"
+                className="absolute top-2 right-2 bg-gray-200"
                 variant="secondary"
               >
                 ${product.price.toFixed(2)}
