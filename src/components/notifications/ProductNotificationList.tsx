@@ -118,7 +118,7 @@ const ProductNotificationList = () => {
                 className="w-full text-xs"
               >
                 <Bell className="w-3 h-3 mr-1" />
-                Notificar usuarios
+                Notify User
               </Button>
             </CardFooter>
           </Card>
