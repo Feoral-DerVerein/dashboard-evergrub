@@ -46,7 +46,7 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [viewMode, setViewMode] = useState<"marketplace" | "all" | "admin" | "wishlist">("all");
+  const [viewMode, setViewMode] = useState<"all" | "admin" | "wishlist">("all");
   const {
     toast
   } = useToast();
@@ -64,9 +64,7 @@ const Notifications = () => {
       setLoading(true);
       let data;
       
-      if (viewMode === "marketplace") {
-        data = await notificationService.getMarketplaceNotifications();
-      } else if (viewMode === "admin") {
+      if (viewMode === "admin") {
         data = await notificationService.getAllNotifications().then(allNotifications => 
           allNotifications.filter(n => !n.for_marketplace)
         );
@@ -142,9 +140,6 @@ const Notifications = () => {
             <div className="flex gap-2">
               <button className={`px-3 py-1 rounded-full text-sm ${viewMode === "all" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`} onClick={() => setViewMode("all")}>
                 All
-              </button>
-              <button className={`px-3 py-1 rounded-full text-sm ${viewMode === "marketplace" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`} onClick={() => setViewMode("marketplace")}>
-                Marketplace
               </button>
               <button className={`px-3 py-1 rounded-full text-sm ${viewMode === "wishlist" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`} onClick={() => setViewMode("wishlist")}>
                 <Heart className="w-3 h-3 inline-block mr-1" />
