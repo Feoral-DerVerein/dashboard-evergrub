@@ -9,6 +9,7 @@ import { Product } from "@/types/product.types";
 import { wishlistService } from "@/services/wishlistService";
 import { toast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { notificationService } from "@/services/notificationService";
 
 const ProductNotificationList = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -37,10 +38,21 @@ const ProductNotificationList = () => {
 
   const handleNotifyUsers = async (productId: number, productName: string) => {
     try {
+      // Send notification to wishlist users
       await wishlistService.notifyWishlistUsers(productId);
+      
+      // Create a new notification for the marketplace
+      await notificationService.createWishlistNotification(
+        productId,
+        productName,
+        undefined,
+        undefined,
+        "Evergreen Marketplace"
+      );
+      
       toast({
         title: "Success",
-        description: `Users interested in ${productName} have been notified`,
+        description: `Users interested in ${productName} have been notified and a marketplace notification was sent to Evergreen`,
         variant: "success"
       });
     } catch (error) {
