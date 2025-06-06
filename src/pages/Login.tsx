@@ -1,4 +1,3 @@
-
 import { useState, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -92,11 +91,11 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-white px-6 pb-20">
       <div className="pt-10 flex justify-center">
-        <img src="/lovable-uploads/33cb00f3-3fd6-4357-9976-3db12a4c11a6.png" alt="Evergrub Logo" className="h-16 w-auto" />
+        <img src="/lovable-uploads/25d0c5fc-4ab3-44dd-8e67-5e06c5a81537.png" alt="WiseBite Logo" className="h-16 w-auto" />
       </div>
 
       <div className="mt-8">
-        <h1 className="text-center mb-8 text-xl text-emerald-700 font-bold">Welcome to EverGrub</h1>
+        <h1 className="text-center mb-8 text-xl text-emerald-700 font-bold">Welcome to WiseBite</h1>
 
         <div className="flex justify-center gap-12 mb-8">
           <button onClick={() => setActiveTab('login')} className={`text-lg ${activeTab === 'login' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400'} pb-2`}>
