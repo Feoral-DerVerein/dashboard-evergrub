@@ -1,5 +1,4 @@
-
-import { ArrowLeft, Calendar, Camera, Barcode } from "lucide-react";
+import { ArrowLeft, Calendar, Camera, Barcode, Zap } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -56,6 +55,62 @@ const AddProduct = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Auto-fill demo product function
+  const handleAutoFillDemo = () => {
+    const demoProducts = [
+      {
+        name: "Lavender Essential Oil",
+        price: "45.99",
+        discount: "15",
+        description: "Premium Australian lavender essential oil. Perfect for relaxation and aromatherapy. Sourced from the finest lavender fields in Tasmania.",
+        category: "SPA Products",
+        brand: "Premium",
+        quantity: "25",
+        expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
+        image: "/lovable-uploads/a8d0ed43-9247-43c0-b4b7-0b73bca854af.png"
+      },
+      {
+        name: "Organic Green Tea",
+        price: "28.50",
+        discount: "10",
+        description: "Premium organic green tea blend. Rich in antioxidants and perfect for a healthy lifestyle. Sustainably sourced.",
+        category: "Restaurant",
+        brand: "Equate",
+        quantity: "50",
+        expirationDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 6 months from now
+        image: "/lovable-uploads/298479ff-ca23-474b-b635-b25052f38dce.png"
+      },
+      {
+        name: "Eucalyptus Body Scrub",
+        price: "32.95",
+        discount: "20",
+        description: "Invigorating eucalyptus body scrub with natural sea salt. Exfoliates and moisturizes for silky smooth skin.",
+        category: "SPA Products",
+        brand: "Premium",
+        quantity: "15",
+        expirationDate: new Date(Date.now() + 730 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 years from now
+        image: "/lovable-uploads/4f94a856-2c39-4c16-9c3d-3ae6fdf872ed.png"
+      }
+    ];
+
+    // Select a random demo product
+    const randomProduct = demoProducts[Math.floor(Math.random() * demoProducts.length)];
+    
+    setFormData({
+      ...formData,
+      ...randomProduct,
+      customBrand: ""
+    });
+    
+    setPreviewImage(randomProduct.image);
+    setShowCustomBrand(false);
+    
+    toast({
+      title: "Demo Product Loaded",
+      description: `"${randomProduct.name}" has been auto-filled for demonstration`,
+    });
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -489,6 +544,18 @@ const AddProduct = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Demo auto-fill button */}
+          {!isEditMode && (
+            <button
+              type="button"
+              onClick={handleAutoFillDemo}
+              className="w-full flex items-center justify-center gap-2 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              <Zap className="w-5 h-5" />
+              Auto-fill Demo Product
+            </button>
+          )}
+
           {/* Barcode scanner button */}
           <button
             type="button"
@@ -765,3 +832,5 @@ const AddProduct = () => {
 };
 
 export default AddProduct;
+
+}
