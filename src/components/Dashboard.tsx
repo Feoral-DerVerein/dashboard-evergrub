@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart } from "lucide-react";
+import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
@@ -8,7 +8,6 @@ import { getUserOrders } from "@/services/orderService";
 import { Order } from "@/types/order.types";
 import { format, parseISO } from "date-fns";
 import PointsBadge from "./PointsBadge";
-import GrainsSection from "./GrainsSection";
 import { calculateProductPoints } from "@/utils/pointsCalculator";
 
 type QuickAccessItemProps = {
@@ -275,7 +274,7 @@ const Dashboard = () => {
         <main className="px-6">
           <section className="mb-8">
             <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
               <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
               <QuickAccessItem icon={ShoppingBasket} label="Orders" to="/orders" badgeCount={orderCount} />
@@ -283,15 +282,8 @@ const Dashboard = () => {
               <QuickAccessItem icon={Bell} label="Notifications" to="/notifications" badgeCount={notificationCount} />
               <QuickAccessItem icon={Megaphone} label="Ads" to="/ads" />
               <QuickAccessItem icon={Heart} label="Donate" to="/donate" />
+              <QuickAccessItem icon={Coins} label="Grains" to="/grains" badgeCount={stats.totalGrains >= 2000 ? 1 : undefined} />
             </div>
-          </section>
-
-          {/* Grains Section */}
-          <section className="mb-8">
-            <GrainsSection 
-              totalGrains={stats.totalGrains} 
-              className="w-full"
-            />
           </section>
 
           <section className="grid grid-cols-2 gap-4 mb-8">
