@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      grain_transactions: {
+        Row: {
+          amount: number
+          cash_value: number | null
+          created_at: string
+          description: string
+          id: string
+          order_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          cash_value?: number | null
+          created_at?: string
+          description: string
+          id?: string
+          order_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          cash_value?: number | null
+          created_at?: string
+          description?: string
+          id?: string
+          order_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grain_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           description: string
@@ -331,6 +372,36 @@ export type Database = {
           socialFacebook?: string
           socialInstagram?: string
           userId?: string
+        }
+        Relationships: []
+      }
+      user_grain_balance: {
+        Row: {
+          cash_redeemed: number
+          id: string
+          lifetime_earned: number
+          lifetime_redeemed: number
+          total_grains: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cash_redeemed?: number
+          id?: string
+          lifetime_earned?: number
+          lifetime_redeemed?: number
+          total_grains?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cash_redeemed?: number
+          id?: string
+          lifetime_earned?: number
+          lifetime_redeemed?: number
+          total_grains?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

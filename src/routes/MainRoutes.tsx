@@ -1,156 +1,53 @@
-
-import { Routes, Route, Navigate } from "react-router-dom";
-import AuthRoute from "@/components/auth/AuthRoutes";
-import ProtectedRoute from "@/components/auth/ProtectedRoutes";
-import Login from "@/pages/Login";
+import { Routes, Route } from "react-router-dom";
+import Index from "@/pages/Index";
 import Dashboard from "@/components/Dashboard";
-import KPI from "@/pages/KPI";
+import Login from "@/pages/Login";
+import Profile from "@/pages/Profile";
 import Products from "@/pages/Products";
 import AddProduct from "@/pages/AddProduct";
 import Orders from "@/pages/Orders";
-import Notifications from "@/pages/Notifications";
-import Plus from "@/pages/Plus";
-import Profile from "@/pages/Profile";
-import NotFound from "@/pages/NotFound";
-import Microsoft from "@/pages/Microsoft";
-import Google from "@/pages/Google";
-import Apple from "@/pages/Apple";
-import Phone from "@/pages/Phone";
 import Sales from "@/pages/Sales";
+import Notifications from "@/pages/Notifications";
+import KPI from "@/pages/KPI";
 import Ads from "@/pages/Ads";
 import CreateAd from "@/pages/CreateAd";
-import PaymentPortal from "@/pages/PaymentPortal";
 import Donate from "@/pages/Donate";
+import Grains from "@/pages/Grains";
 import Wishlist from "@/pages/Wishlist";
+import PaymentPortal from "@/pages/PaymentPortal";
+import Users from "@/pages/Users";
+import Phone from "@/pages/Phone";
+import Google from "@/pages/Google";
+import Apple from "@/pages/Apple";
+import Microsoft from "@/pages/Microsoft";
+import Plus from "@/pages/Plus";
+import NotFound from "@/pages/NotFound";
 
 const MainRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={
-        <AuthRoute>
-          <Login />
-        </AuthRoute>
-      } />
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
-      } />
-      <Route path="/kpi" element={
-        <ProtectedRoute>
-          <KPI />
-        </ProtectedRoute>
-      } />
-      <Route path="/products" element={
-        <ProtectedRoute>
-          <Products />
-        </ProtectedRoute>
-      } />
-      <Route path="/products/add" element={
-        <ProtectedRoute>
-          <AddProduct />
-        </ProtectedRoute>
-      } />
-      <Route path="/products/edit/:id" element={
-        <ProtectedRoute>
-          <AddProduct />
-        </ProtectedRoute>
-      } />
-      <Route path="/orders" element={
-        <ProtectedRoute>
-          <Orders />
-        </ProtectedRoute>
-      } />
-      <Route path="/sales" element={
-        <ProtectedRoute>
-          <Sales />
-        </ProtectedRoute>
-      } />
-      <Route path="/notifications" element={
-        <ProtectedRoute>
-          <Notifications />
-        </ProtectedRoute>
-      } />
-      <Route path="/wishlist" element={
-        <ProtectedRoute>
-          <Wishlist />
-        </ProtectedRoute>
-      } />
-      <Route path="/plus" element={
-        <ProtectedRoute>
-          <Plus />
-        </ProtectedRoute>
-      } />
-      <Route path="/profile" element={
-        <ProtectedRoute>
-          <Profile />
-        </ProtectedRoute>
-      } />
-      <Route path="/microsoft" element={
-        <ProtectedRoute>
-          <Microsoft />
-        </ProtectedRoute>
-      } />
-      <Route path="/google" element={
-        <ProtectedRoute>
-          <Google />
-        </ProtectedRoute>
-      } />
-      <Route path="/apple" element={
-        <ProtectedRoute>
-          <Apple />
-        </ProtectedRoute>
-      } />
-      <Route path="/phone" element={
-        <ProtectedRoute>
-          <Phone />
-        </ProtectedRoute>
-      } />
-      <Route path="/ads" element={
-        <ProtectedRoute>
-          <Ads />
-        </ProtectedRoute>
-      } />
-      <Route path="/ads/create" element={
-        <ProtectedRoute>
-          <CreateAd />
-        </ProtectedRoute>
-      } />
-      <Route path="/payment-portal" element={
-        <ProtectedRoute>
-          <PaymentPortal />
-        </ProtectedRoute>
-      } />
-      <Route path="/donate" element={
-        <ProtectedRoute>
-          <Donate />
-        </ProtectedRoute>
-      } />
-      <Route path="/reports" element={
-        <ProtectedRoute>
-          <NotFound />
-        </ProtectedRoute>
-      } />
-      <Route path="/analytics" element={
-        <ProtectedRoute>
-          <NotFound />
-        </ProtectedRoute>
-      } />
-      <Route path="/support" element={
-        <ProtectedRoute>
-          <NotFound />
-        </ProtectedRoute>
-      } />
-      <Route path="/settings" element={
-        <ProtectedRoute>
-          <NotFound />
-        </ProtectedRoute>
-      } />
-      <Route path="/help" element={
-        <ProtectedRoute>
-          <NotFound />
-        </ProtectedRoute>
-      } />
+      <Route path="/" element={<Index />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/products" element={<Products />} />
+      <Route path="/products/add" element={<AddProduct />} />
+      <Route path="/orders" element={<Orders />} />
+      <Route path="/sales" element={<Sales />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route path="/kpi" element={<KPI />} />
+      <Route path="/ads" element={<Ads />} />
+      <Route path="/ads/create" element={<CreateAd />} />
+      <Route path="/donate" element={<Donate />} />
+      <Route path="/grains" element={<Grains />} />
+      <Route path="/wishlist" element={<Wishlist />} />
+      <Route path="/payment" element={<PaymentPortal />} />
+      <Route path="/users" element={<Users />} />
+      <Route path="/login/phone" element={<Phone />} />
+      <Route path="/login/google" element={<Google />} />
+      <Route path="/login/apple" element={<Apple />} />
+      <Route path="/login/microsoft" element={<Microsoft />} />
+      <Route path="/login/plus" element={<Plus />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
