@@ -1,4 +1,3 @@
-
 import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -8,6 +7,8 @@ import { salesService, Sale } from "@/services/salesService";
 import { getUserOrders } from "@/services/orderService";
 import { Order } from "@/types/order.types";
 import { format, parseISO } from "date-fns";
+import PointsBadge from "./PointsBadge";
+import { calculateProductPoints } from "@/utils/pointsCalculator";
 
 type QuickAccessItemProps = {
   icon: React.ComponentType<{
@@ -54,16 +55,28 @@ type RecentActivityItemProps = {
   time: string;
   amount?: string;
   type?: 'order' | 'payment' | 'user';
+  orderItems?: any[];
 };
 const RecentActivityItem = ({
   title,
   time,
   amount,
-  type
+  type,
+  orderItems
 }: RecentActivityItemProps) => <div className="recent-activity-item">
-    <div>
+    <div className="flex-1">
       <p className="font-medium text-gray-900">{title}</p>
       <p className="text-sm text-gray-500">{time}</p>
+      {orderItems && orderItems.length > 0 && (
+        <div className="mt-1 flex flex-wrap gap-1">
+          {orderItems.slice(0, 2).map((item, index) => (
+            <PointsBadge key={index} price={item.price} size="sm" />
+          ))}
+          {orderItems.length > 2 && (
+            <span className="text-xs text-gray-400">+{orderItems.length - 2} more</span>
+          )}
+        </div>
+      )}
     </div>
     {amount && <span className="font-medium">{amount}</span>}
   </div>;
@@ -108,6 +121,7 @@ const Dashboard = () => {
     activeUsers: 0,
     newOrders: 0,
     totalRevenue: 0,
+    totalPoints: 0,
     isLoading: true
   });
 
@@ -116,14 +130,27 @@ const Dashboard = () => {
       try {
         const recentSales = await salesService.getSales();
         const totalRevenue = recentSales.reduce((sum, sale) => sum + Number(sale.amount), 0);
+        
+        // Calculate total points from sales
+        const totalPoints = recentSales.reduce((sum, sale) => {
+          if (sale.products && Array.isArray(sale.products)) {
+            return sum + sale.products.reduce((productSum: number, product: any) => {
+              return productSum + calculateProductPoints(product.price || 0);
+            }, 0);
+          }
+          return sum;
+        }, 0);
+        
         const monthlySummary = await salesService.getMonthlySales();
         const orders = await getUserOrders();
         const pendingOrders = orders.filter(order => order.status === "pending").length;
+        
         setStats({
           totalSales: recentSales.length,
           activeUsers: Math.floor(recentSales.length * 1.5),
           newOrders: pendingOrders || orderCount,
           totalRevenue: totalRevenue,
+          totalPoints: totalPoints,
           isLoading: false
         });
       } catch (error) {
@@ -147,7 +174,8 @@ const Dashboard = () => {
           title: `Payment completed for ${sale.customer_name}`,
           time: formatTimeAgo(sale.created_at),
           amount: `$${Number(sale.amount).toFixed(2)}`,
-          type: 'payment' as const
+          type: 'payment' as const,
+          orderItems: sale.products || []
         }));
         const recentOrders = await getUserOrders();
         const latestOrders = recentOrders.filter(order => order.status === "pending").slice(0, 1);
@@ -255,7 +283,7 @@ const Dashboard = () => {
             <StatCard label="Total Sales" value={stats.isLoading ? "" : stats.totalSales} trend="12.5%" isLoading={stats.isLoading} />
             <StatCard label="Active Users" value={stats.isLoading ? "" : stats.activeUsers} trend="18.2%" isLoading={stats.isLoading} />
             <StatCard label="New Orders" value={stats.isLoading ? "" : stats.newOrders} trend="8.1%" isLoading={stats.isLoading} />
-            <StatCard label="Revenue" value={stats.isLoading ? "" : `$${stats.totalRevenue.toFixed(2)}`} trend="22.3%" isLoading={stats.isLoading} />
+            <StatCard label="Points Earned" value={stats.isLoading ? "" : `${stats.totalPoints.toLocaleString()}`} trend="15.4%" isLoading={stats.isLoading} />
           </section>
 
           <section>

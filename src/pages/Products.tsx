@@ -1,4 +1,3 @@
-
 import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -6,6 +5,7 @@ import { BottomNav } from "@/components/Dashboard";
 import { useAuth } from "@/context/AuthContext";
 import { productService, Product, SAFFIRE_FREYCINET_STORE_ID } from "@/services/productService";
 import { useToast } from "@/components/ui/use-toast";
+import PointsBadge from "@/components/PointsBadge";
 
 const categories = ["All", "Restaurant", "SPA Products"];
 
@@ -230,15 +230,20 @@ const Products = () => {
             <div className="grid grid-cols-2 gap-4">
               {filteredProducts.map((product) => (
                 <div key={product.id} className="border border-gray-200 rounded-lg p-3">
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-32 object-cover rounded-md mb-2"
-                    onError={(e) => {
-                      console.error("Image failed to load:", product.image);
-                      (e.target as HTMLImageElement).src = "/placeholder.svg";
-                    }}
-                  />
+                  <div className="relative">
+                    <img
+                      src={product.image || "/placeholder.svg"}
+                      alt={product.name}
+                      className="w-full h-32 object-cover rounded-md mb-2"
+                      onError={(e) => {
+                        console.error("Image failed to load:", product.image);
+                        (e.target as HTMLImageElement).src = "/placeholder.svg";
+                      }}
+                    />
+                    <div className="absolute top-2 right-2">
+                      <PointsBadge price={product.price} variant="default" />
+                    </div>
+                  </div>
                   <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
                   <p className="text-green-600 font-medium mb-2">$ {product.price.toFixed(2)}</p>
                   <div className="flex gap-2">
