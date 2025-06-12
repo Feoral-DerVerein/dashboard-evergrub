@@ -274,7 +274,7 @@ const Dashboard = () => {
         <main className="px-6">
           <section className="mb-8">
             <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
               <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
               <QuickAccessItem icon={ShoppingBasket} label="Orders" to="/orders" badgeCount={orderCount} />
