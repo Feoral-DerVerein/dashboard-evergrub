@@ -8,6 +8,7 @@ import { getUserOrders } from "@/services/orderService";
 import { Order } from "@/types/order.types";
 import { format, parseISO } from "date-fns";
 import PointsBadge from "./PointsBadge";
+import GrainsSection from "./GrainsSection";
 import { calculateProductPoints } from "@/utils/pointsCalculator";
 
 type QuickAccessItemProps = {
@@ -122,6 +123,7 @@ const Dashboard = () => {
     newOrders: 0,
     totalRevenue: 0,
     totalPoints: 0,
+    totalGrains: 0,
     isLoading: true
   });
 
@@ -140,6 +142,10 @@ const Dashboard = () => {
           }
           return sum;
         }, 0);
+
+        // For demo purposes, grains are the same as points earned
+        // In a real app, this would come from a user_grains table
+        const totalGrains = totalPoints;
         
         const monthlySummary = await salesService.getMonthlySales();
         const orders = await getUserOrders();
@@ -151,6 +157,7 @@ const Dashboard = () => {
           newOrders: pendingOrders || orderCount,
           totalRevenue: totalRevenue,
           totalPoints: totalPoints,
+          totalGrains: totalGrains,
           isLoading: false
         });
       } catch (error) {
@@ -277,6 +284,14 @@ const Dashboard = () => {
               <QuickAccessItem icon={Megaphone} label="Ads" to="/ads" />
               <QuickAccessItem icon={Heart} label="Donate" to="/donate" />
             </div>
+          </section>
+
+          {/* Grains Section */}
+          <section className="mb-8">
+            <GrainsSection 
+              totalGrains={stats.totalGrains} 
+              className="w-full"
+            />
           </section>
 
           <section className="grid grid-cols-2 gap-4 mb-8">
