@@ -37,7 +37,7 @@ export const useGrains = () => {
       console.error('Error fetching user grain data:', error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar los datos de grains",
+        description: "Could not load grains data",
         variant: "destructive"
       });
     }
@@ -58,13 +58,13 @@ export const useGrains = () => {
       await refreshData();
       
       toast({
-        title: "¡Canje exitoso!",
-        description: `Has canjeado ${grains} grains por $${cashValue.toFixed(2)}`,
+        title: "Redemption successful!",
+        description: `You redeemed ${grains} grains for $${cashValue.toFixed(2)}`,
       });
     } catch (error: any) {
       toast({
-        title: "Error en el canje",
-        description: error.message || "No se pudo completar el canje",
+        title: "Redemption error",
+        description: error.message || "Could not complete redemption",
         variant: "destructive"
       });
     }
@@ -78,13 +78,13 @@ export const useGrains = () => {
       await refreshData();
       
       toast({
-        title: "Grains utilizados",
-        description: `Has usado ${grains} grains para: ${description}`,
+        title: "Grains used",
+        description: `You used ${grains} grains for: ${description}`,
       });
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "No se pudieron usar los grains",
+        description: error.message || "Could not use grains",
         variant: "destructive"
       });
     }

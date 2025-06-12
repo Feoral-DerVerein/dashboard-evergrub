@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { History, TrendingUp, TrendingDown, ShoppingCart } from 'lucide-react';
 import { GrainTransaction } from '@/services/grainService';
 import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
 
 interface TransactionHistoryProps {
   transactions: GrainTransaction[];
@@ -18,7 +17,7 @@ const TransactionHistory = ({ transactions, loading }: TransactionHistoryProps) 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5" />
-            Historial de Transacciones
+            Transaction History
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -54,13 +53,13 @@ const TransactionHistory = ({ transactions, loading }: TransactionHistoryProps) 
   const getTransactionBadge = (type: string) => {
     switch (type) {
       case 'earned':
-        return <Badge variant="secondary" className="bg-green-100 text-green-800">Ganados</Badge>;
+        return <Badge variant="secondary" className="bg-green-100 text-green-800">Earned</Badge>;
       case 'redeemed':
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Canjeados</Badge>;
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Redeemed</Badge>;
       case 'purchased_with':
-        return <Badge variant="secondary" className="bg-purple-100 text-purple-800">Usados</Badge>;
+        return <Badge variant="secondary" className="bg-purple-100 text-purple-800">Used</Badge>;
       default:
-        return <Badge variant="outline">Desconocido</Badge>;
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
@@ -69,16 +68,16 @@ const TransactionHistory = ({ transactions, loading }: TransactionHistoryProps) 
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <History className="h-5 w-5" />
-          Historial de Transacciones
+          Transaction History
         </CardTitle>
       </CardHeader>
       <CardContent>
         {transactions.length === 0 ? (
           <div className="text-center py-8">
             <History className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No hay transacciones aún</p>
+            <p className="text-gray-500">No transactions yet</p>
             <p className="text-sm text-gray-400">
-              Tus transacciones de grains aparecerán aquí
+              Your grain transactions will appear here
             </p>
           </div>
         ) : (
@@ -95,11 +94,11 @@ const TransactionHistory = ({ transactions, loading }: TransactionHistoryProps) 
                       {transaction.description}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {format(parseISO(transaction.created_at), "d 'de' MMMM 'a las' HH:mm", { locale: es })}
+                      {format(parseISO(transaction.created_at), "MMM d 'at' HH:mm")}
                     </p>
                     {transaction.cash_value > 0 && (
                       <p className="text-sm text-green-600 font-medium">
-                        Dinero: ${transaction.cash_value.toFixed(2)}
+                        Cash: ${transaction.cash_value.toFixed(2)}
                       </p>
                     )}
                   </div>

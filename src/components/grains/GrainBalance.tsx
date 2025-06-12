@@ -36,7 +36,7 @@ const GrainBalance = ({ balance, loading }: GrainBalanceProps) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <Card className="bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Grains Disponibles</CardTitle>
+          <CardTitle className="text-sm font-medium text-gray-600">Available Grains</CardTitle>
           <Coins className="h-4 w-4 text-yellow-600" />
         </CardHeader>
         <CardContent>
@@ -44,47 +44,47 @@ const GrainBalance = ({ balance, loading }: GrainBalanceProps) => {
             {formatPoints(totalGrains).replace('pts', 'grains')}
           </div>
           <p className="text-xs text-gray-600 mt-1">
-            Valor: {formatPointsValue(totalGrains)}
+            Value: {formatPointsValue(totalGrains)}
           </p>
         </CardContent>
       </Card>
 
       <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Total Ganados</CardTitle>
+          <CardTitle className="text-sm font-medium text-gray-600">Total Earned</CardTitle>
           <TrendingUp className="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-green-700">
             {formatPoints(lifetimeEarned).replace('pts', 'grains')}
           </div>
-          <p className="text-xs text-gray-600 mt-1">Desde el inicio</p>
+          <p className="text-xs text-gray-600 mt-1">Since beginning</p>
         </CardContent>
       </Card>
 
       <Card className="bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Total Canjeados</CardTitle>
+          <CardTitle className="text-sm font-medium text-gray-600">Total Redeemed</CardTitle>
           <History className="h-4 w-4 text-blue-600" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-blue-700">
             {formatPoints(lifetimeRedeemed).replace('pts', 'grains')}
           </div>
-          <p className="text-xs text-gray-600 mt-1">Historial completo</p>
+          <p className="text-xs text-gray-600 mt-1">Complete history</p>
         </CardContent>
       </Card>
 
       <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Dinero Canjeado</CardTitle>
+          <CardTitle className="text-sm font-medium text-gray-600">Cash Redeemed</CardTitle>
           <DollarSign className="h-4 w-4 text-purple-600" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-purple-700">
             ${cashRedeemed.toFixed(2)}
           </div>
-          <p className="text-xs text-gray-600 mt-1">Total en efectivo</p>
+          <p className="text-xs text-gray-600 mt-1">Total in cash</p>
         </CardContent>
       </Card>
     </div>

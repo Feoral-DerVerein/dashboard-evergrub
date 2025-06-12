@@ -23,7 +23,7 @@ export interface UserGrainBalance {
 }
 
 export const grainService = {
-  // Obtener balance del usuario
+  // Get user balance
   async getUserBalance(userId: string): Promise<UserGrainBalance | null> {
     const { data, error } = await supabase
       .from('user_grain_balance')
@@ -39,7 +39,7 @@ export const grainService = {
     return data;
   },
 
-  // Obtener historial de transacciones
+  // Get transaction history
   async getUserTransactions(userId: string, limit = 50): Promise<GrainTransaction[]> {
     const { data, error } = await supabase
       .from('grain_transactions')
@@ -53,10 +53,10 @@ export const grainService = {
       throw error;
     }
 
-    return data || [];
+    return (data || []) as GrainTransaction[];
   },
 
-  // Crear transacción de puntos ganados
+  // Create earned grains transaction
   async addEarnedGrains(userId: string, amount: number, description: string, orderId?: string): Promise<GrainTransaction> {
     const { data, error } = await supabase
       .from('grain_transactions')
@@ -76,12 +76,12 @@ export const grainService = {
       throw error;
     }
 
-    return data;
+    return data as GrainTransaction;
   },
 
-  // Canjear grains por dinero
+  // Redeem grains for cash
   async redeemGrains(userId: string, grains: number, cashValue: number): Promise<GrainTransaction> {
-    // Verificar que el usuario tenga suficientes grains
+    // Verify user has enough grains
     const balance = await this.getUserBalance(userId);
     if (!balance || balance.total_grains < grains) {
       throw new Error('Insufficient grains balance');
@@ -104,12 +104,12 @@ export const grainService = {
       throw error;
     }
 
-    return data;
+    return data as GrainTransaction;
   },
 
-  // Usar grains para comprar
+  // Use grains for purchase
   async useGrainsForPurchase(userId: string, grains: number, description: string, orderId?: string): Promise<GrainTransaction> {
-    // Verificar que el usuario tenga suficientes grains
+    // Verify user has enough grains
     const balance = await this.getUserBalance(userId);
     if (!balance || balance.total_grains < grains) {
       throw new Error('Insufficient grains balance');
@@ -133,6 +133,6 @@ export const grainService = {
       throw error;
     }
 
-    return data;
+    return data as GrainTransaction;
   }
 };

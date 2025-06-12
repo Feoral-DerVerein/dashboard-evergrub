@@ -24,8 +24,8 @@ const Grains = () => {
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div>
-                <h1 className="text-xl font-semibold">Mis Grains</h1>
-                <p className="text-sm text-gray-500">Gestiona tus puntos y canjes</p>
+                <h1 className="text-xl font-semibold">My Grains</h1>
+                <p className="text-sm text-gray-500">Manage your points and redemptions</p>
               </div>
             </div>
             <Button
@@ -35,7 +35,7 @@ const Grains = () => {
               disabled={loading}
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Actualizar
+              Refresh
             </Button>
           </div>
         </header>
