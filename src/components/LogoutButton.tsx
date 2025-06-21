@@ -47,7 +47,7 @@ export const LogoutButton = () => {
       className="flex items-center gap-2"
     >
       <LogOut className="h-4 w-4" />
-      <span>Cerrar sesión</span>
+      <span>Log out</span>
     </Button>
   );
 };
