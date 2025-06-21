@@ -26,7 +26,8 @@ export const LogoutButton = () => {
       });
       
       console.log("Redirecting to login page");
-      navigate("/", { replace: true });
+      // Force navigation to login page
+      window.location.href = "/login";
     } catch (error) {
       console.error("Error logging out:", error);
       toast({
