@@ -1,5 +1,11 @@
 import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 import { useState, useEffect } from "react";
@@ -9,6 +15,7 @@ import { Order } from "@/types/order.types";
 import { format, parseISO } from "date-fns";
 import PointsBadge from "./PointsBadge";
 import { calculateProductPoints } from "@/utils/pointsCalculator";
+import { LogoutButton } from "./LogoutButton";
 
 type QuickAccessItemProps = {
   icon: React.ComponentType<{
@@ -264,10 +271,25 @@ const Dashboard = () => {
               <p className="text-gray-500">Welcome, Felipe</p>
               <p className="text-gray-400 text-sm">Ortega's account</p>
             </div>
-            <Avatar className="h-12 w-12">
-              <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
-              <AvatarFallback>O</AvatarFallback>
-            </Avatar>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className="h-12 w-12 cursor-pointer">
+                  <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
+                  <AvatarFallback>O</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="flex items-center gap-2 w-full">
+                    <User className="h-4 w-4" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <LogoutButton />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
