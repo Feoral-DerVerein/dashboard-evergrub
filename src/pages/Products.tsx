@@ -1,10 +1,11 @@
-import { Search, Plus, Edit, Trash2 } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { useAuth } from "@/context/AuthContext";
 import { productService, Product, SAFFIRE_FREYCINET_STORE_ID } from "@/services/productService";
 import { useToast } from "@/components/ui/use-toast";
+import { wishlistService } from "@/services/wishlistService";
 import PointsBadge from "@/components/PointsBadge";
 
 const categories = ["All", "Restaurant", "SPA Products"];
@@ -15,6 +16,7 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [notifyingProductId, setNotifyingProductId] = useState<number | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -82,6 +84,28 @@ const Products = () => {
         description: "Could not delete product: " + (error.message || "Unknown error"),
         variant: "destructive"
       });
+    }
+  };
+
+  const handleNotifyWishlistUsers = async (productId: number, productName: string) => {
+    if (!productId) return;
+    
+    setNotifyingProductId(productId);
+    try {
+      await wishlistService.notifyWishlistUsers(productId);
+      toast({
+        title: "Notification sent",
+        description: `Users with ${productName} in their wishlist have been notified`
+      });
+    } catch (error: any) {
+      console.error("Error notifying wishlist users:", error);
+      toast({
+        title: "Error",
+        description: "Failed to notify wishlist users: " + (error.message || "Unknown error"),
+        variant: "destructive"
+      });
+    } finally {
+      setNotifyingProductId(null);
     }
   };
 
@@ -246,20 +270,30 @@ const Products = () => {
                   </div>
                   <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
                   <p className="text-green-600 font-medium mb-2">$ {product.price.toFixed(2)}</p>
-                  <div className="flex gap-2">
-                    <Link
-                      to={`/products/edit/${product.id}`}
-                      className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
-                    >
-                      <Edit className="w-3 h-3" />
-                      Edit
-                    </Link>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <Link
+                        to={`/products/edit/${product.id}`}
+                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
+                      >
+                        <Edit className="w-3 h-3" />
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => product.id && handleDeleteProduct(product.id)}
+                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Delete
+                      </button>
+                    </div>
                     <button
-                      onClick={() => product.id && handleDeleteProduct(product.id)}
-                      className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100"
+                      onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)}
+                      disabled={notifyingProductId === product.id}
+                      className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Trash2 className="w-3 h-3" />
-                      Delete
+                      <Bell className="w-3 h-3" />
+                      {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
                     </button>
                   </div>
                 </div>
