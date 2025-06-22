@@ -118,7 +118,7 @@ const Products = () => {
       // Simulate API call for notifying shops
       await new Promise(resolve => setTimeout(resolve, 1000));
       toast({
-        title: "Shops notified",
+        title: "Message sent",
         description: `Partner shops have been notified about ${productName}`
       });
     } catch (error: any) {
