@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Building, Hotel, Store, ShoppingCart, Check, Users } from "lucide-react";
+import { ArrowLeft, Building, Hotel, Store, ShoppingCart, Check, Users, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -70,6 +69,19 @@ const Partners = () => {
 
   const handleTypeChange = (value: PartnerType) => {
     setForm(prev => ({ ...prev, type: value }));
+  };
+
+  const handleContactPartner = (partner: Partner) => {
+    if (partner.phone) {
+      window.open(`tel:${partner.phone}`, '_self');
+    } else if (partner.email) {
+      window.open(`mailto:${partner.email}`, '_self');
+    } else {
+      toast({
+        title: "Contact Information",
+        description: `Contact ${partner.contactPerson} at ${partner.name}`,
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -291,6 +303,15 @@ const Partners = () => {
                             Added on {partner.dateAdded}
                           </p>
                         </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleContactPartner(partner)}
+                          className="flex items-center gap-1 text-green-600 border-green-200 hover:bg-green-50"
+                        >
+                          <Phone className="w-3 h-3" />
+                          Contact
+                        </Button>
                       </div>
                     );
                   })}
