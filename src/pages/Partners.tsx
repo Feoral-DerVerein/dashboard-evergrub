@@ -1,11 +1,11 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Building, Hotel, Store, ShoppingCart, Check } from "lucide-react";
+import { ArrowLeft, Building, Hotel, Store, ShoppingCart, Check, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -25,6 +25,11 @@ interface PartnerForm {
   contactPerson: string;
 }
 
+interface Partner extends PartnerForm {
+  id: string;
+  dateAdded: string;
+}
+
 const Partners = () => {
   const [form, setForm] = useState<PartnerForm>({
     name: "",
@@ -35,6 +40,7 @@ const Partners = () => {
     contactPerson: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [partners, setPartners] = useState<Partner[]>([]);
   const { toast } = useToast();
 
   const partnerTypes = [
@@ -43,6 +49,14 @@ const Partners = () => {
     { value: "supermarket", label: "Supermercado", icon: ShoppingCart },
     { value: "market", label: "Mercado", icon: Store }
   ];
+
+  const getPartnerTypeLabel = (type: PartnerType) => {
+    return partnerTypes.find(pt => pt.value === type)?.label || type;
+  };
+
+  const getPartnerTypeIcon = (type: PartnerType) => {
+    return partnerTypes.find(pt => pt.value === type)?.icon || Building;
+  };
 
   const handleInputChange = (field: keyof PartnerForm) => (
     e: React.ChangeEvent<HTMLInputElement>
@@ -71,6 +85,16 @@ const Partners = () => {
     try {
       // Simulate API call to save partner
       await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Add partner to local list
+      const newPartner: Partner = {
+        ...form,
+        id: Math.random().toString(36).substr(2, 9),
+        dateAdded: new Date().toLocaleDateString(),
+        type: form.type as PartnerType
+      };
+      
+      setPartners(prev => [...prev, newPartner]);
       
       toast({
         title: "Partner added successfully",
@@ -112,7 +136,7 @@ const Partners = () => {
           </div>
         </header>
 
-        <main className="px-6 py-6">
+        <main className="px-6 py-6 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <Label htmlFor="name" className="text-sm font-medium text-gray-700">
@@ -229,6 +253,47 @@ const Partners = () => {
               )}
             </Button>
           </form>
+
+          {/* Partners Added Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Users className="w-5 h-5 text-green-600" />
+                Partners Added ({partners.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {partners.length === 0 ? (
+                <p className="text-gray-500 text-sm text-center py-4">
+                  No partners added yet
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {partners.map((partner) => {
+                    const Icon = getPartnerTypeIcon(partner.type);
+                    return (
+                      <div key={partner.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="flex-shrink-0">
+                          <Icon className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 truncate">
+                            {partner.name}
+                          </h4>
+                          <p className="text-sm text-gray-500">
+                            {getPartnerTypeLabel(partner.type)} • {partner.contactPerson}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            Added on {partner.dateAdded}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </main>
       </div>
     </div>
