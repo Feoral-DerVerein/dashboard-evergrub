@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Building, Hotel, Store, ShoppingCart, Check, Users, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { partnersService, PartnerData, Partner } from "@/services/partnersService";
 
 type PartnerType = "restaurant" | "hotel" | "supermarket" | "market";
 
@@ -22,13 +24,7 @@ interface PartnerForm {
   email: string;
   phone: string;
   address: string;
-  contactPerson: string;
-}
-
-interface Partner extends PartnerForm {
-  id: string;
-  dateAdded: string;
-  type: PartnerType; // This should always be a valid PartnerType, not empty string
+  contact_person: string;
 }
 
 const Partners = () => {
@@ -38,10 +34,11 @@ const Partners = () => {
     email: "",
     phone: "",
     address: "",
-    contactPerson: ""
+    contact_person: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   const partnerTypes = [
@@ -50,6 +47,28 @@ const Partners = () => {
     { value: "supermarket", label: "Supermarket", icon: ShoppingCart },
     { value: "market", label: "Market", icon: Store }
   ];
+
+  // Load partners when component mounts
+  useEffect(() => {
+    loadPartners();
+  }, []);
+
+  const loadPartners = async () => {
+    try {
+      setIsLoading(true);
+      const data = await partnersService.getPartners();
+      setPartners(data);
+    } catch (error) {
+      console.error("Error loading partners:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load partners",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getPartnerTypeLabel = (type: PartnerType | "") => {
     if (!type) return "";
@@ -79,7 +98,7 @@ const Partners = () => {
     } else {
       toast({
         title: "Contact Information",
-        description: `Contact ${partner.contactPerson} at ${partner.name}`,
+        description: `Contact ${partner.contact_person} at ${partner.name}`,
       });
     }
   };
@@ -87,7 +106,7 @@ const Partners = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!form.name || !form.type || !form.email || !form.contactPerson) {
+    if (!form.name || !form.type || !form.email || !form.contact_person) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -99,34 +118,35 @@ const Partners = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call to save partner
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Add partner to local list
-      const newPartner: Partner = {
-        ...form,
-        id: Math.random().toString(36).substr(2, 9),
-        dateAdded: new Date().toLocaleDateString(),
-        type: form.type as PartnerType // Safe cast since we validated above
+      const partnerData: PartnerData = {
+        name: form.name,
+        type: form.type as PartnerType,
+        email: form.email,
+        phone: form.phone || undefined,
+        address: form.address || undefined,
+        contact_person: form.contact_person
       };
-      
-      setPartners(prev => [...prev, newPartner]);
+
+      await partnersService.createPartner(partnerData);
       
       toast({
         title: "Partner added successfully",
         description: `${form.name} has been registered as a B2B partner`
       });
       
-      // Reset form
+      // Reset form and reload partners
       setForm({
         name: "",
         type: "",
         email: "",
         phone: "",
         address: "",
-        contactPerson: ""
+        contact_person: ""
       });
+
+      await loadPartners();
     } catch (error) {
+      console.error("Error adding partner:", error);
       toast({
         title: "Error",
         description: "Failed to add partner. Please try again.",
@@ -135,6 +155,10 @@ const Partners = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
@@ -194,14 +218,14 @@ const Partners = () => {
             </div>
 
             <div>
-              <Label htmlFor="contactPerson" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="contact_person" className="text-sm font-medium text-gray-700">
                 Contact Person *
               </Label>
               <Input
-                id="contactPerson"
+                id="contact_person"
                 type="text"
-                value={form.contactPerson}
-                onChange={handleInputChange("contactPerson")}
+                value={form.contact_person}
+                onChange={handleInputChange("contact_person")}
                 placeholder="Enter contact person name"
                 className="mt-1"
                 required
@@ -279,7 +303,11 @@ const Partners = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {partners.length === 0 ? (
+              {isLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
+                </div>
+              ) : partners.length === 0 ? (
                 <p className="text-gray-500 text-sm text-center py-4">
                   No partners added yet
                 </p>
@@ -297,10 +325,10 @@ const Partners = () => {
                             {partner.name}
                           </h4>
                           <p className="text-sm text-gray-500">
-                            {getPartnerTypeLabel(partner.type)} • {partner.contactPerson}
+                            {getPartnerTypeLabel(partner.type)} • {partner.contact_person}
                           </p>
                           <p className="text-xs text-gray-400">
-                            Added on {partner.dateAdded}
+                            Added on {formatDate(partner.date_added)}
                           </p>
                         </div>
                         <Button

@@ -187,6 +187,45 @@ export type Database = {
         }
         Relationships: []
       }
+      partners: {
+        Row: {
+          address: string | null
+          contact_person: string
+          created_at: string
+          date_added: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          contact_person: string
+          created_at?: string
+          date_added?: string
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          contact_person?: string
+          created_at?: string
+          date_added?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       point_activities: {
         Row: {
           created_at: string | null
