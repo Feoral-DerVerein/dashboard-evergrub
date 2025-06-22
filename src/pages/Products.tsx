@@ -1,4 +1,4 @@
-import { Search, Plus, Edit, Trash2, Bell } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell, Store } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -17,6 +17,7 @@ const Products = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [notifyingProductId, setNotifyingProductId] = useState<number | null>(null);
+  const [notifyingShopsProductId, setNotifyingShopsProductId] = useState<number | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -106,6 +107,29 @@ const Products = () => {
       });
     } finally {
       setNotifyingProductId(null);
+    }
+  };
+
+  const handleNotifyShops = async (productId: number, productName: string) => {
+    if (!productId) return;
+    
+    setNotifyingShopsProductId(productId);
+    try {
+      // Simulate API call for notifying shops
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast({
+        title: "Shops notified",
+        description: `Partner shops have been notified about ${productName}`
+      });
+    } catch (error: any) {
+      console.error("Error notifying shops:", error);
+      toast({
+        title: "Error",
+        description: "Failed to notify shops: " + (error.message || "Unknown error"),
+        variant: "destructive"
+      });
+    } finally {
+      setNotifyingShopsProductId(null);
     }
   };
 
@@ -294,6 +318,14 @@ const Products = () => {
                     >
                       <Bell className="w-3 h-3" />
                       {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
+                    </button>
+                    <button
+                      onClick={() => product.id && handleNotifyShops(product.id, product.name)}
+                      disabled={notifyingShopsProductId === product.id}
+                      className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-purple-600 bg-purple-50 rounded hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Store className="w-3 h-3" />
+                      {notifyingShopsProductId === product.id ? "Notifying..." : "Notify Shops"}
                     </button>
                   </div>
                 </div>
