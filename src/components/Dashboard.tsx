@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins } from "lucide-react";
+import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { 
   DropdownMenu,
@@ -305,6 +305,7 @@ const Dashboard = () => {
               <QuickAccessItem icon={Megaphone} label="Ads" to="/ads" />
               <QuickAccessItem icon={Heart} label="Donate" to="/donate" />
               <QuickAccessItem icon={Coins} label="Grains" to="/grains" badgeCount={stats.totalGrains >= 2000 ? 1 : undefined} />
+              <QuickAccessItem icon={Handshake} label="Socio" to="/partners" />
             </div>
           </section>
 
