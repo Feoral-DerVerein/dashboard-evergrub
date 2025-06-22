@@ -118,26 +118,15 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
         {/* Products List */}
         <div className="flex-1 overflow-y-auto space-y-3">
           {inventory.map((item) => (
-            <Card key={item.product.id} className="p-4 hover:shadow-md transition-shadow">
+            <Card key={item.product.id} className="p-3 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 {/* Product Info */}
-                <div className="flex items-center gap-4 flex-1">
-                  <img
-                    src={item.product.image || "/placeholder.svg"}
-                    alt={item.product.name}
-                    className="w-16 h-16 object-cover rounded-lg border"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">{item.product.name}</h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>${item.product.price.toFixed(2)} each</span>
-                      <span>•</span>
-                      <span>Current: {item.product.quantity}</span>
-                      <span>•</span>
-                      <span className={item.product.category === "Restaurant" ? "text-orange-600" : "text-purple-600"}>
-                        {item.product.category}
-                      </span>
-                    </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-sm">{item.product.name}</h3>
+                  <div className="flex items-center gap-3 text-xs text-gray-500">
+                    <span className={item.product.category === "Restaurant" ? "text-orange-600" : "text-purple-600"}>
+                      {item.product.category}
+                    </span>
                   </div>
                 </div>
                 
@@ -170,17 +159,14 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
                     <Plus className="w-4 h-4" />
                   </Button>
                   
-                  {/* Value Display */}
-                  <div className="text-right min-w-[100px] ml-4">
-                    <p className="font-bold text-lg">
-                      ${(item.newQuantity * item.product.price).toFixed(2)}
-                    </p>
-                    {item.newQuantity !== item.product.quantity && (
-                      <p className="text-xs text-blue-600">
+                  {/* Change Indicator */}
+                  {item.newQuantity !== item.product.quantity && (
+                    <div className="text-right min-w-[60px] ml-2">
+                      <p className="text-xs text-blue-600 font-medium">
                         Changed
                       </p>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
