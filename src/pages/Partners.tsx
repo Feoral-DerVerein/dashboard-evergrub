@@ -28,6 +28,7 @@ interface PartnerForm {
 interface Partner extends PartnerForm {
   id: string;
   dateAdded: string;
+  type: PartnerType; // This should always be a valid PartnerType, not empty string
 }
 
 const Partners = () => {
@@ -50,11 +51,13 @@ const Partners = () => {
     { value: "market", label: "Mercado", icon: Store }
   ];
 
-  const getPartnerTypeLabel = (type: PartnerType) => {
+  const getPartnerTypeLabel = (type: PartnerType | "") => {
+    if (!type) return "";
     return partnerTypes.find(pt => pt.value === type)?.label || type;
   };
 
-  const getPartnerTypeIcon = (type: PartnerType) => {
+  const getPartnerTypeIcon = (type: PartnerType | "") => {
+    if (!type) return Building;
     return partnerTypes.find(pt => pt.value === type)?.icon || Building;
   };
 
@@ -91,7 +94,7 @@ const Partners = () => {
         ...form,
         id: Math.random().toString(36).substr(2, 9),
         dateAdded: new Date().toLocaleDateString(),
-        type: form.type as PartnerType
+        type: form.type as PartnerType // Safe cast since we validated above
       };
       
       setPartners(prev => [...prev, newPartner]);
