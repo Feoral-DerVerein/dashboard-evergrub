@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Package, Plus, Minus, Calculator, Save, X } from "lucide-react";
+import { Package, Plus, Minus, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,6 @@ interface InventoryItem {
 const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) => {
   const [open, setOpen] = useState(false);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
-  const [totalValue, setTotalValue] = useState(0);
 
   useEffect(() => {
     if (open && products.length > 0) {
@@ -31,13 +30,6 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
       setInventory(inventoryItems);
     }
   }, [open, products]);
-
-  useEffect(() => {
-    const total = inventory.reduce((sum, item) => {
-      return sum + (item.newQuantity * item.product.price);
-    }, 0);
-    setTotalValue(total);
-  }, [inventory]);
 
   const updateQuantity = (productId: number, change: number) => {
     setInventory(prev => prev.map(item => {
@@ -94,7 +86,7 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
         {/* Summary Card */}
         <Card className="mb-4">
           <CardContent className="pt-4">
-            <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-2 gap-4 text-center">
               <div>
                 <p className="text-sm text-gray-500">Total Products</p>
                 <p className="text-2xl font-bold">{inventory.length}</p>
@@ -103,12 +95,6 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
                 <p className="text-sm text-gray-500">Products Changed</p>
                 <p className="text-2xl font-bold text-blue-600">
                   {inventory.filter(item => item.newQuantity !== item.product.quantity).length}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Total Value</p>
-                <p className="text-2xl font-bold text-green-600">
-                  ${totalValue.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -175,14 +161,7 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
         
         {/* Action Buttons */}
         <div className="border-t pt-4 mt-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Calculator className="w-5 h-5 text-green-600" />
-              <span className="text-lg font-bold">
-                Total Inventory Value: ${totalValue.toFixed(2)}
-              </span>
-            </div>
-            
+          <div className="flex items-center justify-end">
             <div className="flex gap-3">
               <Button 
                 variant="outline" 
