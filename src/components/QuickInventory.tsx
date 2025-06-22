@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Package, Plus, Minus, Calculator } from "lucide-react";
+import { Package, Plus, Minus, Calculator, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -78,107 +78,144 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button variant="outline" className="flex items-center gap-2 w-full">
           <Package className="w-4 h-4" />
-          Quick Inventory
+          Quick Inventory Update
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Package className="w-5 h-5" />
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogHeader className="pb-4 border-b">
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <Package className="w-6 h-6" />
             Quick Inventory Update
           </DialogTitle>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto">
-          <div className="space-y-4">
-            {inventory.map((item) => (
-              <Card key={item.product.id} className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={item.product.image || "/placeholder.svg"}
-                      alt={item.product.name}
-                      className="w-12 h-12 object-cover rounded"
-                    />
-                    <div>
-                      <h3 className="font-medium">{item.product.name}</h3>
-                      <p className="text-sm text-gray-500">
-                        ${item.product.price.toFixed(2)} each
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        Current: {item.product.quantity}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateQuantity(item.product.id!, -1)}
-                      disabled={item.newQuantity <= 0}
-                    >
-                      <Minus className="w-3 h-3" />
-                    </Button>
-                    
-                    <Input
-                      type="number"
-                      min="0"
-                      value={item.newQuantity}
-                      onChange={(e) => setQuantity(item.product.id!, parseInt(e.target.value) || 0)}
-                      className="w-20 text-center"
-                    />
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateQuantity(item.product.id!, 1)}
-                    >
-                      <Plus className="w-3 h-3" />
-                    </Button>
-                    
-                    <div className="text-right min-w-[80px]">
-                      <p className="font-medium">
-                        ${(item.newQuantity * item.product.price).toFixed(2)}
-                      </p>
+        {/* Summary Card */}
+        <Card className="mb-4">
+          <CardContent className="pt-4">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-sm text-gray-500">Total Products</p>
+                <p className="text-2xl font-bold">{inventory.length}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Products Changed</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {inventory.filter(item => item.newQuantity !== item.product.quantity).length}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Total Value</p>
+                <p className="text-2xl font-bold text-green-600">
+                  ${totalValue.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Products List */}
+        <div className="flex-1 overflow-y-auto space-y-3">
+          {inventory.map((item) => (
+            <Card key={item.product.id} className="p-4 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                {/* Product Info */}
+                <div className="flex items-center gap-4 flex-1">
+                  <img
+                    src={item.product.image || "/placeholder.svg"}
+                    alt={item.product.name}
+                    className="w-16 h-16 object-cover rounded-lg border"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg">{item.product.name}</h3>
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span>${item.product.price.toFixed(2)} each</span>
+                      <span>•</span>
+                      <span>Current: {item.product.quantity}</span>
+                      <span>•</span>
+                      <span className={item.product.category === "Restaurant" ? "text-orange-600" : "text-purple-600"}>
+                        {item.product.category}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </Card>
-            ))}
-          </div>
+                
+                {/* Quantity Controls */}
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updateQuantity(item.product.id!, -1)}
+                    disabled={item.newQuantity <= 0}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                  
+                  <Input
+                    type="number"
+                    min="0"
+                    value={item.newQuantity}
+                    onChange={(e) => setQuantity(item.product.id!, parseInt(e.target.value) || 0)}
+                    className="w-20 text-center font-semibold"
+                  />
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updateQuantity(item.product.id!, 1)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                  
+                  {/* Value Display */}
+                  <div className="text-right min-w-[100px] ml-4">
+                    <p className="font-bold text-lg">
+                      ${(item.newQuantity * item.product.price).toFixed(2)}
+                    </p>
+                    {item.newQuantity !== item.product.quantity && (
+                      <p className="text-xs text-blue-600">
+                        Changed
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
         
+        {/* Action Buttons */}
         <div className="border-t pt-4 mt-4">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Calculator className="w-5 h-5" />
-              <span className="text-lg font-semibold">
+              <Calculator className="w-5 h-5 text-green-600" />
+              <span className="text-lg font-bold">
                 Total Inventory Value: ${totalValue.toFixed(2)}
               </span>
             </div>
             
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setOpen(false)}>
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2"
+              >
+                <X className="w-4 h-4" />
                 Cancel
               </Button>
               <Button 
                 onClick={handleSave}
                 disabled={!hasChanges}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
               >
-                Save Changes
+                <Save className="w-4 h-4" />
+                Save Changes ({inventory.filter(item => item.newQuantity !== item.product.quantity).length})
               </Button>
             </div>
           </div>
-          
-          {hasChanges && (
-            <p className="text-sm text-blue-600">
-              {inventory.filter(item => item.newQuantity !== item.product.quantity).length} products have changes
-            </p>
-          )}
         </div>
       </DialogContent>
     </Dialog>
