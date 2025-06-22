@@ -1,3 +1,4 @@
+
 import { Search, Plus, Edit, Trash2, Bell, Store } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -7,6 +8,7 @@ import { productService, Product, SAFFIRE_FREYCINET_STORE_ID } from "@/services/
 import { useToast } from "@/components/ui/use-toast";
 import { wishlistService } from "@/services/wishlistService";
 import PointsBadge from "@/components/PointsBadge";
+import QuickInventory from "@/components/QuickInventory";
 
 const categories = ["All", "Restaurant", "SPA Products"];
 
@@ -83,6 +85,43 @@ const Products = () => {
       toast({
         title: "Error",
         description: "Could not delete product: " + (error.message || "Unknown error"),
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUpdateQuantities = async (updates: { id: number; quantity: number }[]) => {
+    try {
+      // Update each product quantity
+      const updatePromises = updates.map(async (update) => {
+        const updatedProduct = await productService.updateProduct(update.id, {
+          quantity: update.quantity
+        });
+        return updatedProduct;
+      });
+
+      await Promise.all(updatePromises);
+
+      // Update local state
+      setProducts(prevProducts =>
+        prevProducts.map(product => {
+          const update = updates.find(u => u.id === product.id);
+          if (update) {
+            return { ...product, quantity: update.quantity };
+          }
+          return product;
+        })
+      );
+
+      toast({
+        title: "Inventory updated",
+        description: `Successfully updated ${updates.length} products`
+      });
+    } catch (error: any) {
+      console.error("Error updating inventory:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update inventory: " + (error.message || "Unknown error"),
         variant: "destructive"
       });
     }
@@ -199,13 +238,19 @@ const Products = () => {
               <h1 className="text-2xl font-bold text-gray-900">Products</h1>
               <p className="text-gray-500">Manage your Saffire Freycinet products</p>
             </div>
-            <Link
-              to="/products/add"
-              className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm"
-            >
-              <Plus className="w-4 h-4" />
-              Add Product
-            </Link>
+            <div className="flex gap-2">
+              <QuickInventory 
+                products={products} 
+                onUpdateQuantities={handleUpdateQuantities}
+              />
+              <Link
+                to="/products/add"
+                className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Add Product
+              </Link>
+            </div>
           </div>
 
           <div className="relative mb-6">
