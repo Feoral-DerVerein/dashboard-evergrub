@@ -29,7 +29,7 @@ export const partnersService = {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as Partner;
   },
 
   async getPartners(): Promise<Partner[]> {
@@ -39,7 +39,7 @@ export const partnersService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as Partner[];
   },
 
   async deletePartner(id: string): Promise<void> {
