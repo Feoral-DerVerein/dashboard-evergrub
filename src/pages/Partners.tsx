@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Building, Hotel, Store, ShoppingCart, Check, Users } from "lucide-react";
@@ -45,10 +46,10 @@ const Partners = () => {
   const { toast } = useToast();
 
   const partnerTypes = [
-    { value: "restaurant", label: "Restaurante", icon: Building },
+    { value: "restaurant", label: "Restaurant", icon: Building },
     { value: "hotel", label: "Hotel", icon: Hotel },
-    { value: "supermarket", label: "Supermercado", icon: ShoppingCart },
-    { value: "market", label: "Mercado", icon: Store }
+    { value: "supermarket", label: "Supermarket", icon: ShoppingCart },
+    { value: "market", label: "Market", icon: Store }
   ];
 
   const getPartnerTypeLabel = (type: PartnerType | "") => {
