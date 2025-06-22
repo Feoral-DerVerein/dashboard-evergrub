@@ -323,12 +323,12 @@ const Products = () => {
           ) : (
             <div className="grid grid-cols-2 gap-4">
               {filteredProducts.map((product) => (
-                <div key={product.id} className="border border-gray-200 rounded-lg p-3">
+                <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
                   <div className="relative">
                     <img
                       src={product.image || "/placeholder.svg"}
                       alt={product.name}
-                      className="w-full h-32 object-cover rounded-md mb-2"
+                      className="w-full h-32 object-cover"
                       onError={(e) => {
                         console.error("Image failed to load:", product.image);
                         (e.target as HTMLImageElement).src = "/placeholder.svg";
@@ -337,42 +337,66 @@ const Products = () => {
                     <div className="absolute top-2 right-2">
                       <PointsBadge price={product.price} variant="default" />
                     </div>
+                    <div className="absolute bottom-2 left-2">
+                      <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                        product.quantity > 10 
+                          ? 'bg-green-100 text-green-800' 
+                          : product.quantity > 0 
+                          ? 'bg-yellow-100 text-yellow-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        Stock: {product.quantity}
+                      </span>
+                    </div>
                   </div>
-                  <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
-                  <p className="text-green-600 font-medium mb-2">$ {product.price.toFixed(2)}</p>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      <Link
-                        to={`/products/edit/${product.id}`}
-                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
-                      >
-                        <Edit className="w-3 h-3" />
-                        Edit
-                      </Link>
+                  
+                  <div className="p-3">
+                    <div className="mb-2">
+                      <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">
+                        {product.name}
+                      </h3>
+                      <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                      <p className="text-lg font-bold text-green-600">
+                        ${product.price.toFixed(2)}
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex gap-1">
+                        <Link
+                          to={`/products/edit/${product.id}`}
+                          className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+                        >
+                          <Edit className="w-3 h-3" />
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => product.id && handleDeleteProduct(product.id)}
+                          className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Delete
+                        </button>
+                      </div>
+                      
                       <button
-                        onClick={() => product.id && handleDeleteProduct(product.id)}
-                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100"
+                        onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)}
+                        disabled={notifyingProductId === product.id}
+                        className="w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        <Trash2 className="w-3 h-3" />
-                        Delete
+                        <Bell className="w-3 h-3" />
+                        {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
+                      </button>
+                      
+                      <button
+                        onClick={() => product.id && handleNotifyShops(product.id, product.name)}
+                        disabled={notifyingShopsProductId === product.id}
+                        className="w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-purple-600 bg-purple-50 rounded hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <Store className="w-3 h-3" />
+                        {notifyingShopsProductId === product.id ? "Notifying..." : "Notify Shops"}
                       </button>
                     </div>
-                    <button
-                      onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)}
-                      disabled={notifyingProductId === product.id}
-                      className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Bell className="w-3 h-3" />
-                      {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
-                    </button>
-                    <button
-                      onClick={() => product.id && handleNotifyShops(product.id, product.name)}
-                      disabled={notifyingShopsProductId === product.id}
-                      className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-purple-600 bg-purple-50 rounded hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Store className="w-3 h-3" />
-                      {notifyingShopsProductId === product.id ? "Notifying..." : "Notify Shops"}
-                    </button>
                   </div>
                 </div>
               ))}
