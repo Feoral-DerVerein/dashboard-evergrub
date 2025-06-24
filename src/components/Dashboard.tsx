@@ -305,7 +305,7 @@ const Dashboard = () => {
               <QuickAccessItem icon={Megaphone} label="Ads" to="/ads" />
               <QuickAccessItem icon={Heart} label="Donate" to="/donate" />
               <QuickAccessItem icon={Coins} label="Grains" to="/grains" badgeCount={stats.totalGrains >= 2000 ? 1 : undefined} />
-              <QuickAccessItem icon={Handshake} label="Socio" to="/partners" />
+              <QuickAccessItem icon={Handshake} label="Partner" to="/partners" />
             </div>
           </section>
 
