@@ -17,9 +17,80 @@ interface InventoryItem {
   newQuantity: number;
 }
 
+interface MinibarItem {
+  name: string;
+  category: string;
+  quantity: number;
+}
+
+const MINIBAR_REPLENISHMENT_ITEMS: MinibarItem[] = [
+  // FRIDGE CONTENT
+  { name: "Coke", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Coke Zero", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Sprite", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Fever Tree Soda", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Fever Tree Tonic", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Juicy Isle Apple Juice", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Juicy Isle Green Juice", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Juicy Isle Orange Juice", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Kombucha", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Pagan Cider", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "James Boags", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Sparkling Apple Juice", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Arras Blanc de Blanc (Luxury)", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Arras Brut Elite Signature", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Clemens Hill Riesling (White Wine Lux/Sig)", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Arras Grand Vintage (PAV)", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Freycinet Chardonnay (PAV)", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "NON (Drinks)- Variety", category: "FRIDGE CONTENT", quantity: 0 },
+  { name: "Milk", category: "FRIDGE CONTENT", quantity: 0 },
+  
+  // DRINKER BEVERAGES
+  { name: "Still Water", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "Sparkling Water", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "Gala Estate Noir (Red Wine)", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "Overeem 50ml Port Cask (1)", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "Overeem 50ml Sherry Cas (1)", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "McHenry's Classic Gin 50ml (1)", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "McHenry's Federation 50ml (1)", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "McHenry's Barrel Aged Gin 50ml (1)", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "McHenry's PUER Vodka 50ml (1)", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "McHenry's Christmas Gin 50ml (1)", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "McHenry's PUER Vodka 200ml (PAV)", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "Apothecary Gin", category: "DRINKER BEVERAGES", quantity: 0 },
+  { name: "Craigie Knowe Cabernet Sav(PAV)", category: "DRINKER BEVERAGES", quantity: 0 },
+  
+  // DRAWER SNACKS
+  { name: "Tyrrells- sea salt & vinegar", category: "DRAWER SNACKS", quantity: 0 },
+  { name: "Tyrrells- cheddar and chives", category: "DRAWER SNACKS", quantity: 0 },
+  { name: "Coal River Farm Dark Chocolate", category: "DRAWER SNACKS", quantity: 0 },
+  { name: "Nutsnmore - Tamari Almonds", category: "DRAWER SNACKS", quantity: 0 },
+  { name: "Nutsnmore - Cajin Cashews", category: "DRAWER SNACKS", quantity: 0 },
+  { name: "Salted Caramel Popcorn", category: "DRAWER SNACKS", quantity: 0 },
+  
+  // MISC
+  { name: "Happy Birthday Lollies", category: "MISC", quantity: 0 },
+  { name: "Sweet Heart Lollies", category: "MISC", quantity: 0 },
+  { name: "Cookies", category: "MISC", quantity: 0 },
+  { name: "Apples", category: "MISC", quantity: 0 },
+  { name: "Small Island (guest return)", category: "MISC", quantity: 0 },
+  
+  // TEA/COFFEE
+  { name: "Arpeggio (Green)", category: "TEA/COFFEE", quantity: 0 },
+  { name: "Volluto Decaf (Gold)", category: "TEA/COFFEE", quantity: 0 },
+  { name: "Art of Tea English Breakfast", category: "TEA/COFFEE", quantity: 0 },
+  { name: "Art of Tea Saffire Rose Earl Grey", category: "TEA/COFFEE", quantity: 0 },
+  { name: "Art of Tea Berries & More Forest", category: "TEA/COFFEE", quantity: 0 },
+  { name: "Art of Tea Peppermint", category: "TEA/COFFEE", quantity: 0 },
+  { name: "Art of Tea Snooze Blend", category: "TEA/COFFEE", quantity: 0 },
+  { name: "Art of Tea Salamanca Blend", category: "TEA/COFFEE", quantity: 0 },
+];
+
 const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) => {
   const [open, setOpen] = useState(false);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [minibarItems, setMinibarItems] = useState<MinibarItem[]>(MINIBAR_REPLENISHMENT_ITEMS);
+  const [showMinibarSheet, setShowMinibarSheet] = useState(false);
 
   useEffect(() => {
     if (open && products.length > 0) {
@@ -51,6 +122,25 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
     }));
   };
 
+  const updateMinibarQuantity = (index: number, change: number) => {
+    setMinibarItems(prev => prev.map((item, i) => {
+      if (i === index) {
+        return { ...item, quantity: Math.max(0, item.quantity + change) };
+      }
+      return item;
+    }));
+  };
+
+  const setMinibarQuantity = (index: number, quantity: number) => {
+    const numQuantity = Math.max(0, parseInt(quantity.toString()) || 0);
+    setMinibarItems(prev => prev.map((item, i) => {
+      if (i === index) {
+        return { ...item, quantity: numQuantity };
+      }
+      return item;
+    }));
+  };
+
   const handleSave = () => {
     const updates = inventory
       .filter(item => item.newQuantity !== item.product.quantity)
@@ -66,6 +156,15 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
   };
 
   const hasChanges = inventory.some(item => item.newQuantity !== item.product.quantity);
+  const minibarHasChanges = minibarItems.some(item => item.quantity > 0);
+
+  const groupedMinibarItems = minibarItems.reduce((acc, item) => {
+    if (!acc[item.category]) {
+      acc[item.category] = [];
+    }
+    acc[item.category].push(item);
+    return acc;
+  }, {} as Record<string, MinibarItem[]>);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -83,81 +182,169 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
           </DialogTitle>
         </DialogHeader>
         
-        {/* Summary Card */}
-        <Card className="mb-4">
-          <CardContent className="pt-4">
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div>
-                <p className="text-sm text-gray-500">Total Products</p>
-                <p className="text-2xl font-bold">{inventory.length}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Products Changed</p>
-                <p className="text-2xl font-bold text-blue-600">
-                  {inventory.filter(item => item.newQuantity !== item.product.quantity).length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Toggle Buttons */}
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant={!showMinibarSheet ? "default" : "outline"}
+            onClick={() => setShowMinibarSheet(false)}
+            className="flex-1"
+          >
+            Regular Products
+          </Button>
+          <Button
+            variant={showMinibarSheet ? "default" : "outline"}
+            onClick={() => setShowMinibarSheet(true)}
+            className="flex-1"
+          >
+            Minibar Replenishment Sheet
+          </Button>
+        </div>
 
-        {/* Products List */}
-        <div className="flex-1 overflow-y-auto space-y-3">
-          {inventory.map((item) => (
-            <Card key={item.product.id} className="p-3 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between">
-                {/* Product Info */}
-                <div className="flex-1">
-                  <h3 className="font-medium text-sm">{item.product.name}</h3>
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <span className={item.product.category === "Restaurant" ? "text-orange-600" : "text-purple-600"}>
-                      {item.product.category}
-                    </span>
+        {!showMinibarSheet ? (
+          <>
+            {/* Summary Card */}
+            <Card className="mb-4">
+              <CardContent className="pt-4">
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <p className="text-sm text-gray-500">Total Products</p>
+                    <p className="text-2xl font-bold">{inventory.length}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Products Changed</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {inventory.filter(item => item.newQuantity !== item.product.quantity).length}
+                    </p>
                   </div>
                 </div>
-                
-                {/* Quantity Controls */}
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => updateQuantity(item.product.id!, -1)}
-                    disabled={item.newQuantity <= 0}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  
-                  <Input
-                    type="number"
-                    min="0"
-                    value={item.newQuantity}
-                    onChange={(e) => setQuantity(item.product.id!, parseInt(e.target.value) || 0)}
-                    className="w-20 text-center font-semibold"
-                  />
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => updateQuantity(item.product.id!, 1)}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                  
-                  {/* Change Indicator */}
-                  {item.newQuantity !== item.product.quantity && (
-                    <div className="text-right min-w-[60px] ml-2">
-                      <p className="text-xs text-blue-600 font-medium">
-                        Changed
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
+              </CardContent>
             </Card>
-          ))}
-        </div>
+
+            {/* Products List */}
+            <div className="flex-1 overflow-y-auto space-y-3">
+              {inventory.map((item) => (
+                <Card key={item.product.id} className="p-3 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    {/* Product Info */}
+                    <div className="flex-1">
+                      <h3 className="font-medium text-xs">{item.product.name}</h3>
+                      <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <span className={item.product.category === "Restaurant" ? "text-orange-600" : "text-purple-600"}>
+                          {item.product.category}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Quantity Controls */}
+                    <div className="flex items-center gap-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateQuantity(item.product.id!, -1)}
+                        disabled={item.newQuantity <= 0}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </Button>
+                      
+                      <Input
+                        type="number"
+                        min="0"
+                        value={item.newQuantity}
+                        onChange={(e) => setQuantity(item.product.id!, parseInt(e.target.value) || 0)}
+                        className="w-20 text-center font-semibold"
+                      />
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateQuantity(item.product.id!, 1)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                      
+                      {/* Change Indicator */}
+                      {item.newQuantity !== item.product.quantity && (
+                        <div className="text-right min-w-[60px] ml-2">
+                          <p className="text-xs text-blue-600 font-medium">
+                            Changed
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Minibar Sheet Summary */}
+            <Card className="mb-4">
+              <CardContent className="pt-4">
+                <div className="text-center">
+                  <p className="text-sm text-gray-500">Total Minibar Items</p>
+                  <p className="text-2xl font-bold">{minibarItems.length}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Minibar Items by Category */}
+            <div className="flex-1 overflow-y-auto space-y-4">
+              {Object.entries(groupedMinibarItems).map(([category, items]) => (
+                <div key={category}>
+                  <h3 className="font-semibold text-sm text-gray-800 mb-2 sticky top-0 bg-white py-1">
+                    {category}
+                  </h3>
+                  <div className="space-y-2">
+                    {items.map((item, index) => {
+                      const globalIndex = minibarItems.findIndex(mi => mi.name === item.name);
+                      return (
+                        <Card key={item.name} className="p-2 hover:shadow-md transition-shadow">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-xs">{item.name}</h4>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => updateMinibarQuantity(globalIndex, -1)}
+                                disabled={item.quantity <= 0}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Minus className="w-3 h-3" />
+                              </Button>
+                              
+                              <Input
+                                type="number"
+                                min="0"
+                                value={item.quantity}
+                                onChange={(e) => setMinibarQuantity(globalIndex, parseInt(e.target.value) || 0)}
+                                className="w-16 text-center text-xs h-6"
+                              />
+                              
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => updateMinibarQuantity(globalIndex, 1)}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Plus className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
         
         {/* Action Buttons */}
         <div className="border-t pt-4 mt-4">
@@ -173,11 +360,11 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
               </Button>
               <Button 
                 onClick={handleSave}
-                disabled={!hasChanges}
+                disabled={!hasChanges && !minibarHasChanges}
                 className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
-                Save Changes ({inventory.filter(item => item.newQuantity !== item.product.quantity).length})
+                Save Changes ({!showMinibarSheet ? inventory.filter(item => item.newQuantity !== item.product.quantity).length : minibarItems.filter(item => item.quantity > 0).length})
               </Button>
             </div>
           </div>
