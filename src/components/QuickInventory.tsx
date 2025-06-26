@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Product } from "@/services/productService";
 
 interface QuickInventoryProps {
@@ -90,6 +91,13 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [minibarItems, setMinibarItems] = useState<MinibarItem[]>(MINIBAR_REPLENISHMENT_ITEMS);
   const [showMinibarSheet, setShowMinibarSheet] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<string>("");
+
+  // Generate room options (1-20)
+  const roomOptions = Array.from({ length: 20 }, (_, i) => ({
+    value: `room-${i + 1}`,
+    label: `Room ${i + 1}`
+  }));
 
   useEffect(() => {
     if (open && products.length > 0) {
@@ -199,6 +207,27 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
           </Button>
         </div>
 
+        {/* Room Selection - Only show when minibar is selected */}
+        {showMinibarSheet && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Room
+            </label>
+            <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Choose a room..." />
+              </SelectTrigger>
+              <SelectContent>
+                {roomOptions.map((room) => (
+                  <SelectItem key={room.value} value={room.value}>
+                    {room.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         {!showMinibarSheet ? (
           <>
             {/* Summary Card */}
@@ -283,6 +312,12 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
             <Card className="mb-4">
               <CardContent className="pt-4">
                 <div className="text-center">
+                  <p className="text-sm text-gray-500">Selected Room</p>
+                  <p className="text-lg font-bold text-green-600">
+                    {selectedRoom ? roomOptions.find(r => r.value === selectedRoom)?.label : "None"}
+                  </p>
+                </div>
+                <div className="text-center">
                   <p className="text-sm text-gray-500">Total Minibar Items</p>
                   <p className="text-2xl font-bold">{minibarItems.length}</p>
                 </div>
@@ -359,7 +394,7 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
               </Button>
               <Button 
                 onClick={handleSave}
-                disabled={!hasChanges && !minibarHasChanges}
+                disabled={(!hasChanges && !minibarHasChanges) || (showMinibarSheet && !selectedRoom)}
                 className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
