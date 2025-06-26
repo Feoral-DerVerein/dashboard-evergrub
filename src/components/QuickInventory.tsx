@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Package, Plus, Minus, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -196,7 +195,7 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
             onClick={() => setShowMinibarSheet(true)}
             className="flex-1"
           >
-            Minibar Replenishment Sheet
+            Minibar
           </Button>
         </div>
 
