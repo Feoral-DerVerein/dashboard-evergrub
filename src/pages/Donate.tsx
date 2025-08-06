@@ -61,8 +61,8 @@ const CharityCard = ({
 };
 
 const Donate = () => {
-  return <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="max-w-md mx-auto bg-white min-h-screen">
+  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
+      <div className="max-w-md md:max-w-6xl mx-auto bg-white min-h-screen md:min-h-0 md:rounded-xl md:shadow-sm md:my-0">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
           <div className="flex items-center mb-1">
             <Link to="/dashboard" className="mr-2">

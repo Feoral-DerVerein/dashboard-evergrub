@@ -137,8 +137,8 @@ const Notifications = () => {
           </div> : filteredNotifications.map(notification => <StandardNotification key={notification.id} notification={notification} onNotifyUsers={handleNotifyWishlistUsers} onMarkAsRead={handleMarkAsRead} />)}
       </div>;
   };
-  return <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="max-w-md mx-auto bg-white min-h-screen">
+  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
+      <div className="max-w-md md:max-w-6xl mx-auto bg-white min-h-screen md:min-h-0 md:rounded-xl md:shadow-sm md:my-0">
         <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold">Notifications</h1>

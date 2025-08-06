@@ -162,8 +162,8 @@ const Partners = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-md mx-auto bg-white min-h-screen">
+    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
+      <div className="max-w-md md:max-w-6xl mx-auto bg-white min-h-screen md:min-h-0 md:rounded-xl md:shadow-sm md:my-0">
         <header className="px-6 pt-8 pb-6 border-b border-gray-100">
           <div className="flex items-center gap-3 mb-1">
             <Link to="/dashboard" className="p-2 hover:bg-gray-100 rounded-lg">

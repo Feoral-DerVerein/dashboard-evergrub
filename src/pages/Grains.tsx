@@ -11,8 +11,8 @@ const Grains = () => {
   const { balance, transactions, loading, refreshData, redeemGrains } = useGrains();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto bg-white min-h-screen">
+    <div className="min-h-screen bg-gray-50 md:flex md:items-center md:justify-center">
+      <div className="max-w-4xl mx-auto bg-white min-h-screen md:min-h-0 md:rounded-xl md:shadow-sm md:my-0">
         {/* Header */}
         <header className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
           <div className="flex items-center justify-between">

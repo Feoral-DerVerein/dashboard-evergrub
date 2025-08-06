@@ -136,9 +136,8 @@ const KPI = () => {
       setIsGeneratingReport(false);
     }
   };
-  return <div className="min-h-screen flex flex-col w-full bg-gray-50">
-      <div className="flex-1">
-        <div className="max-w-md mx-auto bg-white min-h-screen animate-fade-in pb-20">
+  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
+      <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
           <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-4">
@@ -222,7 +221,6 @@ const KPI = () => {
             </div>
           </main>
         </div>
-      </div>
 
       <BottomNav />
     </div>;
