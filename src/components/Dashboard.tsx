@@ -265,71 +265,128 @@ const Dashboard = () => {
 
   return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
       <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
-        <header className="px-6 pt-8 pb-6">
-          <div className="flex justify-between items-center mb-1">
-            <div>
-              <img src="/lovable-uploads/25d0c5fc-4ab3-44dd-8e67-5e06c5a81537.png" alt="WiseBite Logo" className="h-9 w-auto mb-0" />
-              <p className="text-gray-500">Welcome, Felipe</p>
-              <p className="text-gray-400 text-sm">Ortega's account</p>
+        <div className="md:grid md:grid-cols-[220px_1fr]">
+          {/* Sidebar - desktop only */}
+          <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen md:rounded-l-xl">
+            <div className="mb-6 px-2">
+              <img src="/lovable-uploads/25d0c5fc-4ab3-44dd-8e67-5e06c5a81537.png" alt="WiseBite Logo" className="h-8 w-auto" />
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Avatar className="h-12 w-12 cursor-pointer">
-                  <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
-                  <AvatarFallback>O</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="flex items-center gap-2 w-full">
-                    <User className="h-4 w-4" />
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <LogoutButton />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </header>
+            <nav className="space-y-1">
+              <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <Home className="w-4 h-4" />
+                <span>Dashboard</span>
+              </Link>
+              <Link to="/kpi" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <BarChart3 className="w-4 h-4" />
+                <span>Performance</span>
+              </Link>
+              <Link to="/products" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <ShoppingCart className="w-4 h-4" />
+                <span>Products</span>
+              </Link>
+              <Link to="/orders" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <ShoppingBasket className="w-4 h-4" />
+                <span>Orders</span>
+              </Link>
+              <Link to="/sales" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <BarChart3 className="w-4 h-4" />
+                <span>Sales</span>
+              </Link>
+              <Link to="/notifications" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <Bell className="w-4 h-4" />
+                <span>Notifications</span>
+              </Link>
+              <Link to="/ads" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <Megaphone className="w-4 h-4" />
+                <span>Ads</span>
+              </Link>
+              <Link to="/donate" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <Heart className="w-4 h-4" />
+                <span>Donate</span>
+              </Link>
+              <Link to="/grains" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <Coins className="w-4 h-4" />
+                <span>Grains</span>
+              </Link>
+              <Link to="/partners" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <Handshake className="w-4 h-4" />
+                <span>Partners</span>
+              </Link>
+            </nav>
+            <div className="mt-auto pt-4 border-t border-gray-100">
+              <LogoutButton />
+            </div>
+          </aside>
 
-        <main className="px-6 md:grid md:grid-cols-3 md:gap-6">
-          <div className="md:col-span-2">
-            <section className="mb-8">
-              <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
-              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
-                <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
-                <QuickAccessItem icon={ShoppingBasket} label="Orders" to="/orders" badgeCount={orderCount} />
-                <QuickAccessItem icon={BarChart3} label="Sales" to="/sales" />
-                <QuickAccessItem icon={Bell} label="Notifications" to="/notifications" badgeCount={notificationCount} />
-                <QuickAccessItem icon={Megaphone} label="Ads" to="/ads" />
-                <QuickAccessItem icon={Heart} label="Donate" to="/donate" />
-                <QuickAccessItem icon={Coins} label="Grains" to="/grains" badgeCount={stats.totalGrains >= 2000 ? 1 : undefined} />
-                <QuickAccessItem icon={Handshake} label="Partner" to="/partners" />
+          {/* Main content */}
+          <div>
+            <header className="px-6 pt-8 pb-6">
+              <div className="flex justify-between items-center mb-1">
+                <div>
+                  <img src="/lovable-uploads/25d0c5fc-4ab3-44dd-8e67-5e06c5a81537.png" alt="WiseBite Logo" className="h-9 w-auto mb-0" />
+                  <p className="text-gray-500">Welcome, Felipe</p>
+                  <p className="text-gray-400 text-sm">Ortega's account</p>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Avatar className="h-12 w-12 cursor-pointer">
+                      <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
+                      <AvatarFallback>O</AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile" className="flex items-center gap-2 w-full">
+                        <User className="h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <LogoutButton />
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-            </section>
+            </header>
 
-            <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <StatCard label="Total Sales" value={stats.isLoading ? "" : stats.totalSales} trend="12.5%" isLoading={stats.isLoading} />
-              <StatCard label="Active Users" value={stats.isLoading ? "" : stats.activeUsers} trend="18.2%" isLoading={stats.isLoading} />
-              <StatCard label="New Orders" value={stats.isLoading ? "" : stats.newOrders} trend="8.1%" isLoading={stats.isLoading} />
-              <StatCard label="Points Earned" value={stats.isLoading ? "" : `${stats.totalPoints.toLocaleString()}`} trend="15.4%" isLoading={stats.isLoading} />
-            </section>
+            <main className="px-6 md:grid md:grid-cols-3 md:gap-6">
+              <div className="md:col-span-2">
+                <section className="mb-8">
+                  <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
+                  <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
+                    <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
+                    <QuickAccessItem icon={ShoppingBasket} label="Orders" to="/orders" badgeCount={orderCount} />
+                    <QuickAccessItem icon={BarChart3} label="Sales" to="/sales" />
+                    <QuickAccessItem icon={Bell} label="Notifications" to="/notifications" badgeCount={notificationCount} />
+                    <QuickAccessItem icon={Megaphone} label="Ads" to="/ads" />
+                    <QuickAccessItem icon={Heart} label="Donate" to="/donate" />
+                    <QuickAccessItem icon={Coins} label="Grains" to="/grains" badgeCount={stats.totalGrains >= 2000 ? 1 : undefined} />
+                    <QuickAccessItem icon={Handshake} label="Partner" to="/partners" />
+                  </div>
+                </section>
+
+                <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  <StatCard label="Total Sales" value={stats.isLoading ? "" : stats.totalSales} trend="12.5%" isLoading={stats.isLoading} />
+                  <StatCard label="Active Users" value={stats.isLoading ? "" : stats.activeUsers} trend="18.2%" isLoading={stats.isLoading} />
+                  <StatCard label="New Orders" value={stats.isLoading ? "" : stats.newOrders} trend="8.1%" isLoading={stats.isLoading} />
+                  <StatCard label="Points Earned" value={stats.isLoading ? "" : `${stats.totalPoints.toLocaleString()}`} trend="15.4%" isLoading={stats.isLoading} />
+                </section>
+              </div>
+
+              <section className="md:col-span-1">
+                <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
+                <div className="space-y-2">
+                  {isLoading ? <div className="flex items-center justify-center py-6">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
+                    </div> : recentActivity.length > 0 ? recentActivity.map((activity, index) => <RecentActivityItem key={index} {...activity} />) : <p className="text-gray-500 text-center py-4">No recent activity to display</p>}
+                </div>
+              </section>
+            </main>
+
+            <BottomNav />
           </div>
-
-          <section className="md:col-span-1">
-            <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
-            <div className="space-y-2">
-              {isLoading ? <div className="flex items-center justify-center py-6">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
-                </div> : recentActivity.length > 0 ? recentActivity.map((activity, index) => <RecentActivityItem key={index} {...activity} />) : <p className="text-gray-500 text-center py-4">No recent activity to display</p>}
-            </div>
-          </section>
-        </main>
-
-        <BottomNav />
+        </div>
       </div>
     </div>;
 };
