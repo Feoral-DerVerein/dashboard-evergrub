@@ -93,8 +93,9 @@ export const BottomNav = () => {
     orderCount,
     notificationCount
   } = useNotificationsAndOrders();
-  return <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between">
+  return <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between md:hidden">
       <Link to="/dashboard" className="bottom-nav-item">
+
         <Home className="w-6 h-6" />
         <span className="text-xs">Home</span>
       </Link>
@@ -263,7 +264,7 @@ const Dashboard = () => {
   };
 
   return <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="max-w-md mx-auto bg-white min-h-screen animate-fade-in">
+      <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-6 min-h-screen md:min-h-0 animate-fade-in">
         <header className="px-6 pt-8 pb-6">
           <div className="flex justify-between items-center mb-1">
             <div>
@@ -293,30 +294,32 @@ const Dashboard = () => {
           </div>
         </header>
 
-        <main className="px-6">
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
-            <div className="grid grid-cols-3 gap-4">
-              <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
-              <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
-              <QuickAccessItem icon={ShoppingBasket} label="Orders" to="/orders" badgeCount={orderCount} />
-              <QuickAccessItem icon={BarChart3} label="Sales" to="/sales" />
-              <QuickAccessItem icon={Bell} label="Notifications" to="/notifications" badgeCount={notificationCount} />
-              <QuickAccessItem icon={Megaphone} label="Ads" to="/ads" />
-              <QuickAccessItem icon={Heart} label="Donate" to="/donate" />
-              <QuickAccessItem icon={Coins} label="Grains" to="/grains" badgeCount={stats.totalGrains >= 2000 ? 1 : undefined} />
-              <QuickAccessItem icon={Handshake} label="Partner" to="/partners" />
-            </div>
-          </section>
+        <main className="px-6 md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-2">
+            <section className="mb-8">
+              <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <QuickAccessItem icon={Home} label="KPI" to="/kpi" />
+                <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
+                <QuickAccessItem icon={ShoppingBasket} label="Orders" to="/orders" badgeCount={orderCount} />
+                <QuickAccessItem icon={BarChart3} label="Sales" to="/sales" />
+                <QuickAccessItem icon={Bell} label="Notifications" to="/notifications" badgeCount={notificationCount} />
+                <QuickAccessItem icon={Megaphone} label="Ads" to="/ads" />
+                <QuickAccessItem icon={Heart} label="Donate" to="/donate" />
+                <QuickAccessItem icon={Coins} label="Grains" to="/grains" badgeCount={stats.totalGrains >= 2000 ? 1 : undefined} />
+                <QuickAccessItem icon={Handshake} label="Partner" to="/partners" />
+              </div>
+            </section>
 
-          <section className="grid grid-cols-2 gap-4 mb-8">
-            <StatCard label="Total Sales" value={stats.isLoading ? "" : stats.totalSales} trend="12.5%" isLoading={stats.isLoading} />
-            <StatCard label="Active Users" value={stats.isLoading ? "" : stats.activeUsers} trend="18.2%" isLoading={stats.isLoading} />
-            <StatCard label="New Orders" value={stats.isLoading ? "" : stats.newOrders} trend="8.1%" isLoading={stats.isLoading} />
-            <StatCard label="Points Earned" value={stats.isLoading ? "" : `${stats.totalPoints.toLocaleString()}`} trend="15.4%" isLoading={stats.isLoading} />
-          </section>
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <StatCard label="Total Sales" value={stats.isLoading ? "" : stats.totalSales} trend="12.5%" isLoading={stats.isLoading} />
+              <StatCard label="Active Users" value={stats.isLoading ? "" : stats.activeUsers} trend="18.2%" isLoading={stats.isLoading} />
+              <StatCard label="New Orders" value={stats.isLoading ? "" : stats.newOrders} trend="8.1%" isLoading={stats.isLoading} />
+              <StatCard label="Points Earned" value={stats.isLoading ? "" : `${stats.totalPoints.toLocaleString()}`} trend="15.4%" isLoading={stats.isLoading} />
+            </section>
+          </div>
 
-          <section>
+          <section className="md:col-span-1">
             <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
             <div className="space-y-2">
               {isLoading ? <div className="flex items-center justify-center py-6">
