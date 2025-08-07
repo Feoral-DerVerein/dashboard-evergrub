@@ -230,183 +230,183 @@ const Products = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
-      <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
-        <div className="px-6 pt-8">
-          <div className="flex justify-between items-center mb-2">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-              <p className="text-gray-500">Manage your Saffire Freycinet products</p>
-            </div>
-            <Link
-              to="/products/add"
-              className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm"
-            >
-              <Plus className="w-4 h-4" />
-              Add Product
-            </Link>
+    <>
+      <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+            <p className="text-gray-500">Manage your Saffire Freycinet products</p>
           </div>
+          <Link
+            to="/products/add"
+            className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add Product
+          </Link>
+        </div>
+      </header>
 
-          <div className="mb-6">
-            <QuickInventory 
-              products={products} 
-              onUpdateQuantities={handleUpdateQuantities}
-            />
-          </div>
-
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search products..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Total Products</p>
-              <p className="text-2xl font-bold">{products.length}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Out of Stock</p>
-              <p className="text-2xl font-bold text-red-500">
-                {products.filter(p => p.quantity === 0).length}
-              </p>
-            </div>
-          </div>
-
-          <div className="mb-6 overflow-x-auto">
-            <div className="flex gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
-                    selectedCategory === category
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-            </div>
-          ) : error ? (
-            <div className="text-center py-20">
-              <p className="text-red-500 mb-4">{error}</p>
-              <button
-                onClick={handleRetry}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                Retry Loading
-              </button>
-            </div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-gray-500">No products available</p>
-              <Link
-                to="/products/add"
-                className="inline-block mt-4 text-green-600 hover:text-green-700"
-              >
-                Add a product
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              {filteredProducts.map((product) => (
-                <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
-                  <div className="relative">
-                    <img
-                      src={product.image || "/placeholder.svg"}
-                      alt={product.name}
-                      className="w-full h-32 object-cover"
-                      onError={(e) => {
-                        console.error("Image failed to load:", product.image);
-                        (e.target as HTMLImageElement).src = "/placeholder.svg";
-                      }}
-                    />
-                    <div className="absolute top-2 right-2">
-                      <PointsBadge price={product.price} variant="default" />
-                    </div>
-                    <div className="absolute bottom-2 left-2">
-                      <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                        product.quantity > 10 
-                          ? 'bg-green-100 text-green-800' 
-                          : product.quantity > 0 
-                          ? 'bg-yellow-100 text-yellow-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        Stock: {product.quantity}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="p-3">
-                    <div className="mb-2">
-                      <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">
-                        {product.name}
-                      </h3>
-                      <p className="text-xs text-gray-500 mb-1">{product.category}</p>
-                      <p className="text-lg font-bold text-green-600">
-                        ${product.price.toFixed(2)}
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex gap-1">
-                        <Link
-                          to={`/products/edit/${product.id}`}
-                          className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
-                        >
-                          <Edit className="w-3 h-3" />
-                          Edit
-                        </Link>
-                        <button
-                          onClick={() => product.id && handleDeleteProduct(product.id)}
-                          className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                          Delete
-                        </button>
-                      </div>
-                      
-                      <button
-                        onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)}
-                        disabled={notifyingProductId === product.id}
-                        className="w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <Bell className="w-3 h-3" />
-                        {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
-                      </button>
-                      
-                      <button
-                        onClick={() => product.id && handleNotifyShops(product.id, product.name)}
-                        disabled={notifyingShopsProductId === product.id}
-                        className="w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-purple-600 bg-purple-50 rounded hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <Store className="w-3 h-3" />
-                        {notifyingShopsProductId === product.id ? "Notifying..." : "Notify Shops"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+      <main className="px-6 py-4">
+        <div className="mb-6">
+          <QuickInventory 
+            products={products} 
+            onUpdateQuantities={handleUpdateQuantities}
+          />
         </div>
 
-        <BottomNav />
-      </div>
-    </div>
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search products..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <p className="text-sm font-medium text-gray-500">Total Products</p>
+            <p className="text-2xl font-bold">{products.length}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Out of Stock</p>
+            <p className="text-2xl font-bold text-red-500">
+              {products.filter(p => p.quantity === 0).length}
+            </p>
+          </div>
+        </div>
+
+        <div className="mb-6 overflow-x-auto">
+          <div className="flex gap-2">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
+                  selectedCategory === category
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <p className="text-red-500 mb-4">{error}</p>
+            <button
+              onClick={handleRetry}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Retry Loading
+            </button>
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-gray-500">No products available</p>
+            <Link
+              to="/products/add"
+              className="inline-block mt-4 text-green-600 hover:text-green-700"
+            >
+              Add a product
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            {filteredProducts.map((product) => (
+              <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                <div className="relative">
+                  <img
+                    src={product.image || "/placeholder.svg"}
+                    alt={product.name}
+                    className="w-full h-32 object-cover"
+                    onError={(e) => {
+                      console.error("Image failed to load:", product.image);
+                      (e.target as HTMLImageElement).src = "/placeholder.svg";
+                    }}
+                  />
+                  <div className="absolute top-2 right-2">
+                    <PointsBadge price={product.price} variant="default" />
+                  </div>
+                  <div className="absolute bottom-2 left-2">
+                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                      product.quantity > 10 
+                        ? 'bg-green-100 text-green-800' 
+                        : product.quantity > 0 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      Stock: {product.quantity}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="p-3">
+                  <div className="mb-2">
+                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                    <p className="text-lg font-bold text-green-600">
+                      ${product.price.toFixed(2)}
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex gap-1">
+                      <Link
+                        to={`/products/edit/${product.id}`}
+                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+                      >
+                        <Edit className="w-3 h-3" />
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => product.id && handleDeleteProduct(product.id)}
+                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Delete
+                      </button>
+                    </div>
+                    
+                    <button
+                      onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)}
+                      disabled={notifyingProductId === product.id}
+                      className="w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Bell className="w-3 h-3" />
+                      {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
+                    </button>
+                    
+                    <button
+                      onClick={() => product.id && handleNotifyShops(product.id, product.name)}
+                      disabled={notifyingShopsProductId === product.id}
+                      className="w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-purple-600 bg-purple-50 rounded hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Store className="w-3 h-3" />
+                      {notifyingShopsProductId === product.id ? "Notifying..." : "Notify Shops"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+
+      <BottomNav />
+    </>
   );
 };
 

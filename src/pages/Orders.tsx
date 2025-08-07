@@ -286,37 +286,53 @@ const Orders = () => {
         </CardFooter>
       </Card>;
   };
-  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
-      <div className="max-w-md md:max-w-6xl mx-auto bg-white min-h-screen md:min-h-0 md:rounded-xl md:shadow-sm md:my-0 pb-20 md:pb-0">
-        <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
-          <div className="flex items-center justify-between gap-3 mb-6">
-            <h1 className="text-2xl font-bold">Orders</h1>
-            
+  return (
+    <>
+      <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <h1 className="text-2xl font-bold">Orders</h1>
+          
+        </div>
+        <div className="flex justify-between items-center">
+          <p className="text-gray-500">
+            {isLoading ? "Loading orders..." : `${orders.length} Orders`}
+          </p>
+        </div>
+      </header>
+
+      <main className="px-6 py-4">
+        {isLoading ? (
+          <div className="flex justify-center py-10">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
           </div>
-          <div className="flex justify-between items-center">
-            <p className="text-gray-500">
-              {isLoading ? "Loading orders..." : `${orders.length} Orders`}
+        ) : orders.length > 0 ? (
+          viewMode === "cards" ? (
+            <div className="space-y-4">
+              {orders.map(order => (
+                <OrderCard key={order.id} order={order} />
+              ))}
+            </div>
+          ) : (
+            <OrdersTable
+              orders={orders}
+              onViewDetails={handleViewDetails}
+              onStatusChange={handleStatusChange}
+            />
+          )
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <Package className="h-16 w-16 text-gray-300 mb-4" />
+            <p className="text-gray-500 font-medium mb-2">No orders found</p>
+            <p className="text-gray-400 text-sm max-w-xs">
+              New orders will appear here when customers make purchases.
             </p>
           </div>
-        </header>
+        )}
+      </main>
 
-        <main className="px-6 py-4">
-          {isLoading ? <div className="flex justify-center py-10">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-            </div> : orders.length > 0 ? viewMode === "cards" ? <div className="space-y-4">
-                {orders.map(order => <OrderCard key={order.id} order={order} />)}
-              </div> : <OrdersTable orders={orders} onViewDetails={handleViewDetails} onStatusChange={handleStatusChange} /> : <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Package className="h-16 w-16 text-gray-300 mb-4" />
-              <p className="text-gray-500 font-medium mb-2">No orders found</p>
-              <p className="text-gray-400 text-sm max-w-xs">
-                New orders will appear here when customers make purchases.
-              </p>
-            </div>}
-        </main>
-
-        <OrderDetailsDialog />
-        <BottomNav />
-      </div>
-    </div>;
+      <OrderDetailsDialog />
+      <BottomNav />
+    </>
+  );
 };
 export default Orders;

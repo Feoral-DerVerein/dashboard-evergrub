@@ -131,49 +131,57 @@ const Sales = () => {
       </div>
     </Card>;
 
-  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
-      <div className="max-w-md md:max-w-6xl mx-auto bg-white min-h-screen md:min-h-0 md:rounded-xl md:shadow-sm md:my-0 pb-20 md:pb-0">
-        <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
-          <div className="flex items-center justify-between gap-3 mb-6">
-            <h1 className="text-2xl font-bold">Sales</h1>
-            <div className="flex gap-2 bg-gray-100 p-1 rounded-md">
-              <Button variant="default" size="sm" className="">
-                <List className="h-4 w-4 mr-1" />
-                Cards
-              </Button>
-            </div>
+  return (
+    <>
+      <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <h1 className="text-2xl font-bold">Sales</h1>
+          <div className="flex gap-2 bg-gray-100 p-1 rounded-md">
+            <Button variant="default" size="sm" className="">
+              <List className="h-4 w-4 mr-1" />
+              Cards
+            </Button>
           </div>
-          <div className="flex justify-between items-center">
-            <p className="text-gray-500">
-              {isLoading ? "Loading sales..." : `${sales.length} Sales`}
+        </div>
+        <div className="flex justify-between items-center">
+          <p className="text-gray-500">
+            {isLoading ? "Loading sales..." : `${sales.length} Sales`}
+          </p>
+        </div>
+      </header>
+
+      <main className="px-6 py-4">
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <StatCard label="Today Revenue" value={`$${todaySales.total.toFixed(2)}`} icon={DollarSign} trend="12.5%" />
+          <StatCard label="Today Orders" value={todaySales.count} icon={Package} trend="8.3%" />
+          <StatCard label="Monthly Revenue" value={`$${monthlySales.total.toFixed(2)}`} icon={BarChart3} trend="22.3%" />
+          <StatCard label="Total Orders" value={sales.length} icon={Receipt} />
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center py-10">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+          </div>
+        ) : sales.length > 0 ? (
+          <div className="space-y-4">
+            {sales.map(sale => (
+              <SaleCard key={sale.id} sale={sale} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <Receipt className="h-16 w-16 text-gray-300 mb-4" />
+            <p className="text-gray-500 font-medium mb-2">No sales found</p>
+            <p className="text-gray-400 text-sm max-w-xs">
+              Completed orders will appear here as sales records.
             </p>
           </div>
-        </header>
+        )}
+      </main>
 
-        <main className="px-6 py-4">
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <StatCard label="Today Revenue" value={`$${todaySales.total.toFixed(2)}`} icon={DollarSign} trend="12.5%" />
-            <StatCard label="Today Orders" value={todaySales.count} icon={Package} trend="8.3%" />
-            <StatCard label="Monthly Revenue" value={`$${monthlySales.total.toFixed(2)}`} icon={BarChart3} trend="22.3%" />
-            <StatCard label="Total Orders" value={sales.length} icon={Receipt} />
-          </div>
-
-          {isLoading ? <div className="flex justify-center py-10">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-            </div> : sales.length > 0 ? <div className="space-y-4">
-                {sales.map(sale => <SaleCard key={sale.id} sale={sale} />)}
-              </div> : <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Receipt className="h-16 w-16 text-gray-300 mb-4" />
-              <p className="text-gray-500 font-medium mb-2">No sales found</p>
-              <p className="text-gray-400 text-sm max-w-xs">
-                Completed orders will appear here as sales records.
-              </p>
-            </div>}
-        </main>
-
-        <BottomNav />
-      </div>
-    </div>;
+      <BottomNav />
+    </>
+  );
 };
 
 export default Sales;
