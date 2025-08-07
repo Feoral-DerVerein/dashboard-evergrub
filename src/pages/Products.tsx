@@ -256,10 +256,10 @@ const [importOpen, setImportOpen] = useState(false);
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem asChild>
-                  <Link to="/products/add">Agregar individual</Link>
+                  <Link to="/products/add">Add single product</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setImportOpen(true)}>
-                  Importar desde Excel o lista
+                  Import from Excel or list
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
