@@ -294,7 +294,6 @@ const QuickInventory = ({
       return item;
     }));
   };
-
   const setPrice = (productId: number, price: number) => {
     const numPrice = Math.max(0, parseFloat(price.toString()) || 0);
     setInventory(prev => prev.map(item => {
@@ -331,9 +330,7 @@ const QuickInventory = ({
     }));
   };
   const handleSave = () => {
-    const updates = inventory.filter(item => 
-      item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price
-    ).map(item => ({
+    const updates = inventory.filter(item => item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price).map(item => ({
       id: item.product.id!,
       quantity: item.newQuantity,
       price: item.newPrice
@@ -343,9 +340,7 @@ const QuickInventory = ({
     }
     setOpen(false);
   };
-  const hasChanges = inventory.some(item => 
-    item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price
-  );
+  const hasChanges = inventory.some(item => item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price);
   const minibarHasChanges = minibarItems.some(item => item.quantity > 0);
   const groupedMinibarItems = minibarItems.reduce((acc, item) => {
     if (!acc[item.category]) {
@@ -356,14 +351,7 @@ const QuickInventory = ({
   }, {} as Record<string, MinibarItem[]>);
   return <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
-          variant="outline" 
-          size={compact ? "sm" : "default"} 
-          className={`flex items-center gap-2 ${compact ? "" : "w-full"}`}
-        >
-          <Package className="w-4 h-4" />
-          Quick Inventory Update
-        </Button>
+        
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-4 border-b">
@@ -412,9 +400,7 @@ const QuickInventory = ({
                   <div>
                     <p className="text-sm text-gray-500">Products Changed</p>
                     <p className="text-2xl font-bold text-blue-600">
-                      {inventory.filter(item => 
-                        item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price
-                      ).length}
+                      {inventory.filter(item => item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price).length}
                     </p>
                   </div>
                 </div>
@@ -438,11 +424,9 @@ const QuickInventory = ({
                       </div>
                       
                       {/* Change Indicator */}
-                      {(item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price) && 
-                        <div className="text-right">
+                      {(item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price) && <div className="text-right">
                           <p className="text-xs text-blue-600 font-medium">Changed</p>
-                        </div>
-                      }
+                        </div>}
                     </div>
 
                     {/* Controls Row */}
@@ -453,13 +437,7 @@ const QuickInventory = ({
                         <Button variant="outline" size="sm" onClick={() => updateQuantity(item.product.id!, -1)} disabled={item.newQuantity <= 0} className="h-7 w-7 p-0">
                           <Minus className="w-3 h-3" />
                         </Button>
-                        <Input 
-                          type="number" 
-                          min="0" 
-                          value={item.newQuantity} 
-                          onChange={e => setQuantity(item.product.id!, parseInt(e.target.value) || 0)} 
-                          className="w-16 text-center text-sm h-7" 
-                        />
+                        <Input type="number" min="0" value={item.newQuantity} onChange={e => setQuantity(item.product.id!, parseInt(e.target.value) || 0)} className="w-16 text-center text-sm h-7" />
                         <Button variant="outline" size="sm" onClick={() => updateQuantity(item.product.id!, 1)} className="h-7 w-7 p-0">
                           <Plus className="w-3 h-3" />
                         </Button>
@@ -470,14 +448,7 @@ const QuickInventory = ({
                         <label className="text-xs text-gray-500 min-w-[35px]">Price:</label>
                         <div className="flex items-center">
                           <span className="text-xs text-gray-500 mr-1">$</span>
-                          <Input 
-                            type="number" 
-                            min="0" 
-                            step="0.01"
-                            value={item.newPrice} 
-                            onChange={e => setPrice(item.product.id!, parseFloat(e.target.value) || 0)} 
-                            className="w-20 text-center text-sm h-7" 
-                          />
+                          <Input type="number" min="0" step="0.01" value={item.newPrice} onChange={e => setPrice(item.product.id!, parseFloat(e.target.value) || 0)} className="w-20 text-center text-sm h-7" />
                         </div>
                       </div>
                     </div>
@@ -545,9 +516,7 @@ const QuickInventory = ({
               </Button>
               <Button onClick={handleSave} disabled={!hasChanges && !minibarHasChanges || showMinibarSheet && !selectedRoom} className="bg-green-600 hover:bg-green-700 flex items-center gap-2">
                 <Save className="w-4 h-4" />
-                Save Changes ({!showMinibarSheet ? inventory.filter(item => 
-                  item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price
-                ).length : minibarItems.filter(item => item.quantity > 0).length})
+                Save Changes ({!showMinibarSheet ? inventory.filter(item => item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price).length : minibarItems.filter(item => item.quantity > 0).length})
               </Button>
             </div>
           </div>
