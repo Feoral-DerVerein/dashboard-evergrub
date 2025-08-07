@@ -12,6 +12,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { productService, Product } from "@/services/productService";
 import { partnersService, Partner } from "@/services/partnersService";
 import { useAuth } from "@/context/AuthContext";
+import { AIRecommendations } from "@/components/AIRecommendations";
 const salesData = [{
   day: "Mon",
   value: 2500
@@ -179,9 +180,9 @@ const KPI = () => {
             </div>
           </header>
 
-          <main className="px-6 md:grid md:grid-cols-3 md:gap-6">
-            {/* Moved right column content above the chart */}
-            <section className="md:col-span-3 space-y-6 mt-6 md:mt-0">
+          <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
+            {/* First column - Stock Alerts and metrics */}
+            <section className="md:col-span-1 space-y-6 mt-6 md:mt-0 md:order-1 order-2">
               <div>
                 <h3 className="text-lg font-semibold mb-4">Stock Alerts</h3>
                 <div className="space-y-2">
@@ -277,7 +278,8 @@ const KPI = () => {
               </div>
             </section>
 
-            <div className="md:col-span-2 space-y-6 mt-6 md:mt-0">
+            {/* Second column - Main dashboard content */}
+            <div className="md:col-span-2 space-y-6 mt-6 md:mt-0 md:order-2 order-1">
               {/* Time Filters */}
               <div className="flex gap-2 overflow-x-auto pb-2">
                 <TimeFilterButton label="Today" isActive={activeTimeFilter === "Today"} onClick={() => handleTimeFilterClick("Today")} />
@@ -325,6 +327,11 @@ const KPI = () => {
                 </div>
               </div>
             </div>
+
+            {/* Third column - AI Recommendations */}
+            <aside className="md:col-span-1 mt-6 md:mt-0 md:order-3 order-3">
+              <AIRecommendations />
+            </aside>
           </main>
         </div>
 
