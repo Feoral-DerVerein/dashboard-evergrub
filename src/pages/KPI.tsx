@@ -226,6 +226,16 @@ const KPI = () => {
               </div>
 
               <div>
+                <h3 className="text-lg font-semibold mb-4">AI Predictive Insights</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <SustainabilityCard label="Top Selling Product" value="Organic Apples" subtext="95% sell-through rate" />
+                  <SustainabilityCard label="Overstocked Item" value="Canned Beans" subtext="32 units excess" />
+                  <SustainabilityCard label="Demand Forecast" value="+15%" subtext="Next week prediction" />
+                  <SustainabilityCard label="Optimal Reorder" value="3 days" subtext="For bread products" />
+                </div>
+              </div>
+
+              <div>
                 <h3 className="text-lg font-semibold mb-4">Expiring Soon</h3>
                 <div className="space-y-2">
                   {products.filter(p => ((): number => { const d = new Date(p.expirationDate); return isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); })() <= 14).length === 0 ? (
