@@ -258,10 +258,7 @@ const Dashboard = () => {
               <img src="/lovable-uploads/25d0c5fc-4ab3-44dd-8e67-5e06c5a81537.png" alt="WiseBite Logo" className="h-8 w-auto" />
             </div>
             <nav className="space-y-1">
-              <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                <Home className="w-4 h-4" />
-                <span>Dashboard</span>
-              </Link>
+              
               <Link to="/kpi" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                 <BarChart3 className="w-4 h-4" />
                 <span>Performance</span>
