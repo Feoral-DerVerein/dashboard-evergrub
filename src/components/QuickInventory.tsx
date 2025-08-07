@@ -1,22 +1,26 @@
 import { useState, useEffect } from "react";
-import { Package, Plus, Minus, Save, X } from "lucide-react";
+import { Package, Plus, Minus, Save, X, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Product } from "@/services/productService";
+import { calculateProductPoints, formatPoints } from "@/utils/pointsCalculator";
+import PointsBadge from "@/components/PointsBadge";
 interface QuickInventoryProps {
   products: Product[];
   onUpdateQuantities: (updates: {
     id: number;
     quantity: number;
+    price?: number;
   }[]) => void;
   compact?: boolean;
 }
 interface InventoryItem {
   product: Product;
   newQuantity: number;
+  newPrice: number;
 }
 interface MinibarItem {
   name: string;
@@ -260,7 +264,8 @@ const QuickInventory = ({
     if (open && products.length > 0) {
       const inventoryItems = products.map(product => ({
         product,
-        newQuantity: product.quantity
+        newQuantity: product.quantity,
+        newPrice: product.price
       }));
       setInventory(inventoryItems);
     }
@@ -284,6 +289,19 @@ const QuickInventory = ({
         return {
           ...item,
           newQuantity: numQuantity
+        };
+      }
+      return item;
+    }));
+  };
+
+  const setPrice = (productId: number, price: number) => {
+    const numPrice = Math.max(0, parseFloat(price.toString()) || 0);
+    setInventory(prev => prev.map(item => {
+      if (item.product.id === productId) {
+        return {
+          ...item,
+          newPrice: numPrice
         };
       }
       return item;
@@ -313,16 +331,21 @@ const QuickInventory = ({
     }));
   };
   const handleSave = () => {
-    const updates = inventory.filter(item => item.newQuantity !== item.product.quantity).map(item => ({
+    const updates = inventory.filter(item => 
+      item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price
+    ).map(item => ({
       id: item.product.id!,
-      quantity: item.newQuantity
+      quantity: item.newQuantity,
+      price: item.newPrice
     }));
     if (updates.length > 0) {
       onUpdateQuantities(updates);
     }
     setOpen(false);
   };
-  const hasChanges = inventory.some(item => item.newQuantity !== item.product.quantity);
+  const hasChanges = inventory.some(item => 
+    item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price
+  );
   const minibarHasChanges = minibarItems.some(item => item.quantity > 0);
   const groupedMinibarItems = minibarItems.reduce((acc, item) => {
     if (!acc[item.category]) {
@@ -389,7 +412,9 @@ const QuickInventory = ({
                   <div>
                     <p className="text-sm text-gray-500">Products Changed</p>
                     <p className="text-2xl font-bold text-blue-600">
-                      {inventory.filter(item => item.newQuantity !== item.product.quantity).length}
+                      {inventory.filter(item => 
+                        item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price
+                      ).length}
                     </p>
                   </div>
                 </div>
@@ -399,35 +424,62 @@ const QuickInventory = ({
             {/* Products List */}
             <div className="flex-1 overflow-y-auto space-y-3">
               {inventory.map(item => <Card key={item.product.id} className="p-3 hover:shadow-md transition-shadow">
-                  <div className="flex items-center justify-between">
-                    {/* Product Info */}
-                    <div className="flex-1">
-                      <h3 className="font-medium text-xs">{item.product.name}</h3>
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <span className={item.product.category === "Restaurant" ? "text-orange-600" : "text-purple-600"}>
-                          {item.product.category}
-                        </span>
+                  <div className="space-y-3">
+                    {/* Product Info Header */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-medium text-sm">{item.product.name}</h3>
+                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                          <span className={item.product.category === "Restaurant" ? "text-orange-600" : "text-purple-600"}>
+                            {item.product.category}
+                          </span>
+                          <PointsBadge price={item.newPrice} size="sm" />
+                        </div>
                       </div>
-                    </div>
-                    
-                    {/* Quantity Controls */}
-                    <div className="flex items-center gap-3">
-                      <Button variant="outline" size="sm" onClick={() => updateQuantity(item.product.id!, -1)} disabled={item.newQuantity <= 0} className="h-8 w-8 p-0">
-                        <Minus className="w-4 h-4" />
-                      </Button>
-                      
-                      <Input type="number" min="0" value={item.newQuantity} onChange={e => setQuantity(item.product.id!, parseInt(e.target.value) || 0)} className="w-20 text-center font-semibold" />
-                      
-                      <Button variant="outline" size="sm" onClick={() => updateQuantity(item.product.id!, 1)} className="h-8 w-8 p-0">
-                        <Plus className="w-4 h-4" />
-                      </Button>
                       
                       {/* Change Indicator */}
-                      {item.newQuantity !== item.product.quantity && <div className="text-right min-w-[60px] ml-2">
-                          <p className="text-xs text-blue-600 font-medium">
-                            Changed
-                          </p>
-                        </div>}
+                      {(item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price) && 
+                        <div className="text-right">
+                          <p className="text-xs text-blue-600 font-medium">Changed</p>
+                        </div>
+                      }
+                    </div>
+
+                    {/* Controls Row */}
+                    <div className="flex items-center gap-4">
+                      {/* Quantity Controls */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-gray-500 min-w-[40px]">Qty:</label>
+                        <Button variant="outline" size="sm" onClick={() => updateQuantity(item.product.id!, -1)} disabled={item.newQuantity <= 0} className="h-7 w-7 p-0">
+                          <Minus className="w-3 h-3" />
+                        </Button>
+                        <Input 
+                          type="number" 
+                          min="0" 
+                          value={item.newQuantity} 
+                          onChange={e => setQuantity(item.product.id!, parseInt(e.target.value) || 0)} 
+                          className="w-16 text-center text-sm h-7" 
+                        />
+                        <Button variant="outline" size="sm" onClick={() => updateQuantity(item.product.id!, 1)} className="h-7 w-7 p-0">
+                          <Plus className="w-3 h-3" />
+                        </Button>
+                      </div>
+                      
+                      {/* Price Controls */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-gray-500 min-w-[35px]">Price:</label>
+                        <div className="flex items-center">
+                          <span className="text-xs text-gray-500 mr-1">$</span>
+                          <Input 
+                            type="number" 
+                            min="0" 
+                            step="0.01"
+                            value={item.newPrice} 
+                            onChange={e => setPrice(item.product.id!, parseFloat(e.target.value) || 0)} 
+                            className="w-20 text-center text-sm h-7" 
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </Card>)}
@@ -493,7 +545,9 @@ const QuickInventory = ({
               </Button>
               <Button onClick={handleSave} disabled={!hasChanges && !minibarHasChanges || showMinibarSheet && !selectedRoom} className="bg-green-600 hover:bg-green-700 flex items-center gap-2">
                 <Save className="w-4 h-4" />
-                Save Changes ({!showMinibarSheet ? inventory.filter(item => item.newQuantity !== item.product.quantity).length : minibarItems.filter(item => item.quantity > 0).length})
+                Save Changes ({!showMinibarSheet ? inventory.filter(item => 
+                  item.newQuantity !== item.product.quantity || item.newPrice !== item.product.price
+                ).length : minibarItems.filter(item => item.quantity > 0).length})
               </Button>
             </div>
           </div>

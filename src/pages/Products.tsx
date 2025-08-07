@@ -93,13 +93,16 @@ const [importOpen, setImportOpen] = useState(false);
     }
   };
 
-  const handleUpdateQuantities = async (updates: { id: number; quantity: number }[]) => {
+  const handleUpdateQuantities = async (updates: { id: number; quantity: number; price?: number }[]) => {
     try {
-      // Update each product quantity
+      // Update each product quantity and price
       const updatePromises = updates.map(async (update) => {
-        const updatedProduct = await productService.updateProduct(update.id, {
-          quantity: update.quantity
-        });
+        const updateData: any = { quantity: update.quantity };
+        if (update.price !== undefined) {
+          updateData.price = update.price;
+        }
+        
+        const updatedProduct = await productService.updateProduct(update.id, updateData);
         return updatedProduct;
       });
 
@@ -110,7 +113,11 @@ const [importOpen, setImportOpen] = useState(false);
         prevProducts.map(product => {
           const update = updates.find(u => u.id === product.id);
           if (update) {
-            return { ...product, quantity: update.quantity };
+            const updatedProduct = { ...product, quantity: update.quantity };
+            if (update.price !== undefined) {
+              updatedProduct.price = update.price;
+            }
+            return updatedProduct;
           }
           return product;
         })
