@@ -232,10 +232,10 @@ const KPI = () => {
             {/* Right column */}
             <section className="md:col-span-1 space-y-6 mt-6 md:mt-0">
               <div>
-                <h3 className="text-lg font-semibold mb-4">Alertas de stock</h3>
+                <h3 className="text-lg font-semibold mb-4">Stock Alerts</h3>
                 <div className="space-y-2">
                   {products.filter(p => p.quantity > 0 && p.quantity <= 5).length === 0 ? (
-                    <p className="text-sm text-gray-500">Sin alertas</p>
+                    <p className="text-sm text-gray-500">No alerts</p>
                   ) : (
                     products.filter(p => p.quantity > 0 && p.quantity <= 5).slice(0,5).map(item => (
                       <div key={item.id} className="bg-yellow-50 p-3 rounded-lg flex items-center justify-between">
@@ -259,6 +259,14 @@ const KPI = () => {
               </div>
 
               <div>
+                <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <SustainabilityCard label="Cost Savings" value="$1,240" subtext="+14% vs last month" />
+                  <SustainabilityCard label="Food Waste Reduced" value="36 kg" subtext="+9% vs last month" />
+                </div>
+              </div>
+
+              <div>
                 <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <InsightCard label="Conversion Rate" value="24.8%" trend="2.1%" />
@@ -270,7 +278,7 @@ const KPI = () => {
                 <h3 className="text-lg font-semibold mb-4">Expiring Soon</h3>
                 <div className="space-y-2">
                   {products.filter(p => ((): number => { const d = new Date(p.expirationDate); return isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); })() <= 14).length === 0 ? (
-                    <p className="text-sm text-gray-500">Sin productos por caducar pronto</p>
+                    <p className="text-sm text-gray-500">No items expiring soon</p>
                   ) : (
                     products
                       .filter(p => { const d = new Date(p.expirationDate); const days = isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); return days <= 14; })
@@ -281,7 +289,7 @@ const KPI = () => {
                           key={item.id}
                           name={item.name}
                           expires={`${((): number => { const d = new Date(item.expirationDate); return isNaN(d.getTime()) ? 0 : Math.max(0, Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24))); })()} days`}
-                          quantity={`${item.quantity} uds`}
+                          quantity={`${item.quantity} units`}
                           severity={((): "high" | "medium" | "low" => { const d = new Date(item.expirationDate); const days = isNaN(d.getTime()) ? 999 : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); return days <= 3 ? 'high' : days <= 7 ? 'medium' : 'low'; })()}
                         />
                       ))
@@ -290,10 +298,10 @@ const KPI = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-4">Proveedores</h3>
+                <h3 className="text-lg font-semibold mb-4">Suppliers</h3>
                 <div className="space-y-2">
                   {partners.length === 0 ? (
-                    <p className="text-sm text-gray-500">Aún no hay proveedores</p>
+                    <p className="text-sm text-gray-500">No suppliers yet</p>
                   ) : (
                     partners.slice(0,3).map(p => (
                       <div key={p.id} className="bg-white border border-gray-100 p-3 rounded-lg">
@@ -304,7 +312,7 @@ const KPI = () => {
                     ))
                   )}
                 </div>
-                <Link to="/partners" className="text-sm text-blue-600 hover:underline inline-block mt-2">Gestionar proveedores</Link>
+                <Link to="/partners" className="text-sm text-blue-600 hover:underline inline-block mt-2">Manage suppliers</Link>
               </div>
             </section>
           </main>
