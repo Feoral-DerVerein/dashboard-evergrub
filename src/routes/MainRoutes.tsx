@@ -1,7 +1,7 @@
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import Index from "@/pages/Index";
+
 import Profile from "@/pages/Profile";
 import Products from "@/pages/Products";
 import AddProduct from "@/pages/AddProduct";
@@ -43,7 +43,7 @@ const MainRoutes = () => {
       
       {/* Protected routes - only accessible when logged in */}
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-        <Route path="/dashboard" element={<Index />} />
+        <Route path="/dashboard" element={<Navigate to="/kpi" replace />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/add" element={<AddProduct />} />
@@ -64,7 +64,7 @@ const MainRoutes = () => {
       
       {/* Default redirects */}
       <Route path="/" element={
-        user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+        user ? <Navigate to="/kpi" replace /> : <Navigate to="/login" replace />
       } />
       
       {/* 404 page */}
