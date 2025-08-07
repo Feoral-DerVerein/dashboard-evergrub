@@ -9,7 +9,7 @@ const AppLayout = () => {
   return (
     <div className="min-h-screen bg-gray-50 md:flex md:items-center md:justify-center">
       <div className="w-full max-w-7xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0">
-        <div className="md:grid md:grid-cols-[220px_1fr]">
+        <div className={isDashboard ? "" : "md:grid md:grid-cols-[220px_1fr]"}>
           {/* Sidebar - hide on dashboard to avoid duplication (dashboard already renders its own) */}
           {!isDashboard && (
             <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen md:rounded-l-xl">
