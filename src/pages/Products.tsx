@@ -329,7 +329,7 @@ const Products = () => {
                   <img
                     src={product.image || "/placeholder.svg"}
                     alt={product.name}
-                    className="w-full h-32 object-cover"
+                    className="w-full h-24 object-cover"
                     onError={(e) => {
                       console.error("Image failed to load:", product.image);
                       (e.target as HTMLImageElement).src = "/placeholder.svg";
