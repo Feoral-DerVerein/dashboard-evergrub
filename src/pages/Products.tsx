@@ -322,14 +322,14 @@ const Products = () => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredProducts.map((product) => (
               <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
                 <div className="relative">
                   <img
                     src={product.image || "/placeholder.svg"}
                     alt={product.name}
-                    className="w-full h-24 object-cover"
+                    className="w-full h-20 object-cover"
                     onError={(e) => {
                       console.error("Image failed to load:", product.image);
                       (e.target as HTMLImageElement).src = "/placeholder.svg";
@@ -351,29 +351,29 @@ const Products = () => {
                   </div>
                 </div>
                 
-                <div className="p-3">
+                <div className="p-2">
                   <div className="mb-2">
                     <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">
                       {product.name}
                     </h3>
                     <p className="text-xs text-gray-500 mb-1">{product.category}</p>
-                    <p className="text-lg font-bold text-green-600">
+                    <p className="text-sm font-semibold text-green-600">
                       ${product.price.toFixed(2)}
                     </p>
                   </div>
                   
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <div className="flex gap-1">
                       <Link
                         to={`/products/edit/${product.id}`}
-                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
                       >
                         <Edit className="w-3 h-3" />
                         Edit
                       </Link>
                       <button
                         onClick={() => product.id && handleDeleteProduct(product.id)}
-                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
                       >
                         <Trash2 className="w-3 h-3" />
                         Delete
@@ -383,7 +383,7 @@ const Products = () => {
                     <button
                       onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)}
                       disabled={notifyingProductId === product.id}
-                      className="w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Bell className="w-3 h-3" />
                       {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
@@ -392,7 +392,7 @@ const Products = () => {
                     <button
                       onClick={() => product.id && handleNotifyShops(product.id, product.name)}
                       disabled={notifyingShopsProductId === product.id}
-                      className="w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-purple-600 bg-purple-50 rounded hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-purple-600 bg-purple-50 rounded hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Store className="w-3 h-3" />
                       {notifyingShopsProductId === product.id ? "Notifying..." : "Notify Shops"}
