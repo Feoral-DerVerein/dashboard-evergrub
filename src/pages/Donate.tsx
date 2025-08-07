@@ -64,7 +64,7 @@ const CharityCard = ({
           <CardDescription>{charity.description}</CardDescription>
         </CardHeader>
         <CardFooter>
-          <Button onClick={handleOpenForm} className="w-full bg-emerald-700 hover:bg-emerald-600">
+          <Button onClick={handleOpenForm} size="sm" className="w-auto">
             Donate
           </Button>
         </CardFooter>
@@ -102,8 +102,10 @@ const Donate = () => {
             </p>
           </div>
 
-          <div className="space-y-4">
-            {charities.map(charity => <CharityCard key={charity.name} charity={charity} />)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {charities.map((charity) => (
+              <CharityCard key={charity.name} charity={charity} />
+            ))}
           </div>
         </main>
 
