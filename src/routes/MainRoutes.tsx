@@ -26,6 +26,7 @@ import Plus from "@/pages/Plus";
 import NotFound from "@/pages/NotFound";
 import AuthRoute from "@/components/auth/AuthRoutes";
 import ProtectedRoute from "@/components/auth/ProtectedRoutes";
+import AppLayout from "@/components/layout/AppLayout";
 
 const MainRoutes = () => {
   const { user } = useAuth();
@@ -41,23 +42,25 @@ const MainRoutes = () => {
       <Route path="/plus" element={<AuthRoute><Plus /></AuthRoute>} />
       
       {/* Protected routes - only accessible when logged in */}
-      <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
-      <Route path="/products/add" element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
-      <Route path="/products/edit/:id" element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
-      <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
-      <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-      <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-      <Route path="/kpi" element={<ProtectedRoute><KPI /></ProtectedRoute>} />
-      <Route path="/ads" element={<ProtectedRoute><Ads /></ProtectedRoute>} />
-      <Route path="/ads/create" element={<ProtectedRoute><CreateAd /></ProtectedRoute>} />
-      <Route path="/donate" element={<ProtectedRoute><Donate /></ProtectedRoute>} />
-      <Route path="/grains" element={<ProtectedRoute><Grains /></ProtectedRoute>} />
-      <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-      <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
-      <Route path="/payment" element={<ProtectedRoute><PaymentPortal /></ProtectedRoute>} />
-      <Route path="/partners" element={<ProtectedRoute><Partners /></ProtectedRoute>} />
+      <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+        <Route path="/dashboard" element={<Index />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/add" element={<AddProduct />} />
+        <Route path="/products/edit/:id" element={<AddProduct />} />
+        <Route path="/sales" element={<Sales />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/kpi" element={<KPI />} />
+        <Route path="/ads" element={<Ads />} />
+        <Route path="/ads/create" element={<CreateAd />} />
+        <Route path="/donate" element={<Donate />} />
+        <Route path="/grains" element={<Grains />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/payment" element={<PaymentPortal />} />
+        <Route path="/partners" element={<Partners />} />
+      </Route>
       
       {/* Default redirects */}
       <Route path="/" element={
