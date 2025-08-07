@@ -180,7 +180,7 @@ const KPI = () => {
           </header>
 
           <main className="px-6 md:grid md:grid-cols-3 md:gap-6">
-            <div className="md:col-span-2 space-y-6">
+            <div className="order-2 md:order-1 md:col-span-2 space-y-6 mt-6 md:mt-0">
               {/* Time Filters */}
               <div className="flex gap-2 overflow-x-auto pb-2">
                 <TimeFilterButton label="Today" isActive={activeTimeFilter === "Today"} onClick={() => handleTimeFilterClick("Today")} />
