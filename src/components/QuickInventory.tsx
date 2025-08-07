@@ -12,6 +12,7 @@ interface QuickInventoryProps {
     id: number;
     quantity: number;
   }[]) => void;
+  compact?: boolean;
 }
 interface InventoryItem {
   product: Product;
@@ -239,7 +240,8 @@ const MINIBAR_REPLENISHMENT_ITEMS: MinibarItem[] = [
 }];
 const QuickInventory = ({
   products,
-  onUpdateQuantities
+  onUpdateQuantities,
+  compact
 }: QuickInventoryProps) => {
   const [open, setOpen] = useState(false);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
@@ -331,7 +333,11 @@ const QuickInventory = ({
   }, {} as Record<string, MinibarItem[]>);
   return <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2 w-full">
+        <Button 
+          variant="outline" 
+          size={compact ? "sm" : "default"} 
+          className={`flex items-center gap-2 ${compact ? "" : "w-full"}`}
+        >
           <Package className="w-4 h-4" />
           Quick Inventory Update
         </Button>

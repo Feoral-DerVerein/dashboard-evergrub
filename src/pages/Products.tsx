@@ -9,6 +9,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { wishlistService } from "@/services/wishlistService";
 import PointsBadge from "@/components/PointsBadge";
 import QuickInventory from "@/components/QuickInventory";
+import BulkImportProductsDialog from "@/components/BulkImportProductsDialog";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const categories = ["All", "Restaurant", "SPA Products"];
 
@@ -20,8 +22,9 @@ const Products = () => {
   const [error, setError] = useState<string | null>(null);
   const [notifyingProductId, setNotifyingProductId] = useState<number | null>(null);
   const [notifyingShopsProductId, setNotifyingShopsProductId] = useState<number | null>(null);
-  const { user } = useAuth();
-  const { toast } = useToast();
+const { user } = useAuth();
+const { toast } = useToast();
+const [importOpen, setImportOpen] = useState(false);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -243,16 +246,32 @@ const Products = () => {
               onUpdateQuantities={handleUpdateQuantities}
               compact
             />
-            <Link
-              to="/products/add"
-              className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm"
-            >
-              <Plus className="w-4 h-4" />
-              Add Product
-            </Link>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm">
+                  <Plus className="w-4 h-4" />
+                  Add Product
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link to="/products/add">Agregar individual</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setImportOpen(true)}>
+                  Importar desde Excel o lista
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
+
+      <BulkImportProductsDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onImported={(newProducts) => setProducts(prev => [...newProducts, ...prev])}
+      />
 
       <main className="px-6 py-4">
 
