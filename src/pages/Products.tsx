@@ -1,5 +1,5 @@
 
-import { Search, Plus, Edit, Trash2, Bell, Store } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -25,6 +25,7 @@ const Products = () => {
 const { user } = useAuth();
 const { toast } = useToast();
 const [importOpen, setImportOpen] = useState(false);
+const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null>(null);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -179,6 +180,29 @@ const [importOpen, setImportOpen] = useState(false);
       });
     } finally {
       setNotifyingShopsProductId(null);
+    }
+  };
+
+  const handleToggleMarketplaceVisibility = async (product: Product) => {
+    if (!product.id) return;
+    const id = product.id;
+    setTogglingMarketplaceId(id);
+    try {
+      const updated = await productService.updateProduct(id, { isMarketplaceVisible: !(product as any).isMarketplaceVisible });
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, isMarketplaceVisible: (updated as any).isMarketplaceVisible } : p));
+      toast({
+        title: (updated as any).isMarketplaceVisible ? "Visible en marketplace" : "Oculto del marketplace",
+        description: `${product.name} ahora ${(updated as any).isMarketplaceVisible ? "aparece" : "no aparece"} en WiseBite`
+      });
+    } catch (error: any) {
+      console.error("Error toggling marketplace visibility:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo cambiar la visibilidad: " + (error.message || "Error desconocido"),
+        variant: "destructive"
+      });
+    } finally {
+      setTogglingMarketplaceId(null);
     }
   };
 
@@ -353,6 +377,15 @@ const [importOpen, setImportOpen] = useState(false);
             {filteredProducts.map((product) => (
               <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
                 <div className="relative">
+                  <button
+                    onClick={() => handleToggleMarketplaceVisibility(product)}
+                    disabled={togglingMarketplaceId === product.id}
+                    className="absolute top-2 left-2 z-10 bg-white/90 backdrop-blur px-2 py-1 rounded-md shadow-sm border border-gray-200 text-gray-700 hover:bg-white disabled:opacity-60"
+                    aria-label={((product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace")}
+                    title={((product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace")}
+                  >
+                    {((product as any).isMarketplaceVisible) ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                  </button>
                   <img
                     src={product.image || "/placeholder.svg"}
                     alt={product.name}

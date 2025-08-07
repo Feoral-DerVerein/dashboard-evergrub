@@ -113,10 +113,11 @@ export const productService = {
   // Get all products (for marketplace)
   async getAllProducts(): Promise<Product[]> {
     try {
-      console.log("Fetching all products");
+      console.log("Fetching all products visible in marketplace");
       const { data, error } = await supabase
         .from('products')
-        .select('*');
+        .select('*')
+        .eq('is_marketplace_visible', true);
       
       if (error) {
         console.error("Error fetching all products:", error);
@@ -277,6 +278,7 @@ export const productService = {
     if (updates.brand !== undefined) dbUpdates.brand = updates.brand;
     if (updates.quantity !== undefined) dbUpdates.quantity = updates.quantity;
     if (updates.expirationDate !== undefined) dbUpdates.expirationdate = updates.expirationDate;
+    if ((updates as any).isMarketplaceVisible !== undefined) (dbUpdates as any).is_marketplace_visible = (updates as any).isMarketplaceVisible;
     
     // Handle empty image to prevent upload errors
     if (updates.image !== undefined) {
