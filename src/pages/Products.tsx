@@ -237,23 +237,24 @@ const Products = () => {
             <h1 className="text-2xl font-bold text-gray-900">Products</h1>
             <p className="text-gray-500">Manage your Saffire Freycinet products</p>
           </div>
-          <Link
-            to="/products/add"
-            className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Add Product
-          </Link>
+          <div className="flex items-center gap-2">
+            <QuickInventory 
+              products={products} 
+              onUpdateQuantities={handleUpdateQuantities}
+              compact
+            />
+            <Link
+              to="/products/add"
+              className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add Product
+            </Link>
+          </div>
         </div>
       </header>
 
       <main className="px-6 py-4">
-        <div className="mb-6">
-          <QuickInventory 
-            products={products} 
-            onUpdateQuantities={handleUpdateQuantities}
-          />
-        </div>
 
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />

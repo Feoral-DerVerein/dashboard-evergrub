@@ -10,6 +10,7 @@ import { Product } from "@/services/productService";
 interface QuickInventoryProps {
   products: Product[];
   onUpdateQuantities: (updates: { id: number; quantity: number }[]) => void;
+  compact?: boolean;
 }
 
 interface InventoryItem {
@@ -86,7 +87,7 @@ const MINIBAR_REPLENISHMENT_ITEMS: MinibarItem[] = [
   { name: "Art of Tea Salamanca Blend", category: "TEA/COFFEE", quantity: 0 },
 ];
 
-const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) => {
+const QuickInventory = ({ products, onUpdateQuantities, compact }: QuickInventoryProps) => {
   const [open, setOpen] = useState(false);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [minibarItems, setMinibarItems] = useState<MinibarItem[]>(MINIBAR_REPLENISHMENT_ITEMS);
@@ -176,7 +177,7 @@ const QuickInventory = ({ products, onUpdateQuantities }: QuickInventoryProps) =
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2 w-full">
+        <Button variant="outline" className={compact ? "flex items-center gap-2 px-3 py-2 text-sm" : "flex items-center gap-2 w-full"}>
           <Package className="w-4 h-4" />
           Quick Inventory Update
         </Button>
