@@ -1,14 +1,12 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 
 const AppLayout = () => {
-  const location = useLocation();
-  const isDashboard = location.pathname === "/dashboard";
 
   return (
     <div className="min-h-screen bg-gray-50 md:flex md:items-center md:justify-center">
-      <div className="w-full md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0">
+      <div className="w-full max-w-7xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0">
         <div className="md:grid md:grid-cols-[220px_1fr]">
           {/* Sidebar - hide on dashboard to avoid duplication (dashboard already renders its own) */}
           {!isDashboard && (
