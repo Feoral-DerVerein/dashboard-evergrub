@@ -250,26 +250,38 @@ const KPI = () => {
 
             {/* Right column - KPI groups in a single row */}
             <section className="md:col-span-3 order-1 md:order-0 mt-6">
-              <div className="grid md:grid-cols-3 gap-6">
-                <div>
+              <div className="grid md:grid-cols-3 gap-6 items-stretch">
+                <div className="h-full flex flex-col">
                   <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
-                  <div className="grid grid-cols-1 gap-4 items-stretch">
-                    <SustainabilityCard label="CO₂ Saved" value="246 kg" subtext="+18% vs last week" />
-                    <SustainabilityCard label="Waste Reduced" value="85%" subtext="Target: 90%" />
+                  <div className="flex-1 grid grid-rows-2 gap-4">
+                    <div className="flex-1">
+                      <SustainabilityCard label="CO₂ Saved" value="246 kg" subtext="+18% vs last week" />
+                    </div>
+                    <div className="flex-1">
+                      <SustainabilityCard label="Waste Reduced" value="85%" subtext="Target: 90%" />
+                    </div>
                   </div>
                 </div>
-                <div>
+                <div className="h-full flex flex-col">
                   <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
-                  <div className="grid grid-cols-1 gap-4 items-stretch">
-                    <InsightCard label="Conversion Rate" value="24.8%" trend="2.1%" />
-                    <InsightCard label="Return Rate" value="6.8%" trend="5.3%" />
+                  <div className="flex-1 grid grid-rows-2 gap-4">
+                    <div className="flex-1">
+                      <InsightCard label="Conversion Rate" value="24.8%" trend="2.1%" />
+                    </div>
+                    <div className="flex-1">
+                      <InsightCard label="Return Rate" value="6.8%" trend="5.3%" />
+                    </div>
                   </div>
                 </div>
-                <div>
+                <div className="h-full flex flex-col">
                   <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
-                  <div className="grid grid-cols-1 gap-4 items-stretch">
-                    <SustainabilityCard label="Cost Savings" value="$1,240" subtext="+14% vs last month" />
-                    <SustainabilityCard label="Food Waste Reduced" value="36 kg" subtext="+9% vs last month" />
+                  <div className="flex-1 grid grid-rows-2 gap-4">
+                    <div className="flex-1">
+                      <SustainabilityCard label="Cost Savings" value="$1,240" subtext="+14% vs last month" />
+                    </div>
+                    <div className="flex-1">
+                      <SustainabilityCard label="Food Waste Reduced" value="36 kg" subtext="+9% vs last month" />
+                    </div>
                   </div>
                 </div>
               </div>
