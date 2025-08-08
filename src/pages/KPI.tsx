@@ -56,7 +56,7 @@ const MetricCard = ({
   value: string;
   label: string;
   trend?: string;
-}) => <div className="bg-white rounded-xl p-4 shadow-sm">
+}) => <div className="bg-white rounded-xl p-4 shadow-sm h-full min-h-28 flex flex-col justify-between">
     <div className="flex items-center gap-2 mb-1">
       <Icon className="w-4 h-4 text-blue-500" />
       <span className="text-gray-500 text-sm">{label}</span>
@@ -74,7 +74,7 @@ const SustainabilityCard = ({
   label: string;
   value: string;
   subtext: string;
-}) => <div className="bg-white rounded-xl p-4 shadow-sm">
+}) => <div className="bg-white rounded-xl p-4 shadow-sm h-full min-h-28 flex flex-col justify-between">
     <div className="flex items-center gap-2 mb-3">
       <span className="text-gray-600">{label}</span>
     </div>
@@ -91,7 +91,7 @@ const InsightCard = ({
   label: string;
   value: string;
   trend: string;
-}) => <div className="bg-white rounded-xl p-4 shadow-sm">
+}) => <div className="bg-white rounded-xl p-4 shadow-sm h-full min-h-28 flex flex-col justify-between">
     <div className="text-gray-500 mb-2">{label}</div>
     <div className="flex items-baseline gap-2">
       <span className="text-2xl font-semibold">{value}</span>
@@ -204,7 +204,7 @@ const KPI = () => {
 
               <div>
                 <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 items-stretch">
                   <SustainabilityCard label="CO₂ Saved" value="246 kg" subtext="+18% vs last week" />
                   <SustainabilityCard label="Waste Reduced" value="85%" subtext="Target: 90%" />
                 </div>
@@ -212,7 +212,7 @@ const KPI = () => {
 
               <div>
                 <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 items-stretch">
                   <SustainabilityCard label="Cost Savings" value="$1,240" subtext="+14% vs last month" />
                   <SustainabilityCard label="Food Waste Reduced" value="36 kg" subtext="+9% vs last month" />
                 </div>
@@ -220,7 +220,7 @@ const KPI = () => {
 
               <div>
                 <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 items-stretch">
                   <InsightCard label="Conversion Rate" value="24.8%" trend="2.1%" />
                   <InsightCard label="Return Rate" value="6.8%" trend="5.3%" />
                 </div>
@@ -228,7 +228,7 @@ const KPI = () => {
 
               <div>
                 <h3 className="text-lg font-semibold mb-4">AI Predictive Insights</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 items-stretch">
                   <SustainabilityCard label="Top Selling Product" value="Organic Apples" subtext="95% sell-through rate" />
                   <SustainabilityCard label="Overstocked Item" value="Canned Beans" subtext="32 units excess" />
                   <SustainabilityCard label="Demand Forecast" value="+15%" subtext="Next week prediction" />
