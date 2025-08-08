@@ -16,14 +16,40 @@ interface BulkImportProductsDialogProps {
   onImported?: (created: Product[]) => void;
 }
 
-// Minimal column mapping helper
-const getVal = (row: any, keys: string[], fallback: any = "") => {
-  for (const k of keys) {
-    if (row[k] !== undefined && row[k] !== null && String(row[k]).length > 0) return row[k];
-  }
-  return fallback;
-};
+  // Minimal column mapping helper
+  const getVal = (row: any, keys: string[], fallback: any = "") => {
+    for (const k of keys) {
+      if (row[k] !== undefined && row[k] !== null && String(row[k]).length > 0) return row[k];
+    }
+    return fallback;
+  };
 
+  // Header normalization helpers (to tolerate accents, spaces, symbols and case)
+  const normalizeKey = (s: string) =>
+    String(s)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // remove accents
+      .toLowerCase()
+      .replace(/[\s_\-\/]+/g, "") // collapse separators
+      .replace(/[^a-z0-9]/g, ""); // strip non-alphanumerics
+
+  // Common header synonyms (normalized)
+  const NAME_KEYS = ["name", "nombre", "producto", "product", "item", "titulo"];
+  const PRICE_KEYS = ["price", "precio", "preciounitario", "unitprice", "coste", "costo"];
+  const QTY_KEYS = ["quantity", "qty", "cantidad", "stock", "unidades"];
+  const CATEGORY_KEYS = ["category", "categoria", "rubro", "tipo", "seccion"];
+  const BRAND_KEYS = ["brand", "marca"];
+  const DESC_KEYS = ["description", "descripcion", "detalle", "notas"];
+  const BARCODE_KEYS = ["barcode", "ean", "sku", "codigo", "codigodebarras"];
+  const IMAGE_KEYS = ["image", "imagen", "urlimagen", "foto", "photo", "picture"];
+  const EXPIRATION_KEYS = [
+    "expirationdate",
+    "expiration_date",
+    "fechavencimiento",
+    "caducidad",
+    "vencimiento",
+    "fechadecaducidad"
+  ];
 export default function BulkImportProductsDialog({ open, onOpenChange, onImported }: BulkImportProductsDialogProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -35,16 +61,40 @@ export default function BulkImportProductsDialog({ open, onOpenChange, onImporte
   const canImport = useMemo(() => parsed.length > 0 && !!user?.id, [parsed.length, user?.id]);
 
   const mapRowToProduct = (row: any): Product | null => {
-    const name = String(getVal(row, ["name", "Name", "nombre", "Nombre", "product", "Product"]).trim());
+    // Build a normalized key->value map for robust header matching
+    const normalizedRow: Record<string, any> = {};
+    Object.keys(row || {}).forEach((k) => {
+      normalizedRow[normalizeKey(k)] = row[k];
+    });
+
+    const getSmart = (keys: string[], fallback: any = "") => {
+      // Try original keys first
+      const direct = getVal(row, keys, "__MISSING__");
+      if (direct !== "__MISSING__") return direct;
+
+      // Then try normalized keys
+      for (const key of keys) {
+        const nk = normalizeKey(key);
+        if (normalizedRow[nk] !== undefined && normalizedRow[nk] !== null && String(normalizedRow[nk]).length > 0) {
+          return normalizedRow[nk];
+        }
+      }
+      return fallback;
+    };
+
+    const nameRaw = getSmart(NAME_KEYS, "");
+    const name = String(String(nameRaw).trim());
     if (!name) return null;
-    const price = Number(getVal(row, ["price", "Price", "precio", "Precio"], 0)) || 0;
-    const quantity = Number(getVal(row, ["quantity", "Quantity", "qty", "Qty"], 0)) || 0;
-    const category = String(getVal(row, ["category", "Category", "categoria", "Categoría"], "General"));
-    const brand = String(getVal(row, ["brand", "Brand"], ""));
-    const description = String(getVal(row, ["description", "Description", "descripcion", "Descripción"], ""));
-    const barcode = String(getVal(row, ["barcode", "Barcode", "EAN", "SKU"], "")) || undefined;
-    const expirationDate = String(getVal(row, ["expirationDate", "expiration_date", "caducidad", "vencimiento"], ""));
-    const image = String(getVal(row, ["image", "Image", "imagen"], "/placeholder.svg"));
+
+    const price = Number(getSmart(PRICE_KEYS, 0)) || 0;
+    const quantity = Number(getSmart(QTY_KEYS, 0)) || 0;
+    const category = String(getSmart(CATEGORY_KEYS, "General"));
+    const brand = String(getSmart(BRAND_KEYS, ""));
+    const description = String(getSmart(DESC_KEYS, ""));
+    const barcodeVal = String(getSmart(BARCODE_KEYS, "")).trim();
+    const barcode = barcodeVal ? barcodeVal : undefined;
+    const expirationDate = String(getSmart(EXPIRATION_KEYS, ""));
+    const image = String(getSmart(IMAGE_KEYS, "/placeholder.svg"));
 
     if (!user?.id) return null;
 
@@ -66,13 +116,28 @@ export default function BulkImportProductsDialog({ open, onOpenChange, onImporte
 
   const handleFile = async (file: File) => {
     try {
-      const data = await file.arrayBuffer();
-      const wb = XLSX.read(data, { type: "array" });
+      const ext = file.name.split(".").pop()?.toLowerCase();
+      let wb: XLSX.WorkBook;
+
+      if (ext === "csv") {
+        // CSV must be read as text
+        const text = await file.text();
+        wb = XLSX.read(text, { type: "string" });
+      } else {
+        // XLSX/XLS as ArrayBuffer
+        const data = await file.arrayBuffer();
+        wb = XLSX.read(data, { type: "array" });
+      }
+
       const ws = wb.Sheets[wb.SheetNames[0]];
       const rows: any[] = XLSX.utils.sheet_to_json(ws, { defval: "" });
       const mapped = rows.map(mapRowToProduct).filter(Boolean) as Product[];
       setParsed(mapped);
-      toast({ title: "Archivo cargado", description: `${mapped.length} productos detectados` });
+      toast({
+        title: "Archivo cargado",
+        description: mapped.length > 0 ? `${mapped.length} productos detectados` : "No se detectaron productos. Revisa los encabezados (ej.: nombre, precio, cantidad).",
+        variant: mapped.length > 0 ? "default" : "destructive",
+      });
     } catch (e: any) {
       console.error(e);
       toast({ title: "Error al leer el archivo", description: e?.message || "Revisa el formato", variant: "destructive" });
