@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { productService, Product } from "@/services/productService";
+import { productImageSuggestService } from "@/services/productImageSuggestService";
+import { productImageService } from "@/services/productImageService";
 import { useAuth } from "@/context/AuthContext";
 import { Upload, FileSpreadsheet, ListChecks } from "lucide-react";
 import * as XLSX from "xlsx";
-
 interface BulkImportProductsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -108,7 +109,20 @@ export default function BulkImportProductsDialog({ open, onOpenChange, onImporte
       const created: Product[] = [];
       for (const p of parsed) {
         try {
-          const c = await productService.createProduct(p);
+          let imageToUse = (p.image || '').trim();
+          if (!imageToUse || imageToUse === '/placeholder.svg') {
+            const suggested = await productImageSuggestService.suggestImage(p.barcode, p.name);
+            if (suggested && user?.id) {
+              const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+              try {
+                imageToUse = await productImageService.uploadImageFromUrl(suggested, path);
+              } catch (e) {
+                console.warn('Upload from URL failed for', p.name, e);
+              }
+            }
+          }
+
+          const c = await productService.createProduct({ ...p, image: imageToUse || p.image });
           created.push(c);
         } catch (e) {
           console.error("Error creando producto", p.name, e);

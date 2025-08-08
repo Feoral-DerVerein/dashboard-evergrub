@@ -6,7 +6,8 @@ import { useAuth } from "@/context/AuthContext";
 import { productService, Product, SAFFIRE_FREYCINET_STORE_ID } from "@/services/productService";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
+import { productImageSuggestService } from "@/services/productImageSuggestService";
+import { productImageService } from "@/services/productImageService";
 type ProductFormData = {
   name: string;
   price: string;
@@ -454,6 +455,22 @@ const AddProduct = () => {
         throw new Error("Please enter a valid price");
       }
       
+      // Intento automático de imagen sugerida si no se cargó una
+      let finalImage = (formData.image || "").trim();
+      if (!finalImage) {
+        try {
+          const suggestedUrl = await productImageSuggestService.suggestImage(formData.barcode || undefined, formData.name.trim());
+          if (suggestedUrl && user?.id) {
+            const filePath = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(2, 15)}.jpg`;
+            const uploadedUrl = await productImageService.uploadImageFromUrl(suggestedUrl, filePath);
+            finalImage = uploadedUrl;
+            setPreviewImage(uploadedUrl);
+          }
+        } catch (e) {
+          console.warn('No suggested image found or upload failed:', e);
+        }
+      }
+
       const productData: Product = {
         name: formData.name.trim(),
         price: parseFloat(formData.price),
@@ -463,11 +480,10 @@ const AddProduct = () => {
         brand: brandToUse,
         quantity: parseInt(formData.quantity) || 1,
         expirationDate: formData.expirationDate,
-        image: formData.image || "",
+        image: finalImage,
         userId: user.id,
         storeId: SAFFIRE_FREYCINET_STORE_ID
       };
-      
       console.log("Submitting product with data:", productData);
       
       let result;
