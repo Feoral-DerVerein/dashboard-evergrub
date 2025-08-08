@@ -13,28 +13,62 @@ import { productService, Product } from "@/services/productService";
 import { partnersService, Partner } from "@/services/partnersService";
 import { useAuth } from "@/context/AuthContext";
 import { AIRecommendations } from "@/components/AIRecommendations";
-const salesData = [{
-  day: "Mon",
-  value: 2500
-}, {
-  day: "Tue",
-  value: 1500
-}, {
-  day: "Wed",
-  value: 3500
-}, {
-  day: "Thu",
-  value: 4000
-}, {
-  day: "Fri",
-  value: 4500
-}, {
-  day: "Sat",
-  value: 4000
-}, {
-  day: "Sun",
-  value: 4200
-}];
+const chartDataSamples: Record<TimeFilterPeriod, { label: string; value: number }[]> = {
+  Today: [
+    { label: "9AM", value: 200 },
+    { label: "10AM", value: 320 },
+    { label: "11AM", value: 450 },
+    { label: "12PM", value: 600 },
+    { label: "1PM", value: 520 },
+    { label: "2PM", value: 680 },
+    { label: "3PM", value: 740 },
+    { label: "4PM", value: 820 },
+    { label: "5PM", value: 900 }
+  ],
+  Week: [
+    { label: "Mon", value: 2500 },
+    { label: "Tue", value: 1500 },
+    { label: "Wed", value: 3500 },
+    { label: "Thu", value: 4000 },
+    { label: "Fri", value: 4500 },
+    { label: "Sat", value: 4000 },
+    { label: "Sun", value: 4200 }
+  ],
+  Month: [
+    { label: "W1", value: 8200 },
+    { label: "W2", value: 9100 },
+    { label: "W3", value: 8800 },
+    { label: "W4", value: 9800 }
+  ],
+  Quarter: [
+    { label: "W1", value: 3000 },
+    { label: "W2", value: 3600 },
+    { label: "W3", value: 4200 },
+    { label: "W4", value: 3900 },
+    { label: "W5", value: 4400 },
+    { label: "W6", value: 4800 },
+    { label: "W7", value: 5100 },
+    { label: "W8", value: 5300 },
+    { label: "W9", value: 5500 },
+    { label: "W10", value: 5700 },
+    { label: "W11", value: 5900 },
+    { label: "W12", value: 6100 }
+  ],
+  Year: [
+    { label: "Jan", value: 12000 },
+    { label: "Feb", value: 11500 },
+    { label: "Mar", value: 14000 },
+    { label: "Apr", value: 13500 },
+    { label: "May", value: 15000 },
+    { label: "Jun", value: 14500 },
+    { label: "Jul", value: 16000 },
+    { label: "Aug", value: 15800 },
+    { label: "Sep", value: 14900 },
+    { label: "Oct", value: 15500 },
+    { label: "Nov", value: 16200 },
+    { label: "Dec", value: 17000 }
+  ]
+};
 const TimeFilterButton = ({
   label,
   isActive = false,
@@ -133,6 +167,8 @@ const KPI = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loadingInventory, setLoadingInventory] = useState(true);
 
+  // Derived chart data from active period
+  const chartData = chartDataSamples[activeTimeFilter] ?? chartDataSamples["Week"];
   const handleTimeFilterClick = (filter: TimeFilterPeriod) => {
     setActiveTimeFilter(filter);
   };
@@ -326,8 +362,8 @@ const KPI = () => {
               <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
               <div className="bg-white rounded-xl p-4 h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={salesData}>
-                    <XAxis dataKey="day" />
+                  <AreaChart data={chartData}>
+                    <XAxis dataKey="label" />
                     <YAxis />
                     <Area type="monotone" dataKey="value" stroke="#2563eb" fill="#dbeafe" strokeWidth={2} />
                   </AreaChart>
