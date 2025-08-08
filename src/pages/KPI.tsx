@@ -279,7 +279,7 @@ const KPI = () => {
             </section>
 
             {/* Third column - AI Recommendations */}
-            <aside className="md:col-span-3 mt-6 md:mt-0 md:order-2 order-3">
+            <aside className="md:col-span-4 order-1 md:order-0 mt-0 mb-6">
               <AIRecommendations />
             </aside>
           </main>

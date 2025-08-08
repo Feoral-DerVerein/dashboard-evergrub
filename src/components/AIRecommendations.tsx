@@ -91,7 +91,7 @@ const RecommendationCard = ({ recommendation }: { recommendation: AIRecommendati
 
 export const AIRecommendations = () => {
   return (
-    <div className="space-y-4 max-w-sm">
+    <div className="space-y-4 w-full">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">AI Recommendations</h3>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -99,7 +99,7 @@ export const AIRecommendations = () => {
           Updated today
         </div>
       </div>
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {recommendations.map((recommendation) => (
           <RecommendationCard 
             key={recommendation.id} 
