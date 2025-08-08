@@ -91,7 +91,7 @@ const RecommendationCard = ({ recommendation }: { recommendation: AIRecommendati
 
 export const AIRecommendations = () => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-sm">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">AI Recommendations</h3>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
