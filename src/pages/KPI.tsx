@@ -278,59 +278,59 @@ const KPI = () => {
               </div>
             </section>
 
-            {/* Second column - Main dashboard content */}
-            <div className="md:col-span-2 space-y-6 mt-6 md:mt-0 md:order-2 order-1">
-              {/* Time Filters */}
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                <TimeFilterButton label="Today" isActive={activeTimeFilter === "Today"} onClick={() => handleTimeFilterClick("Today")} />
-                <TimeFilterButton label="Week" isActive={activeTimeFilter === "Week"} onClick={() => handleTimeFilterClick("Week")} />
-                <TimeFilterButton label="Month" isActive={activeTimeFilter === "Month"} onClick={() => handleTimeFilterClick("Month")} />
-                <TimeFilterButton label="Quarter" isActive={activeTimeFilter === "Quarter"} onClick={() => handleTimeFilterClick("Quarter")} />
-                <TimeFilterButton label="Year" isActive={activeTimeFilter === "Year"} onClick={() => handleTimeFilterClick("Year")} />
-              </div>
-
-              {/* KPI Metrics */}
-              <div className="grid grid-cols-2 gap-4">
-                <MetricCard icon={AreaChart} value="$2,458" label="Total Sales" trend="12.5%" />
-                <MetricCard icon={Lock} value="186" label="Transactions" trend="8.2%" />
-              </div>
-
-              {/* Download */}
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
-                <Download className="w-5 h-5" />
-                {isGeneratingReport ? "Generating Report..." : "Download Report"}
-              </Button>
-
-              <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
-                <div className="flex items-center justify-center gap-1">
-                  <span>2.4 MB</span>
-                  <span>•</span>
-                  <span>PDF Document</span>
-                </div>
-                <div className="flex items-center justify-center gap-1">
-                  <Lock className="w-4 h-4" />
-                  <span>This file is secure and encrypted</span>
-                </div>
-              </div>
-            </div>
-
             {/* Third column - AI Recommendations */}
-            <aside className="md:col-span-1 mt-6 md:mt-0 md:order-3 order-3">
+            <aside className="md:col-span-3 mt-6 md:mt-0 md:order-2 order-3">
               <AIRecommendations />
             </aside>
           </main>
 
-          {/* Sales Performance Chart - Moved to bottom */}
-          <section className="px-6 mt-8 mb-8">
-            <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
-            <div className="bg-white rounded-xl p-4 h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={salesData}>
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Area type="monotone" dataKey="value" stroke="#2563eb" fill="#dbeafe" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
+          {/* Main dashboard content and chart - Moved to bottom */}
+          <section className="px-6 mt-8 mb-8 space-y-6">
+            {/* Time Filters */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              <TimeFilterButton label="Today" isActive={activeTimeFilter === "Today"} onClick={() => handleTimeFilterClick("Today")} />
+              <TimeFilterButton label="Week" isActive={activeTimeFilter === "Week"} onClick={() => handleTimeFilterClick("Week")} />
+              <TimeFilterButton label="Month" isActive={activeTimeFilter === "Month"} onClick={() => handleTimeFilterClick("Month")} />
+              <TimeFilterButton label="Quarter" isActive={activeTimeFilter === "Quarter"} onClick={() => handleTimeFilterClick("Quarter")} />
+              <TimeFilterButton label="Year" isActive={activeTimeFilter === "Year"} onClick={() => handleTimeFilterClick("Year")} />
+            </div>
+
+            {/* KPI Metrics */}
+            <div className="grid grid-cols-2 gap-4 max-w-lg">
+              <MetricCard icon={AreaChart} value="$2,458" label="Total Sales" trend="12.5%" />
+              <MetricCard icon={Lock} value="186" label="Transactions" trend="8.2%" />
+            </div>
+
+            {/* Sales Performance Chart */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
+              <div className="bg-white rounded-xl p-4 h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={salesData}>
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Area type="monotone" dataKey="value" stroke="#2563eb" fill="#dbeafe" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Download */}
+            <Button className="w-full max-w-lg bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
+              <Download className="w-5 h-5" />
+              {isGeneratingReport ? "Generating Report..." : "Download Report"}
+            </Button>
+
+            <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
+              <div className="flex items-center justify-center gap-1">
+                <span>2.4 MB</span>
+                <span>•</span>
+                <span>PDF Document</span>
+              </div>
+              <div className="flex items-center justify-center gap-1">
+                <Lock className="w-4 h-4" />
+                <span>This file is secure and encrypted</span>
+              </div>
             </div>
           </section>
         </div>
