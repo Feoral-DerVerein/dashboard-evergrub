@@ -182,7 +182,7 @@ const KPI = () => {
 
           <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
             {/* First column - Stock Alerts and metrics */}
-            <section className="md:col-span-1 space-y-6 mt-6 md:mt-0 md:order-1 order-2">
+            <section className="md:col-span-1 space-y-6 mt-6 md:mt-0 md:order-0 order-1">
               <div>
                 <h3 className="text-lg font-semibold mb-4">Stock Alerts</h3>
                 <div className="space-y-2">
@@ -202,39 +202,9 @@ const KPI = () => {
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
-                <div className="grid grid-cols-2 gap-4 items-stretch">
-                  <SustainabilityCard label="CO₂ Saved" value="246 kg" subtext="+18% vs last week" />
-                  <SustainabilityCard label="Waste Reduced" value="85%" subtext="Target: 90%" />
-                </div>
-              </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
-                <div className="grid grid-cols-2 gap-4 items-stretch">
-                  <SustainabilityCard label="Cost Savings" value="$1,240" subtext="+14% vs last month" />
-                  <SustainabilityCard label="Food Waste Reduced" value="36 kg" subtext="+9% vs last month" />
-                </div>
-              </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
-                <div className="grid grid-cols-2 gap-4 items-stretch">
-                  <InsightCard label="Conversion Rate" value="24.8%" trend="2.1%" />
-                  <InsightCard label="Return Rate" value="6.8%" trend="5.3%" />
-                </div>
-              </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-4">AI Predictive Insights</h3>
-                <div className="grid grid-cols-2 gap-4 items-stretch">
-                  <SustainabilityCard label="Top Selling Product" value="Organic Apples" subtext="95% sell-through rate" />
-                  <SustainabilityCard label="Overstocked Item" value="Canned Beans" subtext="32 units excess" />
-                  <SustainabilityCard label="Demand Forecast" value="+15%" subtext="Next week prediction" />
-                  <SustainabilityCard label="Optimal Reorder" value="3 days" subtext="For bread products" />
-                </div>
-              </div>
 
               <div>
                 <h3 className="text-lg font-semibold mb-4">Expiring Soon</h3>
@@ -278,8 +248,46 @@ const KPI = () => {
               </div>
             </section>
 
-            {/* Third column - AI Recommendations */}
-            <aside className="md:col-span-4 order-1 md:order-0 mt-0 mb-6">
+            {/* Right column - KPI groups in a single row */}
+            <section className="md:col-span-3 order-1 md:order-0 mt-6">
+              <div className="grid md:grid-cols-3 gap-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
+                  <div className="grid grid-cols-1 gap-4 items-stretch">
+                    <SustainabilityCard label="CO₂ Saved" value="246 kg" subtext="+18% vs last week" />
+                    <SustainabilityCard label="Waste Reduced" value="85%" subtext="Target: 90%" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
+                  <div className="grid grid-cols-1 gap-4 items-stretch">
+                    <InsightCard label="Conversion Rate" value="24.8%" trend="2.1%" />
+                    <InsightCard label="Return Rate" value="6.8%" trend="5.3%" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
+                  <div className="grid grid-cols-1 gap-4 items-stretch">
+                    <SustainabilityCard label="Cost Savings" value="$1,240" subtext="+14% vs last month" />
+                    <SustainabilityCard label="Food Waste Reduced" value="36 kg" subtext="+9% vs last month" />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* AI Predictive Insights */}
+            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
+              <h3 className="text-lg font-semibold mb-4">AI Predictive Insights</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
+                <SustainabilityCard label="Top Selling Product" value="Organic Apples" subtext="95% sell-through rate" />
+                <SustainabilityCard label="Overstocked Item" value="Canned Beans" subtext="32 units excess" />
+                <SustainabilityCard label="Demand Forecast" value="+15%" subtext="Next week prediction" />
+                <SustainabilityCard label="Optimal Reorder" value="3 days" subtext="For bread products" />
+              </div>
+            </section>
+
+            {/* AI Recommendations */}
+            <aside className="md:col-span-4 order-3 md:order-2 mt-0 mb-6">
               <AIRecommendations />
             </aside>
           </main>
