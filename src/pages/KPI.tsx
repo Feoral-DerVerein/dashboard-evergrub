@@ -322,7 +322,7 @@ const KPI = () => {
             </div>
 
             {/* Sales Performance Chart */}
-            <div>
+            <div className="w-full md:w-1/2">
               <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
               <div className="bg-white rounded-xl p-4 h-64">
                 <ResponsiveContainer width="100%" height="100%">
