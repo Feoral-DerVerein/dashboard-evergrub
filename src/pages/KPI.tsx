@@ -56,7 +56,7 @@ const MetricCard = ({
   value: string;
   label: string;
   trend?: string;
-}) => <div className="bg-white rounded-xl p-4 shadow-sm h-full min-h-28 flex flex-col justify-between">
+}) => <div className="bg-white rounded-xl p-4 shadow-sm">
     <div className="flex items-center gap-2 mb-1">
       <Icon className="w-4 h-4 text-blue-500" />
       <span className="text-gray-500 text-sm">{label}</span>
@@ -74,7 +74,7 @@ const SustainabilityCard = ({
   label: string;
   value: string;
   subtext: string;
-}) => <div className="bg-white rounded-xl p-4 shadow-sm h-full min-h-28 flex flex-col justify-between">
+}) => <div className="bg-white rounded-xl p-4 shadow-sm">
     <div className="flex items-center gap-2 mb-3">
       <span className="text-gray-600">{label}</span>
     </div>
@@ -91,7 +91,7 @@ const InsightCard = ({
   label: string;
   value: string;
   trend: string;
-}) => <div className="bg-white rounded-xl p-4 shadow-sm h-full min-h-28 flex flex-col justify-between">
+}) => <div className="bg-white rounded-xl p-4 shadow-sm">
     <div className="text-gray-500 mb-2">{label}</div>
     <div className="flex items-baseline gap-2">
       <span className="text-2xl font-semibold">{value}</span>
@@ -128,11 +128,12 @@ const KPI = () => {
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
   // Inventory POS state
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loadingInventory, setLoadingInventory] = useState(true);
-
   const handleTimeFilterClick = (filter: TimeFilterPeriod) => {
     setActiveTimeFilter(filter);
   };
@@ -182,112 +183,10 @@ const KPI = () => {
 
           <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
             {/* First column - Stock Alerts and metrics */}
-            <section className="md:col-span-1 space-y-6 mt-6 md:mt-0 md:order-0 order-1">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Stock Alerts</h3>
-                <div className="space-y-2">
-                  {products.filter(p => p.quantity > 0 && p.quantity <= 5).length === 0 ? (
-                    <p className="text-sm text-gray-500">No alerts</p>
-                  ) : (
-                    products.filter(p => p.quantity > 0 && p.quantity <= 5).slice(0,5).map(item => (
-                      <div key={item.id} className="bg-yellow-50 p-3 rounded-lg flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium text-gray-900 text-sm line-clamp-1">{item.name}</h4>
-                          <p className="text-xs text-gray-600">Stock: {item.quantity}</p>
-                        </div>
-                        <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+            
 
-
-
-
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Expiring Soon</h3>
-                <div className="space-y-2">
-                  {products.filter(p => ((): number => { const d = new Date(p.expirationDate); return isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); })() <= 14).length === 0 ? (
-                    <p className="text-sm text-gray-500">No items expiring soon</p>
-                  ) : (
-                    products
-                      .filter(p => { const d = new Date(p.expirationDate); const days = isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); return days <= 14; })
-                      .sort((a,b) => (new Date(a.expirationDate).getTime()) - (new Date(b.expirationDate).getTime()))
-                      .slice(0,5)
-                      .map(item => (
-                        <ExpiringItem
-                          key={item.id}
-                          name={item.name}
-                          expires={`${((): number => { const d = new Date(item.expirationDate); return isNaN(d.getTime()) ? 0 : Math.max(0, Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24))); })()} days`}
-                          quantity={`${item.quantity} units`}
-                          severity={((): "high" | "medium" | "low" => { const d = new Date(item.expirationDate); const days = isNaN(d.getTime()) ? 999 : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); return days <= 3 ? 'high' : days <= 7 ? 'medium' : 'low'; })()}
-                        />
-                      ))
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Suppliers</h3>
-                <div className="space-y-2">
-                  {partners.length === 0 ? (
-                    <p className="text-sm text-gray-500">No suppliers yet</p>
-                  ) : (
-                    partners.slice(0,3).map(p => (
-                      <div key={p.id} className="bg-white border border-gray-100 p-3 rounded-lg">
-                        <h4 className="font-medium text-gray-900 text-sm line-clamp-1">{p.name}</h4>
-                        <p className="text-xs text-gray-600">{p.type} • {p.email}</p>
-                        {p.phone && <p className="text-xs text-gray-500">{p.phone}</p>}
-                      </div>
-                    ))
-                  )}
-                </div>
-                <Link to="/partners" className="text-sm text-blue-600 hover:underline inline-block mt-2">Manage suppliers</Link>
-              </div>
-            </section>
-
-            {/* Right column - KPI groups in a single row */}
-            <section className="md:col-span-3 order-1 md:order-0 mt-6">
-              <div className="grid md:grid-cols-3 gap-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
-                  <div className="grid grid-cols-1 gap-4 items-stretch">
-                    <SustainabilityCard label="CO₂ Saved" value="246 kg" subtext="+18% vs last week" />
-                    <SustainabilityCard label="Waste Reduced" value="85%" subtext="Target: 90%" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
-                  <div className="grid grid-cols-1 gap-4 items-stretch">
-                    <InsightCard label="Conversion Rate" value="24.8%" trend="2.1%" />
-                    <InsightCard label="Return Rate" value="6.8%" trend="5.3%" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
-                  <div className="grid grid-cols-1 gap-4 items-stretch">
-                    <SustainabilityCard label="Cost Savings" value="$1,240" subtext="+14% vs last month" />
-                    <SustainabilityCard label="Food Waste Reduced" value="36 kg" subtext="+9% vs last month" />
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* AI Predictive Insights */}
-            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
-              <h3 className="text-lg font-semibold mb-4">AI Predictive Insights</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
-                <SustainabilityCard label="Top Selling Product" value="Organic Apples" subtext="95% sell-through rate" />
-                <SustainabilityCard label="Overstocked Item" value="Canned Beans" subtext="32 units excess" />
-                <SustainabilityCard label="Demand Forecast" value="+15%" subtext="Next week prediction" />
-                <SustainabilityCard label="Optimal Reorder" value="3 days" subtext="For bread products" />
-              </div>
-            </section>
-
-            {/* AI Recommendations */}
-            <aside className="md:col-span-4 order-3 md:order-2 mt-0 mb-6">
+            {/* Third column - AI Recommendations */}
+            <aside className="md:col-span-3 mt-6 md:mt-0 md:order-2 order-3">
               <AIRecommendations />
             </aside>
           </main>
