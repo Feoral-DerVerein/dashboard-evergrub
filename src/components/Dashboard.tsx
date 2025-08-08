@@ -249,7 +249,7 @@ const Dashboard = () => {
       return 'Recently';
     }
   };
-  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
+  return <div className="min-h-screen pb-20 md:pb-0 md:flex md:items-center md:justify-center bg-[url('/lovable-uploads/b20288e6-b6b7-4a03-95cf-99585bbbd6d5.png')] bg-cover bg-center bg-no-repeat bg-fixed">
       <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
         <div className="md:grid md:grid-cols-[220px_1fr]">
           {/* Sidebar - desktop only */}
