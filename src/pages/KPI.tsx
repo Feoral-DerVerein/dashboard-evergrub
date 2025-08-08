@@ -248,8 +248,21 @@ const KPI = () => {
               </div>
             </section>
 
-            {/* Right column - KPI groups in a single row */}
-            <section className="md:col-span-3 order-1 md:order-0 mt-6">
+            {/* Right column - Chart beside the left section, followed by KPI groups */}
+            <section className="md:col-span-3 order-1 md:order-0 mt-6 space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
+                <div className="bg-white rounded-xl p-4 h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={salesData}>
+                      <XAxis dataKey="day" />
+                      <YAxis />
+                      <Area type="monotone" dataKey="value" stroke="#2563eb" fill="#dbeafe" strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
@@ -309,19 +322,6 @@ const KPI = () => {
               <MetricCard icon={Lock} value="186" label="Transactions" trend="8.2%" />
             </div>
 
-            {/* Sales Performance Chart */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
-              <div className="bg-white rounded-xl p-4 h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={salesData}>
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <Area type="monotone" dataKey="value" stroke="#2563eb" fill="#dbeafe" strokeWidth={2} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
 
             {/* Download */}
             <Button className="w-full max-w-lg bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
