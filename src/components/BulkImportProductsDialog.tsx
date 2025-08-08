@@ -118,6 +118,7 @@ export default function BulkImportProductsDialog({ open, onOpenChange, onImporte
                 imageToUse = await productImageService.uploadImageFromUrl(suggested, path);
               } catch (e) {
                 console.warn('Upload from URL failed for', p.name, e);
+                imageToUse = suggested; // fallback to external URL so it still displays
               }
             }
           }

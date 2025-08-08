@@ -462,9 +462,15 @@ const AddProduct = () => {
           const suggestedUrl = await productImageSuggestService.suggestImage(formData.barcode || undefined, formData.name.trim());
           if (suggestedUrl && user?.id) {
             const filePath = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(2, 15)}.jpg`;
-            const uploadedUrl = await productImageService.uploadImageFromUrl(suggestedUrl, filePath);
-            finalImage = uploadedUrl;
-            setPreviewImage(uploadedUrl);
+            try {
+              const uploadedUrl = await productImageService.uploadImageFromUrl(suggestedUrl, filePath);
+              finalImage = uploadedUrl;
+              setPreviewImage(uploadedUrl);
+            } catch (uploadErr) {
+              console.warn('Upload from URL failed, using external URL instead');
+              finalImage = suggestedUrl; // Fallback to external URL so image still shows
+              setPreviewImage(suggestedUrl);
+            }
           }
         } catch (e) {
           console.warn('No suggested image found or upload failed:', e);
