@@ -1,0 +1,58 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Product } from "@/services/productService";
+
+interface ExpiringSoonCardProps {
+  products: Product[];
+}
+
+function daysUntil(dateStr?: string) {
+  const d = dateStr ? new Date(dateStr) : new Date(NaN);
+  if (isNaN(d.getTime())) return Infinity;
+  return Math.ceil((d.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function severityFor(days: number): "high" | "medium" | "low" {
+  if (days <= 3) return "high";
+  if (days <= 7) return "medium";
+  return "low";
+}
+
+export default function ExpiringSoonCard({ products }: ExpiringSoonCardProps) {
+  const items = products
+    .filter((p) => daysUntil(p.expirationDate) <= 14)
+    .sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime())
+    .slice(0, 5);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Expiring Soon</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {items.length === 0 ? (
+          <p className="text-sm text-gray-500">No items expiring soon</p>
+        ) : (
+          <div className="space-y-2">
+            {items.map((item) => {
+              const d = daysUntil(item.expirationDate);
+              const sev = severityFor(d);
+              const bg = sev === "high" ? "bg-red-50" : sev === "medium" ? "bg-yellow-50" : "bg-red-50";
+              return (
+                <div key={item.id} className={`${bg} p-3 rounded-lg`}>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h4 className="font-medium text-gray-900">{item.name}</h4>
+                      <p className="text-sm text-gray-600">
+                        Expires in: {Math.max(0, isFinite(d) ? d : 0)} days • Quantity: {item.quantity} units
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

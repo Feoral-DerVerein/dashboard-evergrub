@@ -13,6 +13,9 @@ import { productService, Product } from "@/services/productService";
 import { partnersService, Partner } from "@/services/partnersService";
 import { useAuth } from "@/context/AuthContext";
 import { AIRecommendations } from "@/components/AIRecommendations";
+import StockAlertsCard from "@/components/kpi/StockAlertsCard";
+import ExpiringSoonCard from "@/components/kpi/ExpiringSoonCard";
+import SuppliersCard from "@/components/kpi/SuppliersCard";
 const chartDataSamples: Record<TimeFilterPeriod, { label: string; value: number }[]> = {
   Today: [
     { label: "9AM", value: 200 },
@@ -132,31 +135,6 @@ const InsightCard = ({
       <span className="text-emerald-500 text-sm">+{trend}</span>
     </div>
   </div>;
-const ExpiringItem = ({
-  name,
-  expires,
-  quantity,
-  severity
-}: {
-  name: string;
-  expires: string;
-  quantity: string;
-  severity: "high" | "medium" | "low";
-}) => {
-  const bgColor = {
-    high: "bg-red-50",
-    medium: "bg-yellow-50",
-    low: "bg-red-50"
-  }[severity];
-  return <div className={`${bgColor} p-3 rounded-lg mb-2`}>
-      <div className="flex items-start justify-between">
-        <div>
-          <h4 className="font-medium text-gray-900">{name}</h4>
-          <p className="text-sm text-gray-600">Expires in: {expires} • Quantity: {quantity}</p>
-        </div>
-      </div>
-    </div>;
-};
 const KPI = () => {
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeFilterPeriod>("Week");
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -307,63 +285,9 @@ const KPI = () => {
                 </div>
               </div>
               <aside className="w-full md:w-1/2 space-y-6 mt-6 md:mt-0">
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Stock Alerts</h3>
-                  <div className="space-y-2">
-                    {products.filter(p => p.quantity > 0 && p.quantity <= 5).length === 0 ? (
-                      <p className="text-sm text-gray-500">No alerts</p>
-                    ) : (
-                      products.filter(p => p.quantity > 0 && p.quantity <= 5).slice(0,5).map(item => (
-                        <div key={item.id} className="bg-yellow-50 p-3 rounded-lg flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium text-gray-900 text-sm line-clamp-1">{item.name}</h4>
-                            <p className="text-xs text-gray-600">Stock: {item.quantity}</p>
-                          </div>
-                          <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Expiring Soon</h3>
-                  <div className="space-y-2">
-                    {products.filter(p => ((): number => { const d = new Date(p.expirationDate); return isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); })() <= 14).length === 0 ? (
-                      <p className="text-sm text-gray-500">No items expiring soon</p>
-                    ) : (
-                      products
-                        .filter(p => { const d = new Date(p.expirationDate); const days = isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); return days <= 14; })
-                        .sort((a,b) => (new Date(a.expirationDate).getTime()) - (new Date(b.expirationDate).getTime()))
-                        .slice(0,5)
-                        .map(item => (
-                          <ExpiringItem
-                            key={item.id}
-                            name={item.name}
-                            expires={`${((): number => { const d = new Date(item.expirationDate); return isNaN(d.getTime()) ? 0 : Math.max(0, Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24))); })()} days`}
-                            quantity={`${item.quantity} units`}
-                            severity={((): "high" | "medium" | "low" => { const d = new Date(item.expirationDate); const days = isNaN(d.getTime()) ? 999 : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); return days <= 3 ? 'high' : days <= 7 ? 'medium' : 'low'; })()}
-                          />
-                        ))
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Suppliers</h3>
-                  <div className="space-y-2">
-                    {partners.length === 0 ? (
-                      <p className="text-sm text-gray-500">No suppliers yet</p>
-                    ) : (
-                      partners.slice(0,3).map(p => (
-                        <div key={p.id} className="bg-white border border-gray-100 p-3 rounded-lg">
-                          <h4 className="font-medium text-gray-900 text-sm line-clamp-1">{p.name}</h4>
-                          <p className="text-xs text-gray-600">{p.type} • {p.email}</p>
-                          {p.phone && <p className="text-xs text-gray-500">{p.phone}</p>}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  <Link to="/partners" className="text-sm text-blue-600 hover:underline inline-block mt-2">Manage suppliers</Link>
-                </div>
+                <StockAlertsCard products={products} />
+                <ExpiringSoonCard products={products} />
+                <SuppliersCard partners={partners} />
               </aside>
             </div>
 
