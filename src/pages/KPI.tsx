@@ -218,74 +218,9 @@ const KPI = () => {
 
           <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
             {/* First column - Stock Alerts and metrics */}
-            <section className="md:col-span-1 space-y-6 mt-6 md:mt-0 md:order-0 order-1">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Stock Alerts</h3>
-                <div className="space-y-2">
-                  {products.filter(p => p.quantity > 0 && p.quantity <= 5).length === 0 ? (
-                    <p className="text-sm text-gray-500">No alerts</p>
-                  ) : (
-                    products.filter(p => p.quantity > 0 && p.quantity <= 5).slice(0,5).map(item => (
-                      <div key={item.id} className="bg-yellow-50 p-3 rounded-lg flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium text-gray-900 text-sm line-clamp-1">{item.name}</h4>
-                          <p className="text-xs text-gray-600">Stock: {item.quantity}</p>
-                        </div>
-                        <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-
-
-
-
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Expiring Soon</h3>
-                <div className="space-y-2">
-                  {products.filter(p => ((): number => { const d = new Date(p.expirationDate); return isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); })() <= 14).length === 0 ? (
-                    <p className="text-sm text-gray-500">No items expiring soon</p>
-                  ) : (
-                    products
-                      .filter(p => { const d = new Date(p.expirationDate); const days = isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); return days <= 14; })
-                      .sort((a,b) => (new Date(a.expirationDate).getTime()) - (new Date(b.expirationDate).getTime()))
-                      .slice(0,5)
-                      .map(item => (
-                        <ExpiringItem
-                          key={item.id}
-                          name={item.name}
-                          expires={`${((): number => { const d = new Date(item.expirationDate); return isNaN(d.getTime()) ? 0 : Math.max(0, Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24))); })()} days`}
-                          quantity={`${item.quantity} units`}
-                          severity={((): "high" | "medium" | "low" => { const d = new Date(item.expirationDate); const days = isNaN(d.getTime()) ? 999 : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); return days <= 3 ? 'high' : days <= 7 ? 'medium' : 'low'; })()}
-                        />
-                      ))
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Suppliers</h3>
-                <div className="space-y-2">
-                  {partners.length === 0 ? (
-                    <p className="text-sm text-gray-500">No suppliers yet</p>
-                  ) : (
-                    partners.slice(0,3).map(p => (
-                      <div key={p.id} className="bg-white border border-gray-100 p-3 rounded-lg">
-                        <h4 className="font-medium text-gray-900 text-sm line-clamp-1">{p.name}</h4>
-                        <p className="text-xs text-gray-600">{p.type} • {p.email}</p>
-                        {p.phone && <p className="text-xs text-gray-500">{p.phone}</p>}
-                      </div>
-                    ))
-                  )}
-                </div>
-                <Link to="/partners" className="text-sm text-blue-600 hover:underline inline-block mt-2">Manage suppliers</Link>
-              </div>
-            </section>
 
             {/* Right column - KPI groups in a single row */}
-            <section className="md:col-span-3 order-1 md:order-0 mt-6">
+            <section className="md:col-span-4 order-1 md:order-0 mt-6">
               <div className="grid md:grid-cols-3 gap-6 items-stretch">
                 <div className="h-full flex flex-col">
                   <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
@@ -357,18 +292,79 @@ const KPI = () => {
               <MetricCard icon={Lock} value="186" label="Transactions" trend="8.2%" />
             </div>
 
-            {/* Sales Performance Chart */}
-            <div className="w-full md:w-1/2">
-              <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
-              <div className="bg-white rounded-xl p-4 h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
-                    <XAxis dataKey="label" />
-                    <YAxis />
-                    <Area type="monotone" dataKey="value" stroke="#2563eb" fill="#dbeafe" strokeWidth={2} />
-                  </AreaChart>
-                </ResponsiveContainer>
+            {/* Sales Performance Chart + Side Panel */}
+            <div className="md:flex gap-6">
+              <div className="w-full md:w-1/2">
+                <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
+                <div className="bg-white rounded-xl p-4 h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData}>
+                      <XAxis dataKey="label" />
+                      <YAxis />
+                      <Area type="monotone" dataKey="value" stroke="#2563eb" fill="#dbeafe" strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
+              <aside className="w-full md:w-1/2 space-y-6 mt-6 md:mt-0">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Stock Alerts</h3>
+                  <div className="space-y-2">
+                    {products.filter(p => p.quantity > 0 && p.quantity <= 5).length === 0 ? (
+                      <p className="text-sm text-gray-500">No alerts</p>
+                    ) : (
+                      products.filter(p => p.quantity > 0 && p.quantity <= 5).slice(0,5).map(item => (
+                        <div key={item.id} className="bg-yellow-50 p-3 rounded-lg flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium text-gray-900 text-sm line-clamp-1">{item.name}</h4>
+                            <p className="text-xs text-gray-600">Stock: {item.quantity}</p>
+                          </div>
+                          <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Expiring Soon</h3>
+                  <div className="space-y-2">
+                    {products.filter(p => ((): number => { const d = new Date(p.expirationDate); return isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); })() <= 14).length === 0 ? (
+                      <p className="text-sm text-gray-500">No items expiring soon</p>
+                    ) : (
+                      products
+                        .filter(p => { const d = new Date(p.expirationDate); const days = isNaN(d.getTime()) ? Infinity : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); return days <= 14; })
+                        .sort((a,b) => (new Date(a.expirationDate).getTime()) - (new Date(b.expirationDate).getTime()))
+                        .slice(0,5)
+                        .map(item => (
+                          <ExpiringItem
+                            key={item.id}
+                            name={item.name}
+                            expires={`${((): number => { const d = new Date(item.expirationDate); return isNaN(d.getTime()) ? 0 : Math.max(0, Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24))); })()} days`}
+                            quantity={`${item.quantity} units`}
+                            severity={((): "high" | "medium" | "low" => { const d = new Date(item.expirationDate); const days = isNaN(d.getTime()) ? 999 : Math.ceil((d.getTime() - new Date().getTime()) / (1000*60*60*24)); return days <= 3 ? 'high' : days <= 7 ? 'medium' : 'low'; })()}
+                          />
+                        ))
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Suppliers</h3>
+                  <div className="space-y-2">
+                    {partners.length === 0 ? (
+                      <p className="text-sm text-gray-500">No suppliers yet</p>
+                    ) : (
+                      partners.slice(0,3).map(p => (
+                        <div key={p.id} className="bg-white border border-gray-100 p-3 rounded-lg">
+                          <h4 className="font-medium text-gray-900 text-sm line-clamp-1">{p.name}</h4>
+                          <p className="text-xs text-gray-600">{p.type} • {p.email}</p>
+                          {p.phone && <p className="text-xs text-gray-500">{p.phone}</p>}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <Link to="/partners" className="text-sm text-blue-600 hover:underline inline-block mt-2">Manage suppliers</Link>
+                </div>
+              </aside>
             </div>
 
             {/* Download */}
