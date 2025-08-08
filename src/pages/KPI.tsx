@@ -295,20 +295,6 @@ const KPI = () => {
                 <MetricCard icon={Lock} value="186" label="Transactions" trend="8.2%" />
               </div>
 
-              {/* Sales Performance */}
-              <section>
-                <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
-                <div className="bg-white rounded-xl p-4 h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={salesData}>
-                      <XAxis dataKey="day" />
-                      <YAxis />
-                      <Area type="monotone" dataKey="value" stroke="#2563eb" fill="#dbeafe" strokeWidth={2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </section>
-
               {/* Download */}
               <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
                 <Download className="w-5 h-5" />
@@ -333,6 +319,20 @@ const KPI = () => {
               <AIRecommendations />
             </aside>
           </main>
+
+          {/* Sales Performance Chart - Moved to bottom */}
+          <section className="px-6 mt-8 mb-8">
+            <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
+            <div className="bg-white rounded-xl p-4 h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={salesData}>
+                  <XAxis dataKey="day" />
+                  <YAxis />
+                  <Area type="monotone" dataKey="value" stroke="#2563eb" fill="#dbeafe" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
         </div>
 
       <BottomNav />

@@ -16,8 +16,8 @@ const recommendations: AIRecommendation[] = [
   {
     id: '1',
     type: 'purchase',
-    title: 'Reducir compra de tomates',
-    description: 'Reduce compra un 15% la próxima semana por baja demanda histórica',
+    title: 'Reduce tomato purchases',
+    description: 'Decrease purchases by 15% next week due to low historical demand',
     icon: ShoppingCart,
     borderColor: 'border-l-red-500',
     iconColor: 'text-red-500'
@@ -25,8 +25,8 @@ const recommendations: AIRecommendation[] = [
   {
     id: '2',
     type: 'demand',
-    title: 'Incrementar pan integral',
-    description: 'Aumentar compra 10% por alta demanda prevista esta semana',
+    title: 'Increase whole grain bread',
+    description: 'Boost purchases by 10% due to high demand forecast this week',
     icon: TrendingUp,
     borderColor: 'border-l-green-500',
     iconColor: 'text-green-500'
@@ -34,8 +34,8 @@ const recommendations: AIRecommendation[] = [
   {
     id: '3',
     type: 'donation',
-    title: 'Donar yogures',
-    description: 'Productos vencen en 2 días, sugiere donación a banco de alimentos',
+    title: 'Donate yogurt products',
+    description: 'Products expire in 2 days, suggest donation to food bank',
     icon: Heart,
     borderColor: 'border-l-orange-500',
     iconColor: 'text-orange-500'
@@ -43,8 +43,8 @@ const recommendations: AIRecommendation[] = [
   {
     id: '4',
     type: 'optimization',
-    title: 'Redistribuir lácteos',
-    description: 'Mover excedentes de leche a sucursal centro para evitar pérdidas',
+    title: 'Redistribute dairy products',
+    description: 'Move milk surplus to downtown branch to prevent losses',
     icon: RefreshCw,
     borderColor: 'border-l-blue-500',
     iconColor: 'text-blue-500'
@@ -52,8 +52,8 @@ const recommendations: AIRecommendation[] = [
   {
     id: '5',
     type: 'demand',
-    title: 'Demanda de café',
-    description: 'Demanda aumentará 12% por temporada de exámenes universitarios',
+    title: 'Coffee demand surge',
+    description: 'Demand will increase 12% during university exam season',
     icon: TrendingUp,
     borderColor: 'border-l-green-500',
     iconColor: 'text-green-500'
@@ -78,7 +78,7 @@ const RecommendationCard = ({ recommendation }: { recommendation: AIRecommendati
         <div className="flex gap-2">
           <Button size="sm" className="flex-1 h-7 text-xs">
             <Check className="w-3 h-3 mr-1" />
-            Aplicar
+            Apply
           </Button>
           <Button variant="outline" size="sm" className="h-7 px-2">
             <X className="w-3 h-3" />
@@ -93,10 +93,10 @@ export const AIRecommendations = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Recomendaciones IA</h3>
+        <h3 className="text-lg font-semibold">AI Recommendations</h3>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          Actualizadas hoy
+          Updated today
         </div>
       </div>
       <div className="space-y-3">
