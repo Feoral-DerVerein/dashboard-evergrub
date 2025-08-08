@@ -203,12 +203,24 @@ const KPI = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-4">Sustainability, Savings & Customer Insights</h3>
-                <div className="grid grid-flow-col auto-cols-[minmax(220px,1fr)] gap-4 items-stretch overflow-x-auto">
+                <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
+                <div className="grid grid-cols-2 gap-4 items-stretch">
                   <SustainabilityCard label="CO₂ Saved" value="246 kg" subtext="+18% vs last week" />
                   <SustainabilityCard label="Waste Reduced" value="85%" subtext="Target: 90%" />
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
+                <div className="grid grid-cols-2 gap-4 items-stretch">
                   <SustainabilityCard label="Cost Savings" value="$1,240" subtext="+14% vs last month" />
                   <SustainabilityCard label="Food Waste Reduced" value="36 kg" subtext="+9% vs last month" />
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
+                <div className="grid grid-cols-2 gap-4 items-stretch">
                   <InsightCard label="Conversion Rate" value="24.8%" trend="2.1%" />
                   <InsightCard label="Return Rate" value="6.8%" trend="5.3%" />
                 </div>
