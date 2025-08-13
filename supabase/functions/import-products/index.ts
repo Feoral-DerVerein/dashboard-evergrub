@@ -15,16 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    // Verify secret
-    const providedKey = req.headers.get("x-import-api-key") || req.headers.get("X-Import-Api-Key");
-    const secretKey = Deno.env.get("IMPORT_API_KEY");
-    if (!secretKey || !providedKey || providedKey !== secretKey) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
+    // Prepare Supabase client (needed for JWT-based auth and DB ops)
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !serviceRoleKey) {
@@ -36,7 +27,41 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
 
+    // Authorization: allow EITHER a valid IMPORT_API_KEY header OR a valid user JWT matching body.user_id
+    const providedKey = req.headers.get("x-import-api-key") || req.headers.get("X-Import-Api-Key");
+    const secretKey = (Deno.env.get("IMPORT_API_KEY") || "").trim();
+    const isApiAuthorized = !!providedKey && providedKey === secretKey;
+
+    let isUserAuthorized = false;
+    let authUserId: string | null = null;
+    const authHeader = req.headers.get("authorization");
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : undefined;
+
+    // Parse body early to read user_id for user-based authorization
     const body = await req.json().catch(() => ({}));
+    const globalUserId = body.user_id || body.userid || body.global_user_id;
+
+    if (token) {
+      try {
+        const { data: userData } = await supabase.auth.getUser(token);
+        authUserId = userData?.user?.id ?? null;
+      } catch (_) {
+        authUserId = null;
+      }
+    }
+
+    if (authUserId && globalUserId && String(authUserId) === String(globalUserId)) {
+      isUserAuthorized = true;
+    }
+
+    if (!isApiAuthorized && !isUserAuthorized) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized: invalid IMPORT_API_KEY or user mismatch" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // body and globalUserId already parsed above
 
     // Normalize payload to an array of products
     let items: any[] = [];
@@ -44,8 +69,6 @@ serve(async (req) => {
     else if (Array.isArray(body.products)) items = body.products;
     else if (body.product) items = [body.product];
     else if (Object.keys(body).length > 0) items = [body];
-
-    const globalUserId = body.user_id || body.userid || body.global_user_id;
 
     if (!items.length) {
       return new Response(JSON.stringify({ error: "No products provided" }), {

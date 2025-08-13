@@ -29,10 +29,6 @@ const ImportProducts = () => {
       toast({ title: "Sesión requerida", description: "Inicia sesión para importar.", variant: "destructive" });
       return;
     }
-    if (!apiKey) {
-      toast({ title: "Falta API key", description: "Ingresa tu IMPORT_API_KEY.", variant: "destructive" });
-      return;
-    }
 
     let products: any;
     try {
@@ -50,9 +46,9 @@ const ImportProducts = () => {
           user_id: user.id,
           products,
         },
-        headers: {
+        headers: apiKey ? {
           "x-import-api-key": apiKey,
-        },
+        } : {},
       });
 
       if (error) throw error;
@@ -73,7 +69,7 @@ const ImportProducts = () => {
     <main className="p-6">
       <header className="mb-6">
         <h1 className="text-2xl font-semibold">Importar productos</h1>
-        <p className="text-sm text-gray-500">Usa tu IMPORT_API_KEY y tu sesión actual para importar.</p>
+        <p className="text-sm text-gray-500">Puedes usar tu sesión; la IMPORT_API_KEY es opcional.</p>
       </header>
 
       <section className="max-w-2xl space-y-4">
