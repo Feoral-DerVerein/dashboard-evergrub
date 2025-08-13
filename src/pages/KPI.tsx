@@ -17,6 +17,7 @@ import StockAlertsCard from "@/components/kpi/StockAlertsCard";
 import ExpiringSoonCard from "@/components/kpi/ExpiringSoonCard";
 import SuppliersCard from "@/components/kpi/SuppliersCard";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
+import { supabase } from "@/integrations/supabase/client";
 const chartDataSamples: Record<TimeFilterPeriod, { label: string; value: number }[]> = {
   Today: [
     { label: "9AM", value: 200 },
@@ -146,24 +147,46 @@ const KPI = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loadingInventory, setLoadingInventory] = useState(true);
 
+  // AI insights state
+  const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
+  const [aiInsights, setAiInsights] = useState<any | null>(null);
+
   // Derived chart data from active period
   const chartData = chartDataSamples[activeTimeFilter] ?? chartDataSamples["Week"];
   const handleTimeFilterClick = (filter: TimeFilterPeriod) => {
     setActiveTimeFilter(filter);
   };
-  const handleDownloadReport = async () => {
-    try {
-      setIsGeneratingReport(true);
-      toast.info("Generating report...");
-      await generateKpiReport(activeTimeFilter);
-      toast.success("Report generated successfully!");
-    } catch (error) {
-      console.error("Error generating report:", error);
-      toast.error("Failed to generate report. Please try again.");
-    } finally {
-      setIsGeneratingReport(false);
-    }
-  };
+const handleDownloadReport = async () => {
+  try {
+    setIsGeneratingReport(true);
+    toast.info("Generating report...");
+    await generateKpiReport(activeTimeFilter);
+    toast.success("Report generated successfully!");
+  } catch (error) {
+    console.error("Error generating report:", error);
+    toast.error("Failed to generate report. Please try again.");
+  } finally {
+    setIsGeneratingReport(false);
+  }
+};
+
+const handleGenerateInsights = async () => {
+  try {
+    setIsGeneratingInsights(true);
+    toast.info("Generando insights con IA...");
+    const { data, error } = await supabase.functions.invoke('ai-train', {
+      body: { period: activeTimeFilter }
+    });
+    if (error) throw error;
+    setAiInsights(data);
+    toast.success("Insights generados.");
+  } catch (err) {
+    console.error("AI insights error:", err);
+    toast.error("No se pudieron generar los insights.");
+  } finally {
+    setIsGeneratingInsights(false);
+  }
+};
   return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
       <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
           <header className="px-6 pt-8 pb-6">
@@ -292,14 +315,35 @@ const KPI = () => {
               </aside>
             </div>
 
-            {/* IA Training + Download */}
-            <div className="w-full max-w-lg space-y-3">
-              <UploadTrainingDataDialog />
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
-                <Download className="w-5 h-5" />
-                {isGeneratingReport ? "Generating Report..." : "Download Report"}
-              </Button>
-            </div>
+{/* IA Training + Download */}
+<div className="w-full max-w-lg space-y-3">
+  <UploadTrainingDataDialog />
+  <div className="grid grid-cols-1 gap-2">
+    <Button className="w-full" onClick={handleGenerateInsights} disabled={isGeneratingInsights}>
+      {isGeneratingInsights ? "Generando insights..." : "Generar insights IA"}
+    </Button>
+    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
+      <Download className="w-5 h-5" />
+      {isGeneratingReport ? "Generating Report..." : "Download Report"}
+    </Button>
+  </div>
+  {aiInsights && (
+    <div className="bg-white rounded-xl p-4 border">
+      <h4 className="font-semibold mb-2">Resumen IA</h4>
+      <p className="text-sm text-gray-600 mb-3">{aiInsights.executive_summary}</p>
+      {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && (
+        <div>
+          <h5 className="text-sm font-medium mb-1">Recomendaciones</h5>
+          <ul className="list-disc pl-5 text-sm text-gray-700">
+            {aiInsights.recommendations.slice(0,3).map((r: any, i: number) => (
+              <li key={i}>{typeof r === 'string' ? r : (r.title || JSON.stringify(r))}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  )}
+</div>
 
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
               <div className="flex items-center justify-center gap-1">

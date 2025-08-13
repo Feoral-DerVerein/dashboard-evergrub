@@ -5,3 +5,7 @@ verify_jwt = false
 
 [functions.sync-products-from-storage]
 verify_jwt = false
+
+[functions.ai-train]
+verify_jwt = true
+
