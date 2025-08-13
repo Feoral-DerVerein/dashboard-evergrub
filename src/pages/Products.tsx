@@ -1,11 +1,11 @@
 
-import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { useAuth } from "@/context/AuthContext";
 import { productService, Product, SAFFIRE_FREYCINET_STORE_ID } from "@/services/productService";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { wishlistService } from "@/services/wishlistService";
 import PointsBadge from "@/components/PointsBadge";
 import QuickInventory from "@/components/QuickInventory";
@@ -277,6 +277,11 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
               onUpdateQuantities={handleUpdateQuantities}
               compact
             />
+
+            <Link to="/import" className="bg-blue-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-blue-700 transition-colors text-sm">
+              <Upload className="w-4 h-4" />
+              Import many
+            </Link>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
