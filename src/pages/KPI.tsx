@@ -16,6 +16,7 @@ import { AIRecommendations } from "@/components/AIRecommendations";
 import StockAlertsCard from "@/components/kpi/StockAlertsCard";
 import ExpiringSoonCard from "@/components/kpi/ExpiringSoonCard";
 import SuppliersCard from "@/components/kpi/SuppliersCard";
+import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 const chartDataSamples: Record<TimeFilterPeriod, { label: string; value: number }[]> = {
   Today: [
     { label: "9AM", value: 200 },
@@ -291,11 +292,14 @@ const KPI = () => {
               </aside>
             </div>
 
-            {/* Download */}
-            <Button className="w-full max-w-lg bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
-              <Download className="w-5 h-5" />
-              {isGeneratingReport ? "Generating Report..." : "Download Report"}
-            </Button>
+            {/* IA Training + Download */}
+            <div className="w-full max-w-lg space-y-3">
+              <UploadTrainingDataDialog />
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
+                <Download className="w-5 h-5" />
+                {isGeneratingReport ? "Generating Report..." : "Download Report"}
+              </Button>
+            </div>
 
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
               <div className="flex items-center justify-center gap-1">
