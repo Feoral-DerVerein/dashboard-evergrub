@@ -9,10 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 const defaultProducts = `[
   {
     "name": "Producto demo",
-    "sku": "SKU-001",
     "price": 9.99,
-    "stock": 10,
-    "category": "demo"
+    "quantity": 10,
+    "category": "General",
+    "description": "Descripción opcional",
+    "brand": "Generic",
+    "image": "https://example.com/imagen.jpg",
+    "is_marketplace_visible": true
   }
 ]`;
 
