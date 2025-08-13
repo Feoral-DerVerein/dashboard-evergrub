@@ -1,0 +1,3 @@
+name,price,quantity,category,brand,description,barcode,image,expirationDate,userid,storeid
+Agua mineral 500ml,2.5,100,Bebidas,MarcaX,Sin gas,7791234567890,,2026-12-31,REEMPLAZAR_USER_ID,super-1
+Galletas chocolate,1.2,50,Snacks,MarcaY,Caja x 12,1234567890123,,2026-06-30,REEMPLAZAR_USER_ID,super-1

@@ -91,6 +91,70 @@ const toInt = (v: any, def = 0) => {
   return Number.isFinite(n) ? n : def;
 };
 
+async function suggestImageUrl(barcode?: string | null, name?: string | null): Promise<string | null> {
+  try {
+    if (barcode) {
+      const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`);
+      if (res.ok) {
+        const json = await res.json();
+        const p = json?.product;
+        const img = p?.image_url || p?.image_front_url || p?.image_small_url;
+        if (img) return img;
+      }
+    }
+  } catch (_) {}
+  try {
+    if (name) {
+      const url = `https://world.openfoodfacts.org/cgi/search.pl?action=process&search_terms=${encodeURIComponent(name)}&search_simple=1&json=1&page_size=10&fields=product_name,image_url,image_front_url,image_small_url,code`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const json = await res.json();
+        const products = json?.products || [];
+        for (const p of products) {
+          const img = p?.image_url || p?.image_front_url || p?.image_small_url;
+          if (img) return img;
+        }
+      }
+    }
+  } catch (_) {}
+  return null;
+}
+
+function slugify(s: string) {
+  return String(s)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+}
+
+async function uploadToAnyProductImagesBucket(supabase: any, blob: Blob, path: string): Promise<string | null> {
+  // Try preferred bucket id
+  try {
+    const { error } = await supabase.storage.from('product-images').upload(path, blob, {
+      upsert: true,
+      contentType: blob.type || 'image/jpeg',
+    });
+    if (!error) {
+      const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+      return data?.publicUrl ?? null;
+    }
+  } catch (_) {}
+  // Fallback to existing bucket with space in name
+  try {
+    const { error } = await supabase.storage.from('Product Images').upload(path, blob, {
+      upsert: true,
+      contentType: blob.type || 'image/jpeg',
+    });
+    if (!error) {
+      const { data } = supabase.storage.from('Product Images').getPublicUrl(path);
+      return data?.publicUrl ?? null;
+    }
+  } catch (_) {}
+  return null;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -176,6 +240,27 @@ serve(async (req) => {
         continue;
       }
 
+      // Determine image: if not provided, try to suggest and upload
+      let finalImage = image || "";
+      if (!finalImage) {
+        const suggested = await suggestImageUrl(barcode, name);
+        if (suggested) {
+          try {
+            const res = await fetch(suggested);
+            if (res.ok) {
+              const blob = await res.blob();
+              const pathName = `${userid}/${Date.now()}-${slugify(name || 'product')}.jpg`;
+              const uploaded = await uploadToAnyProductImagesBucket(supabase, blob, pathName);
+              finalImage = uploaded || suggested; // fallback to external URL if upload fails
+            } else {
+              finalImage = suggested;
+            }
+          } catch (_) {
+            finalImage = suggested;
+          }
+        }
+      }
+
       valid.push({
         name,
         price,
@@ -185,7 +270,7 @@ serve(async (req) => {
         brand,
         quantity,
         expirationdate,
-        image: image || "",
+        image: finalImage,
         is_marketplace_visible: true,
         userid,
         storeid,

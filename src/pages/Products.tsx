@@ -1,5 +1,5 @@
 
-import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -281,6 +281,11 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
             <Link to="/import" className="bg-blue-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-blue-700 transition-colors text-sm">
               <Upload className="w-4 h-4" />
               Import many
+            </Link>
+
+            <Link to="/sync" className="bg-indigo-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-indigo-700 transition-colors text-sm">
+              <FileSpreadsheet className="w-4 h-4" />
+              Sync CSV
             </Link>
 
             <DropdownMenu>

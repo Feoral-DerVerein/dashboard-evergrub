@@ -28,6 +28,7 @@ import AuthRoute from "@/components/auth/AuthRoutes";
 import ProtectedRoute from "@/components/auth/ProtectedRoutes";
 import AppLayout from "@/components/layout/AppLayout";
 import ImportProducts from "@/pages/ImportProducts";
+import ProductSync from "@/pages/ProductSync";
 
 const MainRoutes = () => {
   const { user } = useAuth();
@@ -62,6 +63,7 @@ const MainRoutes = () => {
         <Route path="/payment" element={<PaymentPortal />} />
         <Route path="/partners" element={<Partners />} />
         <Route path="/import" element={<ImportProducts />} />
+        <Route path="/sync" element={<ProductSync />} />
       </Route>
       
       {/* Default redirects */}
