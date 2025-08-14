@@ -423,8 +423,7 @@ const KPI = () => {
       setIsGeneratingInsights(false);
     }
   };
-  return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
+  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
       <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
@@ -539,8 +538,12 @@ const KPI = () => {
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData}>
-                    <XAxis dataKey="label" tick={{fontSize: 12}} />
-                    <YAxis tick={{fontSize: 12}} />
+                    <XAxis dataKey="label" tick={{
+                  fontSize: 12
+                }} />
+                    <YAxis tick={{
+                  fontSize: 12
+                }} />
                     <Area type="monotone" dataKey="value" stroke="#3b82f6" fill="#93c5fd" strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -622,11 +625,7 @@ const KPI = () => {
             </div>
 
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
-              <div className="flex items-center justify-center gap-1">
-                <span>2.4 MB</span>
-                <span>•</span>
-                <span>PDF Document</span>
-              </div>
+              
               <div className="flex items-center justify-center gap-1">
                 <Lock className="w-4 h-4" />
                 <span>This file is secure and encrypted</span>
@@ -636,8 +635,6 @@ const KPI = () => {
         </div>
 
       <BottomNav />
-    </div>
-  );
+    </div>;
 };
-
 export default KPI;
