@@ -55,7 +55,7 @@ const AppLayout = () => {
                 </Link>
                 <Link to="/ai" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <Sparkles className="w-4 h-4" />
-                  <span>AI</span>
+                  <span>Negentropy AI</span>
                 </Link>
               </nav>
               <div className="mt-auto pt-4 border-t border-gray-100">
