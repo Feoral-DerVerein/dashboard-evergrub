@@ -1,4 +1,3 @@
-
 import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -11,9 +10,7 @@ import PointsBadge from "@/components/PointsBadge";
 import QuickInventory from "@/components/QuickInventory";
 import BulkImportProductsDialog from "@/components/BulkImportProductsDialog";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-
 const categories = ["All", "Restaurant", "SPA Products"];
-
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,38 +19,37 @@ const Products = () => {
   const [error, setError] = useState<string | null>(null);
   const [notifyingProductId, setNotifyingProductId] = useState<number | null>(null);
   const [notifyingShopsProductId, setNotifyingShopsProductId] = useState<number | null>(null);
-const { user } = useAuth();
-const { toast } = useToast();
-const [importOpen, setImportOpen] = useState(false);
-const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null>(null);
-
+  const {
+    user
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
+  const [importOpen, setImportOpen] = useState(false);
+  const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null>(null);
   useEffect(() => {
     const loadProducts = async () => {
       if (!user) {
         setLoading(false);
         return;
       }
-      
       setError(null);
       try {
         console.log("Loading products for user:", user.id);
-        
+
         // Get both user's products and Saffire Freycinet products
         const userProducts = await productService.getProductsByUser(user.id);
         const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
-        
         console.log("User products loaded:", userProducts.length);
         console.log("Saffire Freycinet store products loaded:", storeProducts.length);
-        
+
         // Combine products and remove duplicates by ID
         const combinedProducts = [...userProducts];
-        
         storeProducts.forEach(storeProduct => {
           if (!combinedProducts.some(p => p.id === storeProduct.id)) {
             combinedProducts.push(storeProduct);
           }
         });
-        
         console.log("Combined unique products:", combinedProducts.length);
         setProducts(combinedProducts);
       } catch (error: any) {
@@ -70,13 +66,10 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
         setLoading(false);
       }
     };
-
     loadProducts();
   }, [user, toast]);
-
   const handleDeleteProduct = async (id: number) => {
     if (!confirm("¿Estás seguro de que deseas eliminar este producto?")) return;
-
     try {
       await productService.deleteProduct(id);
       setProducts(products.filter(product => product.id !== id));
@@ -93,37 +86,40 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
       });
     }
   };
-
-  const handleUpdateQuantities = async (updates: { id: number; quantity: number; price?: number }[]) => {
+  const handleUpdateQuantities = async (updates: {
+    id: number;
+    quantity: number;
+    price?: number;
+  }[]) => {
     try {
       // Update each product quantity and price
-      const updatePromises = updates.map(async (update) => {
-        const updateData: any = { quantity: update.quantity };
+      const updatePromises = updates.map(async update => {
+        const updateData: any = {
+          quantity: update.quantity
+        };
         if (update.price !== undefined) {
           updateData.price = update.price;
         }
-        
         const updatedProduct = await productService.updateProduct(update.id, updateData);
         return updatedProduct;
       });
-
       await Promise.all(updatePromises);
 
       // Update local state
-      setProducts(prevProducts =>
-        prevProducts.map(product => {
-          const update = updates.find(u => u.id === product.id);
-          if (update) {
-            const updatedProduct = { ...product, quantity: update.quantity };
-            if (update.price !== undefined) {
-              updatedProduct.price = update.price;
-            }
-            return updatedProduct;
+      setProducts(prevProducts => prevProducts.map(product => {
+        const update = updates.find(u => u.id === product.id);
+        if (update) {
+          const updatedProduct = {
+            ...product,
+            quantity: update.quantity
+          };
+          if (update.price !== undefined) {
+            updatedProduct.price = update.price;
           }
-          return product;
-        })
-      );
-
+          return updatedProduct;
+        }
+        return product;
+      }));
       toast({
         title: "Inventory updated",
         description: `Successfully updated ${updates.length} products`
@@ -137,10 +133,8 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
       });
     }
   };
-
   const handleNotifyWishlistUsers = async (productId: number, productName: string) => {
     if (!productId) return;
-    
     setNotifyingProductId(productId);
     try {
       await wishlistService.notifyWishlistUsers(productId);
@@ -159,10 +153,8 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
       setNotifyingProductId(null);
     }
   };
-
   const handleNotifyShops = async (productId: number, productName: string) => {
     if (!productId) return;
-    
     setNotifyingShopsProductId(productId);
     try {
       // Simulate API call for notifying shops
@@ -182,14 +174,18 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
       setNotifyingShopsProductId(null);
     }
   };
-
   const handleToggleMarketplaceVisibility = async (product: Product) => {
     if (!product.id) return;
     const id = product.id;
     setTogglingMarketplaceId(id);
     try {
-      const updated = await productService.updateProduct(id, { isMarketplaceVisible: !(product as any).isMarketplaceVisible });
-      setProducts(prev => prev.map(p => p.id === id ? { ...p, isMarketplaceVisible: (updated as any).isMarketplaceVisible } : p));
+      const updated = await productService.updateProduct(id, {
+        isMarketplaceVisible: !(product as any).isMarketplaceVisible
+      });
+      setProducts(prev => prev.map(p => p.id === id ? {
+        ...p,
+        isMarketplaceVisible: (updated as any).isMarketplaceVisible
+      } : p));
       toast({
         title: (updated as any).isMarketplaceVisible ? "Visible en marketplace" : "Oculto del marketplace",
         description: `${product.name} ahora ${(updated as any).isMarketplaceVisible ? "aparece" : "no aparece"} en WiseBite`
@@ -205,8 +201,7 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
       setTogglingMarketplaceId(null);
     }
   };
-
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -216,12 +211,10 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
   useEffect(() => {
     if (products.length > 0) {
       console.log("Total products loaded:", products.length);
-      console.log("Products with Saffire Freycinet store ID:", 
-        products.filter(p => p.storeId === SAFFIRE_FREYCINET_STORE_ID).length);
+      console.log("Products with Saffire Freycinet store ID:", products.filter(p => p.storeId === SAFFIRE_FREYCINET_STORE_ID).length);
       console.log("Products filtered by category and search:", filteredProducts.length);
     }
   }, [products, filteredProducts]);
-
   const handleRetry = () => {
     setLoading(true);
     setError(null);
@@ -232,16 +225,14 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
           // Get both user's products and Saffire Freycinet products
           const userProducts = await productService.getProductsByUser(user.id);
           const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
-          
+
           // Combine products and remove duplicates by ID
           const combinedProducts = [...userProducts];
-          
           storeProducts.forEach(storeProduct => {
             if (!combinedProducts.some(p => p.id === storeProduct.id)) {
               combinedProducts.push(storeProduct);
             }
           });
-          
           setProducts(combinedProducts);
         } catch (error: any) {
           console.error("Error retrying product load:", error);
@@ -256,15 +247,12 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
           setLoading(false);
         }
       };
-      
       loadProducts();
     } else {
       setLoading(false);
     }
   };
-
-  return (
-    <>
+  return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
         <div className="flex justify-between items-center">
           <div>
@@ -272,21 +260,14 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
             <p className="text-gray-500">Manage your Saffire Freycinet products</p>
           </div>
           <div className="flex items-center gap-2">
-            <QuickInventory 
-              products={products} 
-              onUpdateQuantities={handleUpdateQuantities}
-              compact
-            />
+            <QuickInventory products={products} onUpdateQuantities={handleUpdateQuantities} compact />
 
             <Link to="/import" className="bg-blue-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-blue-700 transition-colors text-sm">
               <Upload className="w-4 h-4" />
               Import many
             </Link>
 
-            <Link to="/sync" className="bg-indigo-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-indigo-700 transition-colors text-sm">
-              <FileSpreadsheet className="w-4 h-4" />
-              Sync CSV
-            </Link>
+            
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -308,23 +289,13 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
         </div>
       </header>
 
-      <BulkImportProductsDialog
-        open={importOpen}
-        onOpenChange={setImportOpen}
-        onImported={(newProducts) => setProducts(prev => [...newProducts, ...prev])}
-      />
+      <BulkImportProductsDialog open={importOpen} onOpenChange={setImportOpen} onImported={newProducts => setProducts(prev => [...newProducts, ...prev])} />
 
       <main className="px-6 py-4">
 
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <input type="text" placeholder="Search products..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
         </div>
 
         <div className="flex justify-between items-center mb-4">
@@ -342,80 +313,39 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
 
         <div className="mb-6 overflow-x-auto">
           <div className="flex gap-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
-                  selectedCategory === category
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
+            {categories.map(category => <button key={category} onClick={() => setSelectedCategory(category)} className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${selectedCategory === category ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
                 {category}
-              </button>
-            ))}
+              </button>)}
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center items-center py-20">
+        {loading ? <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-          </div>
-        ) : error ? (
-          <div className="text-center py-20">
+          </div> : error ? <div className="text-center py-20">
             <p className="text-red-500 mb-4">{error}</p>
-            <button
-              onClick={handleRetry}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
+            <button onClick={handleRetry} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
               Retry Loading
             </button>
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="text-center py-20">
+          </div> : filteredProducts.length === 0 ? <div className="text-center py-20">
             <p className="text-gray-500">No products available</p>
-            <Link
-              to="/products/add"
-              className="inline-block mt-4 text-green-600 hover:text-green-700"
-            >
+            <Link to="/products/add" className="inline-block mt-4 text-green-600 hover:text-green-700">
               Add a product
             </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+          </div> : <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {filteredProducts.map(product => <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
                 <div className="relative">
-                  <button
-                    onClick={() => handleToggleMarketplaceVisibility(product)}
-                    disabled={togglingMarketplaceId === product.id}
-                    className="absolute top-2 left-2 z-10 bg-white/90 backdrop-blur px-2 py-1 rounded-md shadow-sm border border-gray-200 text-gray-700 hover:bg-white disabled:opacity-60"
-                    aria-label={((product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace")}
-                    title={((product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace")}
-                  >
-                    {((product as any).isMarketplaceVisible) ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                  <button onClick={() => handleToggleMarketplaceVisibility(product)} disabled={togglingMarketplaceId === product.id} className="absolute top-2 left-2 z-10 bg-white/90 backdrop-blur px-2 py-1 rounded-md shadow-sm border border-gray-200 text-gray-700 hover:bg-white disabled:opacity-60" aria-label={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"} title={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"}>
+                    {(product as any).isMarketplaceVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                   </button>
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-20 object-cover"
-                    onError={(e) => {
-                      console.error("Image failed to load:", product.image);
-                      (e.target as HTMLImageElement).src = "/placeholder.svg";
-                    }}
-                  />
+                  <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-20 object-cover" onError={e => {
+              console.error("Image failed to load:", product.image);
+              (e.target as HTMLImageElement).src = "/placeholder.svg";
+            }} />
                   <div className="absolute top-2 right-2">
                     <PointsBadge price={product.price} variant="default" />
                   </div>
                   <div className="absolute bottom-2 left-2">
-                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                      product.quantity > 10 
-                        ? 'bg-green-100 text-green-800' 
-                        : product.quantity > 0 
-                        ? 'bg-yellow-100 text-yellow-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${product.quantity > 10 ? 'bg-green-100 text-green-800' : product.quantity > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
                       Stock: {product.quantity}
                     </span>
                   </div>
@@ -434,50 +364,32 @@ const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null
                   
                   <div className="space-y-1">
                     <div className="flex gap-1">
-                      <Link
-                        to={`/products/edit/${product.id}`}
-                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
-                      >
+                      <Link to={`/products/edit/${product.id}`} className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors">
                         <Edit className="w-3 h-3" />
                         Edit
                       </Link>
-                      <button
-                        onClick={() => product.id && handleDeleteProduct(product.id)}
-                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
-                      >
+                      <button onClick={() => product.id && handleDeleteProduct(product.id)} className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors">
                         <Trash2 className="w-3 h-3" />
                         Delete
                       </button>
                     </div>
                     
-                    <button
-                      onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)}
-                      disabled={notifyingProductId === product.id}
-                      className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
+                    <button onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)} disabled={notifyingProductId === product.id} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                       <Bell className="w-3 h-3" />
                       {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
                     </button>
                     
-                    <button
-                      onClick={() => product.id && handleNotifyShops(product.id, product.name)}
-                      disabled={notifyingShopsProductId === product.id}
-                      className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-purple-600 bg-purple-50 rounded hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
+                    <button onClick={() => product.id && handleNotifyShops(product.id, product.name)} disabled={notifyingShopsProductId === product.id} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-purple-600 bg-purple-50 rounded hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                       <Store className="w-3 h-3" />
                       {notifyingShopsProductId === product.id ? "Notifying..." : "Notify Shops"}
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              </div>)}
+          </div>}
       </main>
 
       <BottomNav />
-    </>
-  );
+    </>;
 };
-
 export default Products;
