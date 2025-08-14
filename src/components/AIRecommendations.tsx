@@ -145,22 +145,73 @@ export const AIRecommendations = ({
     }
   ];
 
+  // Group recommendations by type
+  const groupedRecommendations = dynamicRecommendations.reduce((acc, rec) => {
+    if (!acc[rec.type]) acc[rec.type] = [];
+    acc[rec.type].push(rec);
+    return acc;
+  }, {} as Record<string, AIRecommendation[]>);
+
+  const typeLabels = {
+    purchase: 'Purchase Optimization',
+    demand: 'Demand Management', 
+    donation: 'Sustainability',
+    optimization: 'Operations'
+  };
+
+  const typeIcons = {
+    purchase: ShoppingCart,
+    demand: TrendingUp,
+    donation: Heart,
+    optimization: RefreshCw
+  };
+
   return (
-    <div className="space-y-4 w-full">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">AI Recommendations</h3>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+    <div className="space-y-6 w-full">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-border">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <TrendingUp className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold">AI Recommendations</h3>
+            <p className="text-sm text-muted-foreground">Smart insights for your inventory</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-950">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          Updated with real data
+          <span className="text-xs font-medium text-green-700 dark:text-green-300">Live Data</span>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
-        {dynamicRecommendations.map((recommendation) => (
-          <RecommendationCard 
-            key={recommendation.id} 
-            recommendation={recommendation} 
-          />
-        ))}
+
+      {/* Grouped Recommendations */}
+      <div className="space-y-6">
+        {Object.entries(groupedRecommendations).map(([type, recommendations]) => {
+          const TypeIcon = typeIcons[type as keyof typeof typeIcons];
+          return (
+            <div key={type} className="space-y-3">
+              <div className="flex items-center gap-2 px-1">
+                <TypeIcon className="w-4 h-4 text-muted-foreground" />
+                <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                  {typeLabels[type as keyof typeof typeLabels]}
+                </h4>
+                <div className="flex-1 h-px bg-border"></div>
+                <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                  {recommendations.length}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recommendations.map((recommendation) => (
+                  <RecommendationCard 
+                    key={recommendation.id} 
+                    recommendation={recommendation} 
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
