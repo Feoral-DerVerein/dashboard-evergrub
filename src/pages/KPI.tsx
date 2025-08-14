@@ -423,7 +423,8 @@ const KPI = () => {
       setIsGeneratingInsights(false);
     }
   };
-  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
+  return (
+    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
       <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
