@@ -8,7 +8,6 @@ import { generateKpiReport, TimeFilterPeriod } from "@/utils/reportGenerator";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AIRecommendations } from "@/components/AIRecommendations";
 import { supabase } from "@/integrations/supabase/client";
-
 const AI = () => {
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -28,78 +27,65 @@ const AI = () => {
   });
 
   // AI Business Intelligence Data
-  const [inventoryRecommendations] = useState([
-    {
-      id: 1,
-      type: "reduce",
-      product: "Atlantic Salmon",
-      current: "25 kg",
-      recommended: "15 kg (-40%)",
-      reason: "Stock expires in 4 days, slow sales",
-      priority: "high",
-      savings: "$450"
-    },
-    {
-      id: 2,
-      type: "increase",
-      product: "Organic Vegetables",
-      current: "10 kg",
-      recommended: "18 kg (+80%)",
-      reason: "High demand, good margin",
-      priority: "medium",
-      opportunity: "$230"
-    }
-  ]);
-
-  const [expirationAlerts] = useState([
-    {
-      id: 1,
-      product: "Atlantic Salmon",
-      quantity: "15 kg",
-      daysLeft: 4,
-      value: "$450",
-      priority: "urgent",
-      recommendation: "Move to daily special menu"
-    },
-    {
-      id: 2,
-      product: "Gourmet Cheese",
-      quantity: "8 units",
-      daysLeft: 6,
-      value: "$120",
-      priority: "medium",
-      recommendation: "15% discount to accelerate sales"
-    },
-    {
-      id: 3,
-      product: "Artisan Bread",
-      quantity: "12 loaves",
-      daysLeft: 2,
-      value: "$36",
-      priority: "urgent",
-      recommendation: "2x1 promotion or donate"
-    }
-  ]);
-
-  const [pricingSuggestions] = useState([
-    {
-      id: 1,
-      product: "Premium Salad",
-      currentPrice: "$12",
-      suggestedPrice: "$10 (-17%)",
-      reason: "Accelerate rotation before expiration",
-      impact: "+35% estimated sales"
-    },
-    {
-      id: 2,
-      product: "Green Smoothie",
-      currentPrice: "$8",
-      suggestedPrice: "$9 (+12%)",
-      reason: "High demand, low competition",
-      impact: "+$45 weekly revenue"
-    }
-  ]);
-
+  const [inventoryRecommendations] = useState([{
+    id: 1,
+    type: "reduce",
+    product: "Salmón Atlántico",
+    current: "25 kg",
+    recommended: "15 kg (-40%)",
+    reason: "Stock expira en 4 días, venta lenta",
+    priority: "high",
+    savings: "$450"
+  }, {
+    id: 2,
+    type: "increase",
+    product: "Vegetales Orgánicos",
+    current: "10 kg",
+    recommended: "18 kg (+80%)",
+    reason: "Demanda alta, margen bueno",
+    priority: "medium",
+    opportunity: "$230"
+  }]);
+  const [expirationAlerts] = useState([{
+    id: 1,
+    product: "Salmón Atlántico",
+    quantity: "15 kg",
+    daysLeft: 4,
+    value: "$450",
+    priority: "urgent",
+    recommendation: "Mover a menú especial del día"
+  }, {
+    id: 2,
+    product: "Queso Gourmet",
+    quantity: "8 unidades",
+    daysLeft: 6,
+    value: "$120",
+    priority: "medium",
+    recommendation: "Descuento 15% para acelerar venta"
+  }, {
+    id: 3,
+    product: "Pan Artesanal",
+    quantity: "12 panes",
+    daysLeft: 2,
+    value: "$36",
+    priority: "urgent",
+    recommendation: "Promoción 2x1 o donar"
+  }]);
+  const [pricingSuggestions] = useState([{
+    id: 1,
+    product: "Ensalada Premium",
+    currentPrice: "$12",
+    suggestedPrice: "$10 (-17%)",
+    reason: "Acelerar rotación antes de expiración",
+    impact: "+35% ventas estimadas"
+  }, {
+    id: 2,
+    product: "Smoothie Verde",
+    currentPrice: "$8",
+    suggestedPrice: "$9 (+12%)",
+    reason: "Alta demanda, poca competencia",
+    impact: "+$45 ingresos semanales"
+  }]);
   const [realData] = useState({
     co2Saved: "125 kg",
     co2Change: "+18% vs last week",
@@ -114,16 +100,18 @@ const AI = () => {
     foodWasteReduced: "89 kg",
     foodWasteChange: "+9% vs last month"
   });
-
   const handleGenerateInsights = async () => {
     try {
       setIsGeneratingInsights(true);
       toast.info("Generating AI insights...");
-
-      const { data, error } = await supabase.functions.invoke('ai-train', {
-        body: { period: activeTimeFilter }
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('ai-train', {
+        body: {
+          period: activeTimeFilter
+        }
       });
-
       if (error) throw error;
       setAiInsights(data);
       toast.success("AI insights generated successfully!");
@@ -134,7 +122,6 @@ const AI = () => {
       setIsGeneratingInsights(false);
     }
   };
-
   const handleDownloadReport = async () => {
     try {
       setIsGeneratingReport(true);
@@ -148,36 +135,34 @@ const AI = () => {
       setIsGeneratingReport(false);
     }
   };
-
   const handleAcceptRecommendation = (id: number, type: string) => {
-    toast.success(`${type} recommendation accepted and applied automatically`);
+    toast.success(`Recomendación ${type} aceptada y aplicada automáticamente`);
   };
-
   const handleSendToMarketplace = (product: string) => {
-    toast.success(`${product} sent to marketplace with automatic discount`);
+    toast.success(`${product} enviado al marketplace con descuento automático`);
   };
-
   const handleReduceOrder = (product: string, percentage: string) => {
-    toast.success(`${product} order reduced by ${percentage} for next week`);
+    toast.success(`Pedido de ${product} reducido en ${percentage} para la próxima semana`);
   };
-
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgent": return "bg-red-100 text-red-800 border-red-200";
-      case "high": return "bg-orange-100 text-orange-800 border-orange-200";
-      case "medium": return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      default: return "bg-gray-100 text-gray-800 border-gray-200";
+      case "urgent":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "high":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
-
-  return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
+  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Brain className="w-8 h-8 text-blue-400/70" />
-            <h1 className="text-3xl font-bold text-gray-900">WiseBite AI</h1>
+            
+            <h1 className="text-3xl font-bold text-gray-900"> Welcome to Negentropy AI</h1>
           </div>
           <p className="text-gray-600">
             Harness the power of artificial intelligence to optimize your business operations, 
@@ -191,7 +176,7 @@ const AI = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-400/70" />
+                <Sparkles className="w-5 h-5 text-purple-600" />
                 Training Data
               </CardTitle>
             </CardHeader>
@@ -207,7 +192,7 @@ const AI = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Brain className="w-5 h-5 text-blue-400/70" />
+                <Brain className="w-5 h-5 text-blue-600" />
                 AI Insights
               </CardTitle>
             </CardHeader>
@@ -215,11 +200,7 @@ const AI = () => {
               <p className="text-sm text-gray-600 mb-4">
                 Generate intelligent insights based on your current data and market trends.
               </p>
-              <Button 
-                className="w-full" 
-                onClick={handleGenerateInsights} 
-                disabled={isGeneratingInsights}
-              >
+              <Button className="w-full" onClick={handleGenerateInsights} disabled={isGeneratingInsights}>
                 {isGeneratingInsights ? "Generating..." : "Generate AI Insights"}
               </Button>
             </CardContent>
@@ -229,7 +210,7 @@ const AI = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-green-400/70" />
+                <BarChart3 className="w-5 h-5 text-green-600" />
                 AI Report
               </CardTitle>
             </CardHeader>
@@ -237,11 +218,7 @@ const AI = () => {
               <p className="text-sm text-gray-600 mb-4">
                 Generate comprehensive AI-powered business reports with predictions.
               </p>
-              <Button 
-                className="w-full bg-emerald-400/70 hover:bg-emerald-500/80 text-white" 
-                onClick={handleDownloadReport} 
-                disabled={isGeneratingReport}
-              >
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
                 <Download className="w-4 h-4 mr-2" />
                 {isGeneratingReport ? "Generating..." : "Download AI Report"}
               </Button>
@@ -253,57 +230,43 @@ const AI = () => {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5 text-blue-400/70" />
-              Inventory Recommendations
+              <Package className="w-5 h-5 text-blue-600" />
+              Recomendaciones de Inventario
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {inventoryRecommendations.map((rec) => (
-                <div key={rec.id} className="border rounded-lg p-4 bg-gray-50">
+              {inventoryRecommendations.map(rec => <div key={rec.id} className="border rounded-lg p-4 bg-gray-50">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-gray-900">{rec.product}</h4>
                         <Badge className={getPriorityColor(rec.priority)}>
-                          {rec.priority === "high" ? "High" : "Medium"} priority
+                          {rec.priority === "high" ? "Alta" : "Media"} prioridad
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">{rec.reason}</p>
                       <div className="flex gap-4 text-sm">
-                        <span className="text-gray-600">Current: <strong>{rec.current}</strong></span>
-                        <span className="text-blue-400/80">Recommended: <strong>{rec.recommended}</strong></span>
-                        {rec.savings && <span className="text-green-400/80">Savings: <strong>{rec.savings}</strong></span>}
-                        {rec.opportunity && <span className="text-green-400/80">Opportunity: <strong>{rec.opportunity}</strong></span>}
+                        <span className="text-gray-600">Actual: <strong>{rec.current}</strong></span>
+                        <span className="text-blue-600">Recomendado: <strong>{rec.recommended}</strong></span>
+                        {rec.savings && <span className="text-green-600">Ahorro: <strong>{rec.savings}</strong></span>}
+                        {rec.opportunity && <span className="text-green-600">Oportunidad: <strong>{rec.opportunity}</strong></span>}
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      {rec.type === "reduce" ? (
-                        <ArrowDown className="w-5 h-5 text-red-500" />
-                      ) : (
-                        <ArrowUp className="w-5 h-5 text-green-500" />
-                      )}
+                      {rec.type === "reduce" ? <ArrowDown className="w-5 h-5 text-red-500" /> : <ArrowUp className="w-5 h-5 text-green-500" />}
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleAcceptRecommendation(rec.id, rec.type)}
-                      className="bg-blue-400/70 hover:bg-blue-500/80"
-                    >
+                    <Button size="sm" onClick={() => handleAcceptRecommendation(rec.id, rec.type)} className="bg-blue-600 hover:bg-blue-700">
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Accept Recommendation
+                      Aceptar Recomendación
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => handleReduceOrder(rec.product, rec.type === "reduce" ? "40%" : "80%")}
-                    >
-                      Adjust Order
+                    <Button size="sm" variant="outline" onClick={() => handleReduceOrder(rec.product, rec.type === "reduce" ? "40%" : "80%")}>
+                      Ajustar Pedido
                     </Button>
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </CardContent>
         </Card>
@@ -312,58 +275,44 @@ const AI = () => {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-400/70" />
-              Priority Expiration Alerts
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              Alertas de Caducidad Prioritarias
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {expirationAlerts.map((alert) => (
-                <div key={alert.id} className="border rounded-lg p-4 bg-red-50/50">
+              {expirationAlerts.map(alert => <div key={alert.id} className="border rounded-lg p-4 bg-red-50">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-gray-900">{alert.product}</h4>
                         <Badge className={getPriorityColor(alert.priority)}>
-                          {alert.daysLeft} days remaining
+                          {alert.daysLeft} días restantes
                         </Badge>
                         <Badge variant="outline" className="text-gray-600">
-                          Value: {alert.value}
+                          Valor: {alert.value}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">
                         <Clock className="w-4 h-4 inline mr-1" />
-                        {alert.quantity} • Recommendation: {alert.recommendation}
+                        {alert.quantity} • Recomendación: {alert.recommendation}
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleAcceptRecommendation(alert.id, "promotion")}
-                      className="bg-green-400/70 hover:bg-green-500/80"
-                    >
+                    <Button size="sm" onClick={() => handleAcceptRecommendation(alert.id, "promotion")} className="bg-green-600 hover:bg-green-700">
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Apply Promotion
+                      Aplicar Promoción
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => handleSendToMarketplace(alert.product)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => handleSendToMarketplace(alert.product)}>
                       <ExternalLink className="w-4 h-4 mr-1" />
-                      Send to Marketplace
+                      Enviar a Marketplace
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => handleReduceOrder(alert.product, "20%")}
-                    >
-                      Reduce Order
+                    <Button size="sm" variant="outline" onClick={() => handleReduceOrder(alert.product, "20%")}>
+                      Reducir Pedido
                     </Button>
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </CardContent>
         </Card>
@@ -372,90 +321,69 @@ const AI = () => {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-green-400/70" />
-              Dynamic Pricing Suggestions
+              <DollarSign className="w-5 h-5 text-green-600" />
+              Sugerencias de Precio Dinámico
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {pricingSuggestions.map((suggestion) => (
-                <div key={suggestion.id} className="border rounded-lg p-4 bg-green-50/50">
+              {pricingSuggestions.map(suggestion => <div key={suggestion.id} className="border rounded-lg p-4 bg-green-50">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-900 mb-1">{suggestion.product}</h4>
                       <p className="text-sm text-gray-600 mb-2">{suggestion.reason}</p>
                       <div className="flex gap-4 text-sm">
-                        <span className="text-gray-600">Current price: <strong>{suggestion.currentPrice}</strong></span>
-                        <span className="text-green-400/80">Suggested price: <strong>{suggestion.suggestedPrice}</strong></span>
-                        <span className="text-blue-400/80">Impact: <strong>{suggestion.impact}</strong></span>
+                        <span className="text-gray-600">Precio actual: <strong>{suggestion.currentPrice}</strong></span>
+                        <span className="text-green-600">Precio sugerido: <strong>{suggestion.suggestedPrice}</strong></span>
+                        <span className="text-blue-600">Impacto: <strong>{suggestion.impact}</strong></span>
                       </div>
                     </div>
                     <TrendingUp className="w-5 h-5 text-green-500" />
                   </div>
                   <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleAcceptRecommendation(suggestion.id, "pricing")}
-                      className="bg-green-400/70 hover:bg-green-500/80"
-                    >
+                    <Button size="sm" onClick={() => handleAcceptRecommendation(suggestion.id, "pricing")} className="bg-green-600 hover:bg-green-700">
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Apply Price
+                      Aplicar Precio
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                    >
-                      View Detailed Analysis
+                    <Button size="sm" variant="outline">
+                      Ver Análisis Detallado
                     </Button>
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </CardContent>
         </Card>
 
         {/* Practical Example Card */}
-        <Card className="mb-8 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 border-blue-200/50">
+        <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-blue-700/80">
+            <CardTitle className="flex items-center gap-2 text-blue-900">
               <Brain className="w-5 h-5" />
-              📊 Practical Example: Hotel with Critical Stock
+              📊 Ejemplo Práctico: Hotel con Stock Crítico
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="bg-white/70 rounded-lg p-4 border border-blue-200/50">
+            <div className="bg-white rounded-lg p-4 border border-blue-200">
               <div className="flex items-start gap-3 mb-4">
                 <AlertTriangle className="w-6 h-6 text-red-500 mt-1" />
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900 mb-2">AI Smart Alert</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">Alerta Inteligente de IA</h4>
                   <p className="text-gray-700 mb-3">
-                    "You have <strong>15 kg of salmon</strong> that will expire in <strong>4 days</strong>. 
-                    Recommendation: reduce this week's order by <strong>20%</strong> and move stock to daily special menu."
+                    "Tienes <strong>15 kg de salmón</strong> que vencerán en <strong>4 días</strong>. 
+                    Recomendación: reducir pedido de esta semana en <strong>20%</strong> y mover stock al menú especial del día."
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleAcceptRecommendation(1, "emergency")}
-                      className="bg-green-400/70 hover:bg-green-500/80"
-                    >
+                    <Button size="sm" onClick={() => handleAcceptRecommendation(1, "emergency")} className="bg-green-600 hover:bg-green-700">
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Accept Recommendation
+                      Aceptar Recomendación
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => handleSendToMarketplace("Atlantic Salmon")}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => handleSendToMarketplace("Salmón Atlántico")}>
                       <ExternalLink className="w-4 h-4 mr-1" />
-                      Send to Marketplace
+                      Enviar a Marketplace
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => handleReduceOrder("Salmon", "20%")}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => handleReduceOrder("Salmón", "20%")}>
                       <Package className="w-4 h-4 mr-1" />
-                      Reduce Order
+                      Reducir Pedido
                     </Button>
                   </div>
                 </div>
@@ -468,8 +396,7 @@ const AI = () => {
         <AIRecommendations predictiveData={predictiveData} realData={realData} />
 
         {/* AI Insights Results */}
-        {aiInsights && (
-          <Card className="mt-8">
+        {aiInsights && <Card className="mt-8">
             <CardHeader>
               <CardTitle>Generated AI Insights</CardTitle>
             </CardHeader>
@@ -479,21 +406,16 @@ const AI = () => {
                 <div className="bg-gray-50 rounded-xl p-4">
                   <h4 className="font-semibold mb-2">AI Executive Summary</h4>
                   <p className="text-sm text-gray-600 mb-3">{aiInsights.executive_summary}</p>
-                  {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && (
-                    <div>
+                  {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && <div>
                       <h5 className="text-sm font-medium mb-1">Key Recommendations</h5>
                       <ul className="list-disc pl-5 text-sm text-gray-700">
-                        {aiInsights.recommendations.slice(0, 5).map((r: any, i: number) => (
-                          <li key={i}>{typeof r === 'string' ? r : r.title || JSON.stringify(r)}</li>
-                        ))}
+                        {aiInsights.recommendations.slice(0, 5).map((r: any, i: number) => <li key={i}>{typeof r === 'string' ? r : r.title || JSON.stringify(r)}</li>)}
                       </ul>
-                    </div>
-                  )}
+                    </div>}
                 </div>
 
                 {/* Sustainability Impact */}
-                {aiInsights.sustainability_impact && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {aiInsights.sustainability_impact && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-green-50 rounded-xl p-4">
                       <h4 className="font-semibold text-green-700 mb-2">Environmental Impact</h4>
                       <div className="space-y-3">
@@ -541,15 +463,11 @@ const AI = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  </div>}
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AI;
