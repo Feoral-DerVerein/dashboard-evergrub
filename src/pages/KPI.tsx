@@ -347,6 +347,10 @@ const KPI = () => {
         userId: p.userid
       }));
       setProducts(mappedProducts);
+
+      // Load partners data
+      const partnersData = await partnersService.getPartners();
+      setPartners(partnersData);
     } catch (error) {
       console.error('Error loading real data:', error);
     }
@@ -430,9 +434,16 @@ const KPI = () => {
           </header>
 
           <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
-            {/* First column - Stock Alerts and metrics */}
+            {/* Stock Alerts, Expiring Soon, and Suppliers Row */}
+            <section className="md:col-span-4 order-0 mb-6">
+              <div className="grid md:grid-cols-3 gap-6">
+                <StockAlertsCard products={products} />
+                <ExpiringSoonCard products={products} />
+                <SuppliersCard partners={partners} />
+              </div>
+            </section>
 
-            {/* Right column - KPI groups in a single row */}
+            {/* KPI groups in a single row */}
             <section className="md:col-span-4 order-1 md:order-0 mt-6">
               <div className="grid md:grid-cols-3 gap-6 items-stretch">
                   <div className="h-full flex flex-col">
@@ -505,14 +516,18 @@ const KPI = () => {
               <MetricCard icon={Lock} value={realData.transactions} label="Transactions" trend={realData.transactionsTrend} />
             </div>
 
-            {/* Sales Performance Chart + Side Panel */}
-            <div className="md:flex gap-6">
-              
-              <aside className="w-full md:w-1/2 space-y-6 mt-6 md:mt-0">
-                <StockAlertsCard products={products} />
-                <ExpiringSoonCard products={products} />
-                <SuppliersCard partners={partners} />
-              </aside>
+            {/* Sales Performance Chart */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData}>
+                    <XAxis dataKey="label" tick={{fontSize: 12}} />
+                    <YAxis tick={{fontSize: 12}} />
+                    <Area type="monotone" dataKey="value" stroke="#3b82f6" fill="#93c5fd" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
         {/* IA Training + Download */}
