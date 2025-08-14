@@ -145,32 +145,11 @@ const KPI = () => {
   const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
   const [loadingInventory, setLoadingInventory] = useState(true);
 
   // AI insights state
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [aiInsights, setAiInsights] = useState<any | null>(null);
-
-  // Load orders data for calculations
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('orders')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(100);
-        
-        if (error) throw error;
-        setOrders(data || []);
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      }
-    };
-
-    fetchOrders();
-  }, []);
 
   // Derived chart data from active period
   const chartData = chartDataSamples[activeTimeFilter] ?? chartDataSamples["Week"];
@@ -193,18 +172,12 @@ const handleDownloadReport = async () => {
 
 const handleGenerateInsights = async () => {
   try {
-  console.log('Generating AI insights for period:', activeTimeFilter);
   setIsGeneratingInsights(true);
-  setAiInsights(null); // Clear previous insights
   toast.info("Generating AI insights...");
   const { data, error } = await supabase.functions.invoke('ai-train', {
     body: { period: activeTimeFilter }
   });
-  if (error) {
-    console.error('AI insights error:', error);
-    throw error;
-  }
-  console.log('AI insights received:', data);
+  if (error) throw error;
   setAiInsights(data);
   toast.success("Insights generated successfully.");
 } catch (err) {
@@ -248,80 +221,39 @@ const handleGenerateInsights = async () => {
           <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
             {/* First column - Stock Alerts and metrics */}
 
+            {/* Right column - KPI groups in a single row */}
             <section className="md:col-span-4 order-1 md:order-0 mt-6">
-              {/* Dynamic Sustainability & Customer Metrics replace static ones */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-white rounded-xl p-4 border">
-                  <h4 className="font-semibold text-green-700 mb-2">Sustainability Impact</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-gray-600 text-sm">CO₂ Saved</p>
-                      <p className="text-2xl font-bold">
-                        {aiInsights?.sustainability_impact?.co2_saved_kg || Math.round(orders.length * 3.5)} kg
-                      </p>
-                      <p className="text-green-600 text-sm">
-                        {aiInsights?.sustainability_impact?.co2_saved_change || "+18% vs last week"}
-                      </p>
+              <div className="grid md:grid-cols-3 gap-6 items-stretch">
+                <div className="h-full flex flex-col">
+                  <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
+                  <div className="flex-1 grid grid-rows-2 gap-4">
+                    <div className="flex-1">
+                      <SustainabilityCard label="CO₂ Saved" value="246 kg" subtext="+18% vs last week" />
                     </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">Waste Reduced</p>
-                      <p className="text-2xl font-bold">
-                        {aiInsights?.sustainability_impact?.waste_reduced_percentage || Math.min(85, Math.round((orders.length / (orders.length + 5)) * 100))}%
-                      </p>
-                      <p className="text-green-600 text-sm">
-                        Target: {aiInsights?.sustainability_impact?.waste_target || 90}%
-                      </p>
+                    <div className="flex-1">
+                      <SustainabilityCard label="Waste Reduced" value="85%" subtext="Target: 90%" />
                     </div>
                   </div>
                 </div>
-
-                <div className="bg-white rounded-xl p-4 border">
-                  <h4 className="font-semibold text-blue-700 mb-2">Customer Insights</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-gray-600 text-sm">Conversion Rate</p>
-                      <p className="text-2xl font-bold">
-                        {aiInsights?.customer_insights?.conversion_rate || 
-                         Math.round((orders.filter(o => o.status === 'completed').length / Math.max(orders.length, 1)) * 100 * 100) / 100}%
-                      </p>
-                      <p className="text-green-600 text-sm">
-                        {aiInsights?.customer_insights?.conversion_change || "+2.1%"}
-                      </p>
+                <div className="h-full flex flex-col">
+                  <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
+                  <div className="flex-1 grid grid-rows-2 gap-4">
+                    <div className="flex-1">
+                      <InsightCard label="Conversion Rate" value="24.8%" trend="2.1%" />
                     </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">Return Rate</p>
-                      <p className="text-2xl font-bold">
-                        {aiInsights?.customer_insights?.return_rate || 
-                         Math.round((orders.filter(o => o.status === 'cancelled' || o.status === 'returned').length / Math.max(orders.length, 1)) * 100 * 100) / 100}%
-                      </p>
-                      <p className="text-orange-600 text-sm">
-                        {aiInsights?.customer_insights?.return_change || "+5.3%"}
-                      </p>
+                    <div className="flex-1">
+                      <InsightCard label="Return Rate" value="6.8%" trend="5.3%" />
                     </div>
                   </div>
                 </div>
-
-                <div className="bg-white rounded-xl p-4 border">
-                  <h4 className="font-semibold text-emerald-700 mb-2">Savings & Food Waste</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-gray-600 text-sm">Cost Savings</p>
-                      <p className="text-2xl font-bold">
-                        ${aiInsights?.sustainability_impact?.cost_savings || 
-                         Math.round(orders.reduce((sum, o) => sum + Number(o.total || 0), 0) * 0.12)}
-                      </p>
-                      <p className="text-green-600 text-sm">
-                        {aiInsights?.sustainability_impact?.cost_savings_change || "+14% vs last month"}
-                      </p>
+                <div className="h-full flex flex-col">
+                  <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
+                  <div className="flex-1 grid grid-rows-2 gap-4">
+                    <div className="flex-1">
+                      <SustainabilityCard label="Cost Savings" value="$1,240" subtext="+14% vs last month" />
                     </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">Food Waste Reduced</p>
-                      <p className="text-2xl font-bold">
-                        {aiInsights?.sustainability_impact?.food_waste_reduced_kg || Math.round(orders.length * 2.3)} kg
-                      </p>
-                      <p className="text-green-600 text-sm">
-                        {aiInsights?.sustainability_impact?.food_waste_change || "+9% vs last month"}
-                      </p>
+                    <div className="flex-1">
+                      <SustainabilityCard label="Food Waste Reduced" value="36 kg" subtext="+9% vs last month" />
                     </div>
                   </div>
                 </div>
