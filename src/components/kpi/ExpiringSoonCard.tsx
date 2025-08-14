@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Product } from "@/services/productService";
+import { Store, Heart } from "lucide-react";
 
 interface ExpiringSoonCardProps {
   products: Product[];
@@ -40,11 +42,31 @@ export default function ExpiringSoonCard({ products }: ExpiringSoonCardProps) {
               return (
                 <div key={item.id} className={`${bg} p-3 rounded-lg`}>
                   <div className="flex items-start justify-between">
-                    <div>
+                    <div className="flex-1">
                       <h4 className="font-medium text-gray-900">{item.name}</h4>
                       <p className="text-sm text-gray-600">
                         Expires in: {Math.max(0, isFinite(d) ? d : 0)} days • Quantity: {item.quantity} units
                       </p>
+                    </div>
+                    <div className="flex gap-2 ml-3">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="h-8 px-3"
+                        onClick={() => console.log(`Add ${item.name} to marketplace`)}
+                      >
+                        <Store className="w-3 h-3 mr-1" />
+                        Marketplace
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="h-8 px-3"
+                        onClick={() => console.log(`Donate ${item.name}`)}
+                      >
+                        <Heart className="w-3 h-3 mr-1" />
+                        Donation
+                      </Button>
                     </div>
                   </div>
                 </div>
