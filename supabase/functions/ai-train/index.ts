@@ -36,11 +36,21 @@ serve(async (req) => {
 
   try {
     const { period } = await req.json().catch(() => ({ period: 'Month' }));
+    
+    console.log('=== AI TRAIN FUNCTION START ===');
+    console.log('Period requested:', period);
 
     const { data: userRes, error: userErr } = await supabase.auth.getUser();
-    if (userErr) throw userErr;
+    if (userErr) {
+      console.error('Auth error:', userErr);
+      throw userErr;
+    }
+    
     const userId = userRes?.user?.id;
+    console.log('User ID:', userId);
+    
     if (!userId) {
+      console.error('No user ID found');
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -56,48 +66,72 @@ serve(async (req) => {
       'id,name,price,discount,description,category,brand,quantity,expirationdate,userid,is_marketplace_visible,created_at,storeid';
 
     // 1) Get user products
+    console.log('Fetching user products...');
     let products: any[] = [];
     const { data: userProducts, error: prodErr1 } = await supabase
       .from('products')
       .select(selectCols)
       .eq('userid', userId)
       .limit(500);
-    if (prodErr1) throw prodErr1;
+    
+    if (prodErr1) {
+      console.error('Products error:', prodErr1);
+      throw prodErr1;
+    }
+    
     products = userProducts ?? [];
+    console.log(`Found ${products.length} products for user`);
 
     // 2) Get sales data for performance analysis
+    console.log('Fetching sales data...');
     let sales: any[] = [];
     const { data: salesData, error: salesErr } = await supabase
       .from('sales')
       .select('*')
       .order('sale_date', { ascending: false })
       .limit(100);
-    if (!salesErr && salesData) {
-      sales = salesData;
+    
+    if (salesErr) {
+      console.error('Sales error:', salesErr);
+    } else {
+      sales = salesData ?? [];
+      console.log(`Found ${sales.length} sales records`);
     }
 
     // 3) Get orders data for business insights
+    console.log('Fetching orders data...');
     let orders: any[] = [];
     const { data: ordersData, error: ordersErr } = await supabase
       .from('orders')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
-    if (!ordersErr && ordersData) {
-      orders = ordersData;
+    
+    if (ordersErr) {
+      console.error('Orders error:', ordersErr);
+    } else {
+      orders = ordersData ?? [];
+      console.log(`Found ${orders.length} orders`);
     }
 
     // 4) Get order items for detailed analysis
+    console.log('Fetching order items...');
     let orderItems: any[] = [];
     const { data: itemsData, error: itemsErr } = await supabase
       .from('order_items')
       .select('*')
       .limit(200);
-    if (!itemsErr && itemsData) {
-      orderItems = itemsData;
+    
+    if (itemsErr) {
+      console.error('Order items error:', itemsErr);
+    } else {
+      orderItems = itemsData ?? [];
+      console.log(`Found ${orderItems.length} order items`);
     }
 
     // Build comprehensive business data
+    console.log(`Data summary: ${products.length} products, ${sales.length} sales, ${orders.length} orders, ${orderItems.length} order items`);
+    
     if (products.length > 0 || sales.length > 0 || orders.length > 0) {
       // Add products inventory data
       if (products.length > 0) {
@@ -264,6 +298,8 @@ serve(async (req) => {
     }
 
     const corpus = chunks.join('\n').slice(0, 500_000);
+    console.log(`Generated corpus length: ${corpus.length} characters`);
+    
     if (corpus.length === 0) {
       return new Response(
         JSON.stringify({
