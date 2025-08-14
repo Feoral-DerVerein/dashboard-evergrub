@@ -176,7 +176,7 @@ const AI = () => {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Brain className="w-8 h-8 text-blue-600" />
+            <Brain className="w-8 h-8 text-blue-400/70" />
             <h1 className="text-3xl font-bold text-gray-900">WiseBite AI</h1>
           </div>
           <p className="text-gray-600">
@@ -191,7 +191,7 @@ const AI = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-600" />
+                <Sparkles className="w-5 h-5 text-purple-400/70" />
                 Training Data
               </CardTitle>
             </CardHeader>
@@ -207,7 +207,7 @@ const AI = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Brain className="w-5 h-5 text-blue-600" />
+                <Brain className="w-5 h-5 text-blue-400/70" />
                 AI Insights
               </CardTitle>
             </CardHeader>
@@ -229,7 +229,7 @@ const AI = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-green-600" />
+                <BarChart3 className="w-5 h-5 text-green-400/70" />
                 AI Report
               </CardTitle>
             </CardHeader>
@@ -238,7 +238,7 @@ const AI = () => {
                 Generate comprehensive AI-powered business reports with predictions.
               </p>
               <Button 
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" 
+                className="w-full bg-emerald-400/70 hover:bg-emerald-500/80 text-white" 
                 onClick={handleDownloadReport} 
                 disabled={isGeneratingReport}
               >
@@ -253,7 +253,7 @@ const AI = () => {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5 text-blue-600" />
+              <Package className="w-5 h-5 text-blue-400/70" />
               Inventory Recommendations
             </CardTitle>
           </CardHeader>
@@ -272,9 +272,9 @@ const AI = () => {
                       <p className="text-sm text-gray-600 mb-2">{rec.reason}</p>
                       <div className="flex gap-4 text-sm">
                         <span className="text-gray-600">Current: <strong>{rec.current}</strong></span>
-                        <span className="text-blue-600">Recommended: <strong>{rec.recommended}</strong></span>
-                        {rec.savings && <span className="text-green-600">Savings: <strong>{rec.savings}</strong></span>}
-                        {rec.opportunity && <span className="text-green-600">Opportunity: <strong>{rec.opportunity}</strong></span>}
+                        <span className="text-blue-400/80">Recommended: <strong>{rec.recommended}</strong></span>
+                        {rec.savings && <span className="text-green-400/80">Savings: <strong>{rec.savings}</strong></span>}
+                        {rec.opportunity && <span className="text-green-400/80">Opportunity: <strong>{rec.opportunity}</strong></span>}
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -289,7 +289,7 @@ const AI = () => {
                     <Button 
                       size="sm" 
                       onClick={() => handleAcceptRecommendation(rec.id, rec.type)}
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="bg-blue-400/70 hover:bg-blue-500/80"
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Accept Recommendation
@@ -312,14 +312,14 @@ const AI = () => {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <AlertTriangle className="w-5 h-5 text-red-400/70" />
               Priority Expiration Alerts
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {expirationAlerts.map((alert) => (
-                <div key={alert.id} className="border rounded-lg p-4 bg-red-50">
+                <div key={alert.id} className="border rounded-lg p-4 bg-red-50/50">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -341,7 +341,7 @@ const AI = () => {
                     <Button 
                       size="sm" 
                       onClick={() => handleAcceptRecommendation(alert.id, "promotion")}
-                      className="bg-green-600 hover:bg-green-700"
+                      className="bg-green-400/70 hover:bg-green-500/80"
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Apply Promotion
@@ -372,22 +372,22 @@ const AI = () => {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-green-600" />
+              <DollarSign className="w-5 h-5 text-green-400/70" />
               Dynamic Pricing Suggestions
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {pricingSuggestions.map((suggestion) => (
-                <div key={suggestion.id} className="border rounded-lg p-4 bg-green-50">
+                <div key={suggestion.id} className="border rounded-lg p-4 bg-green-50/50">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-900 mb-1">{suggestion.product}</h4>
                       <p className="text-sm text-gray-600 mb-2">{suggestion.reason}</p>
                       <div className="flex gap-4 text-sm">
                         <span className="text-gray-600">Current price: <strong>{suggestion.currentPrice}</strong></span>
-                        <span className="text-green-600">Suggested price: <strong>{suggestion.suggestedPrice}</strong></span>
-                        <span className="text-blue-600">Impact: <strong>{suggestion.impact}</strong></span>
+                        <span className="text-green-400/80">Suggested price: <strong>{suggestion.suggestedPrice}</strong></span>
+                        <span className="text-blue-400/80">Impact: <strong>{suggestion.impact}</strong></span>
                       </div>
                     </div>
                     <TrendingUp className="w-5 h-5 text-green-500" />
@@ -396,7 +396,7 @@ const AI = () => {
                     <Button 
                       size="sm" 
                       onClick={() => handleAcceptRecommendation(suggestion.id, "pricing")}
-                      className="bg-green-600 hover:bg-green-700"
+                      className="bg-green-400/70 hover:bg-green-500/80"
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Apply Price
@@ -415,15 +415,15 @@ const AI = () => {
         </Card>
 
         {/* Practical Example Card */}
-        <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <Card className="mb-8 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 border-blue-200/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-blue-900">
+            <CardTitle className="flex items-center gap-2 text-blue-700/80">
               <Brain className="w-5 h-5" />
               📊 Practical Example: Hotel with Critical Stock
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="bg-white rounded-lg p-4 border border-blue-200">
+            <div className="bg-white/70 rounded-lg p-4 border border-blue-200/50">
               <div className="flex items-start gap-3 mb-4">
                 <AlertTriangle className="w-6 h-6 text-red-500 mt-1" />
                 <div className="flex-1">
@@ -436,7 +436,7 @@ const AI = () => {
                     <Button 
                       size="sm" 
                       onClick={() => handleAcceptRecommendation(1, "emergency")}
-                      className="bg-green-600 hover:bg-green-700"
+                      className="bg-green-400/70 hover:bg-green-500/80"
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Accept Recommendation
