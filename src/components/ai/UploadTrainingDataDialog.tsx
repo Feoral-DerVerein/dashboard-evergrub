@@ -86,7 +86,7 @@ const UploadTrainingDataDialog: React.FC = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-full max-w-lg" variant="secondary">
-          Cargar datos IA
+          Upload AI Data
         </Button>
       </DialogTrigger>
       <DialogContent>
