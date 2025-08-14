@@ -434,15 +434,6 @@ const KPI = () => {
           </header>
 
           <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
-            {/* Stock Alerts, Expiring Soon, and Suppliers Row */}
-            <section className="md:col-span-4 order-0 mb-6">
-              <div className="grid md:grid-cols-3 gap-6">
-                <StockAlertsCard products={products} />
-                <ExpiringSoonCard products={products} />
-                <SuppliersCard partners={partners} />
-              </div>
-            </section>
-
             {/* KPI groups in a single row */}
             <section className="md:col-span-4 order-1 md:order-0 mt-6">
               <div className="grid md:grid-cols-3 gap-6 items-stretch">
@@ -607,6 +598,13 @@ const KPI = () => {
         </div>}
     </div>}
         </div>
+
+            {/* Stock Alerts, Expiring Soon, and Suppliers Row */}
+            <div className="grid md:grid-cols-3 gap-6 mt-6">
+              <StockAlertsCard products={products} />
+              <ExpiringSoonCard products={products} />
+              <SuppliersCard partners={partners} />
+            </div>
 
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
               <div className="flex items-center justify-center gap-1">
