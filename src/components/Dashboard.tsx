@@ -261,10 +261,6 @@ const Dashboard = () => {
                 <BarChart3 className="w-4 h-4" />
                 <span>Performance</span>
               </Link>
-              <Link to="/ai" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:shadow-lg transition-all duration-200">
-                <Sparkles className="w-5 h-5" />
-                <span className="font-semibold">🤖 IA WiseBite</span>
-              </Link>
               <Link to="/products" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                 <ShoppingCart className="w-4 h-4" />
                 <span>Products</span>
@@ -296,6 +292,10 @@ const Dashboard = () => {
               <Link to="/partners" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                 <Handshake className="w-4 h-4" />
                 <span>Partners</span>
+              </Link>
+              <Link to="/ai" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:shadow-lg transition-all duration-200">
+                <Sparkles className="w-5 h-5" />
+                <span className="font-semibold">🤖 IA WiseBite</span>
               </Link>
             </nav>
             <div className="mt-auto pt-4 border-t border-gray-100">
