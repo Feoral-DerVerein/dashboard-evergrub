@@ -47,15 +47,15 @@ serve(async (req) => {
       });
     }
 
-    // Try to build dataset from products table first; fallback to storage files
-    let usedSource: 'products' | 'storage' = 'products';
+    // Build comprehensive dataset from products, sales, and orders
+    let usedSource: 'comprehensive' | 'storage' = 'comprehensive';
     const chunks: string[] = [];
     const includedNames: string[] = [];
 
     const selectCols =
-      'id,name,price,discount,description,category,brand,quantity,expirationdate,userid,is_marketplace_visible,created_at,storeid,barcode';
+      'id,name,price,discount,description,category,brand,quantity,expirationdate,userid,is_marketplace_visible,created_at,storeid';
 
-    // 1) Try user products, 2) then public marketplace-visible products
+    // 1) Get user products
     let products: any[] = [];
     const { data: userProducts, error: prodErr1 } = await supabase
       .from('products')
@@ -65,29 +65,144 @@ serve(async (req) => {
     if (prodErr1) throw prodErr1;
     products = userProducts ?? [];
 
-    if (products.length === 0) {
-      const { data: publicProducts, error: prodErr2 } = await supabase
-        .from('products')
-        .select(selectCols)
-        .eq('is_marketplace_visible', true)
-        .limit(500);
-      if (prodErr2) throw prodErr2;
-      products = publicProducts ?? [];
+    // 2) Get sales data for performance analysis
+    let sales: any[] = [];
+    const { data: salesData, error: salesErr } = await supabase
+      .from('sales')
+      .select('*')
+      .order('sale_date', { ascending: false })
+      .limit(100);
+    if (!salesErr && salesData) {
+      sales = salesData;
     }
 
-    if (products.length > 0) {
-      for (const p of products) {
-        chunks.push(
-          `Product: ${p.name}\n` +
-            `Price: ${p.price}\n` +
-            `Discount: ${p.discount}\n` +
-            `Category: ${p.category}\n` +
-            `Brand: ${p.brand}\n` +
-            `Quantity: ${p.quantity}\n` +
-            `Expiration: ${p.expirationdate}\n` +
-            `Marketplace Visible: ${p.is_marketplace_visible}\n` +
-            `Description: ${p.description || ''}\n---\n`
-        );
+    // 3) Get orders data for business insights
+    let orders: any[] = [];
+    const { data: ordersData, error: ordersErr } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (!ordersErr && ordersData) {
+      orders = ordersData;
+    }
+
+    // 4) Get order items for detailed analysis
+    let orderItems: any[] = [];
+    const { data: itemsData, error: itemsErr } = await supabase
+      .from('order_items')
+      .select('*')
+      .limit(200);
+    if (!itemsErr && itemsData) {
+      orderItems = itemsData;
+    }
+
+    // Build comprehensive business data
+    if (products.length > 0 || sales.length > 0 || orders.length > 0) {
+      // Add products inventory data
+      if (products.length > 0) {
+        chunks.push("=== INVENTORY DATA ===");
+        for (const p of products) {
+          chunks.push(
+            `Product: ${p.name}\n` +
+              `Price: $${p.price}\n` +
+              `Discount: ${p.discount}%\n` +
+              `Category: ${p.category}\n` +
+              `Brand: ${p.brand}\n` +
+              `Stock Quantity: ${p.quantity}\n` +
+              `Expiration: ${p.expirationdate}\n` +
+              `Marketplace Visible: ${p.is_marketplace_visible}\n` +
+              `Description: ${p.description || ''}\n---\n`
+          );
+        }
+      }
+
+      // Add sales performance data
+      if (sales.length > 0) {
+        chunks.push("\n=== SALES PERFORMANCE ===");
+        let totalRevenue = 0;
+        const categoryPerformance: {[key: string]: {revenue: number, count: number}} = {};
+        
+        for (const sale of sales) {
+          totalRevenue += Number(sale.amount);
+          chunks.push(
+            `Sale Date: ${sale.sale_date}\n` +
+              `Amount: $${sale.amount}\n` +
+              `Customer: ${sale.customer_name}\n` +
+              `Payment Method: ${sale.payment_method}\n` +
+              `Products Sold: ${JSON.stringify(sale.products)}\n---\n`
+          );
+          
+          // Analyze category performance
+          if (sale.products && Array.isArray(sale.products)) {
+            for (const product of sale.products) {
+              const cat = product.category || 'Unknown';
+              if (!categoryPerformance[cat]) {
+                categoryPerformance[cat] = {revenue: 0, count: 0};
+              }
+              categoryPerformance[cat].revenue += Number(product.price) * Number(product.quantity);
+              categoryPerformance[cat].count += Number(product.quantity);
+            }
+          }
+        }
+        
+        chunks.push(`\nTOTAL REVENUE: $${totalRevenue}\n`);
+        chunks.push("CATEGORY PERFORMANCE:\n");
+        for (const [cat, perf] of Object.entries(categoryPerformance)) {
+          chunks.push(`${cat}: $${perf.revenue} revenue, ${perf.count} units sold\n`);
+        }
+      }
+
+      // Add order patterns and trends
+      if (orders.length > 0) {
+        chunks.push("\n=== ORDER PATTERNS ===");
+        const statusCounts: {[key: string]: number} = {};
+        let avgOrderValue = 0;
+        
+        for (const order of orders) {
+          statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+          avgOrderValue += Number(order.total);
+          
+          chunks.push(
+            `Order Date: ${order.created_at}\n` +
+              `Status: ${order.status}\n` +
+              `Total: $${order.total}\n` +
+              `Customer: ${order.customer_name}\n` +
+              `Location: ${order.location || 'N/A'}\n---\n`
+          );
+        }
+        
+        avgOrderValue = avgOrderValue / orders.length;
+        chunks.push(`\nAVERAGE ORDER VALUE: $${avgOrderValue.toFixed(2)}\n`);
+        chunks.push("ORDER STATUS DISTRIBUTION:\n");
+        for (const [status, count] of Object.entries(statusCounts)) {
+          chunks.push(`${status}: ${count} orders\n`);
+        }
+      }
+
+      // Add popular products analysis
+      if (orderItems.length > 0) {
+        chunks.push("\n=== POPULAR PRODUCTS ===");
+        const productSales: {[key: string]: {quantity: number, revenue: number}} = {};
+        
+        for (const item of orderItems) {
+          const name = item.name;
+          if (!productSales[name]) {
+            productSales[name] = {quantity: 0, revenue: 0};
+          }
+          productSales[name].quantity += Number(item.quantity);
+          productSales[name].revenue += Number(item.price) * Number(item.quantity);
+        }
+        
+        // Sort by quantity sold
+        const sortedProducts = Object.entries(productSales)
+          .sort(([,a], [,b]) => b.quantity - a.quantity)
+          .slice(0, 10);
+          
+        chunks.push("TOP SELLING PRODUCTS:\n");
+        for (const [name, data] of sortedProducts) {
+          chunks.push(`${name}: ${data.quantity} units, $${data.revenue.toFixed(2)} revenue\n`);
+        }
       }
     } else {
       usedSource = 'storage';
