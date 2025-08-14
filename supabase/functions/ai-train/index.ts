@@ -14,17 +14,9 @@ serve(async (req) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
-  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
   if (!supabaseUrl || !supabaseKey) {
     return new Response(JSON.stringify({ error: 'Supabase env not configured' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-
-  if (!openAIApiKey) {
-    return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not configured' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -310,67 +302,121 @@ serve(async (req) => {
       );
     }
 
-    const messages = [
-      {
-        role: 'system',
-        content:
-          'You are a retail analytics assistant. Only output strict JSON. No prose. Use conservative estimates when data is missing and mark them as "estimated".',
-      },
-      {
-        role: 'user',
-        content:
-          `Using the following company data snippets (sales, inventory, products). Period focus: ${period}.\n` +
-          `Return valid JSON with this schema: {\n` +
-          `  "executive_summary": string,\n` +
-          `  "key_metrics": { "revenue": number, "orders": number, "avg_ticket": number, "top_products": string[] },\n` +
-          `  "forecast": { "next_4_weeks": number[] },\n` +
-          `  "recommendations": [{ "title": string, "reason": string, "impact": string }],\n` +
-          `  "alerts": string[]\n` +
-          `}.\n` +
-          `Base your answer ONLY on the data below. If a value is not present, estimate and label it as "estimated".\n` +
-          `\n=== DATA START ===\n${corpus}\n=== DATA END ===` ,
-      },
-    ];
-
-    const aiResp = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages,
-        temperature: 0.2,
-        max_tokens: 1200,
-      }),
-    });
-
-    if (!aiResp.ok) {
-      const errText = await aiResp.text();
-      throw new Error(`OpenAI error: ${aiResp.status} ${errText}`);
+    // Generate insights using local data analysis instead of external AI
+    console.log('Generating local insights...');
+    
+    // Calculate key metrics
+    let totalRevenue = 0;
+    let totalOrders = orders.length;
+    let avgOrderValue = 0;
+    const topProducts: string[] = [];
+    const alerts: string[] = [];
+    const recommendations: Array<{title: string, reason: string, impact: string}> = [];
+    
+    // Analyze sales data
+    if (sales.length > 0) {
+      totalRevenue = sales.reduce((sum, sale) => sum + Number(sale.amount || 0), 0);
     }
-
-    const aiJson = await aiResp.json();
-    const content = aiJson?.choices?.[0]?.message?.content ?? '';
-
-    let parsed: any = null;
-    try {
-      parsed = JSON.parse(content);
-    } catch (_) {
-      // Try to extract JSON block
-      const match = content.match(/\{[\s\S]*\}$/);
-      if (match) {
-        parsed = JSON.parse(match[0]);
+    
+    // Calculate average order value
+    if (orders.length > 0) {
+      const orderTotals = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
+      avgOrderValue = orderTotals / orders.length;
+    }
+    
+    // Analyze product performance
+    const productSales: {[key: string]: {quantity: number, revenue: number}} = {};
+    for (const item of orderItems) {
+      const name = item.name;
+      if (!productSales[name]) {
+        productSales[name] = {quantity: 0, revenue: 0};
+      }
+      productSales[name].quantity += Number(item.quantity || 0);
+      productSales[name].revenue += Number(item.price || 0) * Number(item.quantity || 0);
+    }
+    
+    // Get top 3 products by quantity sold
+    const sortedProducts = Object.entries(productSales)
+      .sort(([,a], [,b]) => b.quantity - a.quantity)
+      .slice(0, 3)
+      .map(([name]) => name);
+    topProducts.push(...sortedProducts);
+    
+    // Generate alerts based on data
+    if (products.length > 0) {
+      const lowStockProducts = products.filter(p => Number(p.quantity || 0) < 5);
+      if (lowStockProducts.length > 0) {
+        alerts.push(`${lowStockProducts.length} productos con stock bajo (menos de 5 unidades)`);
+      }
+      
+      const expiringSoon = products.filter(p => {
+        if (!p.expirationdate) return false;
+        const expDate = new Date(p.expirationdate);
+        const today = new Date();
+        const diffDays = (expDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
+        return diffDays <= 7 && diffDays >= 0;
+      });
+      if (expiringSoon.length > 0) {
+        alerts.push(`${expiringSoon.length} productos próximos a vencer en 7 días`);
       }
     }
-
-    if (!parsed) {
-      return new Response(JSON.stringify({ error: 'AI returned invalid JSON' }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    
+    // Generate recommendations
+    if (products.length > 0) {
+      const avgPrice = products.reduce((sum, p) => sum + Number(p.price || 0), 0) / products.length;
+      recommendations.push({
+        title: "Optimizar precios",
+        reason: `Precio promedio de productos: $${avgPrice.toFixed(2)}`,
+        impact: "Incremento potencial del 10-15% en ingresos"
       });
     }
+    
+    if (totalOrders > 0 && avgOrderValue < 50) {
+      recommendations.push({
+        title: "Implementar venta cruzada", 
+        reason: "El ticket promedio es bajo, hay oportunidad de incrementarlo",
+        impact: "Aumento del 20-30% en el valor promedio por orden"
+      });
+    }
+    
+    if (productSales && Object.keys(productSales).length > 0) {
+      recommendations.push({
+        title: "Enfocar marketing en productos top",
+        reason: "Productos más vendidos identificados, maximizar su promoción",
+        impact: "Incremento del 15-25% en ventas de productos estrella"
+      });
+    }
+    
+    // Generate forecast (simple trend-based)
+    const forecast: number[] = [];
+    const baseValue = totalRevenue || avgOrderValue * totalOrders || 1000;
+    for (let week = 1; week <= 4; week++) {
+      // Simple growth projection based on current performance
+      const growth = 1.05; // 5% weekly growth assumption
+      forecast.push(Math.round(baseValue * Math.pow(growth, week)));
+    }
+    
+    // Build response
+    const parsed = {
+      executive_summary: `Análisis de ${period.toLowerCase()}: Se encontraron ${products.length} productos en inventario, ${totalOrders} órdenes procesadas con ingresos totales de $${totalRevenue.toFixed(2)}. ${alerts.length > 0 ? 'Se detectaron alertas importantes que requieren atención.' : 'El negocio muestra estabilidad operativa.'}`,
+      key_metrics: {
+        revenue: totalRevenue,
+        orders: totalOrders,
+        avg_ticket: Math.round(avgOrderValue * 100) / 100,
+        top_products: topProducts.length > 0 ? topProducts : ["No hay datos suficientes"]
+      },
+      forecast: {
+        next_4_weeks: forecast
+      },
+      recommendations: recommendations.length > 0 ? recommendations : [{
+        title: "Continuar operaciones normales",
+        reason: "Los datos actuales muestran funcionamiento estable",
+        impact: "Mantener nivel actual de rendimiento"
+      }],
+      alerts: alerts.length > 0 ? alerts : ["No hay alertas críticas en este momento"]
+    };
+    
+    console.log('Generated insights:', JSON.stringify(parsed, null, 2));
 
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
