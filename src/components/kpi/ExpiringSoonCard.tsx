@@ -26,61 +26,67 @@ export default function ExpiringSoonCard({ products }: ExpiringSoonCardProps) {
     .slice(0, 5);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Expiring Soon</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-4 bg-gradient-to-r from-background to-muted/30">
+        <CardTitle className="text-lg font-bold text-foreground">Expiring Soon</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         {items.length === 0 ? (
-          <div className="text-center py-6">
+          <div className="text-center py-8">
             <p className="text-muted-foreground">No items expiring soon</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {items.map((item) => {
               const d = daysUntil(item.expirationDate);
               const sev = severityFor(d);
-              const bgColor = sev === "high" ? "bg-destructive/10 border-destructive/20" : 
-                             sev === "medium" ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-800" : 
-                             "bg-muted/50 border-border";
-              const urgencyColor = sev === "high" ? "text-destructive" : 
-                                  sev === "medium" ? "text-yellow-600 dark:text-yellow-400" : 
+              const bgGradient = sev === "high" ? "bg-gradient-to-r from-red-50 to-red-100 border-red-200 dark:from-red-950/30 dark:to-red-900/20 dark:border-red-800" : 
+                                sev === "medium" ? "bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 dark:from-yellow-950/30 dark:to-yellow-900/20 dark:border-yellow-800" : 
+                                "bg-gradient-to-r from-muted/30 to-muted/50 border-border";
+              const urgencyColor = sev === "high" ? "text-red-700 dark:text-red-400" : 
+                                  sev === "medium" ? "text-yellow-700 dark:text-yellow-400" : 
                                   "text-muted-foreground";
+              const urgencyBg = sev === "high" ? "bg-red-100 border-red-200 dark:bg-red-900/20 dark:border-red-800" : 
+                               sev === "medium" ? "bg-yellow-100 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800" : 
+                               "bg-muted border-border";
               
               return (
-                <div key={item.id} className={`${bgColor} border rounded-lg p-4 transition-all hover:shadow-sm`}>
-                  <div className="space-y-3">
-                    {/* Product Info */}
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-1">{item.name}</h4>
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className={`font-medium ${urgencyColor}`}>
-                          {Math.max(0, isFinite(d) ? d : 0)} days remaining
-                        </span>
-                        <span className="text-muted-foreground">
+                <div key={item.id} className={`${bgGradient} border rounded-xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] group`}>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
+                    {/* Product Info - Takes more space */}
+                    <div className="lg:col-span-2 space-y-2">
+                      <h4 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">{item.name}</h4>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${urgencyBg}`}>
+                          <div className={`w-2 h-2 rounded-full ${sev === "high" ? "bg-red-500 animate-pulse" : sev === "medium" ? "bg-yellow-500" : "bg-muted-foreground"}`}></div>
+                          <span className={`font-semibold text-sm ${urgencyColor}`}>
+                            {Math.max(0, isFinite(d) ? d : 0)} days left
+                          </span>
+                        </div>
+                        <span className="text-muted-foreground font-medium bg-background/60 px-3 py-1.5 rounded-full border text-sm">
                           {item.quantity} units
                         </span>
                       </div>
                     </div>
                     
-                    {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2">
+                    {/* Action Buttons - More prominent */}
+                    <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3">
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="flex-1 h-9"
+                        className="flex-1 h-11 font-semibold bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 hover:shadow-md hover:scale-105 transition-all duration-200 group/btn"
                         onClick={() => console.log(`Add ${item.name} to marketplace`)}
                       >
-                        <Store className="w-4 h-4 mr-2" />
+                        <Store className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
                         Marketplace
                       </Button>
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="flex-1 h-9"
+                        className="flex-1 h-11 font-semibold bg-gradient-to-r from-green-50 to-green-100 border-green-200 text-green-700 hover:from-green-100 hover:to-green-200 hover:border-green-300 hover:shadow-md hover:scale-105 transition-all duration-200 group/btn"
                         onClick={() => console.log(`Donate ${item.name}`)}
                       >
-                        <Heart className="w-4 h-4 mr-2" />
+                        <Heart className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
                         Donation
                       </Button>
                     </div>
