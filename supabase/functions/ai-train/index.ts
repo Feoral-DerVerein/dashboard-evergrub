@@ -47,69 +47,114 @@ serve(async (req) => {
       });
     }
 
-    // List files in the user's folder
-    const { data: files, error: listError } = await supabase.storage
-      .from('ai-training')
-      .list(userId, { limit: 50, sortBy: { column: 'name', order: 'asc' } });
-
-    if (listError) throw listError;
-    if (!files || files.length === 0) {
-      return new Response(JSON.stringify({ error: 'No training files found' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const textExts = ['txt', 'csv', 'json', 'md', 'tsv'];
-    const allowedMimeExact = ['application/json', 'text/csv', 'text/plain', 'text/markdown', 'application/x-ndjson'];
-    const maxBytes = 120_000;
+    // Try to build dataset from products table first; fallback to storage files
+    let usedSource: 'products' | 'storage' = 'products';
     const chunks: string[] = [];
     const includedNames: string[] = [];
 
-    function isLikelyText(buf: Uint8Array) {
-      const len = Math.min(buf.length, 2048);
-      if (len === 0) return false;
-      let nonPrintable = 0;
-      for (let i = 0; i < len; i++) {
-        const c = buf[i];
-        if (c === 9 || c === 10 || c === 13) continue; // tab, LF, CR
-        if (c < 32 || c > 126) nonPrintable++;
-      }
-      return nonPrintable / len < 0.2;
+    const selectCols =
+      'id,name,price,discount,description,category,brand,quantity,expirationdate,userid,is_marketplace_visible,created_at,storeid,barcode';
+
+    // 1) Try user products, 2) then public marketplace-visible products
+    let products: any[] = [];
+    const { data: userProducts, error: prodErr1 } = await supabase
+      .from('products')
+      .select(selectCols)
+      .eq('userid', userId)
+      .limit(500);
+    if (prodErr1) throw prodErr1;
+    products = userProducts ?? [];
+
+    if (products.length === 0) {
+      const { data: publicProducts, error: prodErr2 } = await supabase
+        .from('products')
+        .select(selectCols)
+        .eq('is_marketplace_visible', true)
+        .limit(500);
+      if (prodErr2) throw prodErr2;
+      products = publicProducts ?? [];
     }
 
-    for (const f of files) {
-      if (f.name.startsWith('.')) continue;
-      const ext = f.name.split('.').pop()?.toLowerCase();
-      const path = `${userId}/${f.name}`;
-      const { data: blob, error: dlError } = await supabase.storage
+    if (products.length > 0) {
+      for (const p of products) {
+        chunks.push(
+          `Product: ${p.name}\n` +
+            `Price: ${p.price}\n` +
+            `Discount: ${p.discount}\n` +
+            `Category: ${p.category}\n` +
+            `Brand: ${p.brand}\n` +
+            `Quantity: ${p.quantity}\n` +
+            `Expiration: ${p.expirationdate}\n` +
+            `Marketplace Visible: ${p.is_marketplace_visible}\n` +
+            `Description: ${p.description || ''}\n---\n`
+        );
+      }
+    } else {
+      usedSource = 'storage';
+      // List files in the user's folder
+      const { data: files, error: listError } = await supabase.storage
         .from('ai-training')
-        .download(path);
-      if (dlError || !blob) continue;
+        .list(userId, { limit: 50, sortBy: { column: 'name', order: 'asc' } });
 
-      const type = (blob as Blob).type || '';
-      const ab = await blob.arrayBuffer();
-      const u8 = new Uint8Array(ab);
+      if (listError) throw listError;
 
-      const considered = (ext ? textExts.includes(ext) : false)
-        || type.startsWith('text/')
-        || allowedMimeExact.includes(type)
-        || isLikelyText(u8);
+      const textExts = ['txt', 'csv', 'json', 'md', 'tsv'];
+      const allowedMimeExact = [
+        'application/json',
+        'text/csv',
+        'text/plain',
+        'text/markdown',
+        'application/x-ndjson',
+      ];
+      const maxBytes = 120_000;
 
-      if (!considered) continue;
+      function isLikelyText(buf: Uint8Array) {
+        const len = Math.min(buf.length, 2048);
+        if (len === 0) return false;
+        let nonPrintable = 0;
+        for (let i = 0; i < len; i++) {
+          const c = buf[i];
+          if (c === 9 || c === 10 || c === 13) continue; // tab, LF, CR
+          if (c < 32 || c > 126) nonPrintable++;
+        }
+        return nonPrintable / len < 0.2;
+      }
 
-      const sliced = ab.byteLength > maxBytes ? ab.slice(0, maxBytes) : ab;
-      const content = new TextDecoder().decode(sliced);
-      chunks.push(`File: ${f.name}\n${content}\n---\n`);
-      includedNames.push(f.name);
-      if (chunks.join('\n').length > 400_000) break; // bound prompt size
+      for (const f of files ?? []) {
+        if (f.name.startsWith('.')) continue;
+        const ext = f.name.split('.').pop()?.toLowerCase();
+        const path = `${userId}/${f.name}`;
+        const { data: blob, error: dlError } = await supabase.storage
+          .from('ai-training')
+          .download(path);
+        if (dlError || !blob) continue;
+
+        const type = (blob as Blob).type || '';
+        const ab = await blob.arrayBuffer();
+        const u8 = new Uint8Array(ab);
+
+        const considered = (ext ? textExts.includes(ext) : false)
+          || type.startsWith('text/')
+          || allowedMimeExact.includes(type)
+          || isLikelyText(u8);
+
+        if (!considered) continue;
+
+        const sliced = ab.byteLength > maxBytes ? ab.slice(0, maxBytes) : ab;
+        const content = new TextDecoder().decode(sliced);
+        chunks.push(`File: ${f.name}\n${content}\n---\n`);
+        includedNames.push(f.name);
+        if (chunks.join('\n').length > 400_000) break; // bound prompt size
+      }
     }
 
     const corpus = chunks.join('\n').slice(0, 500_000);
     if (corpus.length === 0) {
-      const foundNames = files.map((f) => f.name).slice(0, 15).join(', ');
       return new Response(
-        JSON.stringify({ error: `No parsable text files (supported: txt, csv, json, md). Found: ${files.length} file(s): ${foundNames}` }),
+        JSON.stringify({
+          error:
+            'No hay datos disponibles (productos o archivos) para generar insights. Agrega productos o sube archivos de entrenamiento.',
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
