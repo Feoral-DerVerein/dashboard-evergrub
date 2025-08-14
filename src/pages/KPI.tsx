@@ -172,12 +172,18 @@ const handleDownloadReport = async () => {
 
 const handleGenerateInsights = async () => {
   try {
+  console.log('Generating AI insights for period:', activeTimeFilter);
   setIsGeneratingInsights(true);
+  setAiInsights(null); // Clear previous insights
   toast.info("Generating AI insights...");
   const { data, error } = await supabase.functions.invoke('ai-train', {
     body: { period: activeTimeFilter }
   });
-  if (error) throw error;
+  if (error) {
+    console.error('AI insights error:', error);
+    throw error;
+  }
+  console.log('AI insights received:', data);
   setAiInsights(data);
   toast.success("Insights generated successfully.");
 } catch (err) {

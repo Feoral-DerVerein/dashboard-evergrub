@@ -455,8 +455,11 @@ serve(async (req) => {
     }
     
     // Build comprehensive response with sustainability metrics
+    const timestamp = new Date().toISOString();
     const parsed = {
-      executive_summary: `${period} Analysis: Found ${products.length} products in inventory, ${totalOrders} orders processed with total revenue of $${totalRevenue.toFixed(2)}. ${alerts.length > 0 ? 'Important alerts detected that require attention.' : 'Business shows operational stability.'}`,
+      timestamp: timestamp,
+      period: period,
+      executive_summary: `${period} Analysis (${new Date().toLocaleString()}): Found ${products.length} products in inventory, ${totalOrders} orders processed with total revenue of $${totalRevenue.toFixed(2)}. ${alerts.length > 0 ? 'Important alerts detected that require attention.' : 'Business shows operational stability.'}`,
       key_metrics: {
         revenue: totalRevenue,
         orders: totalOrders,
