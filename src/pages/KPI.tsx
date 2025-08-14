@@ -533,22 +533,7 @@ const KPI = () => {
             </div>
 
             {/* Sales Performance Chart */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
-                    <XAxis dataKey="label" tick={{
-                  fontSize: 12
-                }} />
-                    <YAxis tick={{
-                  fontSize: 12
-                }} />
-                    <Area type="monotone" dataKey="value" stroke="#3b82f6" fill="#93c5fd" strokeWidth={2} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            
 
   {aiInsights && <div className="space-y-4">
       {/* Main AI Summary */}
