@@ -454,64 +454,7 @@ const KPI = () => {
             </div>
           </header>
 
-          <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
-            {/* KPI groups in a single row */}
-            <section className="md:col-span-4 order-1 md:order-0 mt-6">
-              <div className="grid md:grid-cols-3 gap-6 items-stretch">
-                  <div className="h-full flex flex-col">
-                    <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
-                    <div className="flex-1 grid grid-rows-2 gap-4">
-                      <div className="flex-1">
-                        <SustainabilityCard label="CO₂ Saved" value={realData.co2Saved} subtext={realData.co2Change} />
-                      </div>
-                      <div className="flex-1">
-                        <SustainabilityCard label="Waste Reduced" value={realData.wasteReduced} subtext={`Target: ${realData.wasteTarget}`} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-full flex flex-col">
-                    <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
-                    <div className="flex-1 grid grid-rows-2 gap-4">
-                      <div className="flex-1">
-                        <InsightCard label="Conversion Rate" value={realData.conversionRate} trend={realData.conversionChange.replace('+', '')} />
-                      </div>
-                      <div className="flex-1">
-                        <InsightCard label="Return Rate" value={realData.returnRate} trend={realData.returnChange.replace('+', '')} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-full flex flex-col">
-                    <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
-                    <div className="flex-1 grid grid-rows-2 gap-4">
-                      <div className="flex-1">
-                        <SustainabilityCard label="Cost Savings" value={realData.costSavings} subtext={realData.costChange} />
-                      </div>
-                      <div className="flex-1">
-                        <SustainabilityCard label="Food Waste Reduced" value={realData.foodWasteReduced} subtext={realData.foodWasteChange} />
-                      </div>
-                    </div>
-                  </div>
-              </div>
-            </section>
-
-            {/* AI Predictive Insights */}
-            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
-              <h3 className="text-lg font-semibold mb-4">AI Predictive Insights</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
-                <SustainabilityCard label="Top Selling Product" value={predictiveData.topSellingProduct} subtext={`${predictiveData.topSellingRate} sell-through rate`} />
-                <SustainabilityCard label="Overstocked Item" value={predictiveData.overstockedItem} subtext={predictiveData.overstockAmount} />
-                <SustainabilityCard label="Demand Forecast" value={predictiveData.demandForecast} subtext={predictiveData.forecastPeriod} />
-                <SustainabilityCard label="Optimal Reorder" value={`${predictiveData.optimalReorder} days`} subtext={`For ${predictiveData.reorderCategory}`} />
-              </div>
-            </section>
-
-            {/* AI Recommendations */}
-            <aside className="md:col-span-4 order-3 md:order-2 mt-0 mb-6">
-              <AIRecommendations predictiveData={predictiveData} realData={realData} />
-            </aside>
-          </main>
-
-          {/* Main dashboard content and chart - Moved to bottom */}
+          {/* Main dashboard content and chart - Moved to top */}
           <section className="px-6 mt-8 mb-8 space-y-6">
             {/* Time Filters */}
             <div className="flex gap-2 overflow-x-auto pb-2">
@@ -600,6 +543,64 @@ const KPI = () => {
         </div>}
     </div>}
           </section>
+
+          <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
+            {/* KPI groups in a single row */}
+            <section className="md:col-span-4 order-1 md:order-0 mt-6">
+              <div className="grid md:grid-cols-3 gap-6 items-stretch">
+                  <div className="h-full flex flex-col">
+                    <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
+                    <div className="flex-1 grid grid-rows-2 gap-4">
+                      <div className="flex-1">
+                        <SustainabilityCard label="CO₂ Saved" value={realData.co2Saved} subtext={realData.co2Change} />
+                      </div>
+                      <div className="flex-1">
+                        <SustainabilityCard label="Waste Reduced" value={realData.wasteReduced} subtext={`Target: ${realData.wasteTarget}`} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="h-full flex flex-col">
+                    <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
+                    <div className="flex-1 grid grid-rows-2 gap-4">
+                      <div className="flex-1">
+                        <InsightCard label="Conversion Rate" value={realData.conversionRate} trend={realData.conversionChange.replace('+', '')} />
+                      </div>
+                      <div className="flex-1">
+                        <InsightCard label="Return Rate" value={realData.returnRate} trend={realData.returnChange.replace('+', '')} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="h-full flex flex-col">
+                    <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
+                    <div className="flex-1 grid grid-rows-2 gap-4">
+                      <div className="flex-1">
+                        <SustainabilityCard label="Cost Savings" value={realData.costSavings} subtext={realData.costChange} />
+                      </div>
+                      <div className="flex-1">
+                        <SustainabilityCard label="Food Waste Reduced" value={realData.foodWasteReduced} subtext={realData.foodWasteChange} />
+                      </div>
+                    </div>
+                  </div>
+              </div>
+            </section>
+
+            {/* AI Predictive Insights */}
+            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
+              <h3 className="text-lg font-semibold mb-4">AI Predictive Insights</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
+                <SustainabilityCard label="Top Selling Product" value={predictiveData.topSellingProduct} subtext={`${predictiveData.topSellingRate} sell-through rate`} />
+                <SustainabilityCard label="Overstocked Item" value={predictiveData.overstockedItem} subtext={predictiveData.overstockAmount} />
+                <SustainabilityCard label="Demand Forecast" value={predictiveData.demandForecast} subtext={predictiveData.forecastPeriod} />
+                <SustainabilityCard label="Optimal Reorder" value={`${predictiveData.optimalReorder} days`} subtext={`For ${predictiveData.reorderCategory}`} />
+              </div>
+            </section>
+
+            {/* AI Recommendations */}
+            <aside className="md:col-span-4 order-3 md:order-2 mt-0 mb-6">
+              <AIRecommendations predictiveData={predictiveData} realData={realData} />
+            </aside>
+          </main>
+
 
           {/* Stock Alerts, Expiring Soon, and Suppliers Row */}
           <section className="px-6">
