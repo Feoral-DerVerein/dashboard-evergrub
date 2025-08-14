@@ -1,4 +1,4 @@
-import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -10,7 +10,37 @@ import PointsBadge from "@/components/PointsBadge";
 import QuickInventory from "@/components/QuickInventory";
 import BulkImportProductsDialog from "@/components/BulkImportProductsDialog";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DonationForm } from "@/components/DonationForm";
 const categories = ["All", "Restaurant", "SPA Products"];
+
+// Food banks from Australia
+const foodBanks = [
+  {
+    name: "OzHarvest",
+    description: "Rescues quality surplus food and delivers it to charities that feed vulnerable Australians."
+  },
+  {
+    name: "Foodbank Australia", 
+    description: "Australia's largest food relief organization, providing food to charities and school programs nationwide."
+  },
+  {
+    name: "SecondBite",
+    description: "Rescues surplus fresh food and redistributes it to community food programs across Australia."
+  },
+  {
+    name: "FareShare",
+    description: "Cooks rescued food into free, nutritious meals for people in need in Melbourne, Brisbane and Sydney."
+  },
+  {
+    name: "The Salvation Army – Doorways",
+    description: "Provides emergency relief including food assistance to individuals and families in crisis."
+  },
+  {
+    name: "St Vincent de Paul (Vinnies)",
+    description: "Supports communities with food relief and assistance through local conferences and services."
+  }
+];
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +57,10 @@ const Products = () => {
   } = useToast();
   const [importOpen, setImportOpen] = useState(false);
   const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [donationDialogOpen, setDonationDialogOpen] = useState(false);
+  const [selectedFoodBank, setSelectedFoodBank] = useState<string | null>(null);
+  const [donationFormOpen, setDonationFormOpen] = useState(false);
   useEffect(() => {
     const loadProducts = async () => {
       if (!user) {
@@ -200,6 +234,17 @@ const Products = () => {
     } finally {
       setTogglingMarketplaceId(null);
     }
+  };
+  
+  const handleDonateProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setDonationDialogOpen(true);
+  };
+
+  const handleSelectFoodBank = (foodBankName: string) => {
+    setSelectedFoodBank(foodBankName);
+    setDonationDialogOpen(false);
+    setDonationFormOpen(true);
   };
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
@@ -379,12 +424,46 @@ const Products = () => {
                       {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
                     </button>
                     
+                    <button onClick={() => handleDonateProduct(product)} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors">
+                      <Heart className="w-3 h-3" />
+                      Donation
+                    </button>
                     
                   </div>
                 </div>
               </div>)}
           </div>}
       </main>
+
+      {/* Food Bank Selection Dialog */}
+      <Dialog open={donationDialogOpen} onOpenChange={setDonationDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Select Food Bank for Donation</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {foodBanks.map((foodBank) => (
+              <div key={foodBank.name} className="p-4 border rounded-lg cursor-pointer hover:bg-gray-50" onClick={() => handleSelectFoodBank(foodBank.name)}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Heart className="h-4 w-4 text-red-500" />
+                  <h3 className="font-medium text-sm">{foodBank.name}</h3>
+                </div>
+                <p className="text-xs text-gray-600">{foodBank.description}</p>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Donation Form Dialog */}
+      <Dialog open={donationFormOpen} onOpenChange={setDonationFormOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Donate to {selectedFoodBank}</DialogTitle>
+          </DialogHeader>
+          <DonationForm onClose={() => setDonationFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
 
       <BottomNav />
     </>;
