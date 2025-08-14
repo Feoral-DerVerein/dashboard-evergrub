@@ -53,9 +53,9 @@ const AppLayout = () => {
                   <Handshake className="w-4 h-4" />
                   <span>Partners</span>
                 </Link>
-                <Link to="/ai" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:shadow-lg transition-all duration-200">
-                  <Sparkles className="w-5 h-5" />
-                  <span className="font-semibold">🤖 IA WiseBite</span>
+                <Link to="/ai" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                  <Sparkles className="w-4 h-4" />
+                  <span>AI</span>
                 </Link>
               </nav>
               <div className="mt-auto pt-4 border-t border-gray-100">
