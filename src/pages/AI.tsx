@@ -32,20 +32,20 @@ const AI = () => {
     {
       id: 1,
       type: "reduce",
-      product: "Salmón Atlántico",
+      product: "Atlantic Salmon",
       current: "25 kg",
       recommended: "15 kg (-40%)",
-      reason: "Stock expira en 4 días, venta lenta",
+      reason: "Stock expires in 4 days, slow sales",
       priority: "high",
       savings: "$450"
     },
     {
       id: 2,
       type: "increase",
-      product: "Vegetales Orgánicos",
+      product: "Organic Vegetables",
       current: "10 kg",
       recommended: "18 kg (+80%)",
-      reason: "Demanda alta, margen bueno",
+      reason: "High demand, good margin",
       priority: "medium",
       opportunity: "$230"
     }
@@ -54,49 +54,49 @@ const AI = () => {
   const [expirationAlerts] = useState([
     {
       id: 1,
-      product: "Salmón Atlántico",
+      product: "Atlantic Salmon",
       quantity: "15 kg",
       daysLeft: 4,
       value: "$450",
       priority: "urgent",
-      recommendation: "Mover a menú especial del día"
+      recommendation: "Move to daily special menu"
     },
     {
       id: 2,
-      product: "Queso Gourmet",
-      quantity: "8 unidades",
+      product: "Gourmet Cheese",
+      quantity: "8 units",
       daysLeft: 6,
       value: "$120",
       priority: "medium",
-      recommendation: "Descuento 15% para acelerar venta"
+      recommendation: "15% discount to accelerate sales"
     },
     {
       id: 3,
-      product: "Pan Artesanal",
-      quantity: "12 panes",
+      product: "Artisan Bread",
+      quantity: "12 loaves",
       daysLeft: 2,
       value: "$36",
       priority: "urgent",
-      recommendation: "Promoción 2x1 o donar"
+      recommendation: "2x1 promotion or donate"
     }
   ]);
 
   const [pricingSuggestions] = useState([
     {
       id: 1,
-      product: "Ensalada Premium",
+      product: "Premium Salad",
       currentPrice: "$12",
       suggestedPrice: "$10 (-17%)",
-      reason: "Acelerar rotación antes de expiración",
-      impact: "+35% ventas estimadas"
+      reason: "Accelerate rotation before expiration",
+      impact: "+35% estimated sales"
     },
     {
       id: 2,
-      product: "Smoothie Verde",
+      product: "Green Smoothie",
       currentPrice: "$8",
       suggestedPrice: "$9 (+12%)",
-      reason: "Alta demanda, poca competencia",
-      impact: "+$45 ingresos semanales"
+      reason: "High demand, low competition",
+      impact: "+$45 weekly revenue"
     }
   ]);
 
@@ -150,15 +150,15 @@ const AI = () => {
   };
 
   const handleAcceptRecommendation = (id: number, type: string) => {
-    toast.success(`Recomendación ${type} aceptada y aplicada automáticamente`);
+    toast.success(`${type} recommendation accepted and applied automatically`);
   };
 
   const handleSendToMarketplace = (product: string) => {
-    toast.success(`${product} enviado al marketplace con descuento automático`);
+    toast.success(`${product} sent to marketplace with automatic discount`);
   };
 
   const handleReduceOrder = (product: string, percentage: string) => {
-    toast.success(`Pedido de ${product} reducido en ${percentage} para la próxima semana`);
+    toast.success(`${product} order reduced by ${percentage} for next week`);
   };
 
   const getPriorityColor = (priority: string) => {
@@ -254,7 +254,7 @@ const AI = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="w-5 h-5 text-blue-600" />
-              Recomendaciones de Inventario
+              Inventory Recommendations
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -266,15 +266,15 @@ const AI = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-gray-900">{rec.product}</h4>
                         <Badge className={getPriorityColor(rec.priority)}>
-                          {rec.priority === "high" ? "Alta" : "Media"} prioridad
+                          {rec.priority === "high" ? "High" : "Medium"} priority
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">{rec.reason}</p>
                       <div className="flex gap-4 text-sm">
-                        <span className="text-gray-600">Actual: <strong>{rec.current}</strong></span>
-                        <span className="text-blue-600">Recomendado: <strong>{rec.recommended}</strong></span>
-                        {rec.savings && <span className="text-green-600">Ahorro: <strong>{rec.savings}</strong></span>}
-                        {rec.opportunity && <span className="text-green-600">Oportunidad: <strong>{rec.opportunity}</strong></span>}
+                        <span className="text-gray-600">Current: <strong>{rec.current}</strong></span>
+                        <span className="text-blue-600">Recommended: <strong>{rec.recommended}</strong></span>
+                        {rec.savings && <span className="text-green-600">Savings: <strong>{rec.savings}</strong></span>}
+                        {rec.opportunity && <span className="text-green-600">Opportunity: <strong>{rec.opportunity}</strong></span>}
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -292,14 +292,14 @@ const AI = () => {
                       className="bg-blue-600 hover:bg-blue-700"
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Aceptar Recomendación
+                      Accept Recommendation
                     </Button>
                     <Button 
                       size="sm" 
                       variant="outline"
                       onClick={() => handleReduceOrder(rec.product, rec.type === "reduce" ? "40%" : "80%")}
                     >
-                      Ajustar Pedido
+                      Adjust Order
                     </Button>
                   </div>
                 </div>
@@ -313,7 +313,7 @@ const AI = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-red-600" />
-              Alertas de Caducidad Prioritarias
+              Priority Expiration Alerts
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -325,15 +325,15 @@ const AI = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-gray-900">{alert.product}</h4>
                         <Badge className={getPriorityColor(alert.priority)}>
-                          {alert.daysLeft} días restantes
+                          {alert.daysLeft} days remaining
                         </Badge>
                         <Badge variant="outline" className="text-gray-600">
-                          Valor: {alert.value}
+                          Value: {alert.value}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">
                         <Clock className="w-4 h-4 inline mr-1" />
-                        {alert.quantity} • Recomendación: {alert.recommendation}
+                        {alert.quantity} • Recommendation: {alert.recommendation}
                       </p>
                     </div>
                   </div>
@@ -344,7 +344,7 @@ const AI = () => {
                       className="bg-green-600 hover:bg-green-700"
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Aplicar Promoción
+                      Apply Promotion
                     </Button>
                     <Button 
                       size="sm" 
@@ -352,14 +352,14 @@ const AI = () => {
                       onClick={() => handleSendToMarketplace(alert.product)}
                     >
                       <ExternalLink className="w-4 h-4 mr-1" />
-                      Enviar a Marketplace
+                      Send to Marketplace
                     </Button>
                     <Button 
                       size="sm" 
                       variant="outline"
                       onClick={() => handleReduceOrder(alert.product, "20%")}
                     >
-                      Reducir Pedido
+                      Reduce Order
                     </Button>
                   </div>
                 </div>
@@ -373,7 +373,7 @@ const AI = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="w-5 h-5 text-green-600" />
-              Sugerencias de Precio Dinámico
+              Dynamic Pricing Suggestions
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -385,9 +385,9 @@ const AI = () => {
                       <h4 className="font-semibold text-gray-900 mb-1">{suggestion.product}</h4>
                       <p className="text-sm text-gray-600 mb-2">{suggestion.reason}</p>
                       <div className="flex gap-4 text-sm">
-                        <span className="text-gray-600">Precio actual: <strong>{suggestion.currentPrice}</strong></span>
-                        <span className="text-green-600">Precio sugerido: <strong>{suggestion.suggestedPrice}</strong></span>
-                        <span className="text-blue-600">Impacto: <strong>{suggestion.impact}</strong></span>
+                        <span className="text-gray-600">Current price: <strong>{suggestion.currentPrice}</strong></span>
+                        <span className="text-green-600">Suggested price: <strong>{suggestion.suggestedPrice}</strong></span>
+                        <span className="text-blue-600">Impact: <strong>{suggestion.impact}</strong></span>
                       </div>
                     </div>
                     <TrendingUp className="w-5 h-5 text-green-500" />
@@ -399,13 +399,13 @@ const AI = () => {
                       className="bg-green-600 hover:bg-green-700"
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Aplicar Precio
+                      Apply Price
                     </Button>
                     <Button 
                       size="sm" 
                       variant="outline"
                     >
-                      Ver Análisis Detallado
+                      View Detailed Analysis
                     </Button>
                   </div>
                 </div>
@@ -419,7 +419,7 @@ const AI = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-blue-900">
               <Brain className="w-5 h-5" />
-              📊 Ejemplo Práctico: Hotel con Stock Crítico
+              📊 Practical Example: Hotel with Critical Stock
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -427,10 +427,10 @@ const AI = () => {
               <div className="flex items-start gap-3 mb-4">
                 <AlertTriangle className="w-6 h-6 text-red-500 mt-1" />
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900 mb-2">Alerta Inteligente de IA</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">AI Smart Alert</h4>
                   <p className="text-gray-700 mb-3">
-                    "Tienes <strong>15 kg de salmón</strong> que vencerán en <strong>4 días</strong>. 
-                    Recomendación: reducir pedido de esta semana en <strong>20%</strong> y mover stock al menú especial del día."
+                    "You have <strong>15 kg of salmon</strong> that will expire in <strong>4 days</strong>. 
+                    Recommendation: reduce this week's order by <strong>20%</strong> and move stock to daily special menu."
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <Button 
@@ -439,23 +439,23 @@ const AI = () => {
                       className="bg-green-600 hover:bg-green-700"
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Aceptar Recomendación
+                      Accept Recommendation
                     </Button>
                     <Button 
                       size="sm" 
                       variant="outline"
-                      onClick={() => handleSendToMarketplace("Salmón Atlántico")}
+                      onClick={() => handleSendToMarketplace("Atlantic Salmon")}
                     >
                       <ExternalLink className="w-4 h-4 mr-1" />
-                      Enviar a Marketplace
+                      Send to Marketplace
                     </Button>
                     <Button 
                       size="sm" 
                       variant="outline"
-                      onClick={() => handleReduceOrder("Salmón", "20%")}
+                      onClick={() => handleReduceOrder("Salmon", "20%")}
                     >
                       <Package className="w-4 h-4 mr-1" />
-                      Reducir Pedido
+                      Reduce Order
                     </Button>
                   </div>
                 </div>
