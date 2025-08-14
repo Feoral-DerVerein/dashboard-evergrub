@@ -51,42 +51,42 @@ export default function ExpiringSoonCard({ products }: ExpiringSoonCardProps) {
                                "bg-muted border-border";
               
               return (
-                <div key={item.id} className={`${bgGradient} border rounded-xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] group`}>
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
+                <div key={item.id} className={`${bgGradient} border rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.01] group`}>
+                  <div className="flex items-start justify-between gap-4">
                     {/* Product Info - Takes more space */}
-                    <div className="lg:col-span-2 space-y-2">
-                      <h4 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">{item.name}</h4>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${urgencyBg}`}>
-                          <div className={`w-2 h-2 rounded-full ${sev === "high" ? "bg-red-500 animate-pulse" : sev === "medium" ? "bg-yellow-500" : "bg-muted-foreground"}`}></div>
-                          <span className={`font-semibold text-sm ${urgencyColor}`}>
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <h4 className="font-bold text-base text-foreground group-hover:text-primary transition-colors truncate">{item.name}</h4>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${urgencyBg}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${sev === "high" ? "bg-red-500 animate-pulse" : sev === "medium" ? "bg-yellow-500" : "bg-muted-foreground"}`}></div>
+                          <span className={urgencyColor}>
                             {Math.max(0, isFinite(d) ? d : 0)} days left
                           </span>
                         </div>
-                        <span className="text-muted-foreground font-medium bg-background/60 px-3 py-1.5 rounded-full border text-sm">
+                        <span className="text-muted-foreground text-xs bg-background/60 px-2.5 py-1 rounded-full border">
                           {item.quantity} units
                         </span>
                       </div>
                     </div>
                     
-                    {/* Action Buttons - More prominent */}
-                    <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3">
+                    {/* Action Buttons - Stacked vertically and smaller */}
+                    <div className="flex flex-col gap-2 flex-shrink-0">
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="flex-1 h-11 font-semibold bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 hover:shadow-md hover:scale-105 transition-all duration-200 group/btn"
+                        className="h-8 px-3 text-xs font-medium bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 hover:shadow-sm hover:scale-105 transition-all duration-200 group/btn"
                         onClick={() => console.log(`Add ${item.name} to marketplace`)}
                       >
-                        <Store className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                        <Store className="w-3 h-3 mr-1.5 group-hover/btn:scale-110 transition-transform" />
                         Marketplace
                       </Button>
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="flex-1 h-11 font-semibold bg-gradient-to-r from-green-50 to-green-100 border-green-200 text-green-700 hover:from-green-100 hover:to-green-200 hover:border-green-300 hover:shadow-md hover:scale-105 transition-all duration-200 group/btn"
+                        className="h-8 px-3 text-xs font-medium bg-gradient-to-r from-green-50 to-green-100 border-green-200 text-green-700 hover:from-green-100 hover:to-green-200 hover:border-green-300 hover:shadow-sm hover:scale-105 transition-all duration-200 group/btn"
                         onClick={() => console.log(`Donate ${item.name}`)}
                       >
-                        <Heart className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                        <Heart className="w-3 h-3 mr-1.5 group-hover/btn:scale-110 transition-transform" />
                         Donation
                       </Button>
                     </div>
