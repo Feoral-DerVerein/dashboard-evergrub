@@ -257,13 +257,13 @@ const Dashboard = () => {
               <img src="/lovable-uploads/25d0c5fc-4ab3-44dd-8e67-5e06c5a81537.png" alt="WiseBite Logo" className="h-8 w-auto" />
             </div>
             <nav className="space-y-1">
-              <Link to="/ai" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:shadow-lg transition-all duration-200 mb-2">
-                <Brain className="w-5 h-5" />
-                <span className="font-semibold">🤖 IA WiseBite</span>
-              </Link>
               <Link to="/kpi" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                 <BarChart3 className="w-4 h-4" />
                 <span>Performance</span>
+              </Link>
+              <Link to="/ai" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:shadow-lg transition-all duration-200">
+                <Brain className="w-5 h-5" />
+                <span className="font-semibold">🤖 IA WiseBite</span>
               </Link>
               <Link to="/products" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                 <ShoppingCart className="w-4 h-4" />
