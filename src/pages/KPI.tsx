@@ -328,17 +328,73 @@ const handleGenerateInsights = async () => {
     </Button>
   </div>
   {aiInsights && (
-    <div className="bg-white rounded-xl p-4 border">
-      <h4 className="font-semibold mb-2">AI Summary</h4>
-      <p className="text-sm text-gray-600 mb-3">{aiInsights.executive_summary}</p>
-      {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && (
-        <div>
-          <h5 className="text-sm font-medium mb-1">Recommendations</h5>
-          <ul className="list-disc pl-5 text-sm text-gray-700">
-            {aiInsights.recommendations.slice(0,3).map((r: any, i: number) => (
-              <li key={i}>{typeof r === 'string' ? r : (r.title || JSON.stringify(r))}</li>
-            ))}
-          </ul>
+    <div className="space-y-4">
+      {/* Main AI Summary */}
+      <div className="bg-white rounded-xl p-4 border">
+        <h4 className="font-semibold mb-2">AI Summary</h4>
+        <p className="text-sm text-gray-600 mb-3">{aiInsights.executive_summary}</p>
+        {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && (
+          <div>
+            <h5 className="text-sm font-medium mb-1">Recommendations</h5>
+            <ul className="list-disc pl-5 text-sm text-gray-700">
+              {aiInsights.recommendations.slice(0,3).map((r: any, i: number) => (
+                <li key={i}>{typeof r === 'string' ? r : (r.title || JSON.stringify(r))}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {/* Sustainability Impact Cards */}
+      {aiInsights.sustainability_impact && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-xl p-4 border">
+            <h4 className="font-semibold text-green-700 mb-2">Sustainability Impact</h4>
+            <div className="space-y-3">
+              <div>
+                <p className="text-gray-600 text-sm">CO₂ Saved</p>
+                <p className="text-2xl font-bold">{aiInsights.sustainability_impact.co2_saved_kg} kg</p>
+                <p className="text-green-600 text-sm">{aiInsights.sustainability_impact.co2_saved_change}</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">Waste Reduced</p>
+                <p className="text-2xl font-bold">{aiInsights.sustainability_impact.waste_reduced_percentage}%</p>
+                <p className="text-green-600 text-sm">Target: {aiInsights.sustainability_impact.waste_target}%</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 border">
+            <h4 className="font-semibold text-blue-700 mb-2">Customer Insights</h4>
+            <div className="space-y-3">
+              <div>
+                <p className="text-gray-600 text-sm">Conversion Rate</p>
+                <p className="text-2xl font-bold">{aiInsights.customer_insights.conversion_rate}%</p>
+                <p className="text-green-600 text-sm">{aiInsights.customer_insights.conversion_change}</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">Return Rate</p>
+                <p className="text-2xl font-bold">{aiInsights.customer_insights.return_rate}%</p>
+                <p className="text-orange-600 text-sm">{aiInsights.customer_insights.return_change}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 border">
+            <h4 className="font-semibold text-emerald-700 mb-2">Savings & Food Waste</h4>
+            <div className="space-y-3">
+              <div>
+                <p className="text-gray-600 text-sm">Cost Savings</p>
+                <p className="text-2xl font-bold">${aiInsights.sustainability_impact.cost_savings}</p>
+                <p className="text-green-600 text-sm">{aiInsights.sustainability_impact.cost_savings_change}</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">Food Waste Reduced</p>
+                <p className="text-2xl font-bold">{aiInsights.sustainability_impact.food_waste_reduced_kg} kg</p>
+                <p className="text-green-600 text-sm">{aiInsights.sustainability_impact.food_waste_change}</p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
