@@ -546,18 +546,6 @@ const KPI = () => {
               </div>
             </div>
 
-        {/* IA Training + Download */}
-        <div className="w-full max-w-lg space-y-3">
-  <UploadTrainingDataDialog />
-  <div className="grid grid-cols-1 gap-2">
-    <Button className="w-full" onClick={handleGenerateInsights} disabled={isGeneratingInsights}>
-      {isGeneratingInsights ? "Generating insights..." : "Generate AI Insights"}
-    </Button>
-    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
-      <Download className="w-5 h-5" />
-      {isGeneratingReport ? "Generating Report..." : "Download Report"}
-    </Button>
-  </div>
   {aiInsights && <div className="space-y-4">
       {/* Main AI Summary */}
       <div className="bg-white rounded-xl p-4 border">
@@ -622,13 +610,28 @@ const KPI = () => {
           </div>
         </div>}
     </div>}
-        </div>
+          </section>
 
-            {/* Stock Alerts, Expiring Soon, and Suppliers Row */}
+          {/* Stock Alerts, Expiring Soon, and Suppliers Row */}
+          <section className="px-6">
             <div className="grid md:grid-cols-3 gap-6 mt-6">
               <StockAlertsCard products={products} />
               <ExpiringSoonCard products={products} />
               <SuppliersCard partners={partners} />
+            </div>
+
+            {/* IA Training + Download Buttons */}
+            <div className="w-full max-w-lg space-y-3 mt-6">
+              <UploadTrainingDataDialog />
+              <div className="grid grid-cols-1 gap-2">
+                <Button className="w-full" onClick={handleGenerateInsights} disabled={isGeneratingInsights}>
+                  {isGeneratingInsights ? "Generating insights..." : "Generate AI Insights"}
+                </Button>
+                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
+                  <Download className="w-5 h-5" />
+                  {isGeneratingReport ? "Generating Report..." : "Download Report"}
+                </Button>
+              </div>
             </div>
 
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
@@ -646,6 +649,8 @@ const KPI = () => {
         </div>
 
       <BottomNav />
-    </div>;
+    </div>
+  );
 };
+
 export default KPI;
