@@ -89,18 +89,73 @@ const RecommendationCard = ({ recommendation }: { recommendation: AIRecommendati
   );
 };
 
-export const AIRecommendations = () => {
+export const AIRecommendations = ({ 
+  predictiveData, 
+  realData 
+}: { 
+  predictiveData?: any; 
+  realData?: any; 
+}) => {
+  // Generate dynamic recommendations based on real data
+  const dynamicRecommendations: AIRecommendation[] = [
+    {
+      id: '1',
+      type: 'purchase',
+      title: `Monitor ${predictiveData?.overstockedItem || 'inventory levels'}`,
+      description: `Consider reducing purchases of ${predictiveData?.overstockedItem || 'overstocked items'} - ${predictiveData?.overstockAmount || 'excess detected'}`,
+      icon: ShoppingCart,
+      borderColor: 'border-l-red-500',
+      iconColor: 'text-red-500'
+    },
+    {
+      id: '2',
+      type: 'demand',
+      title: `Boost ${predictiveData?.topSellingProduct || 'top products'}`,
+      description: `Increase stock of ${predictiveData?.topSellingProduct || 'high-demand products'} - ${predictiveData?.topSellingRate || '0%'} performance rate`,
+      icon: TrendingUp,
+      borderColor: 'border-l-green-500',
+      iconColor: 'text-green-500'
+    },
+    {
+      id: '3',
+      type: 'optimization',
+      title: 'Optimize reorder timing',
+      description: `Consider reordering ${predictiveData?.reorderCategory || 'products'} in ${predictiveData?.optimalReorder || '3'} days for better efficiency`,
+      icon: RefreshCw,
+      borderColor: 'border-l-blue-500',
+      iconColor: 'text-blue-500'
+    },
+    {
+      id: '4',
+      type: 'demand',
+      title: 'Demand forecast analysis',
+      description: `Expected ${predictiveData?.demandForecast || '+15%'} demand increase ${predictiveData?.forecastPeriod || 'next week'} - prepare accordingly`,
+      icon: TrendingUp,
+      borderColor: 'border-l-green-500',
+      iconColor: 'text-green-500'
+    },
+    {
+      id: '5',
+      type: 'donation',
+      title: 'Sustainability impact',
+      description: `Current CO₂ savings: ${realData?.co2Saved || '0 kg'} - maintain eco-friendly practices`,
+      icon: Heart,
+      borderColor: 'border-l-orange-500',
+      iconColor: 'text-orange-500'
+    }
+  ];
+
   return (
     <div className="space-y-4 w-full">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">AI Recommendations</h3>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          Updated today
+          Updated with real data
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
-        {recommendations.map((recommendation) => (
+        {dynamicRecommendations.map((recommendation) => (
           <RecommendationCard 
             key={recommendation.id} 
             recommendation={recommendation} 
