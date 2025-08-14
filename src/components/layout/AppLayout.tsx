@@ -1,18 +1,14 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Sparkles } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
-
 const AppLayout = () => {
   const location = useLocation();
   const isDashboard = location.pathname === "/dashboard";
-
-  return (
-    <div className="min-h-screen bg-gray-50 md:flex md:items-center md:justify-center">
+  return <div className="min-h-screen bg-gray-50 md:flex md:items-center md:justify-center">
       <div className="w-full max-w-7xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0">
         <div className={isDashboard ? "" : "md:grid md:grid-cols-[220px_1fr]"}>
           {/* Sidebar - hide on dashboard to avoid duplication (dashboard already renders its own) */}
-          {!isDashboard && (
-            <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen md:rounded-l-xl">
+          {!isDashboard && <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen md:rounded-l-xl">
               <div className="mb-6 px-2">
                 <img src="/lovable-uploads/25d0c5fc-4ab3-44dd-8e67-5e06c5a81537.png" alt="WiseBite Logo" className="h-8 w-auto" />
               </div>
@@ -41,10 +37,7 @@ const AppLayout = () => {
                   <Megaphone className="w-4 h-4" />
                   <span>Ads</span>
                 </Link>
-                <Link to="/donate" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <Heart className="w-4 h-4" />
-                  <span>Donate</span>
-                </Link>
+                
                 <Link to="/grains" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <Coins className="w-4 h-4" />
                   <span>Grains</span>
@@ -61,8 +54,7 @@ const AppLayout = () => {
               <div className="mt-auto pt-4 border-t border-gray-100">
                 <LogoutButton />
               </div>
-            </aside>
-          )}
+            </aside>}
 
           {/* Routed content */}
           <div>
@@ -70,8 +62,6 @@ const AppLayout = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AppLayout;
