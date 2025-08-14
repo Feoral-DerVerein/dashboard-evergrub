@@ -601,6 +601,8 @@ const KPI = () => {
             </aside>
           </main>
 
+          {/* Main dashboard content and chart - Moved to bottom */}
+          
 
           {/* Stock Alerts, Expiring Soon, and Suppliers Row */}
           <section className="px-6">
