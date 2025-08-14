@@ -32,39 +32,55 @@ export default function ExpiringSoonCard({ products }: ExpiringSoonCardProps) {
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (
-          <p className="text-sm text-gray-500">No items expiring soon</p>
+          <div className="text-center py-6">
+            <p className="text-muted-foreground">No items expiring soon</p>
+          </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {items.map((item) => {
               const d = daysUntil(item.expirationDate);
               const sev = severityFor(d);
-              const bg = sev === "high" ? "bg-red-50" : sev === "medium" ? "bg-yellow-50" : "bg-red-50";
+              const bgColor = sev === "high" ? "bg-destructive/10 border-destructive/20" : 
+                             sev === "medium" ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-800" : 
+                             "bg-muted/50 border-border";
+              const urgencyColor = sev === "high" ? "text-destructive" : 
+                                  sev === "medium" ? "text-yellow-600 dark:text-yellow-400" : 
+                                  "text-muted-foreground";
+              
               return (
-                <div key={item.id} className={`${bg} p-3 rounded-lg`}>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{item.name}</h4>
-                      <p className="text-sm text-gray-600">
-                        Expires in: {Math.max(0, isFinite(d) ? d : 0)} days • Quantity: {item.quantity} units
-                      </p>
+                <div key={item.id} className={`${bgColor} border rounded-lg p-4 transition-all hover:shadow-sm`}>
+                  <div className="space-y-3">
+                    {/* Product Info */}
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">{item.name}</h4>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className={`font-medium ${urgencyColor}`}>
+                          {Math.max(0, isFinite(d) ? d : 0)} days remaining
+                        </span>
+                        <span className="text-muted-foreground">
+                          {item.quantity} units
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex gap-2 ml-3">
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 pt-2">
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="h-8 px-3"
+                        className="flex-1 h-9"
                         onClick={() => console.log(`Add ${item.name} to marketplace`)}
                       >
-                        <Store className="w-3 h-3 mr-1" />
+                        <Store className="w-4 h-4 mr-2" />
                         Marketplace
                       </Button>
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="h-8 px-3"
+                        className="flex-1 h-9"
                         onClick={() => console.log(`Donate ${item.name}`)}
                       >
-                        <Heart className="w-3 h-3 mr-1" />
+                        <Heart className="w-4 h-4 mr-2" />
                         Donation
                       </Button>
                     </div>
