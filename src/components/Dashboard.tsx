@@ -262,7 +262,7 @@ const Dashboard = () => {
                 <span>Performance</span>
               </Link>
               <Link to="/ai" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:shadow-lg transition-all duration-200">
-                <Brain className="w-5 h-5" />
+                <Sparkles className="w-5 h-5" />
                 <span className="font-semibold">🤖 IA WiseBite</span>
               </Link>
               <Link to="/products" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
