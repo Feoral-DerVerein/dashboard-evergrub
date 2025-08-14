@@ -346,7 +346,7 @@ serve(async (req) => {
     if (products.length > 0) {
       const lowStockProducts = products.filter(p => Number(p.quantity || 0) < 5);
       if (lowStockProducts.length > 0) {
-        alerts.push(`${lowStockProducts.length} productos con stock bajo (menos de 5 unidades)`);
+        alerts.push(`${lowStockProducts.length} products with low stock (less than 5 units)`);
       }
       
       const expiringSoon = products.filter(p => {
@@ -357,7 +357,7 @@ serve(async (req) => {
         return diffDays <= 7 && diffDays >= 0;
       });
       if (expiringSoon.length > 0) {
-        alerts.push(`${expiringSoon.length} productos próximos a vencer en 7 días`);
+        alerts.push(`${expiringSoon.length} products expiring within 7 days`);
       }
     }
     
@@ -365,25 +365,25 @@ serve(async (req) => {
     if (products.length > 0) {
       const avgPrice = products.reduce((sum, p) => sum + Number(p.price || 0), 0) / products.length;
       recommendations.push({
-        title: "Optimizar precios",
-        reason: `Precio promedio de productos: $${avgPrice.toFixed(2)}`,
-        impact: "Incremento potencial del 10-15% en ingresos"
+        title: "Optimize pricing strategy",
+        reason: `Current average product price: $${avgPrice.toFixed(2)}`,
+        impact: "Potential 10-15% revenue increase"
       });
     }
     
     if (totalOrders > 0 && avgOrderValue < 50) {
       recommendations.push({
-        title: "Implementar venta cruzada", 
-        reason: "El ticket promedio es bajo, hay oportunidad de incrementarlo",
-        impact: "Aumento del 20-30% en el valor promedio por orden"
+        title: "Implement cross-selling strategy", 
+        reason: "Average order value is low, opportunity to increase it",
+        impact: "20-30% increase in average order value"
       });
     }
     
     if (productSales && Object.keys(productSales).length > 0) {
       recommendations.push({
-        title: "Enfocar marketing en productos top",
-        reason: "Productos más vendidos identificados, maximizar su promoción",
-        impact: "Incremento del 15-25% en ventas de productos estrella"
+        title: "Focus marketing on top products",
+        reason: "Best-selling products identified, maximize their promotion",
+        impact: "15-25% increase in star product sales"
       });
     }
     
@@ -398,22 +398,22 @@ serve(async (req) => {
     
     // Build response
     const parsed = {
-      executive_summary: `Análisis de ${period.toLowerCase()}: Se encontraron ${products.length} productos en inventario, ${totalOrders} órdenes procesadas con ingresos totales de $${totalRevenue.toFixed(2)}. ${alerts.length > 0 ? 'Se detectaron alertas importantes que requieren atención.' : 'El negocio muestra estabilidad operativa.'}`,
+      executive_summary: `${period} Analysis: Found ${products.length} products in inventory, ${totalOrders} orders processed with total revenue of $${totalRevenue.toFixed(2)}. ${alerts.length > 0 ? 'Important alerts detected that require attention.' : 'Business shows operational stability.'}`,
       key_metrics: {
         revenue: totalRevenue,
         orders: totalOrders,
         avg_ticket: Math.round(avgOrderValue * 100) / 100,
-        top_products: topProducts.length > 0 ? topProducts : ["No hay datos suficientes"]
+        top_products: topProducts.length > 0 ? topProducts : ["Insufficient data available"]
       },
       forecast: {
         next_4_weeks: forecast
       },
       recommendations: recommendations.length > 0 ? recommendations : [{
-        title: "Continuar operaciones normales",
-        reason: "Los datos actuales muestran funcionamiento estable",
-        impact: "Mantener nivel actual de rendimiento"
+        title: "Continue normal operations",
+        reason: "Current data shows stable performance",
+        impact: "Maintain current performance level"
       }],
-      alerts: alerts.length > 0 ? alerts : ["No hay alertas críticas en este momento"]
+      alerts: alerts.length > 0 ? alerts : ["No critical alerts at this time"]
     };
     
     console.log('Generated insights:', JSON.stringify(parsed, null, 2));
