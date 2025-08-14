@@ -621,20 +621,6 @@ const KPI = () => {
               <SuppliersCard partners={partners} />
             </div>
 
-            {/* IA Training + Download Buttons */}
-            <div className="w-full max-w-lg space-y-3 mt-6">
-              <UploadTrainingDataDialog />
-              <div className="grid grid-cols-1 gap-2">
-                <Button className="w-full" onClick={handleGenerateInsights} disabled={isGeneratingInsights}>
-                  {isGeneratingInsights ? "Generating insights..." : "Generate AI Insights"}
-                </Button>
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
-                  <Download className="w-5 h-5" />
-                  {isGeneratingReport ? "Generating Report..." : "Download Report"}
-                </Button>
-              </div>
-            </div>
-
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
               <div className="flex items-center justify-center gap-1">
                 <span>2.4 MB</span>
