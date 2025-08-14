@@ -60,30 +60,56 @@ serve(async (req) => {
       });
     }
 
-    const textExts = ['txt', 'csv', 'json', 'md'];
+    const textExts = ['txt', 'csv', 'json', 'md', 'tsv'];
+    const allowedMimeExact = ['application/json', 'text/csv', 'text/plain', 'text/markdown', 'application/x-ndjson'];
     const maxBytes = 120_000;
     const chunks: string[] = [];
+    const includedNames: string[] = [];
+
+    function isLikelyText(buf: Uint8Array) {
+      const len = Math.min(buf.length, 2048);
+      if (len === 0) return false;
+      let nonPrintable = 0;
+      for (let i = 0; i < len; i++) {
+        const c = buf[i];
+        if (c === 9 || c === 10 || c === 13) continue; // tab, LF, CR
+        if (c < 32 || c > 126) nonPrintable++;
+      }
+      return nonPrintable / len < 0.2;
+    }
 
     for (const f of files) {
       if (f.name.startsWith('.')) continue;
       const ext = f.name.split('.').pop()?.toLowerCase();
-      if (!ext || !textExts.includes(ext)) continue;
       const path = `${userId}/${f.name}`;
       const { data: blob, error: dlError } = await supabase.storage
         .from('ai-training')
         .download(path);
       if (dlError || !blob) continue;
+
+      const type = (blob as Blob).type || '';
       const ab = await blob.arrayBuffer();
+      const u8 = new Uint8Array(ab);
+
+      const considered = (ext ? textExts.includes(ext) : false)
+        || type.startsWith('text/')
+        || allowedMimeExact.includes(type)
+        || isLikelyText(u8);
+
+      if (!considered) continue;
+
       const sliced = ab.byteLength > maxBytes ? ab.slice(0, maxBytes) : ab;
       const content = new TextDecoder().decode(sliced);
       chunks.push(`File: ${f.name}\n${content}\n---\n`);
+      includedNames.push(f.name);
       if (chunks.join('\n').length > 400_000) break; // bound prompt size
     }
 
     const corpus = chunks.join('\n').slice(0, 500_000);
     if (corpus.length === 0) {
+      const foundNames = files.map((f) => f.name).slice(0, 15).join(', ');
       return new Response(
-        JSON.stringify({ error: 'No parsable text files (supported: txt, csv, json, md)' }),
+        JSON.stringify({ error: `No parsable text files (supported: txt, csv, json, md). Found: ${files.length} file(s): ${foundNames}` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
