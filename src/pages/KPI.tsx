@@ -256,7 +256,15 @@ const KPI = () => {
     totalSales: "$0",
     salesTrend: "0%",
     transactions: "0",
-    transactionsTrend: "0%"
+    transactionsTrend: "0%",
+    profit: "$0",
+    profitTrend: "0%",
+    savings: "$0",
+    savingsTrend: "0%",
+    revenue: "$0",
+    revenueTrend: "0%",
+    avgOrderValue: "$0",
+    avgOrderTrend: "0%"
   });
 
   // AI Predictive Insights state
@@ -294,6 +302,11 @@ const KPI = () => {
         const costSavings = Math.round(totalSales * 0.15); // 15% savings
         const foodWasteKg = Math.round(estimatedItems * 0.3); // 0.3kg waste reduced per item
 
+        // Calculate additional metrics
+        const profit = Math.round(totalSales * 0.25); // 25% profit margin
+        const revenue = Math.round(totalSales * 1.15); // Revenue including taxes
+        const operationalSavings = Math.round(totalSales * 0.18); // 18% operational savings
+
         setRealData({
           co2Saved: `${co2SavedKg} kg`,
           co2Change: "+18% vs last week",
@@ -310,7 +323,15 @@ const KPI = () => {
           totalSales: `$${Math.round(totalSales).toLocaleString()}`,
           salesTrend: "12.5%",
           transactions: orders.length.toString(),
-          transactionsTrend: "8.2%"
+          transactionsTrend: "8.2%",
+          profit: `$${profit.toLocaleString()}`,
+          profitTrend: "15.8%",
+          savings: `$${operationalSavings.toLocaleString()}`,
+          savingsTrend: "22.3%",
+          revenue: `$${revenue.toLocaleString()}`,
+          revenueTrend: "9.7%",
+          avgOrderValue: `$${Math.round(avgOrderValue).toLocaleString()}`,
+          avgOrderTrend: "4.5%"
         });
       }
       if (products.length > 0) {
@@ -501,10 +522,14 @@ const KPI = () => {
               <TimeFilterButton label="Year" isActive={activeTimeFilter === "Year"} onClick={() => handleTimeFilterClick("Year")} />
             </div>
 
-            {/* KPI Metrics */}
-            <div className="grid grid-cols-2 gap-4 max-w-lg">
+            {/* KPI Metrics - Expanded with Profit, Savings, Revenue */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <MetricCard icon={AreaChart} value={realData.totalSales} label="Total Sales" trend={realData.salesTrend} />
               <MetricCard icon={Lock} value={realData.transactions} label="Transactions" trend={realData.transactionsTrend} />
+              <MetricCard icon={Package} value={realData.profit} label="Profit" trend={realData.profitTrend} />
+              <MetricCard icon={AlertTriangle} value={realData.savings} label="Operational Savings" trend={realData.savingsTrend} />
+              <MetricCard icon={Plus} value={realData.revenue} label="Revenue" trend={realData.revenueTrend} />
+              <MetricCard icon={User} value={realData.avgOrderValue} label="Avg Order Value" trend={realData.avgOrderTrend} />
             </div>
 
             {/* Sales Performance Chart */}
