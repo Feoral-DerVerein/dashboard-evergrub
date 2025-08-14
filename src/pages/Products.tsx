@@ -379,10 +379,7 @@ const Products = () => {
                       {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
                     </button>
                     
-                    <button onClick={() => product.id && handleNotifyShops(product.id, product.name)} disabled={notifyingShopsProductId === product.id} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-purple-600 bg-purple-50 rounded hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                      <Store className="w-3 h-3" />
-                      {notifyingShopsProductId === product.id ? "Notifying..." : "Notify Shops"}
-                    </button>
+                    
                   </div>
                 </div>
               </div>)}
