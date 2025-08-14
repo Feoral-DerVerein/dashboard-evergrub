@@ -172,20 +172,20 @@ const handleDownloadReport = async () => {
 
 const handleGenerateInsights = async () => {
   try {
-    setIsGeneratingInsights(true);
-    toast.info("Generando insights con IA...");
-    const { data, error } = await supabase.functions.invoke('ai-train', {
-      body: { period: activeTimeFilter }
-    });
-    if (error) throw error;
-    setAiInsights(data);
-    toast.success("Insights generados.");
-  } catch (err) {
-    console.error("AI insights error:", err);
-    toast.error("No se pudieron generar los insights.");
-  } finally {
-    setIsGeneratingInsights(false);
-  }
+  setIsGeneratingInsights(true);
+  toast.info("Generating AI insights...");
+  const { data, error } = await supabase.functions.invoke('ai-train', {
+    body: { period: activeTimeFilter }
+  });
+  if (error) throw error;
+  setAiInsights(data);
+  toast.success("Insights generated successfully.");
+} catch (err) {
+  console.error("AI insights error:", err);
+  toast.error("Could not generate insights.");
+} finally {
+  setIsGeneratingInsights(false);
+}
 };
   return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
       <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
@@ -320,7 +320,7 @@ const handleGenerateInsights = async () => {
   <UploadTrainingDataDialog />
   <div className="grid grid-cols-1 gap-2">
     <Button className="w-full" onClick={handleGenerateInsights} disabled={isGeneratingInsights}>
-      {isGeneratingInsights ? "Generando insights..." : "Generar insights IA"}
+      {isGeneratingInsights ? "Generating insights..." : "Generate AI Insights"}
     </Button>
     <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
       <Download className="w-5 h-5" />
@@ -329,11 +329,11 @@ const handleGenerateInsights = async () => {
   </div>
   {aiInsights && (
     <div className="bg-white rounded-xl p-4 border">
-      <h4 className="font-semibold mb-2">Resumen IA</h4>
+      <h4 className="font-semibold mb-2">AI Summary</h4>
       <p className="text-sm text-gray-600 mb-3">{aiInsights.executive_summary}</p>
       {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && (
         <div>
-          <h5 className="text-sm font-medium mb-1">Recomendaciones</h5>
+          <h5 className="text-sm font-medium mb-1">Recommendations</h5>
           <ul className="list-disc pl-5 text-sm text-gray-700">
             {aiInsights.recommendations.slice(0,3).map((r: any, i: number) => (
               <li key={i}>{typeof r === 'string' ? r : (r.title || JSON.stringify(r))}</li>
