@@ -87,14 +87,13 @@ export const BottomNav = () => {
     notificationCount
   } = useNotificationsAndOrders();
   return <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between md:hidden">
-      <Link to="/dashboard" className="bottom-nav-item">
-
+      <Link to="/kpi" className="bottom-nav-item">
         <Home className="w-6 h-6" />
-        <span className="text-xs">Home</span>
+        <span className="text-xs">Dashboard</span>
       </Link>
-      <Link to="/profile" className="bottom-nav-item">
-        <User className="w-6 h-6" />
-        <span className="text-xs">Profile</span>
+      <Link to="/ai" className="bottom-nav-item">
+        <Sparkles className="w-6 h-6" />
+        <span className="text-xs">AI</span>
       </Link>
       <Link to="/products/add" className="bottom-nav-item">
         <Plus className="w-6 h-6" />
