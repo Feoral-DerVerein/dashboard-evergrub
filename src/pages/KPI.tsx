@@ -18,61 +18,147 @@ import ExpiringSoonCard from "@/components/kpi/ExpiringSoonCard";
 import SuppliersCard from "@/components/kpi/SuppliersCard";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { supabase } from "@/integrations/supabase/client";
-const chartDataSamples: Record<TimeFilterPeriod, { label: string; value: number }[]> = {
-  Today: [
-    { label: "9AM", value: 200 },
-    { label: "10AM", value: 320 },
-    { label: "11AM", value: 450 },
-    { label: "12PM", value: 600 },
-    { label: "1PM", value: 520 },
-    { label: "2PM", value: 680 },
-    { label: "3PM", value: 740 },
-    { label: "4PM", value: 820 },
-    { label: "5PM", value: 900 }
-  ],
-  Week: [
-    { label: "Mon", value: 2500 },
-    { label: "Tue", value: 1500 },
-    { label: "Wed", value: 3500 },
-    { label: "Thu", value: 4000 },
-    { label: "Fri", value: 4500 },
-    { label: "Sat", value: 4000 },
-    { label: "Sun", value: 4200 }
-  ],
-  Month: [
-    { label: "W1", value: 8200 },
-    { label: "W2", value: 9100 },
-    { label: "W3", value: 8800 },
-    { label: "W4", value: 9800 }
-  ],
-  Quarter: [
-    { label: "W1", value: 3000 },
-    { label: "W2", value: 3600 },
-    { label: "W3", value: 4200 },
-    { label: "W4", value: 3900 },
-    { label: "W5", value: 4400 },
-    { label: "W6", value: 4800 },
-    { label: "W7", value: 5100 },
-    { label: "W8", value: 5300 },
-    { label: "W9", value: 5500 },
-    { label: "W10", value: 5700 },
-    { label: "W11", value: 5900 },
-    { label: "W12", value: 6100 }
-  ],
-  Year: [
-    { label: "Jan", value: 12000 },
-    { label: "Feb", value: 11500 },
-    { label: "Mar", value: 14000 },
-    { label: "Apr", value: 13500 },
-    { label: "May", value: 15000 },
-    { label: "Jun", value: 14500 },
-    { label: "Jul", value: 16000 },
-    { label: "Aug", value: 15800 },
-    { label: "Sep", value: 14900 },
-    { label: "Oct", value: 15500 },
-    { label: "Nov", value: 16200 },
-    { label: "Dec", value: 17000 }
-  ]
+const chartDataSamples: Record<TimeFilterPeriod, {
+  label: string;
+  value: number;
+}[]> = {
+  Today: [{
+    label: "9AM",
+    value: 200
+  }, {
+    label: "10AM",
+    value: 320
+  }, {
+    label: "11AM",
+    value: 450
+  }, {
+    label: "12PM",
+    value: 600
+  }, {
+    label: "1PM",
+    value: 520
+  }, {
+    label: "2PM",
+    value: 680
+  }, {
+    label: "3PM",
+    value: 740
+  }, {
+    label: "4PM",
+    value: 820
+  }, {
+    label: "5PM",
+    value: 900
+  }],
+  Week: [{
+    label: "Mon",
+    value: 2500
+  }, {
+    label: "Tue",
+    value: 1500
+  }, {
+    label: "Wed",
+    value: 3500
+  }, {
+    label: "Thu",
+    value: 4000
+  }, {
+    label: "Fri",
+    value: 4500
+  }, {
+    label: "Sat",
+    value: 4000
+  }, {
+    label: "Sun",
+    value: 4200
+  }],
+  Month: [{
+    label: "W1",
+    value: 8200
+  }, {
+    label: "W2",
+    value: 9100
+  }, {
+    label: "W3",
+    value: 8800
+  }, {
+    label: "W4",
+    value: 9800
+  }],
+  Quarter: [{
+    label: "W1",
+    value: 3000
+  }, {
+    label: "W2",
+    value: 3600
+  }, {
+    label: "W3",
+    value: 4200
+  }, {
+    label: "W4",
+    value: 3900
+  }, {
+    label: "W5",
+    value: 4400
+  }, {
+    label: "W6",
+    value: 4800
+  }, {
+    label: "W7",
+    value: 5100
+  }, {
+    label: "W8",
+    value: 5300
+  }, {
+    label: "W9",
+    value: 5500
+  }, {
+    label: "W10",
+    value: 5700
+  }, {
+    label: "W11",
+    value: 5900
+  }, {
+    label: "W12",
+    value: 6100
+  }],
+  Year: [{
+    label: "Jan",
+    value: 12000
+  }, {
+    label: "Feb",
+    value: 11500
+  }, {
+    label: "Mar",
+    value: 14000
+  }, {
+    label: "Apr",
+    value: 13500
+  }, {
+    label: "May",
+    value: 15000
+  }, {
+    label: "Jun",
+    value: 14500
+  }, {
+    label: "Jul",
+    value: 16000
+  }, {
+    label: "Aug",
+    value: 15800
+  }, {
+    label: "Sep",
+    value: 14900
+  }, {
+    label: "Oct",
+    value: 15500
+  }, {
+    label: "Nov",
+    value: 16200
+  }, {
+    label: "Dec",
+    value: 17000
+  }]
 };
 const TimeFilterButton = ({
   label,
@@ -142,7 +228,9 @@ const KPI = () => {
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
   // Inventory POS state
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loadingInventory, setLoadingInventory] = useState(true);
@@ -187,26 +275,20 @@ const KPI = () => {
   const loadRealData = async () => {
     try {
       // Fetch orders and products data
-      const [ordersResponse, productsResponse] = await Promise.all([
-        supabase.from('orders').select('*'),
-        supabase.from('products').select('*')
-      ]);
-
+      const [ordersResponse, productsResponse] = await Promise.all([supabase.from('orders').select('*'), supabase.from('products').select('*')]);
       if (ordersResponse.error) throw ordersResponse.error;
       if (productsResponse.error) throw productsResponse.error;
-
       const orders = ordersResponse.data || [];
       const products = productsResponse.data || [];
-
       if (orders.length > 0) {
         // Calculate metrics from real data
         const totalSales = orders.reduce((sum, order) => sum + (order.total || 0), 0);
         const avgOrderValue = totalSales / orders.length;
-        
+
         // Estimated calculations based on business logic (using order count as proxy for items)
         const estimatedItems = orders.length * 3; // Estimate 3 items per order
         const co2SavedKg = Math.round(estimatedItems * 0.5); // ~0.5kg CO2 per item
-        const wasteReducedPercent = Math.min(85, Math.round((estimatedItems / 100) * 5)); // Max 85%
+        const wasteReducedPercent = Math.min(85, Math.round(estimatedItems / 100 * 5)); // Max 85%
         const conversionRate = Math.min(35, Math.round(orders.length * 0.8)); // Realistic conversion
         const returnRate = Math.max(3, Math.round(orders.length * 0.05)); // 5% return rate
         const costSavings = Math.round(totalSales * 0.15); // 15% savings
@@ -231,7 +313,6 @@ const KPI = () => {
           transactionsTrend: "8.2%"
         });
       }
-
       if (products.length > 0) {
         // Calculate AI Predictive Insights from real data
         const categoryCount = products.reduce((acc, product) => {
@@ -240,17 +321,16 @@ const KPI = () => {
         }, {} as Record<string, number>);
 
         // Find top selling category and overstocked items
-        const topCategory = Object.entries(categoryCount).sort(([,a], [,b]) => b - a)[0];
+        const topCategory = Object.entries(categoryCount).sort(([, a], [, b]) => b - a)[0];
         const overstockedItems = products.filter(p => p.quantity > 50);
         const overstockedItem = overstockedItems.length > 0 ? overstockedItems[0] : products[0];
 
         // Calculate demand forecast based on current stock levels
         const avgStock = products.reduce((sum, p) => sum + p.quantity, 0) / products.length;
         const demandIncrease = Math.min(25, Math.max(5, Math.round(avgStock / 10)));
-
         setPredictiveData({
           topSellingProduct: topCategory ? topCategory[0] : "Products",
-          topSellingRate: topCategory ? `${Math.min(95, Math.round((topCategory[1] / products.length) * 10))}%` : "0%",
+          topSellingRate: topCategory ? `${Math.min(95, Math.round(topCategory[1] / products.length * 10))}%` : "0%",
           overstockedItem: overstockedItem?.name || "No overstocked items",
           overstockAmount: overstockedItem ? `${Math.max(0, overstockedItem.quantity - 30)} units excess` : "0 units",
           demandForecast: `+${demandIncrease}%`,
@@ -271,7 +351,6 @@ const KPI = () => {
       console.error('Error loading real data:', error);
     }
   };
-
   useEffect(() => {
     loadRealData();
   }, []);
@@ -281,41 +360,44 @@ const KPI = () => {
   const handleTimeFilterClick = (filter: TimeFilterPeriod) => {
     setActiveTimeFilter(filter);
   };
-const handleDownloadReport = async () => {
-  try {
-    setIsGeneratingReport(true);
-    toast.info("Generating report...");
-    await generateKpiReport(activeTimeFilter);
-    toast.success("Report generated successfully!");
-  } catch (error) {
-    console.error("Error generating report:", error);
-    toast.error("Failed to generate report. Please try again.");
-  } finally {
-    setIsGeneratingReport(false);
-  }
-};
+  const handleDownloadReport = async () => {
+    try {
+      setIsGeneratingReport(true);
+      toast.info("Generating report...");
+      await generateKpiReport(activeTimeFilter);
+      toast.success("Report generated successfully!");
+    } catch (error) {
+      console.error("Error generating report:", error);
+      toast.error("Failed to generate report. Please try again.");
+    } finally {
+      setIsGeneratingReport(false);
+    }
+  };
+  const handleGenerateInsights = async () => {
+    try {
+      setIsGeneratingInsights(true);
+      toast.info("Generating AI insights...");
 
-const handleGenerateInsights = async () => {
-  try {
-  setIsGeneratingInsights(true);
-  toast.info("Generating AI insights...");
-  
-  // Refresh real data when generating insights
-  await loadRealData();
-  
-  const { data, error } = await supabase.functions.invoke('ai-train', {
-    body: { period: activeTimeFilter }
-  });
-  if (error) throw error;
-  setAiInsights(data);
-  toast.success("Insights generated successfully.");
-} catch (err) {
-  console.error("AI insights error:", err);
-  toast.error("Could not generate insights.");
-} finally {
-  setIsGeneratingInsights(false);
-}
-};
+      // Refresh real data when generating insights
+      await loadRealData();
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('ai-train', {
+        body: {
+          period: activeTimeFilter
+        }
+      });
+      if (error) throw error;
+      setAiInsights(data);
+      toast.success("Insights generated successfully.");
+    } catch (err) {
+      console.error("AI insights error:", err);
+      toast.error("Could not generate insights.");
+    } finally {
+      setIsGeneratingInsights(false);
+    }
+  };
   return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
       <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
           <header className="px-6 pt-8 pb-6">
@@ -425,18 +507,7 @@ const handleGenerateInsights = async () => {
 
             {/* Sales Performance Chart + Side Panel */}
             <div className="md:flex gap-6">
-              <div className="w-full md:w-1/2">
-                <h3 className="text-lg font-semibold mb-4">Sales Performance</h3>
-                <div className="bg-white rounded-xl p-4 h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartData}>
-                      <XAxis dataKey="label" />
-                      <YAxis />
-                      <Area type="monotone" dataKey="value" stroke="#2563eb" fill="#dbeafe" strokeWidth={2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
+              
               <aside className="w-full md:w-1/2 space-y-6 mt-6 md:mt-0">
                 <StockAlertsCard products={products} />
                 <ExpiringSoonCard products={products} />
@@ -444,8 +515,8 @@ const handleGenerateInsights = async () => {
               </aside>
             </div>
 
-{/* IA Training + Download */}
-<div className="w-full max-w-lg space-y-3">
+        {/* IA Training + Download */}
+        <div className="w-full max-w-lg space-y-3">
   <UploadTrainingDataDialog />
   <div className="grid grid-cols-1 gap-2">
     <Button className="w-full" onClick={handleGenerateInsights} disabled={isGeneratingInsights}>
@@ -456,27 +527,21 @@ const handleGenerateInsights = async () => {
       {isGeneratingReport ? "Generating Report..." : "Download Report"}
     </Button>
   </div>
-  {aiInsights && (
-    <div className="space-y-4">
+  {aiInsights && <div className="space-y-4">
       {/* Main AI Summary */}
       <div className="bg-white rounded-xl p-4 border">
         <h4 className="font-semibold mb-2">AI Summary</h4>
         <p className="text-sm text-gray-600 mb-3">{aiInsights.executive_summary}</p>
-        {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && (
-          <div>
+        {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && <div>
             <h5 className="text-sm font-medium mb-1">Recommendations</h5>
             <ul className="list-disc pl-5 text-sm text-gray-700">
-              {aiInsights.recommendations.slice(0,3).map((r: any, i: number) => (
-                <li key={i}>{typeof r === 'string' ? r : (r.title || JSON.stringify(r))}</li>
-              ))}
+              {aiInsights.recommendations.slice(0, 3).map((r: any, i: number) => <li key={i}>{typeof r === 'string' ? r : r.title || JSON.stringify(r)}</li>)}
             </ul>
-          </div>
-        )}
+          </div>}
       </div>
 
       {/* Sustainability Impact Cards */}
-      {aiInsights.sustainability_impact && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {aiInsights.sustainability_impact && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white rounded-xl p-4 border">
             <h4 className="font-semibold text-green-700 mb-2">Sustainability Impact</h4>
             <div className="space-y-3">
@@ -524,11 +589,9 @@ const handleGenerateInsights = async () => {
               </div>
             </div>
           </div>
+        </div>}
+    </div>}
         </div>
-      )}
-    </div>
-  )}
-</div>
 
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
               <div className="flex items-center justify-center gap-1">
