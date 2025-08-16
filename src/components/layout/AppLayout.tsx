@@ -1,9 +1,11 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Sparkles } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
+import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 const AppLayout = () => {
   const location = useLocation();
   const isDashboard = location.pathname === "/dashboard";
+  const { notificationCount } = useNotificationsAndOrders();
   return <div className="min-h-screen bg-gray-50 md:flex md:items-center md:justify-center">
       <div className="w-full max-w-7xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0">
         <div className={isDashboard ? "" : "md:grid md:grid-cols-[220px_1fr]"}>
@@ -29,9 +31,14 @@ const AppLayout = () => {
                   <BarChart3 className="w-4 h-4" />
                   <span>Sales</span>
                 </Link>
-                <Link to="/notifications" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <Link to="/notifications" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 relative">
                   <Bell className="w-4 h-4" />
                   <span>Notifications</span>
+                  {notificationCount > 0 && (
+                    <div className="absolute -top-1 left-8 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center min-w-[20px]">
+                      {notificationCount > 99 ? '99+' : notificationCount}
+                    </div>
+                  )}
                 </Link>
                 <Link to="/ads" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <Megaphone className="w-4 h-4" />
