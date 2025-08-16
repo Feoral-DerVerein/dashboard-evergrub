@@ -35,7 +35,7 @@ const AppLayout = () => {
                   <Bell className="w-4 h-4" />
                   <span>Notifications</span>
                   {notificationCount > 0 && (
-                    <div className="absolute -top-1 left-8 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center min-w-[20px]">
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center min-w-[20px]">
                       {notificationCount > 99 ? '99+' : notificationCount}
                     </div>
                   )}
