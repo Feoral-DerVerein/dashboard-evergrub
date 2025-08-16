@@ -318,9 +318,6 @@ const Products = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/products/add">Add single product</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setImportOpen(true)}>
-                  Import from Excel or list
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
