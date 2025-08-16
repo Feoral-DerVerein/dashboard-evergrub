@@ -21,11 +21,13 @@ type ProductFormData = {
   image: string;
   barcode?: string;
 };
-
 const AddProduct = () => {
-  const { id } = useParams<{ id: string }>();
+  const {
+    id
+  } = useParams<{
+    id: string;
+  }>();
   const isEditMode = !!id;
-  
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
     price: "",
@@ -48,82 +50,77 @@ const AddProduct = () => {
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   const [scannerInitialized, setScannerInitialized] = useState(false);
   const [scannerError, setScannerError] = useState<string | null>(null);
-  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
 
   // Auto-fill demo product function
   const handleAutoFillDemo = () => {
-    const demoProducts = [
-      {
-        name: "Lavender Essential Oil",
-        price: "45.99",
-        discount: "15",
-        description: "Premium Australian lavender essential oil. Perfect for relaxation and aromatherapy. Sourced from the finest lavender fields in Tasmania.",
-        category: "SPA Products",
-        brand: "Premium",
-        quantity: "25",
-        expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
-        image: "/lovable-uploads/a8d0ed43-9247-43c0-b4b7-0b73bca854af.png"
-      },
-      {
-        name: "Organic Green Tea",
-        price: "28.50",
-        discount: "10",
-        description: "Premium organic green tea blend. Rich in antioxidants and perfect for a healthy lifestyle. Sustainably sourced.",
-        category: "Restaurant",
-        brand: "Equate",
-        quantity: "50",
-        expirationDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 6 months from now
-        image: "/lovable-uploads/298479ff-ca23-474b-b635-b25052f38dce.png"
-      },
-      {
-        name: "Eucalyptus Body Scrub",
-        price: "32.95",
-        discount: "20",
-        description: "Invigorating eucalyptus body scrub with natural sea salt. Exfoliates and moisturizes for silky smooth skin.",
-        category: "SPA Products",
-        brand: "Premium",
-        quantity: "15",
-        expirationDate: new Date(Date.now() + 730 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 years from now
-        image: "/lovable-uploads/4f94a856-2c39-4c16-9c3d-3ae6fdf872ed.png"
-      }
-    ];
+    const demoProducts = [{
+      name: "Lavender Essential Oil",
+      price: "45.99",
+      discount: "15",
+      description: "Premium Australian lavender essential oil. Perfect for relaxation and aromatherapy. Sourced from the finest lavender fields in Tasmania.",
+      category: "SPA Products",
+      brand: "Premium",
+      quantity: "25",
+      expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      // 1 year from now
+      image: "/lovable-uploads/a8d0ed43-9247-43c0-b4b7-0b73bca854af.png"
+    }, {
+      name: "Organic Green Tea",
+      price: "28.50",
+      discount: "10",
+      description: "Premium organic green tea blend. Rich in antioxidants and perfect for a healthy lifestyle. Sustainably sourced.",
+      category: "Restaurant",
+      brand: "Equate",
+      quantity: "50",
+      expirationDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      // 6 months from now
+      image: "/lovable-uploads/298479ff-ca23-474b-b635-b25052f38dce.png"
+    }, {
+      name: "Eucalyptus Body Scrub",
+      price: "32.95",
+      discount: "20",
+      description: "Invigorating eucalyptus body scrub with natural sea salt. Exfoliates and moisturizes for silky smooth skin.",
+      category: "SPA Products",
+      brand: "Premium",
+      quantity: "15",
+      expirationDate: new Date(Date.now() + 730 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      // 2 years from now
+      image: "/lovable-uploads/4f94a856-2c39-4c16-9c3d-3ae6fdf872ed.png"
+    }];
 
     // Select a random demo product
     const randomProduct = demoProducts[Math.floor(Math.random() * demoProducts.length)];
-    
     setFormData({
       ...formData,
       ...randomProduct,
       customBrand: ""
     });
-    
     setPreviewImage(randomProduct.image);
     setShowCustomBrand(false);
-    
     toast({
       title: "Demo Product Loaded",
-      description: `"${randomProduct.name}" has been auto-filled for demonstration`,
+      description: `"${randomProduct.name}" has been auto-filled for demonstration`
     });
   };
-
   useEffect(() => {
     const fetchProduct = async () => {
       if (isEditMode && id) {
         try {
           console.log(`Fetching product with id: ${id}`);
           const product = await productService.getProductById(parseInt(id));
-          
           if (product) {
             // Check if brand is custom
             const isCustomBrand = !brands.includes(product.brand);
-            
             setFormData({
               name: product.name,
               price: product.price.toString(),
@@ -137,13 +134,10 @@ const AddProduct = () => {
               image: product.image,
               barcode: ""
             });
-            
             setShowCustomBrand(isCustomBrand);
-            
             if (product.image && product.image !== '/placeholder.svg') {
               setPreviewImage(product.image);
             }
-            
             console.log("Product loaded successfully:", product);
           } else {
             console.error("Product not found");
@@ -166,20 +160,19 @@ const AddProduct = () => {
         }
       }
     };
-    
     fetchProduct();
   }, [id, isEditMode, navigate, toast]);
 
   // Initialize barcode scanner
   const initBarcodeScanner = async () => {
     if (!videoRef.current || scannerInitialized) return;
-    
     try {
       setScannerError(null);
       const constraints = {
-        video: { facingMode: "environment" }
+        video: {
+          facingMode: "environment"
+        }
       };
-      
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -212,11 +205,10 @@ const AddProduct = () => {
   // Scan for barcodes in video stream
   const scanBarcode = async () => {
     if (!videoRef.current || !canvasRef.current) return;
-    
     try {
       // Try to dynamically import the barcode detection library
       const Quagga = (await import('quagga')).default;
-      
+
       // Configure Quagga to analyze video feed
       Quagga.init({
         inputStream: {
@@ -225,37 +217,29 @@ const AddProduct = () => {
           target: videoRef.current
         },
         decoder: {
-          readers: [
-            "ean_reader",
-            "ean_8_reader",
-            "upc_reader",
-            "code_128_reader",
-            "code_39_reader"
-          ]
+          readers: ["ean_reader", "ean_8_reader", "upc_reader", "code_128_reader", "code_39_reader"]
         }
-      }, function(err) {
+      }, function (err) {
         if (err) {
           console.error("Barcode scanner initialization error:", err);
           setScannerError("Failed to initialize barcode scanner");
           return;
         }
-        
         console.log("Barcode scanner ready");
         Quagga.start();
       });
-      
-      Quagga.onDetected(async (result) => {
+      Quagga.onDetected(async result => {
         const code = result.codeResult.code;
         console.log("Barcode detected:", code);
-        
+
         // Play a success sound
         const audio = new Audio('/barcode-beep.mp3');
         audio.play().catch(e => console.log("Audio play error:", e));
-        
+
         // Stop the scanner
         Quagga.stop();
         stopBarcodeScanner();
-        
+
         // Look up the product information based on the barcode
         await fetchProductByBarcode(code);
       });
@@ -273,7 +257,7 @@ const AddProduct = () => {
         title: "Barcode Detected",
         description: `Looking up product with barcode: ${barcode}`
       });
-      
+
       // Here we would normally call an API to look up the product
       // For demo purposes, we'll simulate a response after a delay
       setTimeout(() => {
@@ -285,13 +269,10 @@ const AddProduct = () => {
           category: "SPA Products",
           brand: "Generic",
           // Set expiration date to 6 months from now
-          expirationDate: new Date(
-            new Date().setMonth(new Date().getMonth() + 6)
-          ).toISOString().split("T")[0],
+          expirationDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split("T")[0],
           // Random discount between 0 and 30%
           discount: (Math.random() * 30).toFixed(0)
         };
-        
         setFormData({
           ...formData,
           name: mockProduct.name,
@@ -303,20 +284,18 @@ const AddProduct = () => {
           discount: mockProduct.discount,
           barcode: barcode
         });
-        
         toast({
           title: "Product Found",
           description: "Product information has been loaded!"
         });
         setLoading(false);
       }, 1500);
-      
+
       // In a real implementation, we would do something like:
       // const product = await productService.getProductByBarcode(barcode);
       // if (product) {
       //   setFormData({...});
       // }
-      
     } catch (error: any) {
       console.error("Error fetching product by barcode:", error);
       toast({
@@ -336,14 +315,12 @@ const AddProduct = () => {
       initBarcodeScanner();
     }, 500);
   };
-
   const calculateFinalPrice = () => {
     const price = parseFloat(formData.price) || 0;
     const discount = parseFloat(formData.discount) || 0;
-    const finalPrice = price - (price * discount) / 100;
+    const finalPrice = price - price * discount / 100;
     return finalPrice.toFixed(2);
   };
-
   const categories = ["Restaurant", "SPA Products"];
   const brands = ["Equate", "Generic", "Premium"];
 
@@ -351,55 +328,51 @@ const AddProduct = () => {
   const handleBrandChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const brandValue = e.target.value;
     setShowCustomBrand(brandValue === "other");
-    setFormData({ ...formData, brand: brandValue });
+    setFormData({
+      ...formData,
+      brand: brandValue
+    });
   };
-
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
-
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
-
     try {
       setLoading(true);
       setImageUploadError(null);
-      
+
       // Show preview immediately for better UX
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = event => {
         setPreviewImage(event.target?.result as string);
       };
       reader.readAsDataURL(file);
-      
+
       // Basic validation
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
         throw new Error("File size exceeds 5MB limit");
       }
-      
       const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
       if (!allowedTypes.includes(file.type)) {
         throw new Error("Only JPEG, PNG, WEBP, and GIF images are allowed");
       }
-      
+
       // Prepare file path with safeguards
       const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
       const safeFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
       const filePath = `${user.id}/${safeFileName}.${fileExt}`;
-      
       try {
         const publicUrl = await productService.uploadProductImage(file, filePath);
-        
         setFormData({
           ...formData,
           image: publicUrl
         });
-        
         toast({
           title: "Image uploaded",
-          description: "Your image has been successfully uploaded",
+          description: "Your image has been successfully uploaded"
         });
       } catch (uploadError: any) {
         console.error("Image upload failed:", uploadError);
@@ -420,10 +393,8 @@ const AddProduct = () => {
       setUploadProgress(0);
     }
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!user) {
       toast({
         title: "Error",
@@ -432,19 +403,17 @@ const AddProduct = () => {
       });
       return;
     }
-    
     try {
       setLoading(true);
-      
+
       // Validate required fields
-      if (!formData.name || !formData.price || !formData.description || 
-          !formData.category || !formData.expirationDate) {
+      if (!formData.name || !formData.price || !formData.description || !formData.category || !formData.expirationDate) {
         throw new Error("Please fill in all required fields");
       }
 
       // For brand, use custom brand if it's selected
       const brandToUse = formData.brand === "other" ? formData.customBrand.trim() : formData.brand;
-      
+
       // Validate brand
       if (!brandToUse) {
         throw new Error("Please select a brand or enter a custom brand name");
@@ -454,7 +423,7 @@ const AddProduct = () => {
       if (isNaN(parseFloat(formData.price)) || parseFloat(formData.price) <= 0) {
         throw new Error("Please enter a valid price");
       }
-      
+
       // Intento automático de imagen sugerida si no se cargó una
       let finalImage = (formData.image || "").trim();
       if (!finalImage) {
@@ -476,7 +445,6 @@ const AddProduct = () => {
           console.warn('No suggested image found or upload failed:', e);
         }
       }
-
       const productData: Product = {
         name: formData.name.trim(),
         price: parseFloat(formData.price),
@@ -491,36 +459,32 @@ const AddProduct = () => {
         storeId: SAFFIRE_FREYCINET_STORE_ID
       };
       console.log("Submitting product with data:", productData);
-      
       let result;
       if (isEditMode && id) {
         result = await productService.updateProduct(parseInt(id), productData);
         console.log("Product updated successfully:", result);
         toast({
           title: "Product updated",
-          description: "Your product has been updated successfully",
+          description: "Your product has been updated successfully"
         });
       } else {
         result = await productService.createProduct(productData);
         console.log("Product created successfully:", result);
         toast({
           title: "Product added",
-          description: "Your product has been added successfully",
+          description: "Your product has been added successfully"
         });
       }
-      
+
       // Manually add the product to localStorage for immediate display
       try {
         const existingProducts = JSON.parse(localStorage.getItem('saffire_products') || '[]');
-        const updatedProducts = isEditMode 
-          ? existingProducts.map((p: Product) => p.id === parseInt(id!) ? result : p) 
-          : [...existingProducts, result];
+        const updatedProducts = isEditMode ? existingProducts.map((p: Product) => p.id === parseInt(id!) ? result : p) : [...existingProducts, result];
         localStorage.setItem('saffire_products', JSON.stringify(updatedProducts));
       } catch (e) {
         console.error("Error updating localStorage:", e);
         // This is non-critical, so we'll continue even if it fails
       }
-      
       navigate("/products");
     } catch (error: any) {
       console.error(`Error ${isEditMode ? 'updating' : 'adding'} product:`, error);
@@ -533,19 +497,14 @@ const AddProduct = () => {
       setLoading(false);
     }
   };
-
   if (loadingProduct) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p>Loading product data...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gray-50">
+  return <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto bg-white min-h-screen animate-fade-in">
         <div className="px-4 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -555,11 +514,7 @@ const AddProduct = () => {
               </Link>
               <h1 className="text-xl font-semibold">{isEditMode ? 'Edit Product' : 'Add Product'}</h1>
             </div>
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="text-primary-600 font-medium hover:text-primary-700"
-            >
+            <button onClick={handleSubmit} disabled={loading} className="text-primary-600 font-medium hover:text-primary-700">
               {loading ? "Saving..." : "Save"}
             </button>
           </div>
@@ -567,23 +522,10 @@ const AddProduct = () => {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Demo auto-fill button */}
-          {!isEditMode && (
-            <button
-              type="button"
-              onClick={handleAutoFillDemo}
-              className="w-full flex items-center justify-center gap-2 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              <Zap className="w-5 h-5" />
-              Auto-fill Demo Product
-            </button>
-          )}
+          {!isEditMode}
 
           {/* Barcode scanner button */}
-          <button
-            type="button"
-            onClick={handleOpenBarcodeScanner}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
+          <button type="button" onClick={handleOpenBarcodeScanner} className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
             <Barcode className="w-5 h-5" />
             Scan Barcode
           </button>
@@ -593,13 +535,10 @@ const AddProduct = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Product Name <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              required
-            />
+            <input type="text" value={formData.name} onChange={e => setFormData({
+            ...formData,
+            name: e.target.value
+          })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required />
           </div>
 
           {/* Price and discount inputs */}
@@ -610,28 +549,19 @@ const AddProduct = () => {
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-green-600">$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  className="w-full pl-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  required
-                />
+                <input type="number" step="0.01" min="0.01" value={formData.price} onChange={e => setFormData({
+                ...formData,
+                price: e.target.value
+              })} className="w-full pl-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Discount</label>
               <div className="relative">
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={formData.discount}
-                  onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
-                  className="w-full pr-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
+                <input type="number" min="0" max="100" value={formData.discount} onChange={e => setFormData({
+                ...formData,
+                discount: e.target.value
+              })} className="w-full pr-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" />
                 <span className="absolute right-3 top-2 text-gray-500">%</span>
               </div>
               <p className="text-sm text-gray-500 mt-1">Final: ${calculateFinalPrice()}</p>
@@ -643,13 +573,10 @@ const AddProduct = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description <span className="text-red-500">*</span>
             </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              rows={3}
-              required
-            />
+            <textarea value={formData.description} onChange={e => setFormData({
+            ...formData,
+            description: e.target.value
+          })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" rows={3} required />
           </div>
 
           {/* Category and brand inputs */}
@@ -658,51 +585,34 @@ const AddProduct = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Category <span className="text-red-500">*</span>
               </label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                required
-              >
+              <select value={formData.category} onChange={e => setFormData({
+              ...formData,
+              category: e.target.value
+            })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
                 <option value="">Select category</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
+                {categories.map(category => <option key={category} value={category}>
                     {category}
-                  </option>
-                ))}
+                  </option>)}
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Brand <span className="text-red-500">*</span>
               </label>
-              <select
-                value={formData.brand}
-                onChange={handleBrandChange}
-                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                required
-              >
+              <select value={formData.brand} onChange={handleBrandChange} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
                 <option value="">Select brand</option>
-                {brands.map((brand) => (
-                  <option key={brand} value={brand}>
+                {brands.map(brand => <option key={brand} value={brand}>
                     {brand}
-                  </option>
-                ))}
+                  </option>)}
                 <option value="other">Other (Custom)</option>
               </select>
               
-              {showCustomBrand && (
-                <div className="mt-2">
-                  <Input
-                    type="text"
-                    value={formData.customBrand}
-                    onChange={(e) => setFormData({ ...formData, customBrand: e.target.value })}
-                    placeholder="Enter custom brand name"
-                    className="w-full"
-                    required={formData.brand === "other"}
-                  />
-                </div>
-              )}
+              {showCustomBrand && <div className="mt-2">
+                  <Input type="text" value={formData.customBrand} onChange={e => setFormData({
+                ...formData,
+                customBrand: e.target.value
+              })} placeholder="Enter custom brand name" className="w-full" required={formData.brand === "other"} />
+                </div>}
             </div>
           </div>
 
@@ -712,36 +622,20 @@ const AddProduct = () => {
               Quantity <span className="text-red-500">*</span>
             </label>
             <div className="flex items-center">
-              <button
-                type="button"
-                onClick={() =>
-                  setFormData({
-                    ...formData,
-                    quantity: String(Math.max(1, parseInt(formData.quantity) - 1))
-                  })
-                }
-                className="p-2 border border-gray-200 rounded-l-lg hover:bg-gray-50"
-              >
+              <button type="button" onClick={() => setFormData({
+              ...formData,
+              quantity: String(Math.max(1, parseInt(formData.quantity) - 1))
+            })} className="p-2 border border-gray-200 rounded-l-lg hover:bg-gray-50">
                 −
               </button>
-              <input
-                type="number"
-                value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                className="w-full p-2 border-t border-b border-gray-200 text-center focus:outline-none focus:ring-2 focus:ring-primary-500"
-                min="1"
-                required
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  setFormData({
-                    ...formData,
-                    quantity: String(parseInt(formData.quantity) + 1)
-                  })
-                }
-                className="p-2 border border-gray-200 rounded-r-lg hover:bg-gray-50"
-              >
+              <input type="number" value={formData.quantity} onChange={e => setFormData({
+              ...formData,
+              quantity: e.target.value
+            })} className="w-full p-2 border-t border-b border-gray-200 text-center focus:outline-none focus:ring-2 focus:ring-primary-500" min="1" required />
+              <button type="button" onClick={() => setFormData({
+              ...formData,
+              quantity: String(parseInt(formData.quantity) + 1)
+            })} className="p-2 border border-gray-200 rounded-r-lg hover:bg-gray-50">
                 +
               </button>
             </div>
@@ -753,91 +647,56 @@ const AddProduct = () => {
               Expiration Date <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <input
-                type="date"
-                value={formData.expirationDate}
-                onChange={(e) => setFormData({ ...formData, expirationDate: e.target.value })}
-                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                required
-              />
+              <input type="date" value={formData.expirationDate} onChange={e => setFormData({
+              ...formData,
+              expirationDate: e.target.value
+            })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required />
               <Calendar className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
             </div>
           </div>
 
           {/* Image upload */}
           <div className="mt-6">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              className="hidden"
-            />
-            <button
-              type="button"
-              onClick={handleImageClick}
-              className="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
-            >
-              {previewImage ? (
-                <img
-                  src={previewImage}
-                  alt="Product"
-                  className="w-24 h-24 object-cover rounded-lg"
-                />
-              ) : (
-                <Camera className="w-8 h-8 text-gray-400 mb-2" />
-              )}
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" />
+            <button type="button" onClick={handleImageClick} className="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+              {previewImage ? <img src={previewImage} alt="Product" className="w-24 h-24 object-cover rounded-lg" /> : <Camera className="w-8 h-8 text-gray-400 mb-2" />}
               <span className="text-primary-600">
                 {loading ? "Uploading..." : "Change Photo"}
               </span>
-              {imageUploadError && (
-                <p className="text-red-500 text-xs mt-1">{imageUploadError}</p>
-              )}
-              {uploadProgress > 0 && uploadProgress < 100 && (
-                <div className="w-full mt-2 bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-green-600 h-2.5 rounded-full" 
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
-              )}
+              {imageUploadError && <p className="text-red-500 text-xs mt-1">{imageUploadError}</p>}
+              {uploadProgress > 0 && uploadProgress < 100 && <div className="w-full mt-2 bg-gray-200 rounded-full h-2.5">
+                  <div className="bg-green-600 h-2.5 rounded-full" style={{
+                width: `${uploadProgress}%`
+              }}></div>
+                </div>}
             </button>
           </div>
 
           {/* Submit button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors mt-6"
-          >
+          <button type="submit" disabled={loading} className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors mt-6">
             {loading ? "Saving..." : isEditMode ? "Update Product" : "Save Product"}
           </button>
         </form>
       </div>
 
       {/* Barcode Scanner Dialog */}
-      <Dialog open={showBarcodeScanner} onOpenChange={(open) => {
-        if (!open) stopBarcodeScanner();
-        setShowBarcodeScanner(open);
-      }}>
+      <Dialog open={showBarcodeScanner} onOpenChange={open => {
+      if (!open) stopBarcodeScanner();
+      setShowBarcodeScanner(open);
+    }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Scan Barcode</DialogTitle>
           </DialogHeader>
           <div className="relative">
-            <video 
-              ref={videoRef} 
-              className="w-full h-64 bg-black rounded-lg" 
-              playsInline
-              muted
-            ></video>
-            <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" style={{ display: 'none' }}></canvas>
+            <video ref={videoRef} className="w-full h-64 bg-black rounded-lg" playsInline muted></video>
+            <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" style={{
+            display: 'none'
+          }}></canvas>
             
-            {scannerError && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+            {scannerError && <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
                 <p className="text-white text-center p-4">{scannerError}</p>
-              </div>
-            )}
+              </div>}
             
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-64 h-64 border-2 border-green-500 opacity-60"></div>
@@ -849,8 +708,6 @@ const AddProduct = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>;
 };
-
 export default AddProduct;
