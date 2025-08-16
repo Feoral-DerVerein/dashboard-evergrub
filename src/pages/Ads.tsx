@@ -11,22 +11,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useAuthContext } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import AdPerformancePredictor from '@/components/ads/AdPerformancePredictor';
 import { adsService, type Ad, type AdCampaign } from '@/services/adsService';
 
 const StatusBadge = ({ status }: { status: string }) => {
-  const variants = {
-    'active': 'default',
-    'draft': 'secondary', 
-    'paused': 'outline',
-    'completed': 'outline',
-    'rejected': 'destructive'
+  const getVariant = (status: string): "default" | "destructive" | "secondary" | "outline" => {
+    switch (status) {
+      case 'active':
+        return 'default';
+      case 'draft':
+        return 'secondary';
+      case 'paused':
+      case 'completed':
+        return 'outline';
+      case 'rejected':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
   };
   
   return (
-    <Badge variant={variants[status as keyof typeof variants] || 'outline'}>
+    <Badge variant={getVariant(status)}>
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </Badge>
   );
@@ -62,7 +70,7 @@ const Ads = () => {
   });
   
   const isMobile = useIsMobile();
-  const { user } = useAuthContext();
+  const { user } = useAuth();
   const { toast } = useToast();
 
   // Load data on component mount
