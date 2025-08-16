@@ -50,6 +50,8 @@ const AddProduct = () => {
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   const [scannerInitialized, setScannerInitialized] = useState(false);
   const [scannerError, setScannerError] = useState<string | null>(null);
+  const [barcodeInput, setBarcodeInput] = useState("");
+  const [lastKeyTime, setLastKeyTime] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -60,6 +62,44 @@ const AddProduct = () => {
   const {
     user
   } = useAuth();
+
+  // Handle physical barcode scanner input
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const currentTime = Date.now();
+      
+      // If Enter key is pressed and we have accumulated input
+      if (event.key === 'Enter' && barcodeInput.length > 0) {
+        event.preventDefault();
+        fetchProductByBarcode(barcodeInput);
+        setBarcodeInput("");
+        setLastKeyTime(0);
+        return;
+      }
+      
+      // If it's been more than 100ms since last key, start fresh
+      if (currentTime - lastKeyTime > 100) {
+        setBarcodeInput("");
+      }
+      
+      // Only accumulate if it's a valid barcode character and typed quickly
+      if (/^[0-9]$/.test(event.key) && currentTime - lastKeyTime < 100) {
+        setBarcodeInput(prev => prev + event.key);
+        setLastKeyTime(currentTime);
+      } else if (/^[0-9]$/.test(event.key)) {
+        setBarcodeInput(event.key);
+        setLastKeyTime(currentTime);
+      }
+    };
+
+    // Add event listener when component mounts
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // Cleanup event listener when component unmounts
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [barcodeInput, lastKeyTime]);
 
   // Auto-fill demo product function
   const handleAutoFillDemo = () => {
