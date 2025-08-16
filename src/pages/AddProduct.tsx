@@ -272,6 +272,31 @@ const AddProduct = () => {
           }
         }
 
+        // Download and upload image automatically if available
+        let finalImageUrl = "";
+        if (productData.imageUrl && user?.id) {
+          try {
+            toast({
+              title: "Downloading Image",
+              description: "Automatically downloading product image..."
+            });
+            
+            const filePath = `${user.id}/${Date.now()}-barcode-${barcode}.jpg`;
+            const uploadedUrl = await productImageService.uploadImageFromUrl(productData.imageUrl, filePath);
+            finalImageUrl = uploadedUrl;
+            setPreviewImage(uploadedUrl);
+            
+            toast({
+              title: "Image Downloaded",
+              description: "Product image downloaded successfully!"
+            });
+          } catch (uploadErr) {
+            console.warn('Upload from URL failed, using external URL instead');
+            finalImageUrl = productData.imageUrl; // Fallback to external URL
+            setPreviewImage(productData.imageUrl);
+          }
+        }
+
         // Set up the form with the product data
         setFormData({
           ...formData,
@@ -282,17 +307,12 @@ const AddProduct = () => {
           // Set expiration date to 6 months from now as default
           expirationDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split("T")[0],
           barcode: barcode,
-          image: productData.imageUrl || ""
+          image: finalImageUrl
         });
-
-        // Set preview image if available
-        if (productData.imageUrl) {
-          setPreviewImage(productData.imageUrl);
-        }
 
         toast({
           title: "Product Found",
-          description: `Australian product "${productData.name}" loaded from Open Food Facts!`
+          description: `Australian product "${productData.name}" loaded with image from Open Food Facts!`
         });
       } else {
         // Fallback to generic product
