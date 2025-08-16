@@ -5,7 +5,7 @@ import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 const AppLayout = () => {
   const location = useLocation();
   const isDashboard = location.pathname === "/dashboard";
-  const { notificationCount } = useNotificationsAndOrders();
+  const { notificationCount, orderCount, salesCount } = useNotificationsAndOrders();
   return <div className="min-h-screen bg-gray-50 md:flex md:items-center md:justify-center">
       <div className="w-full max-w-7xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0">
         <div className={isDashboard ? "" : "md:grid md:grid-cols-[220px_1fr]"}>
@@ -26,14 +26,17 @@ const AppLayout = () => {
                 <Link to="/orders" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <ShoppingBasket className="w-4 h-4" />
                   <span>Orders</span>
+                  {orderCount > 0 && <span className="text-sm text-gray-500">({orderCount})</span>}
                 </Link>
                 <Link to="/sales" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <BarChart3 className="w-4 h-4" />
                   <span>Sales</span>
+                  {salesCount > 0 && <span className="text-sm text-gray-500">({salesCount})</span>}
                 </Link>
                 <Link to="/notifications" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 relative">
                   <Bell className="w-4 h-4" />
                   <span>Notifications</span>
+                  {notificationCount > 0 && <span className="text-sm text-gray-500">({notificationCount})</span>}
                   {notificationCount > 0 && (
                     <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center min-w-[20px]">
                       {notificationCount > 99 ? '99+' : notificationCount}

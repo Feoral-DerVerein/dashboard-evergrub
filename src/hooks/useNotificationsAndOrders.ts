@@ -6,6 +6,7 @@ import { toast } from "@/components/ui/use-toast";
 export function useNotificationsAndOrders() {
   const [orderCount, setOrderCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [salesCount, setSalesCount] = useState(0);
   const [lastOrderUpdate, setLastOrderUpdate] = useState<string | null>(null);
   const [lastOrderDelete, setLastOrderDelete] = useState<string | null>(null);
   const [lastNotificationUpdate, setLastNotificationUpdate] = useState<string | null>(null);
@@ -42,8 +43,27 @@ export function useNotificationsAndOrders() {
       }
     };
 
+    const fetchSalesCount = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('sales')
+          .select('id')
+          .gte('sale_date', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()); // Last 24 hours
+        
+        if (error) {
+          throw error;
+        }
+        
+        setSalesCount(data?.length || 0);
+      } catch (error) {
+        console.error("Error fetching sales count:", error);
+        setSalesCount(0);
+      }
+    };
+
     fetchOrderCount();
     fetchNotificationCount();
+    fetchSalesCount();
 
     // Set up real-time subscription for orders table
     const ordersChannel = supabase
@@ -97,7 +117,8 @@ export function useNotificationsAndOrders() {
 
   return { 
     orderCount, 
-    notificationCount, 
+    notificationCount,
+    salesCount,
     lastOrderUpdate, 
     lastOrderDelete,
     lastNotificationUpdate 
