@@ -19,6 +19,10 @@ const AppLayout = () => {
                 <img src="/lovable-uploads/25d0c5fc-4ab3-44dd-8e67-5e06c5a81537.png" alt="WiseBite Logo" className="h-8 w-auto" />
               </div>
               <nav className="space-y-1">
+                <Link to="/ai" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Negentropy AI</span>
+                </Link>
                 <Link to="/kpi" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <BarChart3 className="w-4 h-4" />
                   <span>Performance</span>
@@ -51,10 +55,6 @@ const AppLayout = () => {
                 <Link to="/grains" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <Coins className="w-4 h-4" />
                   <span>Grains</span>
-                </Link>
-                <Link to="/ai" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <Sparkles className="w-4 h-4" />
-                  <span>Negentropy AI</span>
                 </Link>
               </nav>
               <div className="mt-auto pt-4 border-t border-gray-100">
