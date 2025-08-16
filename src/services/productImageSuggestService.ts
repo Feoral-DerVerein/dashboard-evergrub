@@ -32,6 +32,14 @@ async function offByName(name?: string): Promise<string | null> {
   }
 }
 
+interface ProductData {
+  name?: string;
+  brand?: string;
+  description?: string;
+  imageUrl?: string;
+  category?: string;
+}
+
 export const productImageSuggestService = {
   async suggestImage(barcode?: string, name?: string): Promise<string | null> {
     // 1) Try Edge Function first
@@ -52,5 +60,73 @@ export const productImageSuggestService = {
     const byName = await offByName(name);
     if (byName) return byName;
     return null;
+  },
+
+  async getProductData(barcode?: string, name?: string): Promise<ProductData | null> {
+    // 1) Try Edge Function first
+    try {
+      const { data, error } = await supabase.functions.invoke('product-data-suggest', {
+        body: { barcode, name }
+      });
+      if (!error && (data as any)?.name) {
+        return data as ProductData;
+      }
+    } catch (e) {
+      console.warn('Edge function product data failed, falling back to client OFF:', e);
+    }
+
+    // 2) Fallback: call Open Food Facts directly from client
+    const productData = await getProductDataByBarcode(barcode);
+    if (productData) return productData;
+    const productDataByName = await getProductDataByName(name);
+    if (productDataByName) return productDataByName;
+    return null;
   }
 };
+
+async function getProductDataByBarcode(barcode?: string): Promise<ProductData | null> {
+  if (!barcode) return null;
+  try {
+    const url = `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const json = await res.json();
+    const p = json?.product;
+    if (!p) return null;
+    
+    return {
+      name: p.product_name || p.product_name_en,
+      brand: p.brands?.split(',')[0]?.trim(),
+      description: p.ingredients_text || p.ingredients_text_en || p.product_name,
+      imageUrl: p.image_url || p.image_front_url || p.image_small_url,
+      category: p.categories?.split(',')[0]?.trim()
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function getProductDataByName(name?: string): Promise<ProductData | null> {
+  if (!name) return null;
+  try {
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?action=process&search_terms=${encodeURIComponent(name)}&search_simple=1&json=1&page_size=10&fields=product_name,image_url,image_front_url,image_small_url,code,brands,ingredients_text,categories`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const json = await res.json();
+    const products = json?.products || [];
+    for (const p of products) {
+      if (p.product_name) {
+        return {
+          name: p.product_name,
+          brand: p.brands?.split(',')[0]?.trim(),
+          description: p.ingredients_text || p.product_name,
+          imageUrl: p.image_url || p.image_front_url || p.image_small_url,
+          category: p.categories?.split(',')[0]?.trim()
+        };
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}

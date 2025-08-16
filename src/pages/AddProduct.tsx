@@ -258,44 +258,64 @@ const AddProduct = () => {
         description: `Looking up product with barcode: ${barcode}`
       });
 
-      // Here we would normally call an API to look up the product
-      // For demo purposes, we'll simulate a response after a delay
-      setTimeout(() => {
-        // Mock data - in a real app, this would come from an API call
-        const mockProduct = {
-          name: `Product ${barcode.substring(0, 4)}`,
-          price: (Math.random() * 100).toFixed(2),
-          description: "Scanned product description",
-          category: "SPA Products",
-          brand: "Generic",
-          // Set expiration date to 6 months from now
-          expirationDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split("T")[0],
-          // Random discount between 0 and 30%
-          discount: (Math.random() * 30).toFixed(0)
-        };
+      // Get product data from Open Food Facts (includes Australian products)
+      const productData = await productImageSuggestService.getProductData(barcode);
+      
+      if (productData && productData.name) {
+        // Map category to our available categories
+        let mappedCategory = "Restaurant"; // default
+        if (productData.category) {
+          const categoryLower = productData.category.toLowerCase();
+          if (categoryLower.includes("cosmetic") || categoryLower.includes("beauty") || 
+              categoryLower.includes("care") || categoryLower.includes("soap")) {
+            mappedCategory = "SPA Products";
+          }
+        }
+
+        // Set up the form with the product data
         setFormData({
           ...formData,
-          name: mockProduct.name,
-          price: mockProduct.price,
-          description: mockProduct.description,
-          category: mockProduct.category,
-          brand: mockProduct.brand,
-          expirationDate: mockProduct.expirationDate,
-          discount: mockProduct.discount,
-          barcode: barcode
+          name: productData.name,
+          description: productData.description || productData.name,
+          category: mappedCategory,
+          brand: productData.brand || "Generic",
+          // Set expiration date to 6 months from now as default
+          expirationDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split("T")[0],
+          barcode: barcode,
+          image: productData.imageUrl || ""
         });
+
+        // Set preview image if available
+        if (productData.imageUrl) {
+          setPreviewImage(productData.imageUrl);
+        }
+
         toast({
           title: "Product Found",
-          description: "Product information has been loaded!"
+          description: `Australian product "${productData.name}" loaded from Open Food Facts!`
         });
-        setLoading(false);
-      }, 1500);
+      } else {
+        // Fallback to generic product
+        const genericProduct = {
+          name: `Product ${barcode.substring(0, 6)}`,
+          description: "Product information not found in database. Please complete manually.",
+          category: "Restaurant",
+          brand: "Generic",
+          expirationDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split("T")[0]
+        };
+        
+        setFormData({
+          ...formData,
+          ...genericProduct,
+          barcode: barcode
+        });
 
-      // In a real implementation, we would do something like:
-      // const product = await productService.getProductByBarcode(barcode);
-      // if (product) {
-      //   setFormData({...});
-      // }
+        toast({
+          title: "Barcode Scanned",
+          description: "Product not found in database. Please complete the form manually.",
+          variant: "destructive"
+        });
+      }
     } catch (error: any) {
       console.error("Error fetching product by barcode:", error);
       toast({
@@ -303,6 +323,7 @@ const AddProduct = () => {
         description: `Could not find product information: ${error.message || "Unknown error"}`,
         variant: "destructive"
       });
+    } finally {
       setLoading(false);
     }
   };
