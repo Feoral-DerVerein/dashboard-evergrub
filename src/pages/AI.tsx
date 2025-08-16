@@ -162,7 +162,7 @@ const AI = () => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             
-            <h1 className="text-3xl font-bold text-gray-900"> Welcome to Negentropy AI</h1>
+            <h1 className="text-3xl px-[250px] font-thin text-gray-950 text-center"> Welcome to Negentropy AI</h1>
           </div>
           <p className="text-gray-600">
             Harness the power of artificial intelligence to optimize your business operations, 
