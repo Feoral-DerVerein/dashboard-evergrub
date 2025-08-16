@@ -8,6 +8,8 @@ import { generateKpiReport, TimeFilterPeriod } from "@/utils/reportGenerator";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AIRecommendations } from "@/components/AIRecommendations";
 import { supabase } from "@/integrations/supabase/client";
+import WeatherWidget from "@/components/widgets/WeatherWidget";
+import VisitorPredictionWidget from "@/components/widgets/VisitorPredictionWidget";
 const AI = () => {
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -168,6 +170,12 @@ const AI = () => {
             Harness the power of artificial intelligence to optimize your business operations, 
             reduce waste, and maximize sustainability impact.
           </p>
+        </div>
+
+        {/* Widgets */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <WeatherWidget />
+          <VisitorPredictionWidget />
         </div>
 
         {/* AI Control Panel */}
