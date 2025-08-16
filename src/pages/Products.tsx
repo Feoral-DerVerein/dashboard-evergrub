@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { wishlistService } from "@/services/wishlistService";
 import PointsBadge from "@/components/PointsBadge";
 import QuickInventory from "@/components/QuickInventory";
-import BulkImportProductsDialog from "@/components/BulkImportProductsDialog";
+import ApiImportDialog from "@/components/ApiImportDialog";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DonationForm } from "@/components/DonationForm";
@@ -318,13 +318,16 @@ const Products = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/products/add">Add single product</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setImportOpen(true)}>
+                  Import from API/POS System
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
       </header>
 
-      <BulkImportProductsDialog open={importOpen} onOpenChange={setImportOpen} onImported={newProducts => setProducts(prev => [...newProducts, ...prev])} />
+      <ApiImportDialog open={importOpen} onOpenChange={setImportOpen} onImported={newProducts => setProducts(prev => [...newProducts, ...prev])} />
 
       <main className="px-6 py-4">
 
