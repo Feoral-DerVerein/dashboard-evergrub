@@ -1,11 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Partner } from "@/services/partnersService";
-import { Link } from "react-router-dom";
-interface SuppliersCardProps {
-  partners: Partner[];
+
+interface Supplier {
+  id: string;
+  name: string;
+  type: string;
 }
+
+interface SuppliersCardProps {
+  suppliers: Supplier[];
+}
+
 export default function SuppliersCard({
-  partners
+  suppliers
 }: SuppliersCardProps) {
   return (
     <Card>
@@ -13,22 +19,19 @@ export default function SuppliersCard({
         <CardTitle>Suppliers</CardTitle>
       </CardHeader>
       <CardContent>
-        {partners.length === 0 ? (
+        {suppliers.length === 0 ? (
           <p className="text-muted-foreground">No suppliers found</p>
         ) : (
           <div className="space-y-3">
-            {partners.map((partner) => (
-              <div key={partner.id} className="flex items-center justify-between p-3 border rounded-lg">
+            {suppliers.map((supplier) => (
+              <div key={supplier.id} className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
-                  <h4 className="font-medium">{partner.name}</h4>
-                  <p className="text-sm text-muted-foreground capitalize">{partner.type}</p>
+                  <h4 className="font-medium">{supplier.name}</h4>
+                  <p className="text-sm text-muted-foreground capitalize">{supplier.type}</p>
                 </div>
-                <Link 
-                  to="/partners" 
-                  className="text-primary hover:underline text-sm"
-                >
-                  View Details
-                </Link>
+                <div className="text-primary text-sm">
+                  Active
+                </div>
               </div>
             ))}
           </div>

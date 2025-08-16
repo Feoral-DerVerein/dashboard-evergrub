@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/components/LogoutButton";
 import { productService, Product } from "@/services/productService";
-import { partnersService, Partner } from "@/services/partnersService";
+
 import { useAuth } from "@/context/AuthContext";
 import { AIRecommendations } from "@/components/AIRecommendations";
 import StockAlertsCard from "@/components/kpi/StockAlertsCard";
@@ -232,7 +232,7 @@ const KPI = () => {
     user
   } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
-  const [partners, setPartners] = useState<Partner[]>([]);
+  const [suppliers, setSuppliers] = useState<Array<{id: string; name: string; type: string}>>([]);
   const [loadingInventory, setLoadingInventory] = useState(true);
 
   // AI insights state
@@ -369,9 +369,12 @@ const KPI = () => {
       }));
       setProducts(mappedProducts);
 
-      // Load partners data
-      const partnersData = await partnersService.getPartners();
-      setPartners(partnersData);
+      // Mock suppliers data
+      setSuppliers([
+        { id: '1', name: 'Local Farm Co.', type: 'produce' },
+        { id: '2', name: 'Organic Supply', type: 'organic' },
+        { id: '3', name: 'Fresh Distributors', type: 'dairy' }
+      ]);
     } catch (error) {
       console.error('Error loading real data:', error);
     }
@@ -609,7 +612,7 @@ const KPI = () => {
             <div className="grid md:grid-cols-3 gap-6 mt-6">
               <StockAlertsCard products={products} />
               <ExpiringSoonCard products={products} />
-              <SuppliersCard partners={partners} />
+              <SuppliersCard suppliers={suppliers} />
             </div>
 
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6">

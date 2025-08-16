@@ -16,7 +16,7 @@ import Grains from "@/pages/Grains";
 import Wishlist from "@/pages/Wishlist";
 import Users from "@/pages/Users";
 import PaymentPortal from "@/pages/PaymentPortal";
-import Partners from "@/pages/Partners";
+
 import Login from "@/pages/Login";
 import Phone from "@/pages/Phone";
 import Apple from "@/pages/Apple";
@@ -62,7 +62,7 @@ const MainRoutes = () => {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/users" element={<Users />} />
         <Route path="/payment" element={<PaymentPortal />} />
-        <Route path="/partners" element={<Partners />} />
+        
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
         <Route path="/ai" element={<AI />} />

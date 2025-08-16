@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Sparkles } from "lucide-react";
+import { ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Sparkles } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 const AppLayout = () => {
   const location = useLocation();
@@ -41,10 +41,6 @@ const AppLayout = () => {
                 <Link to="/grains" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <Coins className="w-4 h-4" />
                   <span>Grains</span>
-                </Link>
-                <Link to="/partners" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <Handshake className="w-4 h-4" />
-                  <span>Partners</span>
                 </Link>
                 <Link to="/ai" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <Sparkles className="w-4 h-4" />
