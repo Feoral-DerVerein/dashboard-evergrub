@@ -7,13 +7,164 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
+      ad_analytics: {
+        Row: {
+          ad_id: string
+          clicks: number
+          cost: number
+          created_at: string
+          date: string
+          id: string
+          impressions: number
+        }
+        Insert: {
+          ad_id: string
+          clicks?: number
+          cost?: number
+          created_at?: string
+          date?: string
+          id?: string
+          impressions?: number
+        }
+        Update: {
+          ad_id?: string
+          clicks?: number
+          cost?: number
+          created_at?: string
+          date?: string
+          id?: string
+          impressions?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_analytics_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "ads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_campaigns: {
+        Row: {
+          budget: number
+          created_at: string
+          end_date: string | null
+          id: string
+          name: string
+          objective: string
+          start_date: string | null
+          status: string
+          total_spent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget?: number
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          name: string
+          objective?: string
+          start_date?: string | null
+          status?: string
+          total_spent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget?: number
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          name?: string
+          objective?: string
+          start_date?: string | null
+          status?: string
+          total_spent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ads: {
+        Row: {
+          ad_type: string
+          budget: number
+          campaign_id: string | null
+          clicks: number
+          created_at: string
+          daily_budget: number
+          description: string | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          impressions: number
+          start_date: string | null
+          status: string
+          target_url: string | null
+          title: string
+          total_spent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ad_type?: string
+          budget?: number
+          campaign_id?: string | null
+          clicks?: number
+          created_at?: string
+          daily_budget?: number
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          impressions?: number
+          start_date?: string | null
+          status?: string
+          target_url?: string | null
+          title: string
+          total_spent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ad_type?: string
+          budget?: number
+          campaign_id?: string | null
+          clicks?: number
+          created_at?: string
+          daily_budget?: number
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          impressions?: number
+          start_date?: string | null
+          status?: string
+          target_url?: string | null
+          title?: string
+          total_spent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ads_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       grain_transactions: {
         Row: {
           amount: number
@@ -555,10 +706,10 @@ export type Database = {
     Functions: {
       add_wishlist_item: {
         Args: {
-          p_product_id: string
-          p_user_id: string
           p_category_id: string
           p_product_data: Json
+          p_product_id: string
+          p_user_id: string
         }
         Returns: {
           category_id: string
@@ -603,7 +754,7 @@ export type Database = {
         Returns: boolean
       }
       update_wishlist_category: {
-        Args: { p_id: string; p_category_id: string }
+        Args: { p_category_id: string; p_id: string }
         Returns: {
           category_id: string
           created_at: string
