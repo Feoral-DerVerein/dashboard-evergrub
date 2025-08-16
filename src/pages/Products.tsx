@@ -307,13 +307,6 @@ const Products = () => {
           <div className="flex items-center gap-2">
             <QuickInventory products={products} onUpdateQuantities={handleUpdateQuantities} compact />
 
-            <Link to="/import" className="bg-blue-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-blue-700 transition-colors text-sm">
-              <Upload className="w-4 h-4" />
-              Import many
-            </Link>
-
-            
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm">
