@@ -34,57 +34,57 @@ const GrainBalance = ({ balance, loading }: GrainBalanceProps) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card className="bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200">
+      <Card className="bg-white/80 border-gray-200">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Available Grains</CardTitle>
-          <Coins className="h-4 w-4 text-yellow-600" />
+          <CardTitle className="text-sm font-medium text-black">Available Grains</CardTitle>
+          <Coins className="h-4 w-4 text-black" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-yellow-700">
+          <div className="text-2xl font-bold text-black">
             {formatPoints(totalGrains).replace('pts', 'grains')}
           </div>
-          <p className="text-xs text-gray-600 mt-1">
+          <p className="text-xs text-black mt-1">
             Value: {formatPointsValue(totalGrains)}
           </p>
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+      <Card className="bg-white/80 border-gray-200">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Total Earned</CardTitle>
-          <TrendingUp className="h-4 w-4 text-green-600" />
+          <CardTitle className="text-sm font-medium text-black">Total Earned</CardTitle>
+          <TrendingUp className="h-4 w-4 text-black" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-green-700">
+          <div className="text-2xl font-bold text-black">
             {formatPoints(lifetimeEarned).replace('pts', 'grains')}
           </div>
-          <p className="text-xs text-gray-600 mt-1">Since beginning</p>
+          <p className="text-xs text-black mt-1">Since beginning</p>
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200">
+      <Card className="bg-white/80 border-gray-200">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Total Redeemed</CardTitle>
-          <History className="h-4 w-4 text-blue-600" />
+          <CardTitle className="text-sm font-medium text-black">Total Redeemed</CardTitle>
+          <History className="h-4 w-4 text-black" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-blue-700">
+          <div className="text-2xl font-bold text-black">
             {formatPoints(lifetimeRedeemed).replace('pts', 'grains')}
           </div>
-          <p className="text-xs text-gray-600 mt-1">Complete history</p>
+          <p className="text-xs text-black mt-1">Complete history</p>
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+      <Card className="bg-white/80 border-gray-200">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Cash Redeemed</CardTitle>
-          <DollarSign className="h-4 w-4 text-purple-600" />
+          <CardTitle className="text-sm font-medium text-black">Cash Redeemed</CardTitle>
+          <DollarSign className="h-4 w-4 text-black" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-purple-700">
+          <div className="text-2xl font-bold text-black">
             ${cashRedeemed.toFixed(2)}
           </div>
-          <p className="text-xs text-gray-600 mt-1">Total in cash</p>
+          <p className="text-xs text-black mt-1">Total in cash</p>
         </CardContent>
       </Card>
     </div>
