@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar, Camera, Barcode, Zap } from "lucide-react";
+import { ArrowLeft, Calendar, Camera, Barcode, Zap, Search } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -52,6 +52,7 @@ const AddProduct = () => {
   const [scannerError, setScannerError] = useState<string | null>(null);
   const [barcodeInput, setBarcodeInput] = useState("");
   const [lastKeyTime, setLastKeyTime] = useState(0);
+  const [barcodeSearchInput, setBarcodeSearchInput] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -396,6 +397,19 @@ const AddProduct = () => {
       initBarcodeScanner();
     }, 500);
   };
+
+  // Handle barcode search
+  const handleBarcodeSearch = async () => {
+    if (!barcodeSearchInput.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a barcode to search",
+        variant: "destructive"
+      });
+      return;
+    }
+    await fetchProductByBarcode(barcodeSearchInput.trim());
+  };
   const calculateFinalPrice = () => {
     const price = parseFloat(formData.price) || 0;
     const discount = parseFloat(formData.discount) || 0;
@@ -620,6 +634,37 @@ const AddProduct = () => {
             ...formData,
             name: e.target.value
           })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required />
+          </div>
+
+          {/* Barcode search input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Search by Barcode
+            </label>
+            <div className="flex gap-2">
+              <Input 
+                type="text" 
+                value={barcodeSearchInput} 
+                onChange={e => setBarcodeSearchInput(e.target.value)}
+                placeholder="Enter barcode number"
+                className="flex-1"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleBarcodeSearch();
+                  }
+                }}
+              />
+              <button 
+                type="button" 
+                onClick={handleBarcodeSearch}
+                disabled={loading || !barcodeSearchInput.trim()}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                <Search className="w-4 h-4" />
+                Search
+              </button>
+            </div>
           </div>
 
           {/* Price and discount inputs */}
