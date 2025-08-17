@@ -8,6 +8,7 @@ interface WeatherData {
   humidity: number;
   windSpeed: number;
   description: string;
+  city: string;
 }
 
 const WeatherWidget = () => {
@@ -16,7 +17,8 @@ const WeatherWidget = () => {
     condition: "sunny",
     humidity: 65,
     windSpeed: 8,
-    description: "Partly cloudy"
+    description: "Partly cloudy",
+    city: "Madrid"
   });
 
   const getWeatherIcon = (condition: string) => {
@@ -51,7 +53,8 @@ const WeatherWidget = () => {
         condition: conditions[Math.floor(Math.random() * conditions.length)],
         humidity: humidities[Math.floor(Math.random() * humidities.length)],
         windSpeed: windSpeeds[Math.floor(Math.random() * windSpeeds.length)],
-        description: "Current conditions"
+        description: "Current conditions",
+        city: "Madrid"
       });
     };
 
@@ -62,9 +65,12 @@ const WeatherWidget = () => {
   return (
     <Card className="bg-white/80 border-blue-200">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-blue-900">
-          {getWeatherIcon(weather.condition)}
-          Real-Time Weather
+        <CardTitle className="flex items-center justify-between text-blue-900">
+          <div className="flex items-center gap-2">
+            {getWeatherIcon(weather.condition)}
+            Real-Time Weather
+          </div>
+          <span className="text-sm font-normal text-blue-700">{weather.city}</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
