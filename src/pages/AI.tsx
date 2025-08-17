@@ -172,12 +172,6 @@ const AI = () => {
           </p>
         </div>
 
-        {/* Widgets */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <WeatherWidget />
-          <VisitorPredictionWidget />
-        </div>
-
         {/* AI Control Panel */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           {/* Training Data Upload */}
@@ -475,6 +469,12 @@ const AI = () => {
               </div>
             </CardContent>
           </Card>}
+          
+        {/* Widgets - Moved to bottom */}
+        <div className="grid md:grid-cols-2 gap-6 mt-8">
+          <WeatherWidget />
+          <VisitorPredictionWidget />
+        </div>
       </div>
     </div>;
 };
