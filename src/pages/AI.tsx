@@ -178,62 +178,6 @@ const AI = () => {
           <VisitorPredictionWidget />
         </div>
 
-        {/* AI Control Panel */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {/* Training Data Upload */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-600" />
-                Training Data
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Upload your business data to improve AI predictions and recommendations.
-              </p>
-              <UploadTrainingDataDialog />
-            </CardContent>
-          </Card>
-
-          {/* Generate Insights */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="w-5 h-5 text-blue-600" />
-                AI Insights
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Generate intelligent insights based on your current data and market trends.
-              </p>
-              <Button className="w-full" onClick={handleGenerateInsights} disabled={isGeneratingInsights}>
-                {isGeneratingInsights ? "Generating..." : "Generate AI Insights"}
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Download Report */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-green-600" />
-                AI Report
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Generate comprehensive AI-powered business reports with predictions.
-              </p>
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
-                <Download className="w-4 h-4 mr-2" />
-                {isGeneratingReport ? "Generating..." : "Download AI Report"}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Inventory Recommendations */}
         <Card className="mb-8">
           <CardHeader>
@@ -475,6 +419,62 @@ const AI = () => {
               </div>
             </CardContent>
           </Card>}
+
+        {/* AI Control Panel */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8 mt-8">
+          {/* Training Data Upload */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-600" />
+                Training Data
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Upload your business data to improve AI predictions and recommendations.
+              </p>
+              <UploadTrainingDataDialog />
+            </CardContent>
+          </Card>
+
+          {/* Generate Insights */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="w-5 h-5 text-blue-600" />
+                AI Insights
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Generate intelligent insights based on your current data and market trends.
+              </p>
+              <Button className="w-full" onClick={handleGenerateInsights} disabled={isGeneratingInsights}>
+                {isGeneratingInsights ? "Generating..." : "Generate AI Insights"}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Download Report */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-green-600" />
+                AI Report
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Generate comprehensive AI-powered business reports with predictions.
+              </p>
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
+                <Download className="w-4 h-4 mr-2" />
+                {isGeneratingReport ? "Generating..." : "Download AI Report"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>;
 };
