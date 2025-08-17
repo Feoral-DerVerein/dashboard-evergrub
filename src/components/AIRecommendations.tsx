@@ -148,5 +148,29 @@ export const AIRecommendations = ({
     donation: Heart,
     optimization: RefreshCw
   };
-  return;
+  return (
+    <div className="space-y-6">
+      {Object.entries(groupedRecommendations).map(([type, recs]) => {
+        const TypeIcon = typeIcons[type as keyof typeof typeIcons];
+        return (
+          <div key={type} className="space-y-3">
+            <div className="flex items-center gap-2 mb-3">
+              <TypeIcon className="w-5 h-5 text-muted-foreground" />
+              <h3 className="text-sm font-medium text-muted-foreground">
+                {typeLabels[type as keyof typeof typeLabels]}
+              </h3>
+            </div>
+            <div className="grid gap-3">
+              {recs.map((recommendation) => (
+                <RecommendationCard 
+                  key={recommendation.id} 
+                  recommendation={recommendation} 
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 };
