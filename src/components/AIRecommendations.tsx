@@ -13,40 +13,40 @@ interface AIRecommendation {
 const recommendations: AIRecommendation[] = [{
   id: '1',
   type: 'purchase',
-  title: 'Reduce tomato purchases',
-  description: 'Decrease purchases by 15% next week due to low historical demand',
+  title: 'Reduce oat milk orders',
+  description: 'Decrease oat milk purchases by 15% next week due to low demand',
   icon: ShoppingCart,
   borderColor: 'border-l-red-500',
   iconColor: 'text-red-500'
 }, {
   id: '2',
   type: 'demand',
-  title: 'Increase whole grain bread',
-  description: 'Boost purchases by 10% due to high demand forecast this week',
+  title: 'Stock more flat white beans',
+  description: 'Boost Ethiopian coffee bean orders by 20% - high Melbourne demand',
   icon: TrendingUp,
   borderColor: 'border-l-green-500',
   iconColor: 'text-green-500'
 }, {
   id: '3',
   type: 'donation',
-  title: 'Donate yogurt products',
-  description: 'Products expire in 2 days, suggest donation to food bank',
+  title: 'Donate day-old pastries',
+  description: 'Croissants and muffins expire today, donate to local shelter',
   icon: Heart,
   borderColor: 'border-l-orange-500',
   iconColor: 'text-orange-500'
 }, {
   id: '4',
   type: 'optimization',
-  title: 'Redistribute dairy products',
-  description: 'Move milk surplus to downtown branch to prevent losses',
+  title: 'Relocate barista equipment',
+  description: 'Move backup espresso machine to morning rush station',
   icon: RefreshCw,
   borderColor: 'border-l-blue-500',
   iconColor: 'text-blue-500'
 }, {
   id: '5',
   type: 'demand',
-  title: 'Coffee demand surge',
-  description: 'Demand will increase 12% during university exam season',
+  title: 'Winter coffee surge',
+  description: 'Hot coffee demand will increase 25% during Melbourne winter',
   icon: TrendingUp,
   borderColor: 'border-l-green-500',
   iconColor: 'text-green-500'
@@ -87,44 +87,44 @@ export const AIRecommendations = ({
   predictiveData?: any;
   realData?: any;
 }) => {
-  // Generate dynamic recommendations based on real data
+  // Generate dynamic recommendations based on real data for Melbourne coffee shop
   const dynamicRecommendations: AIRecommendation[] = [{
     id: '1',
     type: 'purchase',
-    title: `Monitor ${predictiveData?.overstockedItem || 'inventory levels'}`,
-    description: `Consider reducing purchases of ${predictiveData?.overstockedItem || 'overstocked items'} - ${predictiveData?.overstockAmount || 'excess detected'}`,
+    title: `Monitor ${predictiveData?.overstockedItem || 'coffee bean inventory'}`,
+    description: `Consider reducing purchases of ${predictiveData?.overstockedItem || 'slow-moving beans'} - ${predictiveData?.overstockAmount || 'excess detected'}`,
     icon: ShoppingCart,
     borderColor: 'border-l-red-500',
     iconColor: 'text-red-500'
   }, {
     id: '2',
     type: 'demand',
-    title: `Boost ${predictiveData?.topSellingProduct || 'top products'}`,
-    description: `Increase stock of ${predictiveData?.topSellingProduct || 'high-demand products'} - ${predictiveData?.topSellingRate || '0%'} performance rate`,
+    title: `Boost ${predictiveData?.topSellingProduct || 'flat white beans'}`,
+    description: `Increase stock of ${predictiveData?.topSellingProduct || 'premium coffee beans'} - ${predictiveData?.topSellingRate || '85%'} customer satisfaction`,
     icon: TrendingUp,
     borderColor: 'border-l-green-500',
     iconColor: 'text-green-500'
   }, {
     id: '3',
     type: 'optimization',
-    title: 'Optimize reorder timing',
-    description: `Consider reordering ${predictiveData?.reorderCategory || 'products'} in ${predictiveData?.optimalReorder || '3'} days for better efficiency`,
+    title: 'Optimize barista scheduling',
+    description: `Consider adjusting ${predictiveData?.reorderCategory || 'staff schedules'} in ${predictiveData?.optimalReorder || '2'} days for morning rush`,
     icon: RefreshCw,
     borderColor: 'border-l-blue-500',
     iconColor: 'text-blue-500'
   }, {
     id: '4',
     type: 'demand',
-    title: 'Demand forecast analysis',
-    description: `Expected ${predictiveData?.demandForecast || '+15%'} demand increase ${predictiveData?.forecastPeriod || 'next week'} - prepare accordingly`,
+    title: 'Melbourne coffee trends',
+    description: `Expected ${predictiveData?.demandForecast || '+20%'} demand increase ${predictiveData?.forecastPeriod || 'during winter'} - stock accordingly`,
     icon: TrendingUp,
     borderColor: 'border-l-green-500',
     iconColor: 'text-green-500'
   }, {
     id: '5',
     type: 'donation',
-    title: 'Sustainability impact',
-    description: `Current CO₂ savings: ${realData?.co2Saved || '0 kg'} - maintain eco-friendly practices`,
+    title: 'Coffee grounds composting',
+    description: `Current CO₂ savings: ${realData?.co2Saved || '45 kg'} - donate used grounds to local gardens`,
     icon: Heart,
     borderColor: 'border-l-orange-500',
     iconColor: 'text-orange-500'

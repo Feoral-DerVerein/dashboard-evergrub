@@ -18,75 +18,75 @@ const AI = () => {
 
   // Mock data for AI predictions and recommendations
   const [predictiveData] = useState({
-    topSellingProduct: "Organic Vegetables",
-    topSellingRate: "87%",
-    overstockedItem: "Canned Goods",
-    overstockAmount: "15 units excess",
-    demandForecast: "+12%",
-    forecastPeriod: "Next week prediction",
-    optimalReorder: "4",
-    reorderCategory: "Fresh Produce"
+    topSellingProduct: "Flat White Blend",
+    topSellingRate: "92%",
+    overstockedItem: "Decaf Coffee Beans",
+    overstockAmount: "8 kg excess",
+    demandForecast: "+18%",
+    forecastPeriod: "Winter season forecast",
+    optimalReorder: "3",
+    reorderCategory: "Premium Coffee Beans"
   });
 
   // AI Business Intelligence Data
   const [inventoryRecommendations] = useState([{
     id: 1,
     type: "reduce",
-    product: "Atlantic Salmon",
-    current: "25 kg",
-    recommended: "15 kg (-40%)",
-    reason: "Stock expires in 4 days, slow sales",
+    product: "Decaf Coffee Beans",
+    current: "12 kg",
+    recommended: "8 kg (-33%)",
+    reason: "Low demand, slow rotation in Melbourne market",
     priority: "high",
-    savings: "$450"
+    savings: "$180"
   }, {
     id: 2,
     type: "increase",
-    product: "Organic Vegetables",
-    current: "10 kg",
-    recommended: "18 kg (+80%)",
-    reason: "High demand, good margin",
+    product: "Oat Milk",
+    current: "15 L",
+    recommended: "25 L (+67%)",
+    reason: "High demand from Melbourne vegans, excellent margins",
     priority: "medium",
-    opportunity: "$230"
+    opportunity: "$125"
   }]);
   const [expirationAlerts] = useState([{
     id: 1,
-    product: "Atlantic Salmon",
-    quantity: "15 kg",
-    daysLeft: 4,
-    value: "$450",
+    product: "Almond Croissants",
+    quantity: "18 units",
+    daysLeft: 2,
+    value: "$72",
     priority: "urgent",
-    recommendation: "Move to daily special menu"
+    recommendation: "50% discount after 3pm or donate to shelter"
   }, {
     id: 2,
-    product: "Gourmet Cheese",
-    quantity: "8 units",
-    daysLeft: 6,
-    value: "$120",
+    product: "Fresh Milk",
+    quantity: "8 L",
+    daysLeft: 3,
+    value: "$24",
     priority: "medium",
-    recommendation: "15% discount to accelerate sales"
+    recommendation: "Use for coffee drinks first"
   }, {
     id: 3,
-    product: "Artisan Bread",
-    quantity: "12 breads",
-    daysLeft: 2,
-    value: "$36",
+    product: "Banana Bread",
+    quantity: "6 loaves",
+    daysLeft: 1,
+    value: "$48",
     priority: "urgent",
-    recommendation: "2x1 promotion or donate"
+    recommendation: "Staff meal or customer free samples"
   }]);
   const [pricingSuggestions] = useState([{
     id: 1,
-    product: "Premium Salad",
-    currentPrice: "$12",
-    suggestedPrice: "$10 (-17%)",
-    reason: "Accelerate rotation before expiration",
-    impact: "+35% estimated sales"
+    product: "Specialty Latte",
+    currentPrice: "$6.50",
+    suggestedPrice: "$7.20 (+11%)",
+    reason: "High demand during Melbourne winter, premium beans justify price",
+    impact: "+$280 weekly revenue"
   }, {
     id: 2,
-    product: "Green Smoothie",
-    currentPrice: "$8",
-    suggestedPrice: "$9 (+12%)",
-    reason: "High demand, low competition",
-    impact: "+$45 weekly revenue"
+    product: "Vegan Muffins", 
+    currentPrice: "$5.00",
+    suggestedPrice: "$4.50 (-10%)",
+    reason: "Clear stock before weekend batch, attract price-sensitive customers",
+    impact: "+45% estimated sales"
   }]);
   const [realData] = useState({
     co2Saved: "125 kg",
