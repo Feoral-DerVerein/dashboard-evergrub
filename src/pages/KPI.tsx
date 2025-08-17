@@ -598,10 +598,6 @@ const KPI = () => {
               </div>
             </section>
 
-            {/* AI Recommendations */}
-            <aside className="md:col-span-4 order-3 md:order-2 mt-0 mb-6">
-              <AIRecommendations predictiveData={predictiveData} realData={realData} />
-            </aside>
           </main>
 
           {/* Main dashboard content and chart - Moved to bottom */}
