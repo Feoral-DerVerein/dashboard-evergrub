@@ -124,14 +124,14 @@ const Configuration = () => {
       if (authError) throw authError;
       
       toast({
-        title: "Perfil actualizado",
-        description: "Los cambios se han guardado correctamente"
+        title: "Profile updated",
+        description: "Changes have been saved successfully"
       });
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
         title: "Error",
-        description: "No se pudo actualizar el perfil",
+        description: "Could not update profile",
         variant: "destructive"
       });
     } finally {
@@ -143,7 +143,7 @@ const Configuration = () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       toast({
         title: "Error",
-        description: "Las contraseñas no coinciden",
+        description: "Passwords do not match",
         variant: "destructive"
       });
       return;
@@ -152,7 +152,7 @@ const Configuration = () => {
     if (passwordForm.newPassword.length < 6) {
       toast({
         title: "Error",
-        description: "La contraseña debe tener al menos 6 caracteres",
+        description: "Password must be at least 6 characters",
         variant: "destructive"
       });
       return;
@@ -173,14 +173,14 @@ const Configuration = () => {
       });
       
       toast({
-        title: "Contraseña actualizada",
-        description: "Tu contraseña se ha cambiado correctamente"
+        title: "Password updated",
+        description: "Your password has been changed successfully"
       });
     } catch (error) {
       console.error('Error updating password:', error);
       toast({
         title: "Error",
-        description: "No se pudo cambiar la contraseña",
+        description: "Could not change password",
         variant: "destructive"
       });
     } finally {
@@ -198,8 +198,8 @@ const Configuration = () => {
               <User className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Configuración</h1>
-              <p className="text-gray-500">Gestiona tu perfil y preferencias de la cuenta</p>
+              <h1 className="text-2xl font-semibold text-gray-900">Configuration</h1>
+              <p className="text-gray-500">Manage your profile and account preferences</p>
             </div>
           </div>
         </header>
@@ -210,7 +210,7 @@ const Configuration = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="w-5 h-5" />
-                Información del Perfil
+                Profile Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -223,15 +223,15 @@ const Configuration = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="space-y-2">
-                  <Label htmlFor="avatar-url">URL de la foto de perfil</Label>
+                  <Label htmlFor="avatar-url">Profile picture URL</Label>
                   <Input
                     id="avatar-url"
                     value={profile.avatarUrl}
                     onChange={(e) => setProfile(prev => ({ ...prev, avatarUrl: e.target.value }))}
-                    placeholder="https://ejemplo.com/foto.jpg"
+                    placeholder="https://example.com/photo.jpg"
                   />
                   <p className="text-sm text-gray-500">
-                    Introduce la URL de tu foto de perfil
+                    Enter the URL of your profile picture
                   </p>
                 </div>
               </div>
@@ -241,17 +241,17 @@ const Configuration = () => {
               {/* Personal Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="full-name">Nombre completo</Label>
+                  <Label htmlFor="full-name">Full name</Label>
                   <Input
                     id="full-name"
                     value={profile.fullName}
                     onChange={(e) => setProfile(prev => ({ ...prev, fullName: e.target.value }))}
-                    placeholder="Tu nombre completo"
+                    placeholder="Your full name"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Correo electrónico</Label>
+                  <Label htmlFor="email">Email address</Label>
                   <Input
                     id="email"
                     type="email"
@@ -260,12 +260,12 @@ const Configuration = () => {
                     className="bg-gray-50"
                   />
                   <p className="text-sm text-gray-500">
-                    El correo no se puede cambiar por seguridad
+                    Email cannot be changed for security reasons
                   </p>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Teléfono</Label>
+                  <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
                     value={profile.phone}
@@ -281,7 +281,7 @@ const Configuration = () => {
                 className="w-full md:w-auto"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+                {isSaving ? 'Saving...' : 'Save Changes'}
               </Button>
             </CardContent>
           </Card>
@@ -291,23 +291,23 @@ const Configuration = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="w-5 h-5" />
-                Seguridad
+                Security
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Cambiar Contraseña</h3>
+                <h3 className="text-lg font-medium">Change Password</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="current-password">Contraseña actual</Label>
+                    <Label htmlFor="current-password">Current password</Label>
                     <div className="relative">
                       <Input
                         id="current-password"
                         type={showPasswords.current ? "text" : "password"}
                         value={passwordForm.currentPassword}
                         onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
-                        placeholder="Contraseña actual"
+                        placeholder="Current password"
                       />
                       <Button
                         type="button"
@@ -322,14 +322,14 @@ const Configuration = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="new-password">Nueva contraseña</Label>
+                    <Label htmlFor="new-password">New password</Label>
                     <div className="relative">
                       <Input
                         id="new-password"
                         type={showPasswords.new ? "text" : "password"}
                         value={passwordForm.newPassword}
                         onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                        placeholder="Nueva contraseña"
+                        placeholder="New password"
                       />
                       <Button
                         type="button"
@@ -344,14 +344,14 @@ const Configuration = () => {
                   </div>
                   
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="confirm-password">Confirmar nueva contraseña</Label>
+                    <Label htmlFor="confirm-password">Confirm new password</Label>
                     <div className="relative">
                       <Input
                         id="confirm-password"
                         type={showPasswords.confirm ? "text" : "password"}
                         value={passwordForm.confirmPassword}
                         onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        placeholder="Confirmar nueva contraseña"
+                        placeholder="Confirm new password"
                       />
                       <Button
                         type="button"
@@ -372,19 +372,19 @@ const Configuration = () => {
                   variant="outline"
                 >
                   <Lock className="w-4 h-4 mr-2" />
-                  {isLoading ? 'Cambiando...' : 'Cambiar Contraseña'}
+                  {isLoading ? 'Changing...' : 'Change Password'}
                 </Button>
               </div>
               
               <Separator />
               
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Autenticación de Dos Factores</h3>
+                <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">Habilitar 2FA</p>
+                    <p className="font-medium">Enable 2FA</p>
                     <p className="text-sm text-gray-500">
-                      Añade una capa extra de seguridad a tu cuenta
+                      Add an extra layer of security to your account
                     </p>
                   </div>
                   <Switch
@@ -403,15 +403,15 @@ const Configuration = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="w-5 h-5" />
-                Notificaciones
+                Notifications
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Notificaciones por email</p>
+                  <p className="font-medium">Email notifications</p>
                   <p className="text-sm text-gray-500">
-                    Recibe notificaciones importantes por correo
+                    Receive important notifications via email
                   </p>
                 </div>
                 <Switch
@@ -424,9 +424,9 @@ const Configuration = () => {
               
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Notificaciones push</p>
+                  <p className="font-medium">Push notifications</p>
                   <p className="text-sm text-gray-500">
-                    Recibe notificaciones en tiempo real
+                    Receive real-time notifications
                   </p>
                 </div>
                 <Switch
@@ -439,9 +439,9 @@ const Configuration = () => {
               
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Emails de marketing</p>
+                  <p className="font-medium">Marketing emails</p>
                   <p className="text-sm text-gray-500">
-                    Recibe ofertas y novedades de productos
+                    Receive product offers and news
                   </p>
                 </div>
                 <Switch
@@ -459,13 +459,13 @@ const Configuration = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Palette className="w-5 h-5" />
-                Preferencias
+                Preferences
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="language">Idioma</Label>
+                  <Label htmlFor="language">Language</Label>
                   <Select value={settings.language} onValueChange={(value) => 
                     setSettings(prev => ({ ...prev, language: value }))
                   }>
@@ -473,15 +473,15 @@ const Configuration = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="es">Spanish</SelectItem>
                       <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="fr">French</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="currency">Moneda</Label>
+                  <Label htmlFor="currency">Currency</Label>
                   <Select value={settings.currency} onValueChange={(value) => 
                     setSettings(prev => ({ ...prev, currency: value }))
                   }>
@@ -489,16 +489,16 @@ const Configuration = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="USD">USD - Dólar estadounidense</SelectItem>
+                      <SelectItem value="USD">USD - US Dollar</SelectItem>
                       <SelectItem value="EUR">EUR - Euro</SelectItem>
-                      <SelectItem value="MXN">MXN - Peso mexicano</SelectItem>
-                      <SelectItem value="COP">COP - Peso colombiano</SelectItem>
+                      <SelectItem value="MXN">MXN - Mexican Peso</SelectItem>
+                      <SelectItem value="COP">COP - Colombian Peso</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="theme">Tema</Label>
+                  <Label htmlFor="theme">Theme</Label>
                   <Select value={settings.theme} onValueChange={(value) => 
                     setSettings(prev => ({ ...prev, theme: value }))
                   }>
@@ -506,9 +506,9 @@ const Configuration = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="light">Claro</SelectItem>
-                      <SelectItem value="dark">Oscuro</SelectItem>
-                      <SelectItem value="system">Sistema</SelectItem>
+                      <SelectItem value="light">Light</SelectItem>
+                      <SelectItem value="dark">Dark</SelectItem>
+                      <SelectItem value="system">System</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
