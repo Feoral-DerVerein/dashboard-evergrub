@@ -13,6 +13,7 @@ import Ads from "@/pages/Ads";
 import CreateAd from "@/pages/CreateAd";
 import Donate from "@/pages/Donate";
 import Grains from "@/pages/Grains";
+import Configuration from "@/pages/Configuration";
 import Wishlist from "@/pages/Wishlist";
 import Users from "@/pages/Users";
 import PaymentPortal from "@/pages/PaymentPortal";
@@ -59,6 +60,7 @@ const MainRoutes = () => {
         <Route path="/ads/create" element={<CreateAd />} />
         <Route path="/donate" element={<Donate />} />
         <Route path="/grains" element={<Grains />} />
+        <Route path="/configuration" element={<Configuration />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/users" element={<Users />} />
         <Route path="/payment" element={<PaymentPortal />} />
