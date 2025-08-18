@@ -293,16 +293,19 @@ const Products = () => {
       <header className="px-6 pt-8 pb-6 sticky top-0 glass-card z-10 border-b">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+              <p className="text-sm text-gray-600 mt-1">WiseBite Marketplace by Negentropy</p>
+              <p className="text-xs text-gray-500 mt-1">Manage your inventory and marketplace visibility</p>
+            </div>
             <button 
               onClick={() => setTutorialOpen(true)}
-              className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+              className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-2"
               title="Ver tutorial"
             >
               <Info className="w-5 h-5" />
             </button>
           </div>
-          <p className="text-gray-500">Manage your products.</p>
           <div className="flex items-center gap-2">
             <QuickInventory products={products} onUpdateQuantities={handleUpdateQuantities} compact />
 
