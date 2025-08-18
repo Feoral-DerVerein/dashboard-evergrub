@@ -442,13 +442,19 @@ const KPI = () => {
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
               <div>
-                <img src="/lovable-uploads/f5d89a50-1053-4a70-b915-ef437feec2b3.png" alt="Negentropy AI" className="h-9 w-auto mb-0 mx-auto" />
+                <img src="/lovable-uploads/f5d89a50-1053-4a70-b915-ef437feec2b3.png" alt="Negentropy AI" className="h-9 w-auto mb-4 mx-auto" />
+                <div className="flex justify-center mb-4">
+                  <Avatar className="h-16 w-16 cursor-pointer">
+                    <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
+                    <AvatarFallback>O</AvatarFallback>
+                  </Avatar>
+                </div>
                 <p className="text-gray-500">Welcome, Alex! The dashboard displays your business's performance, sustainability, and predictions using our Negentropy AI.</p>
                 <p className="text-gray-400 text-sm">Ortega's Coffe account</p>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar className="h-12 w-12 cursor-pointer">
+                  <Avatar className="h-8 w-8 cursor-pointer absolute top-2 right-2">
                     <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
                     <AvatarFallback>O</AvatarFallback>
                   </Avatar>
