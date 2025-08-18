@@ -120,7 +120,7 @@ export function ScheduleDialog({ open, onOpenChange }: ScheduleDialogProps) {
             Schedule Pickup Times
           </DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Organizar las horas para recoger pedidos - Configure your weekly pickup schedule and select specific dates.
+            Organise the times to collect orders - Configure your weekly pickup schedule and select specific dates.
           </p>
         </DialogHeader>
 
