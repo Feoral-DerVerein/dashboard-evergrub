@@ -6,6 +6,7 @@ import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
@@ -13,40 +14,39 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    
     setLoading(true);
+    
     try {
       console.log(`Attempting to ${activeTab} with email: ${email}`);
+      
       if (activeTab === 'login') {
-        const {
-          data,
-          error
-        } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
+        
         if (error) throw error;
+        
         console.log("Login successful", data);
         toast({
           title: "Login successful",
           description: "Welcome back!"
         });
-        navigate("/dashboard", {
-          replace: true
-        });
+        
+        navigate("/dashboard", { replace: true });
       } else {
-        const {
-          data,
-          error
-        } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password
         });
+        
         if (error) throw error;
+        
         console.log("Registration successful", data);
         toast({
           title: "Registration successful",
@@ -64,18 +64,18 @@ const Login = () => {
       setLoading(false);
     }
   };
+
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
     try {
       console.log(`Attempting login with ${provider}`);
-      const {
-        data,
-        error
-      } = await supabase.auth.signInWithOAuth({
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider as Provider,
         options: {
           redirectTo: window.location.origin + '/dashboard'
         }
       });
+      
       if (error) throw error;
       console.log(`${provider} login initiated`, data);
     } catch (error: any) {
@@ -87,55 +87,89 @@ const Login = () => {
       });
     }
   };
-  return <div className="min-h-screen bg-gradient-to-br from-blue-400 via-cyan-400 to-teal-300 flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-black/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-gray-700/50">
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-cyan-400 to-teal-300 flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-gray-50/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-gray-200/30">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <img src="/lovable-uploads/5bd2200d-698d-4e50-9013-8b2b3b1db08e.png" alt="Negentropy AI" className="h-12 w-auto" />
+          <img src="/lovable-uploads/030dbcde-90ed-4ac5-a577-ac0ec9e12bdd.png" alt="Negentropy" className="h-12 w-auto" />
         </div>
 
         {/* Login Title */}
-        <h1 className="mb-8 tracking-wider text-zinc-950 text-sm text-center font-light">
-          {activeTab === 'login' ? 'LOGIN' : 'SIGN UP'}
+        <h1 className="text-3xl font-bold text-gray-800 text-center mb-8 tracking-wider">
+          Welcome to Negentropy
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Input */}
           <div>
-            <Input type="email" placeholder={activeTab === 'login' ? "Username or email" : "Email"} className="bg-white/20 border-white/30 rounded-full py-3 px-4 text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/30 focus:border-white/50" value={email} onChange={e => setEmail(e.target.value)} required />
+            <Input 
+              type="email" 
+              placeholder={activeTab === 'login' ? "Username or email" : "Email"}
+              className="bg-white/80 border-gray-200 rounded-full py-3 px-4 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
+              value={email} 
+              onChange={e => setEmail(e.target.value)} 
+              required 
+            />
           </div>
 
           {/* Password Input */}
           <div className="relative">
-            <Input type={showPassword ? "text" : "password"} placeholder="Password" className="bg-white/20 border-white/30 rounded-full py-3 px-4 pr-12 text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/30 focus:border-white/50" value={password} onChange={e => setPassword(e.target.value)} required />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white">
+            <Input 
+              type={showPassword ? "text" : "password"} 
+              placeholder="Password" 
+              className="bg-white/80 border-gray-200 rounded-full py-3 px-4 pr-12 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              required 
+            />
+            <button 
+              type="button" 
+              onClick={() => setShowPassword(!showPassword)} 
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
 
           {/* Submit Button */}
-          <Button type="submit" className="w-full bg-white text-blue-600 hover:bg-white/90 py-3 rounded-full font-semibold tracking-wide uppercase mt-6" disabled={loading}>
+          <Button 
+            type="submit" 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-semibold tracking-wide uppercase mt-6" 
+            disabled={loading}
+          >
             {loading ? "Processing..." : activeTab === 'login' ? 'LOG IN' : 'SIGN UP'}
           </Button>
         </form>
 
         {/* Toggle between Login/Signup */}
         <div className="text-center mt-6">
-          <button onClick={() => setActiveTab(activeTab === 'login' ? 'signup' : 'login')} className="text-white/80 hover:text-white text-sm">
+          <button 
+            onClick={() => setActiveTab(activeTab === 'login' ? 'signup' : 'login')} 
+            className="text-gray-600 hover:text-gray-800 text-sm"
+          >
             {activeTab === 'login' ? "Don't have an account?" : "Already have an account?"}
           </button>
         </div>
 
         {/* Forgot Password */}
-        {activeTab === 'login' && <div className="text-center mt-4">
-            <Link to="/forgot-password" className="text-white/70 hover:text-white text-sm">
+        {activeTab === 'login' && (
+          <div className="text-center mt-4">
+            <Link to="/forgot-password" className="text-gray-500 hover:text-gray-700 text-sm">
               Forgot Password?
             </Link>
-          </div>}
+          </div>
+        )}
 
         {/* Social Login */}
         <div className="mt-8 space-y-3">
-          <Button variant="outline" className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/10 border-white/30 text-white hover:bg-white/20" onClick={() => handleSocialLogin('google')} disabled={loading}>
+          <Button 
+            variant="outline" 
+            className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/60 border-gray-200 text-gray-700 hover:bg-white/80" 
+            onClick={() => handleSocialLogin('google')} 
+            disabled={loading}
+          >
             <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
               <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                 <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z" />
@@ -147,7 +181,12 @@ const Login = () => {
             Continue with Google
           </Button>
 
-          <Button variant="outline" className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/10 border-white/30 text-white hover:bg-white/20" onClick={() => handleSocialLogin('microsoft')} disabled={loading}>
+          <Button 
+            variant="outline" 
+            className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/60 border-gray-200 text-gray-700 hover:bg-white/80" 
+            onClick={() => handleSocialLogin('microsoft')} 
+            disabled={loading}
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 21 21">
               <rect x="1" y="1" width="9" height="9" fill="#f25022" />
               <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
@@ -159,17 +198,19 @@ const Login = () => {
         </div>
 
         {/* Terms and Privacy */}
-        <p className="text-center text-white/60 text-xs mt-6">
+        <p className="text-center text-gray-500 text-xs mt-6">
           By continuing, you agree to our{" "}
-          <Link to="/terms" className="text-white/80 hover:text-white underline">
+          <Link to="/terms" className="text-gray-600 hover:text-gray-800 underline">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link to="/privacy" className="text-white/80 hover:text-white underline">
+          <Link to="/privacy" className="text-gray-600 hover:text-gray-800 underline">
             Privacy Policy
           </Link>
         </p>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Login;
