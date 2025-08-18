@@ -76,24 +76,24 @@ export function ScheduleDialog({ open, onOpenChange }: ScheduleDialogProps) {
           </p>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar Section */}
-          <Card>
-            <CardHeader>
+          <Card className="lg:col-span-1">
+            <CardHeader className="pb-2">
               <CardTitle className="text-lg">Select Dates</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-2">
               <CalendarComponent
                 mode="single"
                 selected={selectedDate}
                 onSelect={setSelectedDate}
-                className="rounded-md border"
+                className="rounded-md border w-full"
               />
             </CardContent>
           </Card>
 
           {/* Schedule Configuration */}
-          <Card>
+          <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle className="text-lg">Weekly Schedule</CardTitle>
             </CardHeader>
