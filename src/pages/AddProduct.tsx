@@ -416,7 +416,7 @@ const AddProduct = () => {
     const finalPrice = price - price * discount / 100;
     return finalPrice.toFixed(2);
   };
-  const categories = ["Restaurant", "SPA Products"];
+  const categories = ["Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts"];
   const brands = ["Equate", "Generic", "Premium"];
 
   // Handle brand selection change
