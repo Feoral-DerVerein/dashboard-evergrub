@@ -98,10 +98,42 @@ export const AIRecommendations = ({
     borderColor: 'border-l-red-500',
     iconColor: 'text-red-500'
   }, {
+    id: '1b',
+    type: 'purchase',
+    title: 'Optimize milk suppliers',
+    description: 'Switch to local dairy supplier for 15% cost reduction and fresher products',
+    icon: ShoppingCart,
+    borderColor: 'border-l-red-500',
+    iconColor: 'text-red-500'
+  }, {
+    id: '1c',
+    type: 'purchase',
+    title: 'Bulk pastry orders',
+    description: 'Order croissants in bulk for weekend demand - save 20% on unit costs',
+    icon: ShoppingCart,
+    borderColor: 'border-l-red-500',
+    iconColor: 'text-red-500'
+  }, {
     id: '2',
     type: 'demand',
     title: `Boost ${predictiveData?.topSellingProduct || 'flat white beans'}`,
     description: `Increase stock of ${predictiveData?.topSellingProduct || 'premium coffee beans'} - ${predictiveData?.topSellingRate || '85%'} customer satisfaction`,
+    icon: TrendingUp,
+    borderColor: 'border-l-green-500',
+    iconColor: 'text-green-500'
+  }, {
+    id: '2b',
+    type: 'demand',
+    title: 'Melbourne coffee trends',
+    description: `Expected ${predictiveData?.demandForecast || '+20%'} demand increase ${predictiveData?.forecastPeriod || 'during winter'} - stock accordingly`,
+    icon: TrendingUp,
+    borderColor: 'border-l-green-500',
+    iconColor: 'text-green-500'
+  }, {
+    id: '2c',
+    type: 'demand',
+    title: 'Alternative milk surge',
+    description: 'Oat and almond milk demand up 35% - increase orders for next month',
     icon: TrendingUp,
     borderColor: 'border-l-green-500',
     iconColor: 'text-green-500'
@@ -114,18 +146,42 @@ export const AIRecommendations = ({
     borderColor: 'border-l-blue-500',
     iconColor: 'text-blue-500'
   }, {
-    id: '4',
-    type: 'demand',
-    title: 'Melbourne coffee trends',
-    description: `Expected ${predictiveData?.demandForecast || '+20%'} demand increase ${predictiveData?.forecastPeriod || 'during winter'} - stock accordingly`,
-    icon: TrendingUp,
-    borderColor: 'border-l-green-500',
-    iconColor: 'text-green-500'
+    id: '3b',
+    type: 'optimization',
+    title: 'Equipment maintenance',
+    description: 'Schedule espresso machine cleaning during low-traffic hours (2-4 PM)',
+    icon: RefreshCw,
+    borderColor: 'border-l-blue-500',
+    iconColor: 'text-blue-500'
   }, {
-    id: '5',
+    id: '3c',
+    type: 'optimization',
+    title: 'Menu positioning',
+    description: 'Move high-margin items to eye-level on menu board for better sales',
+    icon: RefreshCw,
+    borderColor: 'border-l-blue-500',
+    iconColor: 'text-blue-500'
+  }, {
+    id: '4',
     type: 'donation',
     title: 'Coffee grounds composting',
     description: `Current CO₂ savings: ${realData?.co2Saved || '45 kg'} - donate used grounds to local gardens`,
+    icon: Heart,
+    borderColor: 'border-l-orange-500',
+    iconColor: 'text-orange-500'
+  }, {
+    id: '4b',
+    type: 'donation',
+    title: 'Day-old pastries',
+    description: 'Partner with local food rescue for unsold baked goods - tax benefits included',
+    icon: Heart,
+    borderColor: 'border-l-orange-500',
+    iconColor: 'text-orange-500'
+  }, {
+    id: '4c',
+    type: 'donation',
+    title: 'Excess coffee beans',
+    description: 'Donate surplus specialty beans to community center for cooking classes',
     icon: Heart,
     borderColor: 'border-l-orange-500',
     iconColor: 'text-orange-500'
