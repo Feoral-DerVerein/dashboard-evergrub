@@ -91,7 +91,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-white px-6 pb-20">
       <div className="pt-10 flex justify-center">
-        <img src="/lovable-uploads/fe83896e-4f98-403b-ae36-d286f825c117.png" alt="Negentropy AI" className="h-16 w-auto" />
+        <img src="/lovable-uploads/5bd2200d-698d-4e50-9013-8b2b3b1db08e.png" alt="Negentropy AI" className="h-16 w-auto" />
       </div>
 
       <div className="mt-8">

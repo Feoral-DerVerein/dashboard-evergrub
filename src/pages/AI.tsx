@@ -402,7 +402,7 @@ const AI = () => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             
-            <img src="/lovable-uploads/fe83896e-4f98-403b-ae36-d286f825c117.png" alt="Negentropy AI" className="h-16 w-auto mx-auto" />
+            <img src="/lovable-uploads/5bd2200d-698d-4e50-9013-8b2b3b1db08e.png" alt="Negentropy AI" className="h-16 w-auto mx-auto" />
           </div>
           <p className="text-gray-600">
             Harness the power of artificial intelligence to optimize your business operations, 
