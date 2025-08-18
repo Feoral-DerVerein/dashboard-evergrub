@@ -15,32 +15,25 @@ import { DonationForm } from "@/components/DonationForm";
 const categories = ["All", "Restaurant", "SPA Products"];
 
 // Food banks from Australia
-const foodBanks = [
-  {
-    name: "OzHarvest",
-    description: "Rescues quality surplus food and delivers it to charities that feed vulnerable Australians."
-  },
-  {
-    name: "Foodbank Australia", 
-    description: "Australia's largest food relief organization, providing food to charities and school programs nationwide."
-  },
-  {
-    name: "SecondBite",
-    description: "Rescues surplus fresh food and redistributes it to community food programs across Australia."
-  },
-  {
-    name: "FareShare",
-    description: "Cooks rescued food into free, nutritious meals for people in need in Melbourne, Brisbane and Sydney."
-  },
-  {
-    name: "The Salvation Army – Doorways",
-    description: "Provides emergency relief including food assistance to individuals and families in crisis."
-  },
-  {
-    name: "St Vincent de Paul (Vinnies)",
-    description: "Supports communities with food relief and assistance through local conferences and services."
-  }
-];
+const foodBanks = [{
+  name: "OzHarvest",
+  description: "Rescues quality surplus food and delivers it to charities that feed vulnerable Australians."
+}, {
+  name: "Foodbank Australia",
+  description: "Australia's largest food relief organization, providing food to charities and school programs nationwide."
+}, {
+  name: "SecondBite",
+  description: "Rescues surplus fresh food and redistributes it to community food programs across Australia."
+}, {
+  name: "FareShare",
+  description: "Cooks rescued food into free, nutritious meals for people in need in Melbourne, Brisbane and Sydney."
+}, {
+  name: "The Salvation Army – Doorways",
+  description: "Provides emergency relief including food assistance to individuals and families in crisis."
+}, {
+  name: "St Vincent de Paul (Vinnies)",
+  description: "Supports communities with food relief and assistance through local conferences and services."
+}];
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -235,12 +228,10 @@ const Products = () => {
       setTogglingMarketplaceId(null);
     }
   };
-  
   const handleDonateProduct = (product: Product) => {
     setSelectedProduct(product);
     setDonationDialogOpen(true);
   };
-
   const handleSelectFoodBank = (foodBankName: string) => {
     setSelectedFoodBank(foodBankName);
     setDonationDialogOpen(false);
@@ -302,7 +293,7 @@ const Products = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-            <p className="text-gray-500">Manage your Saffire Freycinet products</p>
+            <p className="text-gray-500">Manage your products.</p>
           </div>
           <div className="flex items-center gap-2">
             <QuickInventory products={products} onUpdateQuantities={handleUpdateQuantities} compact />
@@ -435,15 +426,13 @@ const Products = () => {
             <DialogTitle>Select Food Bank for Donation</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 max-h-96 overflow-y-auto">
-            {foodBanks.map((foodBank) => (
-              <div key={foodBank.name} className="p-4 border rounded-lg cursor-pointer hover:bg-gray-50" onClick={() => handleSelectFoodBank(foodBank.name)}>
+            {foodBanks.map(foodBank => <div key={foodBank.name} className="p-4 border rounded-lg cursor-pointer hover:bg-gray-50" onClick={() => handleSelectFoodBank(foodBank.name)}>
                 <div className="flex items-center gap-2 mb-2">
                   <Heart className="h-4 w-4 text-red-500" />
                   <h3 className="font-medium text-sm">{foodBank.name}</h3>
                 </div>
                 <p className="text-xs text-gray-600">{foodBank.description}</p>
-              </div>
-            ))}
+              </div>)}
           </div>
         </DialogContent>
       </Dialog>
