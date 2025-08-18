@@ -12,7 +12,7 @@ import ApiImportDialog from "@/components/ApiImportDialog";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DonationForm } from "@/components/DonationForm";
-const categories = ["All", "Restaurant", "SPA Products"];
+const categories = ["All", "Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts"];
 
 // Food banks from Australia
 const foodBanks = [{
