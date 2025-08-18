@@ -97,7 +97,7 @@ const Login = () => {
         </div>
 
         {/* Login Title */}
-        <h1 className="text-2xl font-bold text-gray-800 text-center mb-8 tracking-wider">
+        <h1 className="text-xl font-bold text-gray-800 text-center mb-8 tracking-wider">
           Welcome to Negentropy
         </h1>
 
