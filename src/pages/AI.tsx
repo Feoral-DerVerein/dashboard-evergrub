@@ -448,9 +448,14 @@ const AI = () => {
                       </div>
                       {rec.type === "reduce" ? <ArrowDown className="w-4 h-4 text-red-500" /> : <ArrowUp className="w-4 h-4 text-green-500" />}
                     </div>
-                    <Button size="sm" onClick={() => handleAcceptRecommendation(rec.id, rec.type, rec.product)} className="w-full text-xs">
-                      Accept Recommendation
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button size="sm" onClick={() => handleAcceptRecommendation(rec.id, rec.type, rec.product)} className="flex-1 text-xs h-7">
+                        Accept
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => {}} className="flex-1 text-xs h-7">
+                        Decline
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -483,9 +488,14 @@ const AI = () => {
                         </p>
                       </div>
                     </div>
-                    <Button size="sm" onClick={() => handleApplyPromotion(alert.product, alert.daysLeft)} className="w-full text-xs">
-                      Apply Promotion
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button size="sm" onClick={() => handleApplyPromotion(alert.product, alert.daysLeft)} className="flex-1 text-xs h-7">
+                        Promote
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => {}} className="flex-1 text-xs h-7">
+                        Decline
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -515,9 +525,14 @@ const AI = () => {
                       </div>
                       <TrendingUp className="w-4 h-4 text-green-500" />
                     </div>
-                    <Button size="sm" onClick={() => handleApplyDynamicPricing(suggestion.product, suggestion.currentPrice, suggestion.suggestedPrice)} className="w-full text-xs">
-                      Apply Price
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button size="sm" onClick={() => handleApplyDynamicPricing(suggestion.product, suggestion.currentPrice, suggestion.suggestedPrice)} className="flex-1 text-xs h-7">
+                        Apply
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => {}} className="flex-1 text-xs h-7">
+                        Decline
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -542,9 +557,17 @@ const AI = () => {
                       "You have <strong>15 kg of salmon</strong> expiring in <strong>4 days</strong>. 
                       Recommendation: reduce order by <strong>20%</strong> and create daily special."
                     </p>
-                    <div className="space-y-2">
-                      <Button size="sm" onClick={() => handleApplyPromotion("Atlantic Salmon", 4)} className="w-full text-xs">
-                        Accept Recommendation
+                    <div className="space-y-1">
+                      <div className="flex gap-1">
+                        <Button size="sm" onClick={() => handleApplyPromotion("Atlantic Salmon", 4)} className="flex-1 text-xs h-7">
+                          Accept
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => {}} className="flex-1 text-xs h-7">
+                          Decline
+                        </Button>
+                      </div>
+                      <Button size="sm" variant="outline" onClick={() => handleSendToMarketplace("Atlantic Salmon")} className="w-full text-xs h-7">
+                        Optimize Purchase
                       </Button>
                     </div>
                   </div>
