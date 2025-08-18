@@ -164,190 +164,190 @@ const AI = () => {
 
   const handleAcceptRecommendation = (id: number, type: string, product?: string) => {
     const details = {
-      title: `Aceptar Recomendación de ${type === 'reduce' ? 'Reducción' : 'Aumento'} de Inventario`,
-      description: `Esta acción implementará automáticamente la recomendación de la IA para optimizar tu inventario de café.`,
+      title: `Accept ${type === 'reduce' ? 'Reduction' : 'Increase'} Inventory Recommendation`,
+      description: `This action will automatically implement the AI recommendation to optimize your coffee inventory.`,
       impact: {
-        financial: type === 'reduce' ? '+$180 ahorros semanales' : '+$125 oportunidad semanal',
-        inventory: `${product}: ajuste ${type === 'reduce' ? '-33%' : '+67%'}`,
-        environmental: type === 'reduce' ? 'Reducción de desperdicio 15%' : 'Mayor satisfacción del cliente',
-        timeframe: 'Efectivo inmediatamente, resultados en 3-5 días'
+        financial: type === 'reduce' ? '+$180 weekly savings' : '+$125 weekly opportunity',
+        inventory: `${product}: ${type === 'reduce' ? '-33%' : '+67%'} adjustment`,
+        environmental: type === 'reduce' ? '15% waste reduction' : 'Higher customer satisfaction',
+        timeframe: 'Effective immediately, results in 3-5 days'
       },
       changes: [
-        `Ajuste automático de órdenes para ${product}`,
-        'Actualización de niveles mínimos de stock',
-        'Notificación a proveedores sobre cambios',
-        'Recalibración de alertas de inventario'
+        `Automatic order adjustment for ${product}`,
+        'Update minimum stock levels',
+        'Notify suppliers about changes',
+        'Recalibrate inventory alerts'
       ],
       benefits: [
-        'Optimización automática del flujo de caja',
-        'Reducción de productos vencidos',
-        'Mejor rotación de inventario',
-        'Aumento en márgenes de ganancia'
+        'Automatic cash flow optimization',
+        'Reduction in expired products',
+        'Better inventory turnover',
+        'Increased profit margins'
       ],
       risks: [
-        'Posible desabastecimiento temporal si la demanda aumenta inesperadamente',
-        'Necesidad de monitoreo durante la primera semana'
+        'Possible temporary stockout if demand unexpectedly increases',
+        'Need for monitoring during first week'
       ]
     };
     
     showActionDetails(details, () => {
-      toast.success(`Recomendación de ${type} aplicada automáticamente para ${product}`);
+      toast.success(`${type} recommendation applied automatically for ${product}`);
     });
   };
 
   const handleSendToMarketplace = (product: string) => {
     const details = {
-      title: `Enviar ${product} al Marketplace`,
-      description: `Esta acción enviará automáticamente el producto al marketplace con descuento inteligente basado en la fecha de vencimiento.`,
+      title: `Send ${product} to Marketplace`,
+      description: `This action will automatically send the product to the marketplace with intelligent discount based on expiration date.`,
       impact: {
-        financial: '+$45-65 recuperación estimada vs pérdida total',
-        inventory: 'Liberación inmediata de espacio',
-        environmental: '100% prevención de desperdicio',
-        timeframe: 'Listado inmediato, venta esperada en 2-6 horas'
+        financial: '+$45-65 estimated recovery vs total loss',
+        inventory: 'Immediate space liberation',
+        environmental: '100% waste prevention',
+        timeframe: 'Immediate listing, expected sale in 2-6 hours'
       },
       changes: [
-        `Crear listado automático en marketplace para ${product}`,
-        'Aplicar descuento del 40-60% según urgencia',
-        'Configurar notificaciones de venta en tiempo real',
-        'Actualizar inventario automáticamente tras venta'
+        `Create automatic marketplace listing for ${product}`,
+        'Apply 40-60% discount based on urgency',
+        'Configure real-time sale notifications',
+        'Automatically update inventory after sale'
       ],
       benefits: [
-        'Recuperación parcial de inversión',
-        'Evitar pérdida total del producto',
-        'Contribuir a la economía circular',
-        'Ganar reputación en sostenibilidad'
+        'Partial investment recovery',
+        'Avoid total product loss',
+        'Contribute to circular economy',
+        'Gain sustainability reputation'
       ],
       risks: [
-        'Margen reducido por descuento necesario',
-        'Dependencia de demanda del marketplace'
+        'Reduced margin due to necessary discount',
+        'Dependence on marketplace demand'
       ]
     };
     
     showActionDetails(details, () => {
-      toast.success(`${product} enviado al marketplace con descuento automático`);
+      toast.success(`${product} sent to marketplace with automatic discount`);
     });
   };
 
   const handleReduceOrder = (product: string, percentage: string) => {
     const details = {
-      title: `Reducir Orden de ${product}`,
-      description: `Esta acción reducirá automáticamente tu próximo pedido de ${product} en ${percentage} basado en patrones de demanda y stock actual.`,
+      title: `Reduce ${product} Order`,
+      description: `This action will automatically reduce your next ${product} order by ${percentage} based on demand patterns and current stock.`,
       impact: {
-        financial: `Ahorro estimado: $120-200 en próximo pedido`,
-        inventory: `Reducción de ${percentage} en próximo pedido`,
-        environmental: 'Menos desperdicio potencial',
-        timeframe: 'Aplicado en próxima orden (3-5 días)'
+        financial: `Estimated savings: $120-200 on next order`,
+        inventory: `${percentage} reduction in next order`,
+        environmental: 'Less potential waste',
+        timeframe: 'Applied to next order (3-5 days)'
       },
       changes: [
-        `Ajustar cantidad de ${product} en ${percentage}`,
-        'Notificar cambios al proveedor automáticamente',
-        'Recalibrar alertas de stock mínimo',
-        'Actualizar previsiones de demanda'
+        `Adjust ${product} quantity by ${percentage}`,
+        'Automatically notify supplier of changes',
+        'Recalibrate minimum stock alerts',
+        'Update demand forecasts'
       ],
       benefits: [
-        'Mejor gestión de flujo de caja',
-        'Reducción de productos vencidos',
-        'Optimización de espacio de almacenamiento',
-        'Datos más precisos para futuras órdenes'
+        'Better cash flow management',
+        'Reduction in expired products',
+        'Storage space optimization',
+        'More accurate data for future orders'
       ],
       risks: [
-        'Posible faltante si demanda aumenta súbitamente',
-        'Necesidad de monitoreo cercano durante transición'
+        'Possible shortage if demand suddenly increases',
+        'Need for close monitoring during transition'
       ]
     };
     
     showActionDetails(details, () => {
-      toast.success(`Orden de ${product} reducida en ${percentage} para la próxima semana`);
+      toast.success(`${product} order reduced by ${percentage} for next week`);
     });
   };
 
   const handleApplyPromotion = (product: string, days: number) => {
     const details = {
-      title: `Aplicar Promoción a ${product}`,
-      description: `Esta acción aplicará automáticamente una promoción inteligente para ${product} que vence en ${days} días.`,
+      title: `Apply Promotion to ${product}`,
+      description: `This action will automatically apply an intelligent promotion for ${product} expiring in ${days} days.`,
       impact: {
-        financial: `Recuperación estimada: 70-85% del valor vs pérdida total`,
-        inventory: 'Rotación acelerada de stock próximo a vencer',
-        environmental: 'Prevención de desperdicio alimentario',
-        timeframe: 'Promoción activa inmediatamente por 24-48 horas'
+        financial: `Estimated recovery: 70-85% of value vs total loss`,
+        inventory: 'Accelerated rotation of soon-to-expire stock',
+        environmental: 'Prevention of food waste',
+        timeframe: 'Promotion active immediately for 24-48 hours'
       },
       changes: [
-        `Descuento automático del ${days <= 1 ? '50%' : '30%'} aplicado`,
-        'Notificación push a clientes regulares',
-        'Actualización en displays digitales del café',
-        'Promoción en redes sociales automática'
+        `Automatic ${days <= 1 ? '50%' : '30%'} discount applied`,
+        'Push notification to regular customers',
+        'Update on cafe digital displays',
+        'Automatic social media promotion'
       ],
       benefits: [
-        'Recuperación significativa de inversión',
-        'Aumento en tráfico de clientes',
-        'Mejora en percepción de sostenibilidad',
-        'Oportunidad de venta cruzada'
+        'Significant investment recovery',
+        'Increased customer traffic',
+        'Improved sustainability perception',
+        'Cross-selling opportunity'
       ],
       risks: [
-        'Margen reducido temporalmente',
-        'Posible acostumbramiento de clientes a descuentos'
+        'Temporarily reduced margin',
+        'Possible customer conditioning to discounts'
       ]
     };
     
     showActionDetails(details, () => {
-      toast.success(`Promoción aplicada automáticamente a ${product}`);
+      toast.success(`Promotion automatically applied to ${product}`);
     });
   };
 
   const handleApplyDynamicPricing = (product: string, currentPrice: string, newPrice: string) => {
     const details = {
-      title: `Aplicar Precio Dinámico a ${product}`,
-      description: `Esta acción actualizará el precio de ${product} de ${currentPrice} a ${newPrice} basado en análisis de demanda y competencia.`,
+      title: `Apply Dynamic Pricing to ${product}`,
+      description: `This action will update the price of ${product} from ${currentPrice} to ${newPrice} based on demand and competition analysis.`,
       impact: {
-        financial: `Aumento estimado de ingresos: $280 semanales`,
-        inventory: 'Optimización de rotación por precio',
-        environmental: 'Mejor valoración de productos premium',
-        timeframe: 'Cambio efectivo inmediatamente'
+        financial: `Estimated revenue increase: $280 weekly`,
+        inventory: 'Price-based rotation optimization',
+        environmental: 'Better valuation of premium products',
+        timeframe: 'Change effective immediately'
       },
       changes: [
-        `Actualizar precio de ${currentPrice} a ${newPrice}`,
-        'Modificar sistema POS automáticamente',
-        'Actualizar menús digitales y físicos',
-        'Notificar cambios al equipo de baristas'
+        `Update price from ${currentPrice} to ${newPrice}`,
+        'Automatically modify POS system',
+        'Update digital and physical menus',
+        'Notify barista team of changes'
       ],
       benefits: [
-        'Aumento directo en márgenes',
-        'Mejor posicionamiento de marca premium',
-        'Optimización de demanda por precio',
-        'Datos mejorados para futuras decisiones'
+        'Direct increase in margins',
+        'Better premium brand positioning',
+        'Price-based demand optimization',
+        'Improved data for future decisions'
       ],
       risks: [
-        'Posible resistencia inicial de algunos clientes',
-        'Necesidad de comunicar valor agregado claramente'
+        'Possible initial resistance from some customers',
+        'Need to clearly communicate added value'
       ]
     };
     
     showActionDetails(details, () => {
-      toast.success(`Precio dinámico aplicado: ${product} ahora ${newPrice}`);
+      toast.success(`Dynamic pricing applied: ${product} now ${newPrice}`);
     });
   };
 
   const handleGenerateInsightsWithDetails = () => {
     const details = {
-      title: 'Generar Insights de IA',
-      description: 'Esta acción analizará todos tus datos de ventas, inventario y tendencias del mercado para generar recomendaciones inteligentes personalizadas.',
+      title: 'Generate AI Insights',
+      description: 'This action will analyze all your sales, inventory and market trend data to generate personalized intelligent recommendations.',
       impact: {
-        financial: 'Identificación de oportunidades de ahorro y ganancia',
-        inventory: 'Optimizaciones basadas en patrones reales',
-        environmental: 'Recomendaciones de sostenibilidad',
-        timeframe: 'Análisis completo en 30-60 segundos'
+        financial: 'Identification of savings and profit opportunities',
+        inventory: 'Optimizations based on real patterns',
+        environmental: 'Sustainability recommendations',
+        timeframe: 'Complete analysis in 30-60 seconds'
       },
       changes: [
-        'Análisis completo de datos de ventas últimos 30 días',
-        'Comparación con tendencias de mercado Melbourne',
-        'Identificación de patrones de demanda',
-        'Generación de recomendaciones personalizadas'
+        'Complete analysis of last 30 days sales data',
+        'Comparison with Melbourne market trends',
+        'Identification of demand patterns',
+        'Generation of personalized recommendations'
       ],
       benefits: [
-        'Decisiones basadas en datos reales',
-        'Identificación de tendencias no obvias',
-        'Recomendaciones específicas para tu negocio',
-        'Ventaja competitiva en el mercado'
+        'Real data-based decisions',
+        'Identification of non-obvious trends',
+        'Business-specific recommendations',
+        'Competitive market advantage'
       ]
     };
     
@@ -358,25 +358,25 @@ const AI = () => {
 
   const handleDownloadReportWithDetails = () => {
     const details = {
-      title: 'Descargar Reporte IA',
-      description: 'Esta acción generará un reporte completo en PDF con análisis detallado, recomendaciones y proyecciones para tu cafetería.',
+      title: 'Download AI Report',
+      description: 'This action will generate a complete PDF report with detailed analysis, recommendations and projections for your coffee shop.',
       impact: {
-        financial: 'Análisis completo de KPIs financieros',
-        inventory: 'Reporte detallado de optimizaciones',
-        environmental: 'Métricas de sostenibilidad',
-        timeframe: 'Reporte generado en 15-30 segundos'
+        financial: 'Complete financial KPIs analysis',
+        inventory: 'Detailed optimization report',
+        environmental: 'Sustainability metrics',
+        timeframe: 'Report generated in 15-30 seconds'
       },
       changes: [
-        'Compilación de todos los datos relevantes',
-        'Generación de gráficos y visualizaciones',
-        'Inclusión de recomendaciones prioritarias',
-        'Creación de documento PDF profesional'
+        'Compilation of all relevant data',
+        'Generation of charts and visualizations',
+        'Inclusion of priority recommendations',
+        'Professional PDF document creation'
       ],
       benefits: [
-        'Documentación completa para toma de decisiones',
-        'Material para reuniones con stakeholders',
-        'Seguimiento histórico de mejoras',
-        'Base para planificación estratégica'
+        'Complete documentation for decision making',
+        'Material for stakeholder meetings',
+        'Historical tracking of improvements',
+        'Foundation for strategic planning'
       ]
     };
     
@@ -563,15 +563,15 @@ const AI = () => {
                     Recommendation: reduce this week's order by <strong>20%</strong> and move stock to daily special menu."
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Button size="sm" onClick={() => handleApplyPromotion("Salmón del Atlántico", 4)} className="bg-green-600 hover:bg-green-700">
+                    <Button size="sm" onClick={() => handleApplyPromotion("Atlantic Salmon", 4)} className="bg-green-600 hover:bg-green-700">
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Accept Recommendation
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleSendToMarketplace("Salmón del Atlántico")}>
+                    <Button size="sm" variant="outline" onClick={() => handleSendToMarketplace("Atlantic Salmon")}>
                       <ExternalLink className="w-4 h-4 mr-1" />
                       Send to Marketplace
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleReduceOrder("Salmón", "20%")}>
+                    <Button size="sm" variant="outline" onClick={() => handleReduceOrder("Salmon", "20%")}>
                       <Package className="w-4 h-4 mr-1" />
                       Reduce Order
                     </Button>
