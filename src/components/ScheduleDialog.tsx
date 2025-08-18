@@ -140,7 +140,7 @@ export function ScheduleDialog({ open, onOpenChange }: ScheduleDialogProps) {
                         type="time"
                         value={daySchedule.startTime}
                         onChange={(e) => updateDaySchedule(day as keyof WeeklySchedule, 'startTime', e.target.value)}
-                        className="w-20 h-8 text-xs"
+                        className="w-20 h-8 text-xs text-center"
                       />
                     )}
                   </div>
@@ -152,7 +152,7 @@ export function ScheduleDialog({ open, onOpenChange }: ScheduleDialogProps) {
                         type="time"
                         value={daySchedule.endTime}
                         onChange={(e) => updateDaySchedule(day as keyof WeeklySchedule, 'endTime', e.target.value)}
-                        className="w-20 h-8 text-xs"
+                        className="w-20 h-8 text-xs text-center"
                       />
                     )}
                   </div>
