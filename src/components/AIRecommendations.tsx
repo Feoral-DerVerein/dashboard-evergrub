@@ -57,24 +57,25 @@ const RecommendationCard = ({
   recommendation: AIRecommendation;
 }) => {
   const Icon = recommendation.icon;
-  return <Card className={`border-l-4 ${recommendation.borderColor} shadow-sm hover:shadow-md transition-shadow`}>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-sm font-medium">
-          <Icon className={`w-4 h-4 ${recommendation.iconColor}`} />
+  return <Card className={`border-l-4 ${recommendation.borderColor} shadow-sm hover:shadow-md transition-shadow h-full`}>
+      <CardHeader className="pb-2 px-3 pt-3">
+        <CardTitle className="flex items-center gap-2 text-xs font-medium">
+          <Icon className={`w-3 h-3 ${recommendation.iconColor}`} />
           {recommendation.title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="text-xs text-muted-foreground leading-relaxed">
+      <CardContent className="space-y-2 px-3 pb-3">
+        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
           {recommendation.description}
         </p>
-        <div className="flex gap-2">
-          <Button size="sm" className="flex-1 h-7 text-xs">
+        <div className="flex gap-1">
+          <Button size="sm" className="flex-1 h-6 text-xs px-2">
             <Check className="w-3 h-3 mr-1" />
             Apply
           </Button>
-          <Button variant="outline" size="sm" className="h-7 px-2">
-            <X className="w-3 h-3" />
+          <Button variant="outline" size="sm" className="flex-1 h-6 text-xs px-2">
+            <X className="w-3 h-3 mr-1" />
+            Decline
           </Button>
         </div>
       </CardContent>
@@ -160,7 +161,7 @@ export const AIRecommendations = ({
                 {typeLabels[type as keyof typeof typeLabels]}
               </h3>
             </div>
-            <div className="grid gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {recs.map((recommendation) => (
                 <RecommendationCard 
                   key={recommendation.id} 
