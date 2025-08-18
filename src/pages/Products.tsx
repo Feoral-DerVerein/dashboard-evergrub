@@ -459,7 +459,7 @@ const Products = () => {
       <Dialog open={tutorialOpen} onOpenChange={setTutorialOpen}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Cómo funciona la gestión de productos</DialogTitle>
+            <DialogTitle>How product management works</DialogTitle>
           </DialogHeader>
           <div className="space-y-6">
             <div className="space-y-4">
@@ -469,11 +469,11 @@ const Products = () => {
                   <EyeOff className="w-5 h-5 text-gray-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-blue-900 mb-2">Visibilidad en Marketplace</h3>
+                  <h3 className="font-semibold text-blue-900 mb-2">Marketplace Visibility</h3>
                   <ul className="space-y-2 text-sm text-blue-800">
-                    <li><strong>Ojo abierto (👁️):</strong> El producto SE MUESTRA en el marketplace y está disponible para venta</li>
-                    <li><strong>Ojo cerrado (👁️‍🗨️):</strong> El producto NO SE MUESTRA en el marketplace (solo visible en tu inventario)</li>
-                    <li>Haz clic en el ícono para cambiar la visibilidad</li>
+                    <li><strong>Open eye (👁️):</strong> The product IS SHOWN in the marketplace and is available for sale</li>
+                    <li><strong>Closed eye (👁️‍🗨️):</strong> The product IS NOT SHOWN in the marketplace (only visible in your inventory)</li>
+                    <li>Click the icon to change visibility</li>
                   </ul>
                 </div>
               </div>
@@ -481,9 +481,9 @@ const Products = () => {
               <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg">
                 <Bell className="w-5 h-5 text-green-600 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-green-900 mb-2">Notificar Wishlist</h3>
+                  <h3 className="font-semibold text-green-900 mb-2">Notify Wishlist</h3>
                   <p className="text-sm text-green-800">
-                    Envía notificaciones a los clientes que tienen este producto en su lista de deseos cuando esté disponible
+                    Send notifications to customers who have this product on their wishlist when it's available
                   </p>
                 </div>
               </div>
@@ -491,18 +491,18 @@ const Products = () => {
               <div className="flex items-start gap-3 p-4 bg-red-50 rounded-lg">
                 <Heart className="w-5 h-5 text-red-600 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-red-900 mb-2">Donaciones</h3>
+                  <h3 className="font-semibold text-red-900 mb-2">Donations</h3>
                   <p className="text-sm text-red-800">
-                    Dona productos que están próximos a vencer o que no se venden a bancos de alimentos locales
+                    Donate products that are about to expire or not selling to local food banks
                   </p>
                 </div>
               </div>
 
               <div className="p-4 bg-yellow-50 rounded-lg">
-                <h3 className="font-semibold text-yellow-900 mb-2">💡 Consejo para cafeterías</h3>
+                <h3 className="font-semibold text-yellow-900 mb-2">💡 Coffee shop tip</h3>
                 <p className="text-sm text-yellow-800">
-                  Puedes cargar todo tu inventario desde tu sistema POS y luego elegir qué productos mostrar en el marketplace. 
-                  Esto te permite tener control total sobre qué ofrecer online sin duplicar trabajo.
+                  You can load your entire inventory from your POS system and then choose which products to show in the marketplace. 
+                  This gives you complete control over what to offer online without duplicating work.
                 </p>
               </div>
             </div>
