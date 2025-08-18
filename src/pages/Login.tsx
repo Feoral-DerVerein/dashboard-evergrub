@@ -90,14 +90,14 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 via-cyan-400 to-teal-300 flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-gray-100/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-gray-200/50">
+      <div className="w-full max-w-md bg-gray-50/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-gray-200/30">
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <img src="/lovable-uploads/5bd2200d-698d-4e50-9013-8b2b3b1db08e.png" alt="Negentropy AI" className="h-12 w-auto" />
         </div>
 
         {/* Login Title */}
-        <h1 className="text-3xl font-bold text-white text-center mb-8 tracking-wider">
+        <h1 className="text-3xl font-bold text-gray-800 text-center mb-8 tracking-wider">
           {activeTab === 'login' ? 'LOGIN' : 'SIGN UP'}
         </h1>
 
@@ -107,7 +107,7 @@ const Login = () => {
             <Input 
               type="email" 
               placeholder={activeTab === 'login' ? "Username or email" : "Email"}
-              className="bg-white/20 border-white/30 rounded-full py-3 px-4 text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/30 focus:border-white/50" 
+              className="bg-white/80 border-gray-200 rounded-full py-3 px-4 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
               value={email} 
               onChange={e => setEmail(e.target.value)} 
               required 
@@ -119,7 +119,7 @@ const Login = () => {
             <Input 
               type={showPassword ? "text" : "password"} 
               placeholder="Password" 
-              className="bg-white/20 border-white/30 rounded-full py-3 px-4 pr-12 text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/30 focus:border-white/50" 
+              className="bg-white/80 border-gray-200 rounded-full py-3 px-4 pr-12 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
               value={password} 
               onChange={e => setPassword(e.target.value)} 
               required 
@@ -127,7 +127,7 @@ const Login = () => {
             <button 
               type="button" 
               onClick={() => setShowPassword(!showPassword)} 
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
             >
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
@@ -136,7 +136,7 @@ const Login = () => {
           {/* Submit Button */}
           <Button 
             type="submit" 
-            className="w-full bg-white text-blue-600 hover:bg-white/90 py-3 rounded-full font-semibold tracking-wide uppercase mt-6" 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-semibold tracking-wide uppercase mt-6" 
             disabled={loading}
           >
             {loading ? "Processing..." : activeTab === 'login' ? 'LOG IN' : 'SIGN UP'}
@@ -147,7 +147,7 @@ const Login = () => {
         <div className="text-center mt-6">
           <button 
             onClick={() => setActiveTab(activeTab === 'login' ? 'signup' : 'login')} 
-            className="text-white/80 hover:text-white text-sm"
+            className="text-gray-600 hover:text-gray-800 text-sm"
           >
             {activeTab === 'login' ? "Don't have an account?" : "Already have an account?"}
           </button>
@@ -156,7 +156,7 @@ const Login = () => {
         {/* Forgot Password */}
         {activeTab === 'login' && (
           <div className="text-center mt-4">
-            <Link to="/forgot-password" className="text-white/70 hover:text-white text-sm">
+            <Link to="/forgot-password" className="text-gray-500 hover:text-gray-700 text-sm">
               Forgot Password?
             </Link>
           </div>
@@ -166,7 +166,7 @@ const Login = () => {
         <div className="mt-8 space-y-3">
           <Button 
             variant="outline" 
-            className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/10 border-white/30 text-white hover:bg-white/20" 
+            className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/60 border-gray-200 text-gray-700 hover:bg-white/80" 
             onClick={() => handleSocialLogin('google')} 
             disabled={loading}
           >
@@ -183,7 +183,7 @@ const Login = () => {
 
           <Button 
             variant="outline" 
-            className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/10 border-white/30 text-white hover:bg-white/20" 
+            className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/60 border-gray-200 text-gray-700 hover:bg-white/80" 
             onClick={() => handleSocialLogin('microsoft')} 
             disabled={loading}
           >
@@ -198,13 +198,13 @@ const Login = () => {
         </div>
 
         {/* Terms and Privacy */}
-        <p className="text-center text-white/60 text-xs mt-6">
+        <p className="text-center text-gray-500 text-xs mt-6">
           By continuing, you agree to our{" "}
-          <Link to="/terms" className="text-white/80 hover:text-white underline">
+          <Link to="/terms" className="text-gray-600 hover:text-gray-800 underline">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link to="/privacy" className="text-white/80 hover:text-white underline">
+          <Link to="/privacy" className="text-gray-600 hover:text-gray-800 underline">
             Privacy Policy
           </Link>
         </p>
