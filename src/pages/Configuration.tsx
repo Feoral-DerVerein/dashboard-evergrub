@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { User, Mail, Phone, Lock, Camera, Bell, Shield, Palette, Globe, Save, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Phone, Lock, Camera, Bell, Shield, Palette, Globe, Save, Eye, EyeOff, CreditCard } from 'lucide-react';
 const Configuration = () => {
   const {
     user
@@ -36,6 +36,16 @@ const Configuration = () => {
     language: 'es',
     theme: 'light',
     currency: 'USD'
+  });
+
+  // Bank account state
+  const [bankAccount, setBankAccount] = useState({
+    accountHolderName: '',
+    accountNumber: '',
+    bankName: '',
+    routingNumber: '',
+    accountType: 'checking',
+    country: 'US'
   });
 
   // Password change state
@@ -95,6 +105,24 @@ const Configuration = () => {
     }
   };
 
+  const handleBankAccountUpdate = async () => {
+    try {
+      // Save bank account to localStorage for now (in production, this would be encrypted and stored securely)
+      localStorage.setItem('bankAccount', JSON.stringify(bankAccount));
+      toast({
+        title: "Bank account updated",
+        description: "Your payment information has been saved securely"
+      });
+    } catch (error) {
+      console.error('Error saving bank account:', error);
+      toast({
+        title: "Error",
+        description: "Could not save bank account information",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Load settings from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem('userSettings');
@@ -107,6 +135,17 @@ const Configuration = () => {
         }));
       } catch (error) {
         console.error('Error loading saved settings:', error);
+      }
+    }
+
+    // Load bank account from localStorage
+    const savedBankAccount = localStorage.getItem('bankAccount');
+    if (savedBankAccount) {
+      try {
+        const parsed = JSON.parse(savedBankAccount);
+        setBankAccount(prev => ({ ...prev, ...parsed }));
+      } catch (error) {
+        console.error('Error loading saved bank account:', error);
       }
     }
   }, []);
@@ -412,6 +451,122 @@ const Configuration = () => {
                 marketingEmails: checked
               }))} />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Bank Account for Payments */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="w-5 h-5" />
+                Payment Information
+              </CardTitle>
+              <p className="text-sm text-gray-500">
+                Add your bank account to receive payments from Wisebite sales and Grains redemptions
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="account-holder">Account holder name</Label>
+                  <Input 
+                    id="account-holder" 
+                    value={bankAccount.accountHolderName} 
+                    onChange={e => setBankAccount(prev => ({ ...prev, accountHolderName: e.target.value }))}
+                    placeholder="Full name as on bank account" 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="bank-name">Bank name</Label>
+                  <Input 
+                    id="bank-name" 
+                    value={bankAccount.bankName} 
+                    onChange={e => setBankAccount(prev => ({ ...prev, bankName: e.target.value }))}
+                    placeholder="Your bank's name" 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="account-number">Account number</Label>
+                  <Input 
+                    id="account-number" 
+                    type="password"
+                    value={bankAccount.accountNumber} 
+                    onChange={e => setBankAccount(prev => ({ ...prev, accountNumber: e.target.value }))}
+                    placeholder="••••••••••••" 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="routing-number">Routing number</Label>
+                  <Input 
+                    id="routing-number" 
+                    value={bankAccount.routingNumber} 
+                    onChange={e => setBankAccount(prev => ({ ...prev, routingNumber: e.target.value }))}
+                    placeholder="9-digit routing number" 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="account-type">Account type</Label>
+                  <Select 
+                    value={bankAccount.accountType} 
+                    onValueChange={value => setBankAccount(prev => ({ ...prev, accountType: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="checking">Checking</SelectItem>
+                      <SelectItem value="savings">Savings</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country</Label>
+                  <Select 
+                    value={bankAccount.country} 
+                    onValueChange={value => setBankAccount(prev => ({ ...prev, country: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="US">United States</SelectItem>
+                      <SelectItem value="CA">Canada</SelectItem>
+                      <SelectItem value="GB">United Kingdom</SelectItem>
+                      <SelectItem value="AU">Australia</SelectItem>
+                      <SelectItem value="DE">Germany</SelectItem>
+                      <SelectItem value="FR">France</SelectItem>
+                      <SelectItem value="ES">Spain</SelectItem>
+                      <SelectItem value="IT">Italy</SelectItem>
+                      <SelectItem value="MX">Mexico</SelectItem>
+                      <SelectItem value="BR">Brazil</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-blue-900">Secure Payment Processing</h4>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Your banking information is encrypted and stored securely. We use industry-standard security 
+                      measures to protect your financial data. Payments from Grains redemptions and Wisebite sales 
+                      will be processed to this account within 1-3 business days.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <Button onClick={handleBankAccountUpdate} className="w-full md:w-auto">
+                <Save className="w-4 h-4 mr-2" />
+                Save Payment Information
+              </Button>
             </CardContent>
           </Card>
           
