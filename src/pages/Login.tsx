@@ -94,7 +94,7 @@ const Login = () => {
         <img src="/lovable-uploads/5bd2200d-698d-4e50-9013-8b2b3b1db08e.png" alt="Negentropy AI" className="h-16 w-auto" />
       </div>
 
-      <div className="mt-8">
+      <div className="mt-4">
 
         <div className="flex justify-center gap-12 mb-8">
           <button onClick={() => setActiveTab('login')} className={`text-lg ${activeTab === 'login' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400'} pb-2`}>
