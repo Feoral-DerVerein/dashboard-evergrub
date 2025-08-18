@@ -101,15 +101,12 @@ const Login = () => {
           {activeTab === 'login' ? 'LOGIN' : 'SIGN UP'}
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Input */}
           <div>
-            <label className="block text-white/80 text-sm font-medium mb-2 uppercase tracking-wide">
-              {activeTab === 'login' ? 'USER NAME' : 'EMAIL'}
-            </label>
             <Input 
               type="email" 
-              placeholder={activeTab === 'login' ? "Enter your username or email" : "Enter your email"}
+              placeholder={activeTab === 'login' ? "Username or email" : "Email"}
               className="bg-white/20 border-white/30 rounded-full py-3 px-4 text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/30 focus:border-white/50" 
               value={email} 
               onChange={e => setEmail(e.target.value)} 
@@ -118,33 +115,28 @@ const Login = () => {
           </div>
 
           {/* Password Input */}
-          <div>
-            <label className="block text-white/80 text-sm font-medium mb-2 uppercase tracking-wide">
-              PASSWORD
-            </label>
-            <div className="relative">
-              <Input 
-                type={showPassword ? "text" : "password"} 
-                placeholder="Enter your password" 
-                className="bg-white/20 border-white/30 rounded-full py-3 px-4 pr-12 text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/30 focus:border-white/50" 
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                required 
-              />
-              <button 
-                type="button" 
-                onClick={() => setShowPassword(!showPassword)} 
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
-              >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            </div>
+          <div className="relative">
+            <Input 
+              type={showPassword ? "text" : "password"} 
+              placeholder="Password" 
+              className="bg-white/20 border-white/30 rounded-full py-3 px-4 pr-12 text-white placeholder-white/60 backdrop-blur-sm focus:bg-white/30 focus:border-white/50" 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              required 
+            />
+            <button 
+              type="button" 
+              onClick={() => setShowPassword(!showPassword)} 
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
           </div>
 
           {/* Submit Button */}
           <Button 
             type="submit" 
-            className="w-full bg-white text-blue-600 hover:bg-white/90 py-3 rounded-full font-semibold tracking-wide uppercase mt-8" 
+            className="w-full bg-white text-blue-600 hover:bg-white/90 py-3 rounded-full font-semibold tracking-wide uppercase mt-6" 
             disabled={loading}
           >
             {loading ? "Processing..." : activeTab === 'login' ? 'LOG IN' : 'SIGN UP'}
