@@ -86,7 +86,7 @@ export const BottomNav = () => {
     orderCount,
     notificationCount
   } = useNotificationsAndOrders();
-  return <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between md:hidden">
+  return <div className="fixed bottom-0 left-0 right-0 glass-card border-t border-gray-200 px-6 py-3 flex justify-between md:hidden">
       <Link to="/kpi" className="bottom-nav-item">
         <Home className="w-6 h-6" />
         <span className="text-xs">Dashboard</span>
@@ -249,7 +249,7 @@ const Dashboard = () => {
     }
   };
   return <div className="min-h-screen pb-20 md:pb-0 md:flex md:items-center md:justify-center bg-[url('/lovable-uploads/b20288e6-b6b7-4a03-95cf-99585bbbd6d5.png')] bg-cover bg-center bg-no-repeat bg-fixed">
-      <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
+      <div className="max-w-md md:max-w-6xl mx-auto glass-card md:rounded-xl md:my-0 min-h-screen md:min-h-0 animate-fade-in">
         <div className="md:grid md:grid-cols-[220px_1fr]">
           {/* Sidebar - desktop only */}
           <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen md:rounded-l-xl">

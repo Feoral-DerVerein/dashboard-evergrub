@@ -27,6 +27,12 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 153 100% 33%;
     --radius: 0.5rem;
+    
+    /* Glass effect variables */
+    --glass-bg: 255 255 255 / 0.1;
+    --glass-border: 255 255 255 / 0.2;
+    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    --glass-backdrop: blur(10px);
   }
 }
 
@@ -35,21 +41,33 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-inter antialiased;
+    @apply text-foreground font-inter antialiased;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
   }
 }
 
 .stat-card {
-  @apply p-6 rounded-xl bg-white shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md;
+  @apply p-6 rounded-xl transition-all duration-200 hover:scale-105;
+  background: rgba(var(--glass-bg));
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid rgba(var(--glass-border));
+  box-shadow: var(--glass-shadow);
 }
 
 .quick-access-item {
-  @apply flex flex-col items-center justify-center p-4 rounded-xl bg-white border border-gray-100 
-         transition-all duration-200 hover:shadow-md hover:scale-105;
+  @apply flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-200 hover:scale-105;
+  background: rgba(var(--glass-bg));
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid rgba(var(--glass-border));
+  box-shadow: var(--glass-shadow);
 }
 
 .recent-activity-item {
-  @apply flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-all duration-200;
+  @apply flex items-center justify-between p-4 rounded-lg transition-all duration-200;
+  background: rgba(var(--glass-bg));
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid rgba(var(--glass-border));
 }
 
 .bottom-nav-item {
@@ -58,6 +76,24 @@
 
 .positive-trend {
   @apply text-emerald-500 text-sm font-medium;
+}
+
+/* Glass card utility classes */
+.glass-card {
+  background: rgba(var(--glass-bg));
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid rgba(var(--glass-border));
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card-hover {
+  @apply glass-card transition-all duration-200 hover:scale-105;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 40px rgba(31, 38, 135, 0.25);
 }
 
 /* Add scrollbar utilities */

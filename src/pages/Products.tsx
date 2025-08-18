@@ -290,7 +290,7 @@ const Products = () => {
     }
   };
   return <>
-      <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
+      <header className="px-6 pt-8 pb-6 sticky top-0 glass-card z-10 border-b">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-gray-900">Products</h1>
