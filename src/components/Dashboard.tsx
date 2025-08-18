@@ -289,9 +289,9 @@ const Dashboard = () => {
                 <Coins className="w-4 h-4" />
                 <span>Grains</span>
               </Link>
-              <Link to="/configuration" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                <Settings className="w-4 h-4" />
-                <span>Configuration</span>
+              <Link to="/configuration" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-gray-600 to-gray-700 text-white shadow-md hover:shadow-lg transition-all duration-200 mt-2">
+                <Settings className="w-5 h-5" />
+                <span className="font-semibold">⚙️ Configuración</span>
               </Link>
               <Link to="/partners" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                 <Handshake className="w-4 h-4" />
