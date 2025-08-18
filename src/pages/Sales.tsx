@@ -121,7 +121,7 @@ const Sales = () => {
       </div>
     </Card>;
   return <>
-      <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
+      <header className="px-6 pt-8 pb-6 sticky top-0 glass-card z-10 border-b">
         <div className="flex items-center justify-between gap-3 mb-6">
           <h1 className="text-2xl font-bold">Sales</h1>
           <div className="flex gap-2 bg-gray-100 p-1 rounded-md">

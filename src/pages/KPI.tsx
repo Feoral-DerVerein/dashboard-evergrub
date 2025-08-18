@@ -180,7 +180,7 @@ const MetricCard = ({
   value: string;
   label: string;
   trend?: string;
-}) => <div className="bg-white rounded-xl p-4 shadow-sm h-full min-h-28 flex flex-col justify-between">
+}) => <div className="glass-card rounded-xl p-4 h-full min-h-28 flex flex-col justify-between">
     <div className="flex items-center gap-2 mb-1">
       <Icon className="w-4 h-4 text-blue-500" />
       <span className="text-gray-500 text-sm">{label}</span>
@@ -198,7 +198,7 @@ const SustainabilityCard = ({
   label: string;
   value: string;
   subtext: string;
-}) => <div className="bg-white rounded-xl p-4 shadow-sm h-full min-h-28 flex flex-col justify-between">
+}) => <div className="glass-card rounded-xl p-4 h-full min-h-28 flex flex-col justify-between">
     <div className="flex items-center gap-2 mb-3">
       <span className="text-gray-600">{label}</span>
     </div>
@@ -215,7 +215,7 @@ const InsightCard = ({
   label: string;
   value: string;
   trend: string;
-}) => <div className="bg-white rounded-xl p-4 shadow-sm h-full min-h-28 flex flex-col justify-between">
+}) => <div className="glass-card rounded-xl p-4 h-full min-h-28 flex flex-col justify-between">
     <div className="text-gray-500 mb-2">{label}</div>
     <div className="flex items-baseline gap-2">
       <span className="text-2xl font-semibold">{value}</span>
@@ -438,7 +438,7 @@ const KPI = () => {
     }
   };
   return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
-      <div className="max-w-md md:max-w-6xl mx-auto bg-white md:rounded-xl md:shadow-sm md:my-0 min-h-screen md:min-h-0 animate-fade-in">
+      <div className="max-w-md md:max-w-6xl mx-auto glass-card md:rounded-xl md:my-0 min-h-screen md:min-h-0 animate-fade-in">
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
               <div>
@@ -494,7 +494,7 @@ const KPI = () => {
 
   {aiInsights && <div className="space-y-4">
       {/* Main AI Summary */}
-      <div className="bg-white rounded-xl p-4 border">
+      <div className="glass-card rounded-xl p-4 border">
         <h4 className="font-semibold mb-2">AI Summary</h4>
         <p className="text-sm text-gray-600 mb-3">{aiInsights.executive_summary}</p>
         {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && <div>
@@ -507,7 +507,7 @@ const KPI = () => {
 
       {/* Sustainability Impact Cards */}
       {aiInsights.sustainability_impact && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-xl p-4 border">
+          <div className="glass-card rounded-xl p-4 border">
             <h4 className="font-semibold text-green-700 mb-2">Sustainability Impact</h4>
             <div className="space-y-3">
               <div>
@@ -523,7 +523,7 @@ const KPI = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 border">
+          <div className="glass-card rounded-xl p-4 border">
             <h4 className="font-semibold text-blue-700 mb-2">Customer Insights</h4>
             <div className="space-y-3">
               <div>
@@ -539,7 +539,7 @@ const KPI = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 border">
+          <div className="glass-card rounded-xl p-4 border">
             <h4 className="font-semibold text-emerald-700 mb-2">Savings & Food Waste</h4>
             <div className="space-y-3">
               <div>

@@ -195,7 +195,7 @@ const Ads = () => {
 
   return (
     <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-7xl mx-auto bg-white min-h-screen">
+      <div className="max-w-7xl mx-auto glass-card min-h-screen">
         {/* Header */}
         <header className="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
           <h1 className="text-xl font-semibold">Publicidad</h1>

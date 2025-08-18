@@ -139,7 +139,7 @@ const Notifications = () => {
   };
   return (
     <>
-      <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
+      <header className="px-6 pt-8 pb-6 sticky top-0 glass-card z-10">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Notifications</h1>
           <div className="flex gap-2">

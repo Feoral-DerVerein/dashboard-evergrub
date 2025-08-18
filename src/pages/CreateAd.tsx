@@ -214,7 +214,7 @@ const CreateAd = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto bg-white min-h-screen animate-fade-in pb-20">
+      <div className="max-w-3xl mx-auto glass-card min-h-screen animate-fade-in pb-20">
         <header className="px-6 py-4 border-b border-gray-200 flex items-center">
           <Link to="/ads" className="text-gray-600 mr-2">
             <ArrowLeft className="w-5 h-5" />

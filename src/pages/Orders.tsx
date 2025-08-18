@@ -226,7 +226,7 @@ const Orders = () => {
       return name ? name.substr(0, 2).toUpperCase() : 'CU';
     };
     const customerName = getCustomerName(order.id);
-    return <Card className="mb-4 overflow-hidden bg-white hover:shadow-md transition-all duration-200">
+    return <Card className="mb-4 overflow-hidden glass-card-hover transition-all duration-200">
         <CardContent className="p-0">
           <div className="p-4 border-b border-gray-100">
             <div className="flex justify-between items-center mb-3">
@@ -288,7 +288,7 @@ const Orders = () => {
   };
   return (
     <>
-      <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
+      <header className="px-6 pt-8 pb-6 sticky top-0 glass-card z-10 border-b">
         <div className="flex items-center justify-between gap-3 mb-6">
           <h1 className="text-2xl font-bold">Orders</h1>
           
