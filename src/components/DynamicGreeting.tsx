@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-
 export const DynamicGreeting = () => {
   const [greeting, setGreeting] = useState('');
   const [userName, setUserName] = useState('');
-  const { user } = useAuth();
-
+  const {
+    user
+  } = useAuth();
   const getTimeBasedGreeting = () => {
     const hour = new Date().getHours();
-    
     if (hour >= 5 && hour < 12) {
       return 'Good morning';
     } else if (hour >= 12 && hour < 17) {
@@ -19,7 +18,6 @@ export const DynamicGreeting = () => {
       return 'Good night';
     }
   };
-
   const getUserName = () => {
     if (user?.user_metadata?.full_name) {
       return user.user_metadata.full_name.split(' ')[0]; // Get first name only
@@ -29,7 +27,6 @@ export const DynamicGreeting = () => {
     }
     return 'there'; // Fallback greeting
   };
-
   useEffect(() => {
     const updateGreeting = () => {
       setGreeting(getTimeBasedGreeting());
@@ -41,13 +38,9 @@ export const DynamicGreeting = () => {
 
     // Update every minute to keep the greeting current
     const interval = setInterval(updateGreeting, 60000);
-
     return () => clearInterval(interval);
   }, [user]);
-
-  return (
-    <p className="text-lg text-gray-700 font-medium mt-4">
+  return <p className="text-gray-700 mt-4 text-center text-4xl font-thin">
       {greeting}, {userName}! 👋
-    </p>
-  );
+    </p>;
 };
