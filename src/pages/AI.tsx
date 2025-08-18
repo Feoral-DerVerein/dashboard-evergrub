@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { DynamicGreeting } from '@/components/DynamicGreeting';
 import { Download, Brain, Sparkles, BarChart3, AlertTriangle, TrendingUp, DollarSign, Package, Clock, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -408,6 +409,7 @@ const AI = () => {
             Harness the power of artificial intelligence to optimize your business operations, 
             reduce waste, and maximize sustainability impact.
           </p>
+          <DynamicGreeting />
         </div>
 
         {/* Widgets */}
