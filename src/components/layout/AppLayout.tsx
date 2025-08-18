@@ -16,7 +16,7 @@ const AppLayout = () => {
           {/* Sidebar - hide on dashboard to avoid duplication (dashboard already renders its own) */}
           {!isDashboard && <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen md:rounded-l-xl">
               <div className="mb-6 px-2">
-                <img src="/lovable-uploads/25d0c5fc-4ab3-44dd-8e67-5e06c5a81537.png" alt="WiseBite Logo" className="h-8 w-auto" />
+                <img src="/lovable-uploads/fe83896e-4f98-403b-ae36-d286f825c117.png" alt="Negentropy AI" className="h-8 w-auto" />
               </div>
               <nav className="space-y-1">
                 <Link to="/ai" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
