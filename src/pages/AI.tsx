@@ -418,171 +418,141 @@ const AI = () => {
           <VisitorPredictionWidget />
         </div>
 
-        {/* Inventory Recommendations */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5 text-blue-600" />
-              Inventory Recommendations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {inventoryRecommendations.map(rec => <div key={rec.id} className="border rounded-lg p-4 bg-gray-50">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-semibold text-gray-900">{rec.product}</h4>
-                        <Badge className={getPriorityColor(rec.priority)}>
-                          {rec.priority === "high" ? "High" : "Medium"} priority
-                        </Badge>
+        {/* Main Content Grid - 2 columns */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          {/* Inventory Recommendations */}
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Package className="w-5 h-5 text-blue-600" />
+                Inventory Recommendations
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {inventoryRecommendations.slice(0, 3).map(rec => 
+                  <div key={rec.id} className="border rounded-lg p-3 bg-gray-50">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-medium text-sm text-gray-900">{rec.product}</h4>
+                          <Badge className={getPriorityColor(rec.priority)}>
+                            {rec.priority === "high" ? "High" : "Medium"}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600 mb-1">{rec.reason}</p>
+                        <div className="flex gap-2 text-xs">
+                          <span className="text-gray-600">Current: <strong>{rec.current}</strong></span>
+                          <span className="text-blue-600">Rec: <strong>{rec.recommended}</strong></span>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{rec.reason}</p>
-                       <div className="flex gap-4 text-sm">
-                        <span className="text-gray-600">Current: <strong>{rec.current}</strong></span>
-                        <span className="text-blue-600">Recommended: <strong>{rec.recommended}</strong></span>
-                        {rec.savings && <span className="text-green-600">Savings: <strong>{rec.savings}</strong></span>}
-                        {rec.opportunity && <span className="text-green-600">Opportunity: <strong>{rec.opportunity}</strong></span>}
-                      </div>
+                      {rec.type === "reduce" ? <ArrowDown className="w-4 h-4 text-red-500" /> : <ArrowUp className="w-4 h-4 text-green-500" />}
                     </div>
-                    <div className="flex gap-2">
-                      {rec.type === "reduce" ? <ArrowDown className="w-5 h-5 text-red-500" /> : <ArrowUp className="w-5 h-5 text-green-500" />}
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => handleAcceptRecommendation(rec.id, rec.type, rec.product)} className="bg-blue-600 hover:bg-blue-700">
-                      <CheckCircle className="w-4 h-4 mr-1" />
+                    <Button size="sm" onClick={() => handleAcceptRecommendation(rec.id, rec.type, rec.product)} className="w-full text-xs">
                       Accept Recommendation
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleReduceOrder(rec.product, rec.type === "reduce" ? "40%" : "80%")}>
-                      Adjust Order
-                    </Button>
                   </div>
-                </div>)}
-            </div>
-          </CardContent>
-        </Card>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Expiration Alerts */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
-              Priority Expiration Alerts
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {expirationAlerts.map(alert => <div key={alert.id} className="border rounded-lg p-4 bg-red-50">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-semibold text-gray-900">{alert.product}</h4>
-                        <Badge className={getPriorityColor(alert.priority)}>
-                          {alert.daysLeft} days remaining
-                        </Badge>
-                        <Badge variant="outline" className="text-gray-600">
-                          Value: {alert.value}
-                        </Badge>
+          {/* Expiration Alerts */}
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+                Priority Expiration Alerts
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {expirationAlerts.slice(0, 3).map(alert => 
+                  <div key={alert.id} className="border rounded-lg p-3 bg-red-50">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-medium text-sm text-gray-900">{alert.product}</h4>
+                          <Badge className={getPriorityColor(alert.priority)}>
+                            {alert.daysLeft} days
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600 mb-1">
+                          <Clock className="w-3 h-3 inline mr-1" />
+                          {alert.quantity} • {alert.recommendation}
+                        </p>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        <Clock className="w-4 h-4 inline mr-1" />
-                        {alert.quantity} • Recommendation: {alert.recommendation}
-                      </p>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => handleApplyPromotion(alert.product, alert.daysLeft)} className="bg-green-600 hover:bg-green-700">
-                      <CheckCircle className="w-4 h-4 mr-1" />
+                    <Button size="sm" onClick={() => handleApplyPromotion(alert.product, alert.daysLeft)} className="w-full text-xs">
                       Apply Promotion
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleSendToMarketplace(alert.product)}>
-                      <ExternalLink className="w-4 h-4 mr-1" />
-                      Send to Marketplace
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleReduceOrder(alert.product, "20%")}>
-                      Reduce Order
-                    </Button>
                   </div>
-                </div>)}
-            </div>
-          </CardContent>
-        </Card>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Dynamic Pricing Suggestions */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-green-600" />
-              Dynamic Pricing Suggestions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {pricingSuggestions.map(suggestion => <div key={suggestion.id} className="border rounded-lg p-4 bg-green-50">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 mb-1">{suggestion.product}</h4>
-                      <p className="text-sm text-gray-600 mb-2">{suggestion.reason}</p>
-                       <div className="flex gap-4 text-sm">
-                        <span className="text-gray-600">Current price: <strong>{suggestion.currentPrice}</strong></span>
-                        <span className="text-green-600">Suggested price: <strong>{suggestion.suggestedPrice}</strong></span>
-                        <span className="text-blue-600">Impact: <strong>{suggestion.impact}</strong></span>
+          {/* Dynamic Pricing Suggestions */}
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-green-600" />
+                Dynamic Pricing
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {pricingSuggestions.slice(0, 3).map(suggestion => 
+                  <div key={suggestion.id} className="border rounded-lg p-3 bg-green-50">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-sm text-gray-900 mb-1">{suggestion.product}</h4>
+                        <p className="text-xs text-gray-600 mb-1">{suggestion.reason}</p>
+                        <div className="flex gap-2 text-xs">
+                          <span className="text-gray-600">Current: <strong>{suggestion.currentPrice}</strong></span>
+                          <span className="text-green-600">New: <strong>{suggestion.suggestedPrice}</strong></span>
+                        </div>
                       </div>
+                      <TrendingUp className="w-4 h-4 text-green-500" />
                     </div>
-                    <TrendingUp className="w-5 h-5 text-green-500" />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => handleApplyDynamicPricing(suggestion.product, suggestion.currentPrice, suggestion.suggestedPrice)} className="bg-green-600 hover:bg-green-700">
-                      <CheckCircle className="w-4 h-4 mr-1" />
+                    <Button size="sm" onClick={() => handleApplyDynamicPricing(suggestion.product, suggestion.currentPrice, suggestion.suggestedPrice)} className="w-full text-xs">
                       Apply Price
                     </Button>
-                    <Button size="sm" variant="outline">
-                      View Detailed Analysis
-                    </Button>
                   </div>
-                </div>)}
-            </div>
-          </CardContent>
-        </Card>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Practical Example Card */}
-        <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-blue-900">
-              <Brain className="w-5 h-5" />
-              📊 Practical Example: Hotel with Critical Stock
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-white rounded-lg p-4 border border-blue-200">
-              <div className="flex items-start gap-3 mb-4">
-                <AlertTriangle className="w-6 h-6 text-red-500 mt-1" />
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900 mb-2">AI Smart Alert</h4>
-                  <p className="text-gray-700 mb-3">
-                    "You have <strong>15 kg of salmon</strong> that will expire in <strong>4 days</strong>. 
-                    Recommendation: reduce this week's order by <strong>20%</strong> and move stock to daily special menu."
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Button size="sm" onClick={() => handleApplyPromotion("Atlantic Salmon", 4)} className="bg-green-600 hover:bg-green-700">
-                      <CheckCircle className="w-4 h-4 mr-1" />
-                      Accept Recommendation
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleSendToMarketplace("Atlantic Salmon")}>
-                      <ExternalLink className="w-4 h-4 mr-1" />
-                      Send to Marketplace
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleReduceOrder("Salmon", "20%")}>
-                      <Package className="w-4 h-4 mr-1" />
-                      Reduce Order
-                    </Button>
+          {/* Practical Example Card */}
+          <Card className="h-full bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-900">
+                <Brain className="w-5 h-5" />
+                AI Smart Alert
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-white rounded-lg p-3 border border-blue-200">
+                <div className="flex items-start gap-3 mb-3">
+                  <AlertTriangle className="w-5 h-5 text-red-500 mt-1" />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-sm text-gray-900 mb-2">Critical Stock Alert</h4>
+                    <p className="text-xs text-gray-700 mb-3">
+                      "You have <strong>15 kg of salmon</strong> expiring in <strong>4 days</strong>. 
+                      Recommendation: reduce order by <strong>20%</strong> and create daily special."
+                    </p>
+                    <div className="space-y-2">
+                      <Button size="sm" onClick={() => handleApplyPromotion("Atlantic Salmon", 4)} className="w-full text-xs">
+                        Accept Recommendation
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* AI Recommendations */}
         <AIRecommendations predictiveData={predictiveData} realData={realData} />
