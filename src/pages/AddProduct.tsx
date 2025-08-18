@@ -42,6 +42,7 @@ const AddProduct = () => {
     barcode: ""
   });
   const [showCustomBrand, setShowCustomBrand] = useState(false);
+  const [brandSearchTerm, setBrandSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(isEditMode);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -417,7 +418,28 @@ const AddProduct = () => {
     return finalPrice.toFixed(2);
   };
   const categories = ["Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts"];
-  const brands = ["Equate", "Generic", "Premium"];
+  const brands = [
+    // Coffee Roasters & Suppliers
+    "Gloria Jean's", "The Coffee Club", "Campos Coffee", "Toby's Estate", "Five Senses Coffee",
+    "Single O", "Industry Beans", "St. Ali", "Allpress Espresso", "Coffee Supreme",
+    
+    // Food & Beverage Brands
+    "Bundaberg", "Golden Circle", "Cottee's", "Arnott's", "Tim Tam", "Lamington",
+    "Vegemite", "Weet-Bix", "Milo", "ANZAC", "Pavlova Co", "Fantales",
+    
+    // Bakery & Pastry Suppliers
+    "Bakers Delight", "Brumby's", "Michel's Patisserie", "Sumo Salad", "Boost Juice",
+    "Guzman y Gomez", "Mad Mex", "Zambrero", "Schnitz", "Grill'd",
+    
+    // Dairy & Local Producers
+    "Pauls", "Dairy Farmers", "A2 Milk", "Bega", "Devondale", "Mainland",
+    "King Island Dairy", "Tasmanian Heritage", "Coopers", "James Boag's"
+  ];
+
+  // Filter brands based on search term
+  const filteredBrands = brands.filter(brand => 
+    brand.toLowerCase().includes(brandSearchTerm.toLowerCase())
+  );
 
   // Handle brand selection change
   const handleBrandChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -725,20 +747,44 @@ const AddProduct = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Brand <span className="text-red-500">*</span>
               </label>
+              
+              {/* Brand Search Input */}
+              <div className="relative mb-2">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder="Search brands..."
+                  value={brandSearchTerm}
+                  onChange={(e) => setBrandSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
               <select value={formData.brand} onChange={handleBrandChange} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
                 <option value="">Select brand</option>
-                {brands.map(brand => <option key={brand} value={brand}>
+                {filteredBrands.map(brand => (
+                  <option key={brand} value={brand}>
                     {brand}
-                  </option>)}
-                <option value="other">Other (Custom)</option>
+                  </option>
+                ))}
+                <option value="other">+ Add New Brand</option>
               </select>
               
-              {showCustomBrand && <div className="mt-2">
-                  <Input type="text" value={formData.customBrand} onChange={e => setFormData({
-                ...formData,
-                customBrand: e.target.value
-              })} placeholder="Enter custom brand name" className="w-full" required={formData.brand === "other"} />
-                </div>}
+              {showCustomBrand && (
+                <div className="mt-2">
+                  <Input 
+                    type="text" 
+                    value={formData.customBrand} 
+                    onChange={e => setFormData({
+                      ...formData,
+                      customBrand: e.target.value
+                    })} 
+                    placeholder="Enter new brand name" 
+                    className="w-full" 
+                    required={formData.brand === "other"} 
+                  />
+                </div>
+              )}
             </div>
           </div>
 
