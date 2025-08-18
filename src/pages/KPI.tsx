@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/components/LogoutButton";
 import { productService, Product } from "@/services/productService";
-
 import { useAuth } from "@/context/AuthContext";
 import { AIRecommendations } from "@/components/AIRecommendations";
 import StockAlertsCard from "@/components/kpi/StockAlertsCard";
@@ -232,7 +231,11 @@ const KPI = () => {
     user
   } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
-  const [suppliers, setSuppliers] = useState<Array<{id: string; name: string; type: string}>>([]);
+  const [suppliers, setSuppliers] = useState<Array<{
+    id: string;
+    name: string;
+    type: string;
+  }>>([]);
   const [loadingInventory, setLoadingInventory] = useState(true);
 
   // AI insights state
@@ -370,11 +373,19 @@ const KPI = () => {
       setProducts(mappedProducts);
 
       // Mock suppliers data
-      setSuppliers([
-        { id: '1', name: 'Local Farm Co.', type: 'produce' },
-        { id: '2', name: 'Organic Supply', type: 'organic' },
-        { id: '3', name: 'Fresh Distributors', type: 'dairy' }
-      ]);
+      setSuppliers([{
+        id: '1',
+        name: 'Local Farm Co.',
+        type: 'produce'
+      }, {
+        id: '2',
+        name: 'Organic Supply',
+        type: 'organic'
+      }, {
+        id: '3',
+        name: 'Fresh Distributors',
+        type: 'dairy'
+      }]);
     } catch (error) {
       console.error('Error loading real data:', error);
     }
@@ -431,9 +442,9 @@ const KPI = () => {
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
               <div>
-                <img src="/lovable-uploads/ba8f33b3-1af4-4835-976d-228fb1161c83.png" alt="Negentropy AI" className="h-9 w-auto mb-0" />
-                <p className="text-gray-500">Welcome, Felipe</p>
-                <p className="text-gray-400 text-sm">Ortega's account</p>
+                <img src="/lovable-uploads/5bd2200d-698d-4e50-9013-8b2b3b1db08e.png" alt="Negentropy AI" className="h-9 w-auto mb-0" />
+                <p className="text-gray-500">Welcome, Alex! The dashboard displays your business's performance, sustainability, and predictions using our Negentropy AI.</p>
+                <p className="text-gray-400 text-sm">Ortega's Coffe account</p>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
