@@ -91,7 +91,7 @@ const Ads = () => {
         console.error('Error loading ads data:', error);
         toast({
           title: "Error",
-          description: "No se pudieron cargar los datos de publicidad",
+          description: "Could not load advertising data",
           variant: "destructive"
         });
       } finally {
@@ -142,7 +142,7 @@ const Ads = () => {
     if (!user || !newAd.title) {
       toast({
         title: "Error",
-        description: "Título es requerido",
+        description: "Title is required",
         variant: "destructive"
       });
       return;
@@ -174,14 +174,14 @@ const Ads = () => {
       });
       
       toast({
-        title: "Éxito",
-        description: "Anuncio creado exitosamente"
+        title: "Success",
+        description: "Ad created successfully"
       });
     } catch (error) {
       console.error('Error creating ad:', error);
       toast({
         title: "Error",
-        description: "No se pudo crear el anuncio",
+        description: "Could not create ad",
         variant: "destructive"
       });
     }
@@ -190,7 +190,7 @@ const Ads = () => {
   const stats = calculateSummaryStats();
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Cargando...</div>;
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
   return (
@@ -198,63 +198,63 @@ const Ads = () => {
       <div className="max-w-7xl mx-auto glass-card min-h-screen">
         {/* Header */}
         <header className="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Publicidad</h1>
+          <h1 className="text-xl font-semibold">Advertising</h1>
           
           <div className="flex gap-2">
             <Dialog open={showCreateAdDialog} onOpenChange={setShowCreateAdDialog}>
               <DialogTrigger asChild>
                 <Button size="sm" className="flex items-center gap-2">
                   <Plus className="w-4 h-4" />
-                  Crear anuncio
+                  Create Ad
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Crear nuevo anuncio</DialogTitle>
+                  <DialogTitle>Create New Ad</DialogTitle>
                   <DialogDescription>
-                    Crea un anuncio para mostrar en el marketplace de WiseBite
+                    Create an ad to display on the WiseBite marketplace
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="ad-title">Título *</Label>
+                    <Label htmlFor="ad-title">Title *</Label>
                     <Input
                       id="ad-title"
                       value={newAd.title}
                       onChange={(e) => setNewAd(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="Título del anuncio"
+                      placeholder="Ad title"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="ad-description">Descripción</Label>
+                    <Label htmlFor="ad-description">Description</Label>
                     <Textarea
                       id="ad-description"
                       value={newAd.description}
                       onChange={(e) => setNewAd(prev => ({ ...prev, description: e.target.value }))}
-                      placeholder="Descripción del anuncio"
+                      placeholder="Ad description"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="ad-image">URL de imagen</Label>
+                    <Label htmlFor="ad-image">Image URL</Label>
                     <Input
                       id="ad-image"
                       value={newAd.image_url}
                       onChange={(e) => setNewAd(prev => ({ ...prev, image_url: e.target.value }))}
-                      placeholder="https://ejemplo.com/imagen.jpg"
+                      placeholder="https://example.com/image.jpg"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="ad-url">URL de destino</Label>
+                    <Label htmlFor="ad-url">Target URL</Label>
                     <Input
                       id="ad-url"
                       value={newAd.target_url}
                       onChange={(e) => setNewAd(prev => ({ ...prev, target_url: e.target.value }))}
-                      placeholder="https://ejemplo.com"
+                      placeholder="https://example.com"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="ad-budget">Presupuesto total</Label>
+                      <Label htmlFor="ad-budget">Total Budget</Label>
                       <Input
                         id="ad-budget"
                         type="number"
@@ -264,7 +264,7 @@ const Ads = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="ad-daily-budget">Presupuesto diario</Label>
+                      <Label htmlFor="ad-daily-budget">Daily Budget</Label>
                       <Input
                         id="ad-daily-budget"
                         type="number"
@@ -277,10 +277,10 @@ const Ads = () => {
                 </div>
                 <div className="flex justify-end gap-2 mt-4">
                   <Button variant="outline" onClick={() => setShowCreateAdDialog(false)}>
-                    Cancelar
+                    Cancel
                   </Button>
                   <Button onClick={handleCreateAd}>
-                    Crear anuncio
+                    Create Ad
                   </Button>
                 </div>
               </DialogContent>
@@ -293,7 +293,7 @@ const Ads = () => {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Alcance</CardTitle>
+                <CardTitle className="text-sm font-medium">Reach</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalReach.toLocaleString()}</div>
@@ -302,7 +302,7 @@ const Ads = () => {
             
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Impresiones</CardTitle>
+                <CardTitle className="text-sm font-medium">Impressions</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalImpressions.toLocaleString()}</div>
@@ -320,7 +320,7 @@ const Ads = () => {
             
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">CPC Promedio</CardTitle>
+                <CardTitle className="text-sm font-medium">Average CPC</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">${stats.avgCost.toFixed(2)}</div>
@@ -329,7 +329,7 @@ const Ads = () => {
             
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Gasto Total</CardTitle>
+                <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">${stats.totalSpent.toFixed(2)}</div>
@@ -342,7 +342,7 @@ const Ads = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Buscar anuncios..."
+                placeholder="Search ads..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -353,10 +353,10 @@ const Ads = () => {
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
-              <TabsTrigger value="all">Todos</TabsTrigger>
-              <TabsTrigger value="active">Activos</TabsTrigger>
-              <TabsTrigger value="draft">Borrador</TabsTrigger>
-              <TabsTrigger value="paused">Pausados</TabsTrigger>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="draft">Draft</TabsTrigger>
+              <TabsTrigger value="paused">Paused</TabsTrigger>
             </TabsList>
 
             <TabsContent value={activeTab} className="mt-4">
@@ -364,16 +364,16 @@ const Ads = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Anuncio</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Presupuesto</TableHead>
-                      <TableHead>Gastado</TableHead>
-                      <TableHead>Impresiones</TableHead>
+                      <TableHead>Ad</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Budget</TableHead>
+                      <TableHead>Spent</TableHead>
+                      <TableHead>Impressions</TableHead>
                       <TableHead>Clicks</TableHead>
                       <TableHead>CTR</TableHead>
                       <TableHead>CPC</TableHead>
-                      <TableHead>Acciones</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -406,8 +406,8 @@ const Ads = () => {
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline">
-                              {ad.ad_type === 'banner' ? 'Banner' : 
-                               ad.ad_type === 'sidebar' ? 'Barra lateral' : 'Popup'}
+                               {ad.ad_type === 'banner' ? 'Banner' : 
+                                ad.ad_type === 'sidebar' ? 'Sidebar' : 'Popup'}
                             </Badge>
                           </TableCell>
                           <TableCell>${ad.budget.toLocaleString()}</TableCell>
@@ -430,7 +430,7 @@ const Ads = () => {
                     ) : (
                       <TableRow>
                         <TableCell colSpan={10} className="text-center py-8 text-gray-500">
-                          No hay anuncios que coincidan con los filtros actuales
+                          No ads match the current filters
                         </TableCell>
                       </TableRow>
                     )}
