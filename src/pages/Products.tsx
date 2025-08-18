@@ -1,4 +1,4 @@
-import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -12,6 +12,7 @@ import ApiImportDialog from "@/components/ApiImportDialog";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DonationForm } from "@/components/DonationForm";
+import { ScheduleDialog } from "@/components/ScheduleDialog";
 const categories = ["All", "Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts"];
 
 // Food banks from Australia
@@ -55,6 +56,7 @@ const Products = () => {
   const [selectedFoodBank, setSelectedFoodBank] = useState<string | null>(null);
   const [donationFormOpen, setDonationFormOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
   useEffect(() => {
     const loadProducts = async () => {
       if (!user) {
@@ -325,11 +327,20 @@ const Products = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            
+            <button 
+              onClick={() => setScheduleOpen(true)}
+              className="bg-blue-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-blue-700 transition-colors text-sm"
+            >
+              <Calendar className="w-4 h-4" />
+              Schedule
+            </button>
           </div>
         </div>
       </header>
 
       <ApiImportDialog open={importOpen} onOpenChange={setImportOpen} onImported={newProducts => setProducts(prev => [...newProducts, ...prev])} />
+      <ScheduleDialog open={scheduleOpen} onOpenChange={setScheduleOpen} />
 
       <main className="px-6 py-4">
 
