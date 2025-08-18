@@ -16,6 +16,7 @@ import StockAlertsCard from "@/components/kpi/StockAlertsCard";
 import ExpiringSoonCard from "@/components/kpi/ExpiringSoonCard";
 import SuppliersCard from "@/components/kpi/SuppliersCard";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
+import { AustralianComplianceDialog } from "@/components/AustralianComplianceDialog";
 import { supabase } from "@/integrations/supabase/client";
 const chartDataSamples: Record<TimeFilterPeriod, {
   label: string;
@@ -629,8 +630,13 @@ const KPI = () => {
             </div>
 
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
-              
-              
+              <div className="flex flex-col gap-4 mt-8">
+                <AustralianComplianceDialog />
+                <p className="text-xs text-muted-foreground px-4 leading-relaxed">
+                  Generate Australian legal compliance reports aligned with DCCEEW Food Waste Baseline & Reporting Framework 
+                  and NSW Waste Regulation 2026. Essential for businesses to meet national food waste strategy requirements.
+                </p>
+              </div>
             </div>
           </section>
         </div>
