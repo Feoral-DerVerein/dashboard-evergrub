@@ -93,7 +93,7 @@ const Login = () => {
       <div className="w-full max-w-md bg-gray-50/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-gray-200/30">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <img src="/lovable-uploads/5bd2200d-698d-4e50-9013-8b2b3b1db08e.png" alt="Negentropy AI" className="h-12 w-auto" />
+          <img src="/lovable-uploads/030dbcde-90ed-4ac5-a577-ac0ec9e12bdd.png" alt="Negentropy" className="h-12 w-auto" />
         </div>
 
         {/* Login Title */}
