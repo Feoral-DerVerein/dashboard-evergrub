@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, Clock, ToggleLeft, ToggleRight, ChevronLeft, ChevronRight, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -6,28 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { pickupScheduleService, type WeeklySchedule as ServiceWeeklySchedule, type DaySchedule as ServiceDaySchedule } from "@/services/pickupScheduleService";
+import { toast } from "sonner";
 
 interface ScheduleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-interface DaySchedule {
-  enabled: boolean;
-  collections: number;
-  startTime: string;
-  endTime: string;
-}
-
-interface WeeklySchedule {
-  Monday: DaySchedule;
-  Tuesday: DaySchedule;
-  Wednesday: DaySchedule;
-  Thursday: DaySchedule;
-  Friday: DaySchedule;
-  Saturday: DaySchedule;
-  Sunday: DaySchedule;
-}
+// Type aliases for local use
+type WeeklySchedule = ServiceWeeklySchedule;
+type DaySchedule = ServiceDaySchedule;
 
 const defaultSchedule: WeeklySchedule = {
   Monday: { enabled: true, collections: 3, startTime: "18:00", endTime: "19:30" },
@@ -43,6 +32,46 @@ export function ScheduleDialog({ open, onOpenChange }: ScheduleDialogProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [schedule, setSchedule] = useState<WeeklySchedule>(defaultSchedule);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load existing schedule when dialog opens
+  useEffect(() => {
+    if (open) {
+      loadSchedule();
+    }
+  }, [open]);
+
+  const loadSchedule = async () => {
+    try {
+      setIsLoading(true);
+      const existingSchedule = await pickupScheduleService.getWeeklySchedule();
+      if (existingSchedule) {
+        setSchedule(existingSchedule);
+      } else {
+        setSchedule(defaultSchedule);
+      }
+    } catch (error) {
+      console.error('Failed to load schedule:', error);
+      toast.error('Failed to load existing schedule');
+      setSchedule(defaultSchedule);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const saveSchedule = async () => {
+    try {
+      setIsLoading(true);
+      await pickupScheduleService.saveWeeklySchedule(schedule);
+      toast.success('Pickup schedule saved successfully!');
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Failed to save schedule:', error);
+      toast.error('Failed to save schedule. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -315,11 +344,18 @@ export function ScheduleDialog({ open, onOpenChange }: ScheduleDialogProps) {
         </div>
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
-          <Button onClick={() => onOpenChange(false)}>
-            Save Schedule
+          <Button 
+            onClick={saveSchedule}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Saving...' : 'Save Schedule'}
           </Button>
         </div>
       </DialogContent>

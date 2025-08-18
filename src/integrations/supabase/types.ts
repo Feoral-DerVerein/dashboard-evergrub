@@ -382,6 +382,78 @@ export type Database = {
         }
         Relationships: []
       }
+      pickup_schedules: {
+        Row: {
+          collections: number
+          created_at: string
+          day_of_week: number
+          enabled: boolean
+          end_time: string
+          id: string
+          start_time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          collections?: number
+          created_at?: string
+          day_of_week: number
+          enabled?: boolean
+          end_time: string
+          id?: string
+          start_time: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          collections?: number
+          created_at?: string
+          day_of_week?: number
+          enabled?: boolean
+          end_time?: string
+          id?: string
+          start_time?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pickup_special_dates: {
+        Row: {
+          collections: number
+          created_at: string
+          date: string
+          enabled: boolean
+          end_time: string | null
+          id: string
+          note: string | null
+          start_time: string | null
+          user_id: string
+        }
+        Insert: {
+          collections?: number
+          created_at?: string
+          date: string
+          enabled?: boolean
+          end_time?: string | null
+          id?: string
+          note?: string | null
+          start_time?: string | null
+          user_id: string
+        }
+        Update: {
+          collections?: number
+          created_at?: string
+          date?: string
+          enabled?: boolean
+          end_time?: string | null
+          id?: string
+          note?: string | null
+          start_time?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       point_activities: {
         Row: {
           created_at: string | null
@@ -729,6 +801,16 @@ export type Database = {
           product_data: Json
           product_id: string
           user_id: string
+        }[]
+      }
+      get_pickup_availability: {
+        Args: { p_date: string; p_user_id: string }
+        Returns: {
+          collections: number
+          end_time: string
+          is_available: boolean
+          is_special_date: boolean
+          start_time: string
         }[]
       }
       get_wishlist_by_category: {

@@ -13,6 +13,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DonationForm } from "@/components/DonationForm";
 import { ScheduleDialog } from "@/components/ScheduleDialog";
+import { PickupScheduleDisplay } from "@/components/PickupScheduleDisplay";
 const categories = ["All", "Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts"];
 
 // Food banks from Australia
@@ -415,6 +416,15 @@ const Products = () => {
                     <p className="text-sm font-semibold text-green-600">
                       ${product.price.toFixed(2)}
                     </p>
+                  </div>
+                  
+                  {/* Pickup Schedule Information */}
+                  <div className="mb-2">
+                    <PickupScheduleDisplay 
+                      storeUserId={product.userId} 
+                      compact={true} 
+                      className="text-xs"
+                    />
                   </div>
                   
                   <div className="space-y-1">
