@@ -431,7 +431,7 @@ const KPI = () => {
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
               <div>
-                <img src="/lovable-uploads/5bd2200d-698d-4e50-9013-8b2b3b1db08e.png" alt="Negentropy AI" className="h-9 w-auto mb-0" />
+                <img src="/lovable-uploads/ba8f33b3-1af4-4835-976d-228fb1161c83.png" alt="Negentropy AI" className="h-9 w-auto mb-0" />
                 <p className="text-gray-500">Welcome, Felipe</p>
                 <p className="text-gray-400 text-sm">Ortega's account</p>
               </div>
