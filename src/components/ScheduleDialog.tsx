@@ -76,24 +76,9 @@ export function ScheduleDialog({ open, onOpenChange }: ScheduleDialogProps) {
           </p>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Calendar Section */}
-          <Card className="lg:col-span-1">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Select Dates</CardTitle>
-            </CardHeader>
-            <CardContent className="p-2">
-              <CalendarComponent
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                className="rounded-md border w-full"
-              />
-            </CardContent>
-          </Card>
-
+        <div className="space-y-6">
           {/* Schedule Configuration */}
-          <Card className="lg:col-span-2">
+          <Card>
             <CardHeader>
               <CardTitle className="text-lg">Weekly Schedule</CardTitle>
             </CardHeader>
@@ -169,6 +154,22 @@ export function ScheduleDialog({ open, onOpenChange }: ScheduleDialogProps) {
               ))}
             </CardContent>
           </Card>
+
+          {/* Calendar Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Select Specific Dates</CardTitle>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <CalendarComponent
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                className="rounded-md border pointer-events-auto"
+              />
+            </CardContent>
+          </Card>
+
         </div>
 
         <div className="flex justify-end gap-2 pt-4">
