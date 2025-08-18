@@ -90,7 +90,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 via-cyan-400 to-teal-300 flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-black/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-gray-700/50">
+      <div className="w-full max-w-md bg-gray-100/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-gray-200/50">
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <img src="/lovable-uploads/5bd2200d-698d-4e50-9013-8b2b3b1db08e.png" alt="Negentropy AI" className="h-12 w-auto" />
