@@ -89,13 +89,12 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white px-6 pb-20">
+    <div className="min-h-screen bg-black px-6 pb-20">
       <div className="pt-10 flex justify-center">
         <img src="/lovable-uploads/5bd2200d-698d-4e50-9013-8b2b3b1db08e.png" alt="Negentropy AI" className="h-16 w-auto" />
       </div>
 
       <div className="mt-8">
-        <h1 className="text-center mb-8 text-xl text-emerald-700 font-bold">Welcome to WiseBite</h1>
 
         <div className="flex justify-center gap-12 mb-8">
           <button onClick={() => setActiveTab('login')} className={`text-lg ${activeTab === 'login' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400'} pb-2`}>
@@ -117,7 +116,7 @@ const Login = () => {
             </button>
           </div>
           <div className="text-right">
-            <Link to="/forgot-password" className="text-blue-500 text-sm">
+            <Link to="/forgot-password" className="text-blue-400 text-sm">
               Forgot Password?
             </Link>
           </div>
@@ -126,7 +125,7 @@ const Login = () => {
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-gray-500">OR</div>
+        <div className="mt-6 text-center text-gray-300">OR</div>
 
         <div className="space-y-4 mt-6">
           <Button variant="outline" className="w-full py-6 flex items-center justify-center gap-3 rounded-full border-gray-300" onClick={() => handleSocialLogin('google')} disabled={loading}>
@@ -170,13 +169,13 @@ const Login = () => {
           </Button>
         </div>
 
-        <p className="text-center text-gray-500 text-sm mt-8">
+        <p className="text-center text-gray-300 text-sm mt-8">
           By continuing, you agree to our{" "}
-          <Link to="/terms" className="text-gray-600">
+          <Link to="/terms" className="text-gray-400">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link to="/privacy" className="text-gray-600">
+          <Link to="/privacy" className="text-gray-400">
             Privacy Policy
           </Link>
         </p>
