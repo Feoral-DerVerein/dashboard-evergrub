@@ -99,62 +99,70 @@ export function ScheduleDialog({ open, onOpenChange }: ScheduleDialogProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               {Object.entries(schedule).map(([day, daySchedule]) => (
-                <div key={day} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="min-w-[80px]">
-                      <Label className="font-medium">{day}</Label>
-                    </div>
-                    
+                <div key={day} className="grid grid-cols-6 gap-4 items-center p-4 border rounded-lg">
+                  {/* Day Column */}
+                  <div className="col-span-1">
+                    <Label className="font-medium">{day}</Label>
+                  </div>
+                  
+                  {/* Toggle Column */}
+                  <div className="col-span-1 flex justify-center">
                     <button
                       onClick={() => toggleDay(day as keyof WeeklySchedule)}
                       className="flex items-center gap-2"
                     >
                       {daySchedule.enabled ? (
-                        <>
-                          <ToggleRight className="w-8 h-8 text-primary" />
-                          <span className="text-sm text-primary font-medium">Collection</span>
-                        </>
+                        <ToggleRight className="w-8 h-8 text-primary" />
                       ) : (
-                        <>
-                          <ToggleLeft className="w-8 h-8 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">No collection</span>
-                        </>
+                        <ToggleLeft className="w-8 h-8 text-muted-foreground" />
                       )}
                     </button>
+                  </div>
 
+                  {/* Collections Column */}
+                  <div className="col-span-1 flex justify-center">
                     {daySchedule.enabled && (
-                      <>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={daySchedule.collections}
-                            onChange={(e) => updateDaySchedule(day as keyof WeeklySchedule, 'collections', parseInt(e.target.value) || 1)}
-                            className="w-16 h-8 text-center border rounded-md"
-                          />
-                        </div>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={daySchedule.collections}
+                        onChange={(e) => updateDaySchedule(day as keyof WeeklySchedule, 'collections', parseInt(e.target.value) || 1)}
+                        className="w-16 h-8 text-center"
+                      />
+                    )}
+                  </div>
 
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="time"
-                            value={daySchedule.startTime}
-                            onChange={(e) => updateDaySchedule(day as keyof WeeklySchedule, 'startTime', e.target.value)}
-                            className="w-20 h-8 text-xs"
-                          />
-                          <span className="text-xs text-muted-foreground">-</span>
-                          <Input
-                            type="time"
-                            value={daySchedule.endTime}
-                            onChange={(e) => updateDaySchedule(day as keyof WeeklySchedule, 'endTime', e.target.value)}
-                            className="w-20 h-8 text-xs"
-                          />
-                        </div>
+                  {/* Start Time Column */}
+                  <div className="col-span-1 flex justify-center">
+                    {daySchedule.enabled && (
+                      <Input
+                        type="time"
+                        value={daySchedule.startTime}
+                        onChange={(e) => updateDaySchedule(day as keyof WeeklySchedule, 'startTime', e.target.value)}
+                        className="w-20 h-8 text-xs"
+                      />
+                    )}
+                  </div>
 
-                        <div className="text-xs text-muted-foreground">
-                          Sales stop at {daySchedule.endTime}
-                        </div>
-                      </>
+                  {/* End Time Column */}
+                  <div className="col-span-1 flex justify-center">
+                    {daySchedule.enabled && (
+                      <Input
+                        type="time"
+                        value={daySchedule.endTime}
+                        onChange={(e) => updateDaySchedule(day as keyof WeeklySchedule, 'endTime', e.target.value)}
+                        className="w-20 h-8 text-xs"
+                      />
+                    )}
+                  </div>
+
+                  {/* Status Column */}
+                  <div className="col-span-1 text-center">
+                    {daySchedule.enabled ? (
+                      <span className="text-xs text-primary font-medium">Active</span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Disabled</span>
                     )}
                   </div>
                 </div>
