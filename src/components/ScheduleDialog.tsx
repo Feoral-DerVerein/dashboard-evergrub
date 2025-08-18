@@ -193,9 +193,9 @@ export function ScheduleDialog({ open, onOpenChange }: ScheduleDialogProps) {
                   {/* Status Column */}
                   <div className="col-span-1 text-center">
                     {daySchedule.enabled ? (
-                      <span className="text-xs text-primary font-medium">Active</span>
+                      <span className="text-xs text-primary font-medium">Collection</span>
                     ) : (
-                      <span className="text-xs text-muted-foreground">Disabled</span>
+                      <span className="text-xs text-muted-foreground">No Collection</span>
                     )}
                   </div>
                 </div>
