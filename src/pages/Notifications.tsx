@@ -165,7 +165,7 @@ const Notifications = () => {
       </header>
 
       <main className="px-6">
-        {viewMode !== "products" && <p className="text-gray-500 mb-6 my-px">
+        {viewMode !== "products" && <p className="text-gray-500 mb-6 mt-4">
             You have {filteredNotifications.length} {filteredNotifications.length === 1 ? "notification" : "notifications"}
           </p>}
 
