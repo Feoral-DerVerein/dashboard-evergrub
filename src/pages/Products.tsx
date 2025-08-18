@@ -371,7 +371,11 @@ const Products = () => {
           </div> : <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredProducts.map(product => <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
                 <div className="relative">
-                  <button onClick={() => handleToggleMarketplaceVisibility(product)} disabled={togglingMarketplaceId === product.id} className="absolute top-2 left-2 z-10 bg-white/90 backdrop-blur px-2 py-1 rounded-md shadow-sm border border-gray-200 text-gray-700 hover:bg-white disabled:opacity-60" aria-label={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"} title={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"}>
+                  <button onClick={() => handleToggleMarketplaceVisibility(product)} disabled={togglingMarketplaceId === product.id} className={`absolute top-2 left-2 z-10 backdrop-blur px-2 py-1 rounded-md shadow-sm border disabled:opacity-60 ${
+                    (product as any).isMarketplaceVisible 
+                      ? "bg-white/90 border-gray-200 text-gray-700 hover:bg-white" 
+                      : "bg-red-100/90 border-red-200 text-red-700 hover:bg-red-100"
+                  }`} aria-label={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"} title={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"}>
                     {(product as any).isMarketplaceVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                   </button>
                   <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-20 object-cover" onError={e => {
