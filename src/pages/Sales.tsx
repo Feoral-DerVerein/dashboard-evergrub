@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { BarChart3, Receipt, DollarSign, Package, Calendar, CreditCard, List } from "lucide-react";
 import { BottomNav } from "@/components/Dashboard";
@@ -9,7 +8,6 @@ import { salesService, Sale } from "@/services/salesService";
 import { format, parseISO } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
-
 const Sales = () => {
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,17 +20,14 @@ const Sales = () => {
     count: 0,
     total: 0
   });
-
   useEffect(() => {
     const fetchSales = async () => {
       try {
         setIsLoading(true);
         const fetchedSales = await salesService.getSales();
         setSales(fetchedSales);
-        
         const todaySummary = await salesService.getTodaySales();
         setTodaySales(todaySummary);
-        
         const monthlySummary = await salesService.getMonthlySales();
         setMonthlySales(monthlySummary);
       } catch (error) {
@@ -44,11 +39,9 @@ const Sales = () => {
     };
     fetchSales();
   }, []);
-
   const getInitials = (name: string) => {
     return name ? name.substring(0, 2).toUpperCase() : 'CS';
   };
-
   const formatDate = (dateString: string) => {
     try {
       return format(parseISO(dateString), 'MMM dd, yyyy');
@@ -56,7 +49,6 @@ const Sales = () => {
       return dateString;
     }
   };
-
   const formatTime = (dateString: string) => {
     try {
       return format(parseISO(dateString), 'h:mm a');
@@ -64,7 +56,6 @@ const Sales = () => {
       return '';
     }
   };
-
   const StatCard = ({
     label,
     value,
@@ -82,7 +73,6 @@ const Sales = () => {
         </div>
       </div>
     </Card>;
-
   const SaleCard = ({
     sale
   }: {
@@ -130,17 +120,12 @@ const Sales = () => {
         </div>
       </div>
     </Card>;
-
-  return (
-    <>
+  return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
         <div className="flex items-center justify-between gap-3 mb-6">
           <h1 className="text-2xl font-bold">Sales</h1>
           <div className="flex gap-2 bg-gray-100 p-1 rounded-md">
-            <Button variant="default" size="sm" className="">
-              <List className="h-4 w-4 mr-1" />
-              Cards
-            </Button>
+            
           </div>
         </div>
         <div className="flex justify-between items-center">
@@ -158,30 +143,20 @@ const Sales = () => {
           <StatCard label="Total Orders" value={sales.length} icon={Receipt} />
         </div>
 
-        {isLoading ? (
-          <div className="flex justify-center py-10">
+        {isLoading ? <div className="flex justify-center py-10">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-          </div>
-        ) : sales.length > 0 ? (
-          <div className="space-y-4">
-            {sales.map(sale => (
-              <SaleCard key={sale.id} sale={sale} />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
+          </div> : sales.length > 0 ? <div className="space-y-4">
+            {sales.map(sale => <SaleCard key={sale.id} sale={sale} />)}
+          </div> : <div className="flex flex-col items-center justify-center py-16 text-center">
             <Receipt className="h-16 w-16 text-gray-300 mb-4" />
             <p className="text-gray-500 font-medium mb-2">No sales found</p>
             <p className="text-gray-400 text-sm max-w-xs">
               Completed orders will appear here as sales records.
             </p>
-          </div>
-        )}
+          </div>}
       </main>
 
       <BottomNav />
-    </>
-  );
+    </>;
 };
-
 export default Sales;
