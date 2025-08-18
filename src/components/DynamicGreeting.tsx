@@ -43,6 +43,6 @@ export const DynamicGreeting = () => {
     return () => clearInterval(interval);
   }, [user]);
   return <p className="text-gray-700 mt-4 text-center text-4xl font-thin">
-      {greeting}, {userName}! 👋
+      {greeting}, {userName}!
     </p>;
 };
