@@ -89,15 +89,20 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-cyan-400 to-teal-300 flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-gray-50/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-gray-200/30">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full opacity-20 blur-3xl"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full opacity-20 blur-3xl"></div>
+      <div className="absolute top-3/4 left-1/2 w-64 h-64 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full opacity-15 blur-3xl"></div>
+      
+      <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 relative z-10">
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <img src="/lovable-uploads/030dbcde-90ed-4ac5-a577-ac0ec9e12bdd.png" alt="Negentropy" className="h-12 w-auto" />
         </div>
 
         {/* Login Title */}
-        <h1 className="text-xl font-bold text-gray-800 text-center mb-8 tracking-wider">
+        <h1 className="text-xl font-bold text-white text-center mb-8 tracking-wider">
           Welcome to Negentropy
         </h1>
 
@@ -147,7 +152,7 @@ const Login = () => {
         <div className="text-center mt-6">
           <button 
             onClick={() => setActiveTab(activeTab === 'login' ? 'signup' : 'login')} 
-            className="text-gray-600 hover:text-gray-800 text-sm"
+            className="text-white/80 hover:text-white text-sm"
           >
             {activeTab === 'login' ? "Don't have an account?" : "Already have an account?"}
           </button>
@@ -156,7 +161,7 @@ const Login = () => {
         {/* Forgot Password */}
         {activeTab === 'login' && (
           <div className="text-center mt-4">
-            <Link to="/forgot-password" className="text-gray-500 hover:text-gray-700 text-sm">
+            <Link to="/forgot-password" className="text-white/60 hover:text-white text-sm">
               Forgot Password?
             </Link>
           </div>
@@ -198,13 +203,13 @@ const Login = () => {
         </div>
 
         {/* Terms and Privacy */}
-        <p className="text-center text-gray-500 text-xs mt-6">
+        <p className="text-center text-white/60 text-xs mt-6">
           By continuing, you agree to our{" "}
-          <Link to="/terms" className="text-gray-600 hover:text-gray-800 underline">
+          <Link to="/terms" className="text-white/80 hover:text-white underline">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link to="/privacy" className="text-gray-600 hover:text-gray-800 underline">
+          <Link to="/privacy" className="text-white/80 hover:text-white underline">
             Privacy Policy
           </Link>
         </p>
