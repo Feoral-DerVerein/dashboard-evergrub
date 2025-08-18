@@ -1,4 +1,4 @@
-import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -54,6 +54,7 @@ const Products = () => {
   const [donationDialogOpen, setDonationDialogOpen] = useState(false);
   const [selectedFoodBank, setSelectedFoodBank] = useState<string | null>(null);
   const [donationFormOpen, setDonationFormOpen] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   useEffect(() => {
     const loadProducts = async () => {
       if (!user) {
@@ -291,10 +292,17 @@ const Products = () => {
   return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
         <div className="flex justify-between items-center">
-          <div>
+          <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-            <p className="text-gray-500">Manage your products.</p>
+            <button 
+              onClick={() => setTutorialOpen(true)}
+              className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+              title="Ver tutorial"
+            >
+              <Info className="w-5 h-5" />
+            </button>
           </div>
+          <p className="text-gray-500">Manage your products.</p>
           <div className="flex items-center gap-2">
             <QuickInventory products={products} onUpdateQuantities={handleUpdateQuantities} compact />
 
@@ -444,6 +452,61 @@ const Products = () => {
             <DialogTitle>Donate to {selectedFoodBank}</DialogTitle>
           </DialogHeader>
           <DonationForm onClose={() => setDonationFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
+
+      {/* Tutorial Dialog */}
+      <Dialog open={tutorialOpen} onOpenChange={setTutorialOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Cómo funciona la gestión de productos</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-center gap-2 mt-1">
+                  <Eye className="w-5 h-5 text-blue-600" />
+                  <EyeOff className="w-5 h-5 text-gray-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-blue-900 mb-2">Visibilidad en Marketplace</h3>
+                  <ul className="space-y-2 text-sm text-blue-800">
+                    <li><strong>Ojo abierto (👁️):</strong> El producto SE MUESTRA en el marketplace y está disponible para venta</li>
+                    <li><strong>Ojo cerrado (👁️‍🗨️):</strong> El producto NO SE MUESTRA en el marketplace (solo visible en tu inventario)</li>
+                    <li>Haz clic en el ícono para cambiar la visibilidad</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg">
+                <Bell className="w-5 h-5 text-green-600 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-green-900 mb-2">Notificar Wishlist</h3>
+                  <p className="text-sm text-green-800">
+                    Envía notificaciones a los clientes que tienen este producto en su lista de deseos cuando esté disponible
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-4 bg-red-50 rounded-lg">
+                <Heart className="w-5 h-5 text-red-600 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-red-900 mb-2">Donaciones</h3>
+                  <p className="text-sm text-red-800">
+                    Dona productos que están próximos a vencer o que no se venden a bancos de alimentos locales
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 bg-yellow-50 rounded-lg">
+                <h3 className="font-semibold text-yellow-900 mb-2">💡 Consejo para cafeterías</h3>
+                <p className="text-sm text-yellow-800">
+                  Puedes cargar todo tu inventario desde tu sistema POS y luego elegir qué productos mostrar en el marketplace. 
+                  Esto te permite tener control total sobre qué ofrecer online sin duplicar trabajo.
+                </p>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
