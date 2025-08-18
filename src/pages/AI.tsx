@@ -10,11 +10,15 @@ import { AIRecommendations } from "@/components/AIRecommendations";
 import { supabase } from "@/integrations/supabase/client";
 import WeatherWidget from "@/components/widgets/WeatherWidget";
 import VisitorPredictionWidget from "@/components/widgets/VisitorPredictionWidget";
+import { ActionDetailsDialog } from "@/components/ActionDetailsDialog";
 const AI = () => {
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [aiInsights, setAiInsights] = useState<any | null>(null);
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeFilterPeriod>("Week");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentActionDetails, setCurrentActionDetails] = useState<any>(null);
+  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
   // Mock data for AI predictions and recommendations
   const [predictiveData] = useState({
@@ -137,14 +141,248 @@ const AI = () => {
       setIsGeneratingReport(false);
     }
   };
-  const handleAcceptRecommendation = (id: number, type: string) => {
-    toast.success(`${type} recommendation accepted and applied automatically`);
+  const showActionDetails = (actionDetails: any, action: () => void) => {
+    setCurrentActionDetails(actionDetails);
+    setPendingAction(() => action);
+    setDialogOpen(true);
   };
+
+  const handleConfirmAction = () => {
+    if (pendingAction) {
+      pendingAction();
+      setDialogOpen(false);
+      setPendingAction(null);
+      setCurrentActionDetails(null);
+    }
+  };
+
+  const handleCancelAction = () => {
+    setDialogOpen(false);
+    setPendingAction(null);
+    setCurrentActionDetails(null);
+  };
+
+  const handleAcceptRecommendation = (id: number, type: string, product?: string) => {
+    const details = {
+      title: `Aceptar Recomendación de ${type === 'reduce' ? 'Reducción' : 'Aumento'} de Inventario`,
+      description: `Esta acción implementará automáticamente la recomendación de la IA para optimizar tu inventario de café.`,
+      impact: {
+        financial: type === 'reduce' ? '+$180 ahorros semanales' : '+$125 oportunidad semanal',
+        inventory: `${product}: ajuste ${type === 'reduce' ? '-33%' : '+67%'}`,
+        environmental: type === 'reduce' ? 'Reducción de desperdicio 15%' : 'Mayor satisfacción del cliente',
+        timeframe: 'Efectivo inmediatamente, resultados en 3-5 días'
+      },
+      changes: [
+        `Ajuste automático de órdenes para ${product}`,
+        'Actualización de niveles mínimos de stock',
+        'Notificación a proveedores sobre cambios',
+        'Recalibración de alertas de inventario'
+      ],
+      benefits: [
+        'Optimización automática del flujo de caja',
+        'Reducción de productos vencidos',
+        'Mejor rotación de inventario',
+        'Aumento en márgenes de ganancia'
+      ],
+      risks: [
+        'Posible desabastecimiento temporal si la demanda aumenta inesperadamente',
+        'Necesidad de monitoreo durante la primera semana'
+      ]
+    };
+    
+    showActionDetails(details, () => {
+      toast.success(`Recomendación de ${type} aplicada automáticamente para ${product}`);
+    });
+  };
+
   const handleSendToMarketplace = (product: string) => {
-    toast.success(`${product} sent to marketplace with automatic discount`);
+    const details = {
+      title: `Enviar ${product} al Marketplace`,
+      description: `Esta acción enviará automáticamente el producto al marketplace con descuento inteligente basado en la fecha de vencimiento.`,
+      impact: {
+        financial: '+$45-65 recuperación estimada vs pérdida total',
+        inventory: 'Liberación inmediata de espacio',
+        environmental: '100% prevención de desperdicio',
+        timeframe: 'Listado inmediato, venta esperada en 2-6 horas'
+      },
+      changes: [
+        `Crear listado automático en marketplace para ${product}`,
+        'Aplicar descuento del 40-60% según urgencia',
+        'Configurar notificaciones de venta en tiempo real',
+        'Actualizar inventario automáticamente tras venta'
+      ],
+      benefits: [
+        'Recuperación parcial de inversión',
+        'Evitar pérdida total del producto',
+        'Contribuir a la economía circular',
+        'Ganar reputación en sostenibilidad'
+      ],
+      risks: [
+        'Margen reducido por descuento necesario',
+        'Dependencia de demanda del marketplace'
+      ]
+    };
+    
+    showActionDetails(details, () => {
+      toast.success(`${product} enviado al marketplace con descuento automático`);
+    });
   };
+
   const handleReduceOrder = (product: string, percentage: string) => {
-    toast.success(`${product} order reduced by ${percentage} for next week`);
+    const details = {
+      title: `Reducir Orden de ${product}`,
+      description: `Esta acción reducirá automáticamente tu próximo pedido de ${product} en ${percentage} basado en patrones de demanda y stock actual.`,
+      impact: {
+        financial: `Ahorro estimado: $120-200 en próximo pedido`,
+        inventory: `Reducción de ${percentage} en próximo pedido`,
+        environmental: 'Menos desperdicio potencial',
+        timeframe: 'Aplicado en próxima orden (3-5 días)'
+      },
+      changes: [
+        `Ajustar cantidad de ${product} en ${percentage}`,
+        'Notificar cambios al proveedor automáticamente',
+        'Recalibrar alertas de stock mínimo',
+        'Actualizar previsiones de demanda'
+      ],
+      benefits: [
+        'Mejor gestión de flujo de caja',
+        'Reducción de productos vencidos',
+        'Optimización de espacio de almacenamiento',
+        'Datos más precisos para futuras órdenes'
+      ],
+      risks: [
+        'Posible faltante si demanda aumenta súbitamente',
+        'Necesidad de monitoreo cercano durante transición'
+      ]
+    };
+    
+    showActionDetails(details, () => {
+      toast.success(`Orden de ${product} reducida en ${percentage} para la próxima semana`);
+    });
+  };
+
+  const handleApplyPromotion = (product: string, days: number) => {
+    const details = {
+      title: `Aplicar Promoción a ${product}`,
+      description: `Esta acción aplicará automáticamente una promoción inteligente para ${product} que vence en ${days} días.`,
+      impact: {
+        financial: `Recuperación estimada: 70-85% del valor vs pérdida total`,
+        inventory: 'Rotación acelerada de stock próximo a vencer',
+        environmental: 'Prevención de desperdicio alimentario',
+        timeframe: 'Promoción activa inmediatamente por 24-48 horas'
+      },
+      changes: [
+        `Descuento automático del ${days <= 1 ? '50%' : '30%'} aplicado`,
+        'Notificación push a clientes regulares',
+        'Actualización en displays digitales del café',
+        'Promoción en redes sociales automática'
+      ],
+      benefits: [
+        'Recuperación significativa de inversión',
+        'Aumento en tráfico de clientes',
+        'Mejora en percepción de sostenibilidad',
+        'Oportunidad de venta cruzada'
+      ],
+      risks: [
+        'Margen reducido temporalmente',
+        'Posible acostumbramiento de clientes a descuentos'
+      ]
+    };
+    
+    showActionDetails(details, () => {
+      toast.success(`Promoción aplicada automáticamente a ${product}`);
+    });
+  };
+
+  const handleApplyDynamicPricing = (product: string, currentPrice: string, newPrice: string) => {
+    const details = {
+      title: `Aplicar Precio Dinámico a ${product}`,
+      description: `Esta acción actualizará el precio de ${product} de ${currentPrice} a ${newPrice} basado en análisis de demanda y competencia.`,
+      impact: {
+        financial: `Aumento estimado de ingresos: $280 semanales`,
+        inventory: 'Optimización de rotación por precio',
+        environmental: 'Mejor valoración de productos premium',
+        timeframe: 'Cambio efectivo inmediatamente'
+      },
+      changes: [
+        `Actualizar precio de ${currentPrice} a ${newPrice}`,
+        'Modificar sistema POS automáticamente',
+        'Actualizar menús digitales y físicos',
+        'Notificar cambios al equipo de baristas'
+      ],
+      benefits: [
+        'Aumento directo en márgenes',
+        'Mejor posicionamiento de marca premium',
+        'Optimización de demanda por precio',
+        'Datos mejorados para futuras decisiones'
+      ],
+      risks: [
+        'Posible resistencia inicial de algunos clientes',
+        'Necesidad de comunicar valor agregado claramente'
+      ]
+    };
+    
+    showActionDetails(details, () => {
+      toast.success(`Precio dinámico aplicado: ${product} ahora ${newPrice}`);
+    });
+  };
+
+  const handleGenerateInsightsWithDetails = () => {
+    const details = {
+      title: 'Generar Insights de IA',
+      description: 'Esta acción analizará todos tus datos de ventas, inventario y tendencias del mercado para generar recomendaciones inteligentes personalizadas.',
+      impact: {
+        financial: 'Identificación de oportunidades de ahorro y ganancia',
+        inventory: 'Optimizaciones basadas en patrones reales',
+        environmental: 'Recomendaciones de sostenibilidad',
+        timeframe: 'Análisis completo en 30-60 segundos'
+      },
+      changes: [
+        'Análisis completo de datos de ventas últimos 30 días',
+        'Comparación con tendencias de mercado Melbourne',
+        'Identificación de patrones de demanda',
+        'Generación de recomendaciones personalizadas'
+      ],
+      benefits: [
+        'Decisiones basadas en datos reales',
+        'Identificación de tendencias no obvias',
+        'Recomendaciones específicas para tu negocio',
+        'Ventaja competitiva en el mercado'
+      ]
+    };
+    
+    showActionDetails(details, () => {
+      handleGenerateInsights();
+    });
+  };
+
+  const handleDownloadReportWithDetails = () => {
+    const details = {
+      title: 'Descargar Reporte IA',
+      description: 'Esta acción generará un reporte completo en PDF con análisis detallado, recomendaciones y proyecciones para tu cafetería.',
+      impact: {
+        financial: 'Análisis completo de KPIs financieros',
+        inventory: 'Reporte detallado de optimizaciones',
+        environmental: 'Métricas de sostenibilidad',
+        timeframe: 'Reporte generado en 15-30 segundos'
+      },
+      changes: [
+        'Compilación de todos los datos relevantes',
+        'Generación de gráficos y visualizaciones',
+        'Inclusión de recomendaciones prioritarias',
+        'Creación de documento PDF profesional'
+      ],
+      benefits: [
+        'Documentación completa para toma de decisiones',
+        'Material para reuniones con stakeholders',
+        'Seguimiento histórico de mejoras',
+        'Base para planificación estratégica'
+      ]
+    };
+    
+    showActionDetails(details, () => {
+      handleDownloadReport();
+    });
   };
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -210,7 +448,7 @@ const AI = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={() => handleAcceptRecommendation(rec.id, rec.type)} className="bg-blue-600 hover:bg-blue-700">
+                    <Button size="sm" onClick={() => handleAcceptRecommendation(rec.id, rec.type, rec.product)} className="bg-blue-600 hover:bg-blue-700">
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Accept Recommendation
                     </Button>
@@ -252,7 +490,7 @@ const AI = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={() => handleAcceptRecommendation(alert.id, "promotion")} className="bg-green-600 hover:bg-green-700">
+                    <Button size="sm" onClick={() => handleApplyPromotion(alert.product, alert.daysLeft)} className="bg-green-600 hover:bg-green-700">
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Apply Promotion
                     </Button>
@@ -293,7 +531,7 @@ const AI = () => {
                     <TrendingUp className="w-5 h-5 text-green-500" />
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={() => handleAcceptRecommendation(suggestion.id, "pricing")} className="bg-green-600 hover:bg-green-700">
+                    <Button size="sm" onClick={() => handleApplyDynamicPricing(suggestion.product, suggestion.currentPrice, suggestion.suggestedPrice)} className="bg-green-600 hover:bg-green-700">
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Apply Price
                     </Button>
@@ -325,15 +563,15 @@ const AI = () => {
                     Recommendation: reduce this week's order by <strong>20%</strong> and move stock to daily special menu."
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Button size="sm" onClick={() => handleAcceptRecommendation(1, "emergency")} className="bg-green-600 hover:bg-green-700">
+                    <Button size="sm" onClick={() => handleApplyPromotion("Salmón del Atlántico", 4)} className="bg-green-600 hover:bg-green-700">
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Accept Recommendation
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleSendToMarketplace("Atlantic Salmon")}>
+                    <Button size="sm" variant="outline" onClick={() => handleSendToMarketplace("Salmón del Atlántico")}>
                       <ExternalLink className="w-4 h-4 mr-1" />
                       Send to Marketplace
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleReduceOrder("Salmon", "20%")}>
+                    <Button size="sm" variant="outline" onClick={() => handleReduceOrder("Salmón", "20%")}>
                       <Package className="w-4 h-4 mr-1" />
                       Reduce Order
                     </Button>
@@ -450,7 +688,7 @@ const AI = () => {
               <p className="text-sm text-gray-600 mb-4">
                 Generate intelligent insights based on your current data and market trends.
               </p>
-              <Button className="w-full" onClick={handleGenerateInsights} disabled={isGeneratingInsights}>
+              <Button className="w-full" onClick={handleGenerateInsightsWithDetails} disabled={isGeneratingInsights}>
                 {isGeneratingInsights ? "Generating..." : "Generate AI Insights"}
               </Button>
             </CardContent>
@@ -468,13 +706,22 @@ const AI = () => {
               <p className="text-sm text-gray-600 mb-4">
                 Generate comprehensive AI-powered business reports with predictions.
               </p>
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReport} disabled={isGeneratingReport}>
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReportWithDetails} disabled={isGeneratingReport}>
                 <Download className="w-4 h-4 mr-2" />
                 {isGeneratingReport ? "Generating..." : "Download AI Report"}
               </Button>
             </CardContent>
           </Card>
         </div>
+
+        {/* Action Details Dialog */}
+        <ActionDetailsDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          actionDetails={currentActionDetails}
+          onConfirm={handleConfirmAction}
+          onCancel={handleCancelAction}
+        />
       </div>
     </div>;
 };
