@@ -736,7 +736,7 @@ const AddProduct = () => {
               <select value={formData.category} onChange={e => setFormData({
               ...formData,
               category: e.target.value
-            })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
+            })} className="w-full p-2 glass-card border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
                 <option value="">Select category</option>
                 {categories.map(category => <option key={category} value={category}>
                     {category}
@@ -760,7 +760,7 @@ const AddProduct = () => {
                 />
               </div>
               
-              <select value={formData.brand} onChange={handleBrandChange} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
+              <select value={formData.brand} onChange={handleBrandChange} className="w-full p-2 glass-card border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
                 <option value="">Select brand</option>
                 {filteredBrands.map(brand => (
                   <option key={brand} value={brand}>
