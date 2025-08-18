@@ -20,10 +20,12 @@ export const DynamicGreeting = () => {
   };
   const getUserName = () => {
     if (user?.user_metadata?.full_name) {
-      return user.user_metadata.full_name.split(' ')[0]; // Get first name only
+      const firstName = user.user_metadata.full_name.split(' ')[0];
+      return firstName.toLowerCase() === 'saffire' ? 'Alex' : firstName;
     } else if (user?.email) {
       // Extract name from email if no full name is available
-      return user.email.split('@')[0].charAt(0).toUpperCase() + user.email.split('@')[0].slice(1);
+      const emailName = user.email.split('@')[0].charAt(0).toUpperCase() + user.email.split('@')[0].slice(1);
+      return emailName.toLowerCase() === 'saffire' ? 'Alex' : emailName;
     }
     return 'there'; // Fallback greeting
   };
