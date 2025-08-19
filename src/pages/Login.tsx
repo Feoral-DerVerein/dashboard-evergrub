@@ -185,7 +185,7 @@ const Login = () => {
         </div>
 
         {/* Terms and Privacy */}
-        <p className="text-center text-white/60 text-xs mt-6">
+        <p className="text-center text-foreground text-xs mt-6">
           By continuing, you agree to our{" "}
           <Link to="/terms" className="text-white/80 hover:text-white underline">
             Terms of Service
