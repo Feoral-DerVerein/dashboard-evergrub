@@ -6,6 +6,7 @@ import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
+import Spline from "@splinetool/react-spline";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -89,11 +90,11 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-cyan-400 to-teal-300 flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full opacity-20 blur-3xl"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full opacity-20 blur-3xl"></div>
-      <div className="absolute top-3/4 left-1/2 w-64 h-64 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full opacity-15 blur-3xl"></div>
+    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Spline Background */}
+      <div className="absolute inset-0 z-0">
+        <Spline scene="https://prod.spline.design/JM7ixbJx6pmDGkyo/scene.splinecode" />
+      </div>
       
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 relative z-10">
         {/* Logo */}
