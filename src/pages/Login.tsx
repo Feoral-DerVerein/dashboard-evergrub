@@ -118,8 +118,9 @@ const Login = () => {
       
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 relative z-10">
         {/* Logo */}
-        <div className="flex justify-center mb-8">
+        <div className="flex flex-col items-center mb-8 space-y-3">
           <img src="/lovable-uploads/030dbcde-90ed-4ac5-a577-ac0ec9e12bdd.png" alt="Negentropy" className="h-12 w-auto" />
+          <img src="/lovable-uploads/4195dfdf-99c6-4508-a3ba-b85cbd1b70aa.png" alt="Wisebite" className="h-6 w-auto" />
         </div>
 
         {/* Login Title */}
