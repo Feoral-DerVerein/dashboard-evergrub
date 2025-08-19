@@ -216,6 +216,7 @@ export type Database = {
           timestamp: string
           title: string
           type: string
+          user_id: string | null
         }
         Insert: {
           description: string
@@ -226,6 +227,7 @@ export type Database = {
           timestamp?: string
           title: string
           type: string
+          user_id?: string | null
         }
         Update: {
           description?: string
@@ -236,6 +238,7 @@ export type Database = {
           timestamp?: string
           title?: string
           type?: string
+          user_id?: string | null
         }
         Relationships: [
           {
