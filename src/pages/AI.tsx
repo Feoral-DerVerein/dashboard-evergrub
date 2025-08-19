@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import WeatherWidget from "@/components/widgets/WeatherWidget";
 import VisitorPredictionWidget from "@/components/widgets/VisitorPredictionWidget";
 import { ActionDetailsDialog } from "@/components/ActionDetailsDialog";
+import { aiInsightsService } from "@/services/aiInsightsService";
 const AI = () => {
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -108,23 +109,22 @@ const AI = () => {
     foodWasteChange: "+9% vs last month"
   });
   const handleGenerateInsights = async () => {
+    setIsGeneratingInsights(true);
     try {
-      setIsGeneratingInsights(true);
-      toast.info("Generating AI insights...");
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('ai-train', {
-        body: {
-          period: activeTimeFilter
-        }
-      });
-      if (error) throw error;
-      setAiInsights(data);
-      toast.success("AI insights generated successfully!");
-    } catch (err) {
-      console.error("AI insights error:", err);
-      toast.error("Could not generate insights. Please try again.");
+      // Import the service dynamically to avoid issues
+      const { aiInsightsService } = await import('@/services/aiInsightsService');
+      
+      // Fetch real-time data from database
+      const realTimeData = await aiInsightsService.fetchRealTimeData();
+      
+      // Generate AI insights using real data
+      const insights = await aiInsightsService.generateAIInsights(realTimeData);
+      
+      setAiInsights(insights);
+      toast.success("Insights reales generados con IA exitosamente");
+    } catch (error) {
+      console.error('Error generating insights:', error);
+      toast.error("Error al generar insights con IA");
     } finally {
       setIsGeneratingInsights(false);
     }
@@ -581,74 +581,122 @@ const AI = () => {
         <AIRecommendations predictiveData={predictiveData} realData={realData} />
 
         {/* AI Insights Results */}
-        {aiInsights && <Card className="mt-8">
+        {aiInsights && <Card className="mt-8 border-2 border-green-200 bg-green-50/30">
             <CardHeader>
-              <CardTitle>Generated AI Insights</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="w-5 h-5 text-green-600" />
+                Insights Generados con IA Real
+                <Badge className="bg-green-100 text-green-800 border-green-200">
+                  Datos Reales
+                </Badge>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {/* Main AI Summary */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h4 className="font-semibold mb-2">AI Executive Summary</h4>
-                  <p className="text-sm text-gray-600 mb-3">{aiInsights.executive_summary}</p>
-                  {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && <div>
-                      <h5 className="text-sm font-medium mb-1">Key Recommendations</h5>
-                      <ul className="list-disc pl-5 text-sm text-gray-700">
-                        {aiInsights.recommendations.slice(0, 5).map((r: any, i: number) => <li key={i}>{typeof r === 'string' ? r : r.title || JSON.stringify(r)}</li>)}
-                      </ul>
-                    </div>}
+                <div className="bg-white rounded-xl p-4 border border-green-200">
+                  <h4 className="font-semibold mb-3 text-green-900">📊 Resumen Ejecutivo de IA</h4>
+                  <p className="text-sm text-gray-700 mb-4">{aiInsights.executiveSummary}</p>
+                  
+                  {/* Metrics */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div className="text-center">
+                      <p className="text-xs text-gray-600">Eficiencia</p>
+                      <p className="text-lg font-bold text-blue-600">{aiInsights.metrics.efficiency}%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-600">Reducción Desperdicios</p>
+                      <p className="text-lg font-bold text-green-600">{aiInsights.metrics.wasteReduction}%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-600">Rentabilidad</p>
+                      <p className="text-lg font-bold text-purple-600">{aiInsights.metrics.profitability}%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-600">Satisfacción</p>
+                      <p className="text-lg font-bold text-orange-600">{aiInsights.metrics.customerSatisfaction}%</p>
+                    </div>
+                  </div>
+
+                  {/* Recommendations */}
+                  {aiInsights.recommendations && aiInsights.recommendations.length > 0 && (
+                    <div>
+                      <h5 className="text-sm font-semibold mb-3 text-green-800">🎯 Recomendaciones Prioritarias</h5>
+                      <div className="space-y-2">
+                        {aiInsights.recommendations.slice(0, 3).map((rec: any, i: number) => (
+                          <div key={i} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h6 className="font-medium text-sm text-gray-900">{rec.title}</h6>
+                                <p className="text-xs text-gray-600">{rec.description}</p>
+                                <p className="text-xs text-green-600 font-medium mt-1">💡 {rec.impact}</p>
+                              </div>
+                              <Badge className={rec.priority === 'high' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}>
+                                {rec.priority}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Sustainability Impact */}
-                {aiInsights.sustainability_impact && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-green-50 rounded-xl p-4">
-                      <h4 className="font-semibold text-green-700 mb-2">Environmental Impact</h4>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-gray-600 text-sm">CO₂ Saved</p>
-                          <p className="text-xl font-bold text-green-800">{aiInsights.sustainability_impact.co2_saved_kg} kg</p>
-                          <p className="text-green-600 text-sm">{aiInsights.sustainability_impact.co2_saved_change}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600 text-sm">Waste Reduced</p>
-                          <p className="text-xl font-bold text-green-800">{aiInsights.sustainability_impact.waste_reduced_percentage}%</p>
-                          <p className="text-green-600 text-sm">Target: {aiInsights.sustainability_impact.waste_target}%</p>
-                        </div>
+                {/* Sustainability and Forecast */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                    <h4 className="font-semibold text-green-700 mb-3">🌱 Impacto Sostenibilidad</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-gray-600 text-sm">CO₂ Ahorrado</p>
+                        <p className="text-xl font-bold text-green-800">{aiInsights.sustainability.co2Saved}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 text-sm">Desperdicio Reducido</p>
+                        <p className="text-xl font-bold text-green-800">{aiInsights.sustainability.wasteReduced}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 text-sm">Puntuación Sostenibilidad</p>
+                        <p className="text-xl font-bold text-green-800">{aiInsights.sustainability.sustainabilityScore}/100</p>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="bg-blue-50 rounded-xl p-4">
-                      <h4 className="font-semibold text-blue-700 mb-2">Customer Analytics</h4>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-gray-600 text-sm">Conversion Rate</p>
-                          <p className="text-xl font-bold text-blue-800">{aiInsights.customer_insights.conversion_rate}%</p>
-                          <p className="text-blue-600 text-sm">{aiInsights.customer_insights.conversion_change}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600 text-sm">Return Rate</p>
-                          <p className="text-xl font-bold text-blue-800">{aiInsights.customer_insights.return_rate}%</p>
-                          <p className="text-blue-600 text-sm">{aiInsights.customer_insights.return_change}</p>
-                        </div>
+                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                    <h4 className="font-semibold text-blue-700 mb-3">📈 Pronósticos</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-gray-600 text-sm">Tendencia Ventas</p>
+                        <p className="text-xl font-bold text-blue-800">{aiInsights.forecast.salesTrend}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 text-sm">Pronóstico Demanda</p>
+                        <p className="text-sm text-blue-700">{aiInsights.forecast.demandForecast}</p>
                       </div>
                     </div>
+                  </div>
+                </div>
 
-                    <div className="bg-yellow-50 rounded-xl p-4">
-                      <h4 className="font-semibold text-yellow-700 mb-2">Financial Impact</h4>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-gray-600 text-sm">Cost Savings</p>
-                          <p className="text-xl font-bold text-yellow-800">${aiInsights.sustainability_impact.cost_savings}</p>
-                          <p className="text-yellow-600 text-sm">{aiInsights.sustainability_impact.cost_savings_change}</p>
+                {/* Alerts */}
+                {aiInsights.alerts && aiInsights.alerts.length > 0 && (
+                  <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
+                    <h4 className="font-semibold text-orange-700 mb-3">⚠️ Alertas Críticas</h4>
+                    <div className="space-y-2">
+                      {aiInsights.alerts.map((alert: any, i: number) => (
+                        <div key={i} className="bg-white rounded-lg p-3 border border-orange-200">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className={`w-4 h-4 mt-1 ${alert.type === 'critical' ? 'text-red-500' : 'text-orange-500'}`} />
+                            <div className="flex-1">
+                              <h6 className="font-medium text-sm text-gray-900">{alert.title}</h6>
+                              <p className="text-xs text-gray-600">{alert.description}</p>
+                              <p className="text-xs font-medium text-orange-600 mt-1">{alert.value}</p>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-gray-600 text-sm">Food Waste Reduced</p>
-                          <p className="text-xl font-bold text-yellow-800">{aiInsights.sustainability_impact.food_waste_reduced_kg} kg</p>
-                          <p className="text-yellow-600 text-sm">{aiInsights.sustainability_impact.food_waste_change}</p>
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                  </div>}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>}
