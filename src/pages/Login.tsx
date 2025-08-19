@@ -26,7 +26,6 @@ if (typeof window !== 'undefined' && !document.querySelector('script[src*="splin
   script.src = 'https://unpkg.com/@splinetool/viewer@1.10.48/build/spline-viewer.js';
   document.head.appendChild(script);
 }
-
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
@@ -34,39 +33,40 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
     setLoading(true);
-    
     try {
       console.log(`Attempting to ${activeTab} with email: ${email}`);
-      
       if (activeTab === 'login') {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const {
+          data,
+          error
+        } = await supabase.auth.signInWithPassword({
           email,
           password
         });
-        
         if (error) throw error;
-        
         console.log("Login successful", data);
         toast({
           title: "Login successful",
           description: "Welcome back!"
         });
-        
-        navigate("/dashboard", { replace: true });
+        navigate("/dashboard", {
+          replace: true
+        });
       } else {
-        const { data, error } = await supabase.auth.signUp({
+        const {
+          data,
+          error
+        } = await supabase.auth.signUp({
           email,
           password
         });
-        
         if (error) throw error;
-        
         console.log("Registration successful", data);
         toast({
           title: "Registration successful",
@@ -84,18 +84,18 @@ const Login = () => {
       setLoading(false);
     }
   };
-
   const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
     try {
       console.log(`Attempting login with ${provider}`);
-      
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const {
+        data,
+        error
+      } = await supabase.auth.signInWithOAuth({
         provider: provider as Provider,
         options: {
           redirectTo: window.location.origin + '/dashboard'
         }
       });
-      
       if (error) throw error;
       console.log(`${provider} login initiated`, data);
     } catch (error: any) {
@@ -107,15 +107,13 @@ const Login = () => {
       });
     }
   };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+  return <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
       {/* Spline Background */}
       <div className="absolute inset-0 z-0">
-        <spline-viewer 
-          url="https://prod.spline.design/5tGU25P9vSIBf5ER/scene.splinecode"
-          style={{width: '100%', height: '100%'}}
-        />
+        <spline-viewer url="https://prod.spline.design/5tGU25P9vSIBf5ER/scene.splinecode" style={{
+        width: '100%',
+        height: '100%'
+      }} />
       </div>
       
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 relative z-10">
@@ -125,79 +123,45 @@ const Login = () => {
         </div>
 
         {/* Login Title */}
-        <h1 className="text-xl font-bold text-white text-center mb-8 tracking-wider">
-          Welcome to Negentropy
-        </h1>
+        
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Input */}
           <div>
-            <Input 
-              type="email" 
-              placeholder={activeTab === 'login' ? "Username or email" : "Email"}
-              className="bg-white/80 border-gray-200 rounded-full py-3 px-4 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
-              value={email} 
-              onChange={e => setEmail(e.target.value)} 
-              required 
-            />
+            <Input type="email" placeholder={activeTab === 'login' ? "Username or email" : "Email"} className="bg-white/80 border-gray-200 rounded-full py-3 px-4 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" value={email} onChange={e => setEmail(e.target.value)} required />
           </div>
 
           {/* Password Input */}
           <div className="relative">
-            <Input 
-              type={showPassword ? "text" : "password"} 
-              placeholder="Password" 
-              className="bg-white/80 border-gray-200 rounded-full py-3 px-4 pr-12 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
-              value={password} 
-              onChange={e => setPassword(e.target.value)} 
-              required 
-            />
-            <button 
-              type="button" 
-              onClick={() => setShowPassword(!showPassword)} 
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-            >
+            <Input type={showPassword ? "text" : "password"} placeholder="Password" className="bg-white/80 border-gray-200 rounded-full py-3 px-4 pr-12 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" value={password} onChange={e => setPassword(e.target.value)} required />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
 
           {/* Submit Button */}
-          <Button 
-            type="submit" 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-semibold tracking-wide uppercase mt-6" 
-            disabled={loading}
-          >
+          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-semibold tracking-wide uppercase mt-6" disabled={loading}>
             {loading ? "Processing..." : activeTab === 'login' ? 'LOG IN' : 'SIGN UP'}
           </Button>
         </form>
 
         {/* Toggle between Login/Signup */}
         <div className="text-center mt-6">
-          <button 
-            onClick={() => setActiveTab(activeTab === 'login' ? 'signup' : 'login')} 
-            className="text-foreground/80 hover:text-foreground text-sm"
-          >
+          <button onClick={() => setActiveTab(activeTab === 'login' ? 'signup' : 'login')} className="text-foreground/80 hover:text-foreground text-sm">
             {activeTab === 'login' ? "Don't have an account?" : "Already have an account?"}
           </button>
         </div>
 
         {/* Forgot Password */}
-        {activeTab === 'login' && (
-          <div className="text-center mt-4">
+        {activeTab === 'login' && <div className="text-center mt-4">
             <Link to="/forgot-password" className="text-foreground/60 hover:text-foreground text-sm">
               Forgot Password?
             </Link>
-          </div>
-        )}
+          </div>}
 
         {/* Social Login */}
         <div className="mt-8 space-y-3">
-          <Button 
-            variant="outline" 
-            className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/60 border-gray-200 text-gray-700 hover:bg-white/80" 
-            onClick={() => handleSocialLogin('google')} 
-            disabled={loading}
-          >
+          <Button variant="outline" className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/60 border-gray-200 text-gray-700 hover:bg-white/80" onClick={() => handleSocialLogin('google')} disabled={loading}>
             <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
               <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                 <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z" />
@@ -209,12 +173,7 @@ const Login = () => {
             Continue with Google
           </Button>
 
-          <Button 
-            variant="outline" 
-            className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/60 border-gray-200 text-gray-700 hover:bg-white/80" 
-            onClick={() => handleSocialLogin('microsoft')} 
-            disabled={loading}
-          >
+          <Button variant="outline" className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/60 border-gray-200 text-gray-700 hover:bg-white/80" onClick={() => handleSocialLogin('microsoft')} disabled={loading}>
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 21 21">
               <rect x="1" y="1" width="9" height="9" fill="#f25022" />
               <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
@@ -237,8 +196,6 @@ const Login = () => {
           </Link>
         </p>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Login;
