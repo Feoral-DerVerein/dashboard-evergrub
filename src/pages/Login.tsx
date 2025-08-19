@@ -184,7 +184,7 @@ const Login = () => {
         {/* Forgot Password */}
         {activeTab === 'login' && (
           <div className="text-center mt-4">
-            <Link to="/forgot-password" className="text-white/60 hover:text-white text-sm">
+            <Link to="/forgot-password" className="text-foreground/60 hover:text-foreground text-sm">
               Forgot Password?
             </Link>
           </div>
