@@ -122,7 +122,7 @@ const Login = () => {
         {/* Logo */}
         <div className="flex flex-col items-center mb-8 space-y-3">
           <img src="/lovable-uploads/030dbcde-90ed-4ac5-a577-ac0ec9e12bdd.png" alt="Negentropy" className="h-12 w-auto" />
-          <img src="/lovable-uploads/bbd38ae5-ce6f-46ae-9aef-557f6a27b7b2.png" alt="Wisebite" className="h-6 w-auto" />
+          <img src="/lovable-uploads/b197d668-ff8d-49cd-8132-e5a66b06de54.png" alt="Wisebite" className="h-6 w-auto" />
         </div>
 
         {/* Login Title */}
