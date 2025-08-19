@@ -175,7 +175,7 @@ const Login = () => {
         <div className="text-center mt-6">
           <button 
             onClick={() => setActiveTab(activeTab === 'login' ? 'signup' : 'login')} 
-            className="text-white/80 hover:text-white text-sm"
+            className="text-foreground/80 hover:text-foreground text-sm"
           >
             {activeTab === 'login' ? "Don't have an account?" : "Already have an account?"}
           </button>
