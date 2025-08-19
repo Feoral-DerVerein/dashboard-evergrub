@@ -6,7 +6,26 @@ import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
-import Spline from "@splinetool/react-spline";
+
+// Declare the spline-viewer custom element for TypeScript
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'spline-viewer': {
+        url?: string;
+        style?: React.CSSProperties;
+      };
+    }
+  }
+}
+
+// Add Spline viewer script to document head
+if (typeof window !== 'undefined' && !document.querySelector('script[src*="spline-viewer"]')) {
+  const script = document.createElement('script');
+  script.type = 'module';
+  script.src = 'https://unpkg.com/@splinetool/viewer@1.10.48/build/spline-viewer.js';
+  document.head.appendChild(script);
+}
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -93,7 +112,10 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
       {/* Spline Background */}
       <div className="absolute inset-0 z-0">
-        <Spline scene="https://prod.spline.design/JM7ixbJx6pmDGkyo/scene.splinecode" />
+        <spline-viewer 
+          url="https://prod.spline.design/JM7ixbJx6pmDGkyo/scene.splinecode"
+          style={{width: '100%', height: '100%'}}
+        />
       </div>
       
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 relative z-10">
