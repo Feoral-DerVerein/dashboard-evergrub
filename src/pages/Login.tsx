@@ -113,7 +113,7 @@ const Login = () => {
       {/* Spline Background */}
       <div className="absolute inset-0 z-0">
         <spline-viewer 
-          url="https://prod.spline.design/JM7ixbJx6pmDGkyo/scene.splinecode"
+          url="https://prod.spline.design/5tGU25P9vSIBf5ER/scene.splinecode"
           style={{width: '100%', height: '100%'}}
         />
       </div>
