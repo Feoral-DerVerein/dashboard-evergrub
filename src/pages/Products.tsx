@@ -16,6 +16,7 @@ import { ScheduleDialog } from "@/components/ScheduleDialog";
 import { PickupScheduleDisplay } from "@/components/PickupScheduleDisplay";
 import { SurpriseBagForm } from "@/components/SurpriseBagForm";
 import { SurpriseBagCard } from "@/components/SurpriseBagCard";
+import { SmartBagCreator } from "@/components/SmartBagCreator";
 const categories = ["All", "Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "Surprise Bag"];
 
 // Food banks from Australia
@@ -61,6 +62,7 @@ const Products = () => {
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [surpriseBagFormOpen, setSurpriseBagFormOpen] = useState(false);
+  const [smartBagCreatorOpen, setSmartBagCreatorOpen] = useState(false);
   useEffect(() => {
     const loadProducts = async () => {
       if (!user) {
@@ -329,6 +331,9 @@ const Products = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/products/add">Add single product</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setSmartBagCreatorOpen(true)}>
+                  🧠 Crear Bolsa Inteligente
+                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setSurpriseBagFormOpen(true)}>
                   Create Surprise Bag
                 </DropdownMenuItem>
@@ -566,6 +571,34 @@ const Products = () => {
               </div>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Smart Bag Creator Dialog */}
+      <Dialog open={smartBagCreatorOpen} onOpenChange={setSmartBagCreatorOpen}>
+        <DialogContent className="sm:max-w-7xl max-h-[90vh] overflow-y-auto">
+          <SmartBagCreator onSuccess={() => {
+            setSmartBagCreatorOpen(false);
+            // Reload products to show new smart bags
+            if (user) {
+              const loadProducts = async () => {
+                try {
+                  const userProducts = await productService.getProductsByUser(user.id);
+                  const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
+                  const combinedProducts = [...userProducts];
+                  storeProducts.forEach(storeProduct => {
+                    if (!combinedProducts.some(p => p.id === storeProduct.id)) {
+                      combinedProducts.push(storeProduct);
+                    }
+                  });
+                  setProducts(combinedProducts);
+                } catch (error) {
+                  console.error("Error reloading products:", error);
+                }
+              };
+              loadProducts();
+            }
+          }} />
         </DialogContent>
       </Dialog>
 

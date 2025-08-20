@@ -165,6 +165,42 @@ export type Database = {
           },
         ]
       }
+      customer_preferences: {
+        Row: {
+          category_preferences: Json | null
+          created_at: string
+          dietary_restrictions: string[] | null
+          id: string
+          last_updated: string
+          preferred_price_range: Json | null
+          product_ratings: Json | null
+          purchase_history: Json | null
+          user_id: string
+        }
+        Insert: {
+          category_preferences?: Json | null
+          created_at?: string
+          dietary_restrictions?: string[] | null
+          id?: string
+          last_updated?: string
+          preferred_price_range?: Json | null
+          product_ratings?: Json | null
+          purchase_history?: Json | null
+          user_id: string
+        }
+        Update: {
+          category_preferences?: Json | null
+          created_at?: string
+          dietary_restrictions?: string[] | null
+          id?: string
+          last_updated?: string
+          preferred_price_range?: Json | null
+          product_ratings?: Json | null
+          purchase_history?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       grain_transactions: {
         Row: {
           amount: number
@@ -597,6 +633,107 @@ export type Database = {
           },
         ]
       }
+      smart_bag_analytics: {
+        Row: {
+          created_at: string
+          customer_user_id: string | null
+          feedback: string | null
+          id: string
+          personalized_contents: Json
+          purchased_at: string | null
+          rating: number | null
+          smart_bag_id: string | null
+          viewed_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_user_id?: string | null
+          feedback?: string | null
+          id?: string
+          personalized_contents?: Json
+          purchased_at?: string | null
+          rating?: number | null
+          smart_bag_id?: string | null
+          viewed_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_user_id?: string | null
+          feedback?: string | null
+          id?: string
+          personalized_contents?: Json
+          purchased_at?: string | null
+          rating?: number | null
+          smart_bag_id?: string | null
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "smart_bag_analytics_smart_bag_id_fkey"
+            columns: ["smart_bag_id"]
+            isOneToOne: false
+            referencedRelation: "smart_bags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      smart_bags: {
+        Row: {
+          ai_suggestions: Json | null
+          category: string
+          created_at: string
+          current_quantity: number
+          description: string | null
+          expires_at: string
+          id: string
+          is_active: boolean
+          max_quantity: number
+          name: string
+          personalization_enabled: boolean
+          sale_price: number
+          selected_products: Json
+          total_value: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_suggestions?: Json | null
+          category: string
+          created_at?: string
+          current_quantity?: number
+          description?: string | null
+          expires_at: string
+          id?: string
+          is_active?: boolean
+          max_quantity?: number
+          name: string
+          personalization_enabled?: boolean
+          sale_price?: number
+          selected_products?: Json
+          total_value?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_suggestions?: Json | null
+          category?: string
+          created_at?: string
+          current_quantity?: number
+          description?: string | null
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          max_quantity?: number
+          name?: string
+          personalization_enabled?: boolean
+          sale_price?: number
+          selected_products?: Json
+          total_value?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       store_profiles: {
         Row: {
           businessHours: Json
@@ -805,6 +942,14 @@ export type Database = {
           product_id: string
           user_id: string
         }[]
+      }
+      get_ai_product_suggestions: {
+        Args: {
+          p_category: string
+          p_max_suggestions?: number
+          p_user_id: string
+        }
+        Returns: Json
       }
       get_pickup_availability: {
         Args: { p_date: string; p_user_id: string }
