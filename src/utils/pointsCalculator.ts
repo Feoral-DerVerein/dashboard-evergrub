@@ -1,7 +1,7 @@
 
 // Points calculation utilities
 export const POINTS_CONFIG = {
-  CASHBACK_PERCENTAGE: 0.01, // 1%
+  CASHBACK_PERCENTAGE: 0.02, // 2%
   POINT_VALUE: 0.005, // $0.005 AUD per point (2,000 points = $10)
 };
 
