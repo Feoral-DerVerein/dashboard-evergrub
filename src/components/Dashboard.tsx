@@ -338,7 +338,20 @@ const Dashboard = () => {
               </div>
             </header>
 
-            
+            {/* Main Dashboard Content */}
+            <main className="px-6 pb-6">
+              <div className="text-center mb-8">
+                <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl mx-auto">
+                  This is your summary for today. Here you can view your key performance indicators, 
+                  recent activity, and important metrics to help you manage your coffee shop efficiently.
+                </p>
+              </div>
+              
+              {/* Dashboard content would go here */}
+              <div className="space-y-6">
+                {/* Placeholder for dashboard widgets */}
+              </div>
+            </main>
 
             <BottomNav />
           </div>
