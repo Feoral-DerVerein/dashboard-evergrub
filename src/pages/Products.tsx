@@ -14,7 +14,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { DonationForm } from "@/components/DonationForm";
 import { ScheduleDialog } from "@/components/ScheduleDialog";
 import { PickupScheduleDisplay } from "@/components/PickupScheduleDisplay";
-const categories = ["All", "Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts"];
+import { SurpriseBagForm } from "@/components/SurpriseBagForm";
+import { SurpriseBagCard } from "@/components/SurpriseBagCard";
+const categories = ["All", "Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "Surprise Bag"];
 
 // Food banks from Australia
 const foodBanks = [{
@@ -58,6 +60,7 @@ const Products = () => {
   const [donationFormOpen, setDonationFormOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [surpriseBagFormOpen, setSurpriseBagFormOpen] = useState(false);
   useEffect(() => {
     const loadProducts = async () => {
       if (!user) {
@@ -326,6 +329,9 @@ const Products = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/products/add">Add single product</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setSurpriseBagFormOpen(true)}>
+                  Create Surprise Bag
+                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setImportOpen(true)}>
                   Import from API/POS System
                 </DropdownMenuItem>
@@ -387,74 +393,96 @@ const Products = () => {
               Add a product
             </Link>
           </div> : <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {filteredProducts.map(product => <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
-                <div className="relative">
-                  <button onClick={() => handleToggleMarketplaceVisibility(product)} disabled={togglingMarketplaceId === product.id} className={`absolute top-2 left-2 z-10 backdrop-blur px-2 py-1 rounded-md shadow-sm border disabled:opacity-60 ${
-                    (product as any).isMarketplaceVisible 
-                      ? "bg-white/90 border-gray-200 text-gray-700 hover:bg-white" 
-                      : "bg-red-100/90 border-red-200 text-red-700 hover:bg-red-100"
-                  }`} aria-label={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"} title={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"}>
-                    {(product as any).isMarketplaceVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                  </button>
-                  <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-20 object-cover" onError={e => {
-              console.error("Image failed to load:", product.image);
-              (e.target as HTMLImageElement).src = "/placeholder.svg";
-            }} />
-                  <div className="absolute top-2 right-2">
-                    <PointsBadge price={product.price} variant="default" />
-                  </div>
-                  <div className="absolute bottom-2 left-2">
-                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${product.quantity > 10 ? 'bg-green-100 text-green-800' : product.quantity > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
-                      Stock: {product.quantity}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="p-2">
-                  <div className="mb-2">
-                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">
-                      {product.name}
-                    </h3>
-                    <p className="text-xs text-gray-500 mb-1">{product.category}</p>
-                    <p className="text-sm font-semibold text-green-600">
-                      ${product.price.toFixed(2)}
-                    </p>
+            {filteredProducts.map(product => {
+              // Use special component for surprise bags
+              if (product.isSurpriseBag || product.category === "Surprise Bag") {
+                return (
+                  <SurpriseBagCard
+                    key={product.id}
+                    product={product}
+                    onEdit={() => {
+                      // Navigate to edit page or open edit modal
+                      window.location.href = `/products/edit/${product.id}`;
+                    }}
+                    onDelete={() => product.id && handleDeleteProduct(product.id)}
+                    onToggleVisibility={() => handleToggleMarketplaceVisibility(product)}
+                    isTogglingVisibility={togglingMarketplaceId === product.id}
+                  />
+                );
+              }
+              
+              // Regular product card
+              return (
+                <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                  <div className="relative">
+                    <button onClick={() => handleToggleMarketplaceVisibility(product)} disabled={togglingMarketplaceId === product.id} className={`absolute top-2 left-2 z-10 backdrop-blur px-2 py-1 rounded-md shadow-sm border disabled:opacity-60 ${
+                      (product as any).isMarketplaceVisible 
+                        ? "bg-white/90 border-gray-200 text-gray-700 hover:bg-white" 
+                        : "bg-red-100/90 border-red-200 text-red-700 hover:bg-red-100"
+                    }`} aria-label={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"} title={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"}>
+                      {(product as any).isMarketplaceVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    </button>
+                    <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-20 object-cover" onError={e => {
+                console.error("Image failed to load:", product.image);
+                (e.target as HTMLImageElement).src = "/placeholder.svg";
+              }} />
+                    <div className="absolute top-2 right-2">
+                      <PointsBadge price={product.price} variant="default" />
+                    </div>
+                    <div className="absolute bottom-2 left-2">
+                      <span className={`px-2 py-1 text-xs rounded-full font-medium ${product.quantity > 10 ? 'bg-green-100 text-green-800' : product.quantity > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
+                        Stock: {product.quantity}
+                      </span>
+                    </div>
                   </div>
                   
-                  {/* Pickup Schedule Information */}
-                  <div className="mb-2">
-                    <PickupScheduleDisplay 
-                      storeUserId={product.userId} 
-                      compact={true} 
-                      className="text-xs"
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <div className="flex gap-1">
-                      <Link to={`/products/edit/${product.id}`} className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors">
-                        <Edit className="w-3 h-3" />
-                        Edit
-                      </Link>
-                      <button onClick={() => product.id && handleDeleteProduct(product.id)} className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors">
-                        <Trash2 className="w-3 h-3" />
-                        Delete
-                      </button>
+                  <div className="p-2">
+                    <div className="mb-2">
+                      <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">
+                        {product.name}
+                      </h3>
+                      <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                      <p className="text-sm font-semibold text-green-600">
+                        ${product.price.toFixed(2)}
+                      </p>
                     </div>
                     
-                    <button onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)} disabled={notifyingProductId === product.id} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                      <Bell className="w-3 h-3" />
-                      {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
-                    </button>
+                    {/* Pickup Schedule Information */}
+                    <div className="mb-2">
+                      <PickupScheduleDisplay 
+                        storeUserId={product.userId} 
+                        compact={true} 
+                        className="text-xs"
+                      />
+                    </div>
                     
-                    <button onClick={() => handleDonateProduct(product)} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors">
-                      <Heart className="w-3 h-3" />
-                      Donation
-                    </button>
-                    
+                    <div className="space-y-1">
+                      <div className="flex gap-1">
+                        <Link to={`/products/edit/${product.id}`} className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors">
+                          <Edit className="w-3 h-3" />
+                          Edit
+                        </Link>
+                        <button onClick={() => product.id && handleDeleteProduct(product.id)} className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors">
+                          <Trash2 className="w-3 h-3" />
+                          Delete
+                        </button>
+                      </div>
+                      
+                      <button onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)} disabled={notifyingProductId === product.id} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        <Bell className="w-3 h-3" />
+                        {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
+                      </button>
+                      
+                      <button onClick={() => handleDonateProduct(product)} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors">
+                        <Heart className="w-3 h-3" />
+                        Donation
+                      </button>
+                      
+                    </div>
                   </div>
                 </div>
-              </div>)}
+              );
+            })}
           </div>}
       </main>
 
@@ -538,6 +566,34 @@ const Products = () => {
               </div>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Surprise Bag Form Dialog */}
+      <Dialog open={surpriseBagFormOpen} onOpenChange={setSurpriseBagFormOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <SurpriseBagForm onSuccess={() => {
+            setSurpriseBagFormOpen(false);
+            // Reload products to show the new surprise bag
+            if (user) {
+              const loadProducts = async () => {
+                try {
+                  const userProducts = await productService.getProductsByUser(user.id);
+                  const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
+                  const combinedProducts = [...userProducts];
+                  storeProducts.forEach(storeProduct => {
+                    if (!combinedProducts.some(p => p.id === storeProduct.id)) {
+                      combinedProducts.push(storeProduct);
+                    }
+                  });
+                  setProducts(combinedProducts);
+                } catch (error) {
+                  console.error("Error reloading products:", error);
+                }
+              };
+              loadProducts();
+            }
+          }} />
         </DialogContent>
       </Dialog>
 
