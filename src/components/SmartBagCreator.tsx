@@ -307,8 +307,8 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-1">
                   <Label htmlFor="maxQuantity">Quantity</Label>
                   <Input
                     id="maxQuantity"
@@ -322,7 +322,7 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                   />
                 </div>
 
-                <div>
+                <div className="col-span-2">
                   <Label htmlFor="expiresAt">Available until</Label>
                   <Input
                     id="expiresAt"
