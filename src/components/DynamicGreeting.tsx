@@ -42,7 +42,14 @@ export const DynamicGreeting = () => {
     const interval = setInterval(updateGreeting, 60000);
     return () => clearInterval(interval);
   }, [user]);
-  return <p className="text-gray-700 mt-4 text-center text-4xl font-thin">
-      {greeting}, {userName}!
-    </p>;
+  return (
+    <div className="text-center">
+      <p className="text-muted-foreground mt-4 text-4xl font-thin">
+        {greeting}, {userName}!
+      </p>
+      <p className="text-muted-foreground text-lg mt-2">
+        This is your summary for today.
+      </p>
+    </div>
+  );
 };
