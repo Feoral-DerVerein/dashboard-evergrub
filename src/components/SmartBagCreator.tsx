@@ -215,11 +215,11 @@ export const SmartBagCreator = ({
       <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
         <CardHeader className="text-center">
           <CardTitle className="text-center text-2xl">
-            Crear Bolsa Inteligente
+            Create Smart Bag
           </CardTitle>
           <CardDescription className="text-lg">
-            Sistema IA que analiza tu inventario, fechas de caducidad y wishlist de clientes 
-            para crear bolsas personalizadas automáticamente
+            AI system that analyses your inventory, expiry dates and customer wishlists 
+            to create personalised bags automatically
           </CardDescription>
         </CardHeader>
       </Card>
