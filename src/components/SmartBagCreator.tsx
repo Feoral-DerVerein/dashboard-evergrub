@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Brain, Package, DollarSign, Clock, Target, Sparkles, CheckCircle, AlertTriangle, TrendingUp, Users, Calendar, Zap, Star } from "lucide-react";
+import { Brain, Package, DollarSign, Clock, Target, Sparkles, CheckCircle, AlertTriangle, TrendingUp, Users, Calendar, Zap, Star, Bell } from "lucide-react";
 import { calculateProductPoints, formatPoints } from "@/utils/pointsCalculator";
 interface SmartBagCreatorProps {
   onSuccess?: () => void;
@@ -490,6 +490,20 @@ export const SmartBagCreator = ({
                 <p>No products available for this category</p>
                 <p className="text-sm">Make sure you have products with upcoming expiry dates</p>
               </div>}
+
+            {/* Action Buttons */}
+            {selectedCategory && (
+              <div className="mt-6 flex gap-3 justify-center">
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Package className="w-4 h-4" />
+                  Send to Marketplace
+                </Button>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Bell className="w-4 h-4" />
+                  Send Notification
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
