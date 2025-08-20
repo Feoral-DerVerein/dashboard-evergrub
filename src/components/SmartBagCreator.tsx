@@ -65,7 +65,22 @@ const categories = [
   { value: "Breakfast", label: "☕ Breakfast", emoji: "☕" },
   { value: "Quick Dinner", label: "🍝 Quick Dinner", emoji: "🍝" },
   { value: "Sweet/Desserts", label: "🍰 Sweet/Desserts", emoji: "🍰" },
-  { value: "Office Lunch", label: "🥪 Office Lunch", emoji: "🥪" }
+  { value: "Office Lunch", label: "🥪 Office Lunch", emoji: "🥪" },
+  { value: "Fresh Produce", label: "🥬 Fresh Produce", emoji: "🥬" },
+  { value: "Bakery", label: "🍞 Bakery", emoji: "🍞" },
+  { value: "Dairy", label: "🥛 Dairy", emoji: "🥛" },
+  { value: "Meat & Fish", label: "🥩 Meat & Fish", emoji: "🥩" },
+  { value: "Ready Meals", label: "🍱 Ready Meals", emoji: "🍱" },
+  { value: "Frozen Foods", label: "🧊 Frozen Foods", emoji: "🧊" },
+  { value: "Snacks", label: "🍿 Snacks", emoji: "🍿" },
+  { value: "Beverages", label: "🥤 Beverages", emoji: "🥤" },
+  { value: "International", label: "🌍 International", emoji: "🌍" },
+  { value: "Organic", label: "🌱 Organic", emoji: "🌱" },
+  { value: "Gluten Free", label: "🌾 Gluten Free", emoji: "🌾" },
+  { value: "Vegan", label: "🌿 Vegan", emoji: "🌿" },
+  { value: "Baby Food", label: "👶 Baby Food", emoji: "👶" },
+  { value: "Pet Food", label: "🐕 Pet Food", emoji: "🐕" },
+  { value: "Health & Wellness", label: "💊 Health & Wellness", emoji: "💊" }
 ];
 
 export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
