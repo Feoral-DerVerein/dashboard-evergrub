@@ -18,19 +18,8 @@ const PointsBadge = ({
   showIcon = true,
   className = ''
 }: PointsBadgeProps) => {
-  const points = calculateProductPoints(price);
-  
-  if (points === 0) return null;
-
-  return (
-    <Badge 
-      variant={variant} 
-      className={`${className} ${size === 'sm' ? 'text-xs' : 'text-sm'} font-medium`}
-    >
-      {showIcon && <Star className="w-3 h-3 mr-1 fill-current" />}
-      {formatPoints(points)}
-    </Badge>
-  );
+  // Points functionality removed as it will be integrated into smart bags
+  return null;
 };
 
 export default PointsBadge;
