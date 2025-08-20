@@ -267,6 +267,112 @@ export const SmartBagCreator = ({
       setIsSubmitting(false);
     }
   };
+
+  const handleSendToMarketplace = async () => {
+    if (!user || !selectedCategory || !suggestions) {
+      toast({
+        title: "Error", 
+        description: "Please select a category and generate suggestions first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const selectedProductsData = suggestions.products.filter((p: ProductSuggestion) => selectedProducts.includes(p.id));
+      const formData = watch();
+      
+      const smartBagData = {
+        user_id: user.id,
+        category: selectedCategory,
+        name: formData.name || `Smart Bag ${selectedCategory}`,
+        description: formData.description || `AI-curated ${selectedCategory} smart bag`,
+        total_value: totalValue,
+        sale_price: formData.salePrice || suggestedPrice,
+        max_quantity: formData.maxQuantity || 10,
+        expires_at: formData.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        ai_suggestions: suggestions,
+        selected_products: selectedProductsData,
+        is_active: true
+      };
+
+      // Send to external marketplace
+      const { data, error } = await supabase.functions.invoke('send-to-marketplace', {
+        body: {
+          smartBagData,
+          marketplaceUrl: 'https://lovable.dev/projects/45195c06-d75b-4bb9-880e-7c6af20b31b5'
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Sent to Marketplace!",
+        description: "Smart bag data has been sent to wisebite-marketplace"
+      });
+
+    } catch (error: any) {
+      console.error("Error sending to marketplace:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Could not send to marketplace",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSendNotification = async () => {
+    if (!user || !selectedCategory || !suggestions) {
+      toast({
+        title: "Error",
+        description: "Please select a category and generate suggestions first", 
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const selectedProductsData = suggestions.products.filter((p: ProductSuggestion) => selectedProducts.includes(p.id));
+      const formData = watch();
+
+      const notificationData = {
+        user_id: user.id,
+        category: selectedCategory,
+        name: formData.name || `Smart Bag ${selectedCategory}`,
+        description: formData.description || `AI-curated ${selectedCategory} smart bag`,
+        total_value: totalValue,
+        sale_price: formData.salePrice || suggestedPrice,
+        selected_products: selectedProductsData,
+        product_count: selectedProductsData.length
+      };
+
+      const { error } = await supabase.functions.invoke('send-smart-bag-notification', {
+        body: notificationData
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Notification Sent!",
+        description: "Smart bag notification has been sent to customers"
+      });
+
+    } catch (error: any) {
+      console.error("Error sending notification:", error);
+      toast({
+        title: "Error", 
+        description: error.message || "Could not send notification",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const {
     totalValue,
     suggestedPrice
@@ -379,11 +485,23 @@ export const SmartBagCreator = ({
 
                 {/* Action Buttons - Fixed Position */}
                 <div className="mt-6 flex gap-2 justify-center">
-                  <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-1 text-xs"
+                    onClick={handleSendToMarketplace}
+                    disabled={!selectedCategory || isSubmitting}
+                  >
                     <Package className="w-3 h-3" />
                     Send to Marketplace
                   </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-1 text-xs"
+                    onClick={handleSendNotification}
+                    disabled={!selectedCategory || isSubmitting}
+                  >
                     <Bell className="w-3 h-3" />
                     Send Notification
                   </Button>
