@@ -298,6 +298,9 @@ const Products = () => {
           <div className="flex items-center gap-2">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+              <p className="text-muted-foreground text-sm mt-1">
+                This is your summary for today - manage your inventory efficiently
+              </p>
               <p className="text-sm text-gray-600 mt-1">WiseBite Marketplace by Negentropy</p>
               <p className="text-xs text-gray-500 mt-1">Manage your inventory and marketplace visibility</p>
             </div>
