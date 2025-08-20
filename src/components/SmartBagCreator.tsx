@@ -363,21 +363,19 @@ export const SmartBagCreator = ({
                     💡 Suggested price: ${suggestedPrice}
                   </p>}
                 
-                {/* Grains Points Display */}
-                {(watch("salePrice") || suggestedPrice) > 0 && (
-                  <div className="mt-3 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Star className="w-4 h-4 text-yellow-600 fill-current" />
-                      <span className="text-sm font-medium text-yellow-800">Grains Earned</span>
-                    </div>
-                    <p className="text-sm text-yellow-700">
-                      Customers earn {formatPoints(calculateProductPoints(watch("salePrice") || suggestedPrice))} with this bag
-                    </p>
-                    <p className="text-xs text-yellow-600 mt-1">
-                      2% cashback • 1 grain = $0.005 AUD
-                    </p>
+                {/* Grains Points Display - Always Visible */}
+                <div className="mt-3 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Star className="w-4 h-4 text-yellow-600 fill-current" />
+                    <span className="text-sm font-medium text-yellow-800">Grains Earned</span>
                   </div>
-                )}
+                  <p className="text-sm text-yellow-700">
+                    Customers earn {watch("salePrice") ? formatPoints(calculateProductPoints(watch("salePrice"))) : "0 pts"} with this bag
+                  </p>
+                  <p className="text-xs text-yellow-600 mt-1">
+                    2% cashback • 1 grain = $0.005 AUD
+                  </p>
+                </div>
               </div>
             </form>
           </CardContent>
