@@ -214,10 +214,8 @@ export const SmartBagCreator = ({
       {/* Header */}
       <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
         <CardHeader className="text-center">
-          <CardTitle className="flex items-center justify-center gap-2 text-2xl">
-            <Brain className="w-8 h-8 text-purple-600" />
+          <CardTitle className="text-center text-2xl">
             Crear Bolsa Inteligente
-            <Sparkles className="w-8 h-8 text-yellow-500" />
           </CardTitle>
           <CardDescription className="text-lg">
             Sistema IA que analiza tu inventario, fechas de caducidad y wishlist de clientes 
