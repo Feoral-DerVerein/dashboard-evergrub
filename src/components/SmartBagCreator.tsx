@@ -378,13 +378,13 @@ export const SmartBagCreator = ({
                 </div>
 
                 {/* Action Buttons - Fixed Position */}
-                <div className="mt-6 flex gap-3 justify-center">
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Package className="w-4 h-4" />
+                <div className="mt-6 flex gap-2 justify-center">
+                  <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs">
+                    <Package className="w-3 h-3" />
                     Send to Marketplace
                   </Button>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Bell className="w-4 h-4" />
+                  <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs">
+                    <Bell className="w-3 h-3" />
                     Send Notification
                   </Button>
                 </div>
