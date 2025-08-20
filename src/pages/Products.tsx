@@ -1,4 +1,4 @@
-import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info, Calendar } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info, Calendar, ShoppingBag } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -342,7 +342,8 @@ const Products = () => {
               onClick={() => setSmartBagCreatorOpen(true)}
               className="bg-purple-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-purple-700 transition-colors text-sm"
             >
-              🧠 Create Smart Bag
+              <ShoppingBag className="w-4 h-4" />
+              Create Smart Bag
             </button>
             
             <button 
