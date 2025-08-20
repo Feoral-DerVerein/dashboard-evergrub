@@ -326,7 +326,7 @@ export const SmartBagCreator = ({
                 <Textarea id="description" placeholder="Describe what customers can expect..." {...register("description")} />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="maxQuantity">Quantity</Label>
                   <Input id="maxQuantity" type="number" min="1" placeholder="10" {...register("maxQuantity", {
@@ -338,7 +338,7 @@ export const SmartBagCreator = ({
                 })} />
                 </div>
 
-                <div>
+                <div className="col-span-2">
                   <Label htmlFor="expiresAt">Available until</Label>
                   <Input id="expiresAt" type="datetime-local" {...register("expiresAt", {
                   required: "Date required"
