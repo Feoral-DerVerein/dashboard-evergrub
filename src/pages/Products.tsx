@@ -332,12 +332,6 @@ const Products = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/products/add">Add single product</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSmartBagCreatorOpen(true)}>
-                  🧠 Crear Bolsa Inteligente
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSurpriseBagFormOpen(true)}>
-                  Create Surprise Bag
-                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setImportOpen(true)}>
                   Import from API/POS System
                 </DropdownMenuItem>
