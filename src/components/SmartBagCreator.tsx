@@ -43,25 +43,85 @@ interface EnhancedSuggestion {
   recommendationScore: number;
 }
 const categories = [{
-  value: "Vegetariana",
-  label: "🥗 Vegetariana",
+  value: "Vegetarian",
+  label: "🥗 Vegetarian",
   emoji: "🥗"
 }, {
-  value: "Desayuno",
-  label: "☕ Desayuno",
+  value: "Breakfast",
+  label: "☕ Breakfast",
   emoji: "☕"
 }, {
-  value: "Cena Rápida",
-  label: "🍝 Cena Rápida",
+  value: "Quick Dinner",
+  label: "🍝 Quick Dinner",
   emoji: "🍝"
 }, {
-  value: "Dulce/Postres",
-  label: "🍰 Dulce/Postres",
+  value: "Sweet/Desserts",
+  label: "🍰 Sweet/Desserts",
   emoji: "🍰"
 }, {
-  value: "Lunch Office",
-  label: "🥪 Lunch Office",
+  value: "Office Lunch",
+  label: "🥪 Office Lunch",
   emoji: "🥪"
+}, {
+  value: "Fresh Produce",
+  label: "🥕 Fresh Produce",
+  emoji: "🥕"
+}, {
+  value: "Bakery",
+  label: "🍞 Bakery",
+  emoji: "🍞"
+}, {
+  value: "Dairy",
+  label: "🧀 Dairy",
+  emoji: "🧀"
+}, {
+  value: "Meat & Fish",
+  label: "🥩 Meat & Fish",
+  emoji: "🥩"
+}, {
+  value: "Ready Meals",
+  label: "🍱 Ready Meals",
+  emoji: "🍱"
+}, {
+  value: "Frozen Foods",
+  label: "🧊 Frozen Foods",
+  emoji: "🧊"
+}, {
+  value: "Snacks",
+  label: "🍿 Snacks",
+  emoji: "🍿"
+}, {
+  value: "Beverages",
+  label: "🥤 Beverages",
+  emoji: "🥤"
+}, {
+  value: "Organic",
+  label: "🌱 Organic",
+  emoji: "🌱"
+}, {
+  value: "Vegan",
+  label: "🌿 Vegan",
+  emoji: "🌿"
+}, {
+  value: "Gluten Free",
+  label: "🌾 Gluten Free",
+  emoji: "🌾"
+}, {
+  value: "Baby Food",
+  label: "🍼 Baby Food",
+  emoji: "🍼"
+}, {
+  value: "Pet Food",
+  label: "🐕 Pet Food",
+  emoji: "🐕"
+}, {
+  value: "Health & Wellness",
+  label: "💊 Health & Wellness",
+  emoji: "💊"
+}, {
+  value: "International",
+  label: "🌍 International",
+  emoji: "🌍"
 }];
 export const SmartBagCreator = ({
   onSuccess
@@ -113,17 +173,17 @@ export const SmartBagCreator = ({
 
       // Auto-suggest name based on category and AI insights
       const categoryData = categories.find(c => c.value === category);
-      const defaultName = `Bolsa Inteligente ${categoryData?.label || category}`;
+      const defaultName = `Smart Bag ${categoryData?.label || category}`;
       setValue("name", defaultName);
       toast({
-        title: "¡Sugerencias IA generadas!",
-        description: `Se encontraron ${data.products?.length || 0} productos recomendados`
+        title: "AI Suggestions Generated!",
+        description: `Found ${data.products?.length || 0} recommended products`
       });
     } catch (error: any) {
       console.error("Error loading AI suggestions:", error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las sugerencias de IA",
+        description: "Could not load AI suggestions",
         variant: "destructive"
       });
     } finally {
@@ -152,7 +212,7 @@ export const SmartBagCreator = ({
     if (!user) {
       toast({
         title: "Error",
-        description: "Debes estar logueado para crear una bolsa inteligente",
+        description: "You must be logged in to create a smart bag",
         variant: "destructive"
       });
       return;
@@ -160,7 +220,7 @@ export const SmartBagCreator = ({
     if (selectedProducts.length === 0) {
       toast({
         title: "Error",
-        description: "Selecciona al menos un producto para la bolsa",
+        description: "Select at least one product for the bag",
         variant: "destructive"
       });
       return;
@@ -188,8 +248,8 @@ export const SmartBagCreator = ({
       });
       if (error) throw error;
       toast({
-        title: "¡Bolsa Inteligente Creada!",
-        description: "Tu bolsa inteligente está ahora disponible en el marketplace"
+        title: "Smart Bag Created!",
+        description: "Your smart bag is now available in the marketplace"
       });
       reset();
       setSelectedProducts([]);
@@ -199,7 +259,7 @@ export const SmartBagCreator = ({
       console.error("Error creating smart bag:", error);
       toast({
         title: "Error",
-        description: error.message || "No se pudo crear la bolsa inteligente",
+        description: error.message || "Could not create smart bag",
         variant: "destructive"
       });
     } finally {
@@ -233,13 +293,13 @@ export const SmartBagCreator = ({
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <Label htmlFor="category">Categoría de Bolsa</Label>
+                <Label htmlFor="category">Bag Category</Label>
                 <Select onValueChange={value => {
                 setValue("category", value);
                 setSelectedCategory(value);
               }}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona una categoría..." />
+                    <SelectValue placeholder="Select a category..." />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map(category => <SelectItem key={category.value} value={category.value}>
@@ -249,57 +309,57 @@ export const SmartBagCreator = ({
                 </Select>
                 {errors.category && <p className="text-sm text-red-600">{errors.category.message}</p>}
                 <input type="hidden" {...register("category", {
-                required: "Selecciona una categoría"
+                required: "Select a category"
               })} />
               </div>
 
               <div>
-                <Label htmlFor="name">Nombre de la Bolsa</Label>
-                <Input id="name" placeholder="Ej: Bolsa Inteligente Desayuno" {...register("name", {
-                required: "Nombre requerido"
+                <Label htmlFor="name">Bag Name</Label>
+                <Input id="name" placeholder="e.g.: Smart Breakfast Bag" {...register("name", {
+                required: "Name required"
               })} />
                 {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
               </div>
 
               <div>
-                <Label htmlFor="description">Descripción</Label>
-                <Textarea id="description" placeholder="Describe qué pueden esperar los clientes..." {...register("description")} />
+                <Label htmlFor="description">Description</Label>
+                <Textarea id="description" placeholder="Describe what customers can expect..." {...register("description")} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="maxQuantity">Cantidad</Label>
+                  <Label htmlFor="maxQuantity">Quantity</Label>
                   <Input id="maxQuantity" type="number" min="1" placeholder="10" {...register("maxQuantity", {
-                  required: "Cantidad requerida",
+                  required: "Quantity required",
                   min: {
                     value: 1,
-                    message: "Mínimo 1"
+                    message: "Minimum 1"
                   }
                 })} />
                 </div>
 
                 <div>
-                  <Label htmlFor="expiresAt">Disponible hasta</Label>
+                  <Label htmlFor="expiresAt">Available until</Label>
                   <Input id="expiresAt" type="datetime-local" {...register("expiresAt", {
-                  required: "Fecha requerida"
+                  required: "Date required"
                 })} />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="salePrice">Precio de Venta</Label>
+                <Label htmlFor="salePrice">Sale Price</Label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input id="salePrice" type="number" step="0.01" placeholder={suggestedPrice.toString()} className="pl-10" {...register("salePrice", {
-                  required: "Precio requerido",
+                  required: "Price required",
                   min: {
                     value: 0.01,
-                    message: "Precio debe ser mayor a 0"
+                    message: "Price must be greater than 0"
                   }
                 })} />
                 </div>
                 {suggestedPrice > 0 && <p className="text-sm text-green-600 mt-1">
-                    💡 Precio sugerido: ${suggestedPrice}
+                    💡 Suggested price: ${suggestedPrice}
                   </p>}
               </div>
             </form>
@@ -311,25 +371,25 @@ export const SmartBagCreator = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="w-5 h-5 text-purple-600" />
-              2. Sugerencias IA de Productos
+              2. AI Product Suggestions
             </CardTitle>
             <CardDescription>
-              La IA analiza inventario, fechas de caducidad y demanda de clientes
+              AI analyses inventory, expiry dates and customer demand
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!selectedCategory ? <div className="text-center py-8 text-gray-500">
                 <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Selecciona una categoría para ver sugerencias de IA</p>
+                <p>Select a category to see AI suggestions</p>
               </div> : isLoadingSuggestions ? <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-                <p>Generando sugerencias inteligentes...</p>
+                <p>Generating smart suggestions...</p>
               </div> : suggestions?.products?.length > 0 ? <div className="space-y-4">
                 {/* AI Insights */}
                 {suggestions.enhanced?.categoryInsights && <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
                     <div className="flex items-center gap-2 mb-2">
                       <Sparkles className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium text-blue-800">Insights de IA</span>
+                      <span className="font-medium text-blue-800">AI Insights</span>
                     </div>
                     <p className="text-blue-700 text-sm">{suggestions.enhanced.categoryInsights}</p>
                   </div>}
@@ -352,17 +412,17 @@ export const SmartBagCreator = ({
                               <div className="flex items-center gap-1">
                                 <DollarSign className="w-3 h-3" />
                                 <span>${product.price}</span>
-                                <span className="text-gray-500">({product.quantity} uds)</span>
+                                <span className="text-gray-500">({product.quantity} pcs)</span>
                               </div>
                               
                               {product.days_to_expire <= 2 && <div className="flex items-center gap-1 text-orange-600">
                                   <AlertTriangle className="w-3 h-3" />
-                                  <span>Caduca en {product.days_to_expire} días</span>
+                                  <span>Expires in {product.days_to_expire} days</span>
                                 </div>}
                               
                               {product.wishlist_demand > 0 && <div className="flex items-center gap-1 text-blue-600">
                                   <Users className="w-3 h-3" />
-                                  <span>{product.wishlist_demand} clientes lo desean</span>
+                                  <span>{product.wishlist_demand} customers want this</span>
                                 </div>}
                             </div>
                             
@@ -392,7 +452,7 @@ export const SmartBagCreator = ({
                 {suggestions.enhanced?.suggestedCombinations?.length > 0 && <div className="border-t pt-4">
                     <h4 className="font-medium mb-3 flex items-center gap-2">
                       <Zap className="w-4 h-4 text-yellow-500" />
-                      Combinaciones Sugeridas por IA
+                      AI Suggested Combinations
                     </h4>
                     <div className="space-y-2">
                       {suggestions.enhanced.suggestedCombinations.map((combo: any, index: number) => <div key={index} className="bg-yellow-50 border border-yellow-200 rounded p-3">
@@ -405,15 +465,15 @@ export const SmartBagCreator = ({
                           </div>
                           <p className="text-sm text-gray-600 mb-2">{combo.reason}</p>
                           <Button size="sm" variant="outline" onClick={() => setSelectedProducts(combo.productIds)}>
-                            Usar esta combinación
+                            Use this combination
                           </Button>
                         </div>)}
                     </div>
                   </div>}
               </div> : <div className="text-center py-8 text-gray-500">
                 <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No hay productos disponibles para esta categoría</p>
-                <p className="text-sm">Asegúrate de tener productos con fechas próximas de caducidad</p>
+                <p>No products available for this category</p>
+                <p className="text-sm">Make sure you have products with upcoming expiry dates</p>
               </div>}
           </CardContent>
         </Card>
@@ -424,13 +484,13 @@ export const SmartBagCreator = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-600" />
-              3. Vista Previa de Bolsa
+              3. Bag Preview
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="font-medium mb-3">Productos Incluidos:</h4>
+                <h4 className="font-medium mb-3">Included Products:</h4>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {suggestions?.products?.filter((p: ProductSuggestion) => selectedProducts.includes(p.id))?.map((product: ProductSuggestion) => {
                 const enhancement = suggestions.enhanced?.enhancedProducts?.find((e: EnhancedSuggestion) => e.id === product.id);
@@ -443,19 +503,19 @@ export const SmartBagCreator = ({
               </div>
 
               <div className="text-center">
-                <h4 className="font-medium mb-3">Comparador de Valor:</h4>
+                <h4 className="font-medium mb-3">Value Comparison:</h4>
                 <div className="bg-white rounded-lg p-4 shadow-sm">
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>Valor real:</span>
+                      <span>Actual value:</span>
                       <span className="line-through text-gray-500">${totalValue.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-green-600 text-lg">
-                      <span>Precio bolsa:</span>
+                      <span>Bag price:</span>
                       <span>${watch("salePrice") || suggestedPrice.toFixed(2)}</span>
                     </div>
                     <div className="text-sm text-green-600">
-                      {totalValue > 0 && <>Ahorro: {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}%</>}
+                      {totalValue > 0 && <>Savings: {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}%</>}
                     </div>
                   </div>
                 </div>
@@ -464,9 +524,9 @@ export const SmartBagCreator = ({
 
             <div className="mt-6 text-center">
               <Button onClick={handleSubmit(onSubmit)} size="lg" disabled={isSubmitting} className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold px-8 py-3 text-lg">
-                {isSubmitting ? "Publicando..." : <>
+                {isSubmitting ? "Publishing..." : <>
                     <Sparkles className="w-5 h-5 mr-2" />
-                    Publicar Bolsa Inteligente
+                    Publish Smart Bag
                   </>}
               </Button>
             </div>
