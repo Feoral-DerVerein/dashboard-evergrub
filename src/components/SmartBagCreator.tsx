@@ -376,6 +376,18 @@ export const SmartBagCreator = ({
                     2% cashback • 1 grain = $0.005 AUD
                   </p>
                 </div>
+
+                {/* Action Buttons - Fixed Position */}
+                <div className="mt-6 flex gap-3 justify-center">
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Package className="w-4 h-4" />
+                    Send to Marketplace
+                  </Button>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Bell className="w-4 h-4" />
+                    Send Notification
+                  </Button>
+                </div>
               </div>
             </form>
           </CardContent>
@@ -491,19 +503,6 @@ export const SmartBagCreator = ({
                 <p className="text-sm">Make sure you have products with upcoming expiry dates</p>
               </div>}
 
-            {/* Action Buttons */}
-            {selectedCategory && (
-              <div className="mt-6 flex gap-3 justify-center">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Package className="w-4 h-4" />
-                  Send to Marketplace
-                </Button>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Bell className="w-4 h-4" />
-                  Send Notification
-                </Button>
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>
