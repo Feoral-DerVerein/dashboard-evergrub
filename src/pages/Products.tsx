@@ -1,6 +1,6 @@
 import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { useAuth } from "@/context/AuthContext";
 import { productService, Product, SAFFIRE_FREYCINET_STORE_ID } from "@/services/productService";
@@ -50,6 +50,7 @@ const Products = () => {
   const {
     user
   } = useAuth();
+  const navigate = useNavigate();
   const {
     toast
   } = useToast();
@@ -406,8 +407,8 @@ const Products = () => {
                     key={product.id}
                     product={product}
                     onEdit={() => {
-                      // Navigate to edit page or open edit modal
-                      window.location.href = `/products/edit/${product.id}`;
+                      // Use React Router navigation instead of window.location
+                      navigate(`/products/edit/${product.id}`);
                     }}
                     onDelete={() => product.id && handleDeleteProduct(product.id)}
                     onToggleVisibility={() => handleToggleMarketplaceVisibility(product)}
@@ -577,6 +578,9 @@ const Products = () => {
       {/* Smart Bag Creator Dialog */}
       <Dialog open={smartBagCreatorOpen} onOpenChange={setSmartBagCreatorOpen}>
         <DialogContent className="sm:max-w-7xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Crear Bolsa Inteligente</DialogTitle>
+          </DialogHeader>
           <SmartBagCreator onSuccess={() => {
             setSmartBagCreatorOpen(false);
             // Reload products to show new smart bags
@@ -605,6 +609,9 @@ const Products = () => {
       {/* Surprise Bag Form Dialog */}
       <Dialog open={surpriseBagFormOpen} onOpenChange={setSurpriseBagFormOpen}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Crear Bolsa Sorpresa</DialogTitle>
+          </DialogHeader>
           <SurpriseBagForm onSuccess={() => {
             setSurpriseBagFormOpen(false);
             // Reload products to show the new surprise bag
