@@ -339,6 +339,13 @@ const Products = () => {
             </DropdownMenu>
             
             <button 
+              onClick={() => setSmartBagCreatorOpen(true)}
+              className="bg-purple-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-purple-700 transition-colors text-sm"
+            >
+              🧠 Create Smart Bag
+            </button>
+            
+            <button 
               onClick={() => setScheduleOpen(true)}
               className="bg-blue-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-blue-700 transition-colors text-sm"
             >
@@ -351,6 +358,21 @@ const Products = () => {
 
       <ApiImportDialog open={importOpen} onOpenChange={setImportOpen} onImported={newProducts => setProducts(prev => [...newProducts, ...prev])} />
       <ScheduleDialog open={scheduleOpen} onOpenChange={setScheduleOpen} />
+      
+      <Dialog open={smartBagCreatorOpen} onOpenChange={setSmartBagCreatorOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create Smart Bag</DialogTitle>
+          </DialogHeader>
+          <SmartBagCreator onSuccess={() => {
+            setSmartBagCreatorOpen(false);
+            toast({
+              title: "Smart Bag Created",
+              description: "Your smart bag has been successfully published to the marketplace"
+            });
+          }} />
+        </DialogContent>
+      </Dialog>
 
       <main className="px-6 py-4">
 
