@@ -596,7 +596,6 @@ const Products = () => {
       <Dialog open={smartBagCreatorOpen} onOpenChange={setSmartBagCreatorOpen}>
         <DialogContent className="sm:max-w-7xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Crear Bolsa Inteligente</DialogTitle>
           </DialogHeader>
           <SmartBagCreator onSuccess={() => {
             setSmartBagCreatorOpen(false);
