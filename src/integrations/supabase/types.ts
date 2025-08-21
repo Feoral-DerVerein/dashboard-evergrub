@@ -964,7 +964,18 @@ export type Database = {
           p_max_suggestions?: number
           p_user_id: string
         }
-        Returns: Json
+        Returns: {
+          category: string
+          days_to_expire: number
+          demand_level: string
+          id: number
+          name: string
+          price: number
+          priority: string
+          quantity: number
+          suggestion_reason: string
+          wishlist_demand: number
+        }[]
       }
       get_pickup_availability: {
         Args: { p_date: string; p_user_id: string }
