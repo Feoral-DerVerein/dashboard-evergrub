@@ -528,10 +528,15 @@ export type Database = {
           id: number
           image: string
           is_marketplace_visible: boolean
+          is_surprise_bag: boolean | null
           name: string
+          original_price: number | null
+          pickup_time_end: string | null
+          pickup_time_start: string | null
           price: number
           quantity: number
           storeid: string | null
+          surprise_bag_contents: string | null
           userid: string
         }
         Insert: {
@@ -544,10 +549,15 @@ export type Database = {
           id?: number
           image?: string
           is_marketplace_visible?: boolean
+          is_surprise_bag?: boolean | null
           name: string
+          original_price?: number | null
+          pickup_time_end?: string | null
+          pickup_time_start?: string | null
           price: number
           quantity?: number
           storeid?: string | null
+          surprise_bag_contents?: string | null
           userid: string
         }
         Update: {
@@ -560,10 +570,15 @@ export type Database = {
           id?: number
           image?: string
           is_marketplace_visible?: boolean
+          is_surprise_bag?: boolean | null
           name?: string
+          original_price?: number | null
+          pickup_time_end?: string | null
+          pickup_time_start?: string | null
           price?: number
           quantity?: number
           storeid?: string | null
+          surprise_bag_contents?: string | null
           userid?: string
         }
         Relationships: []
