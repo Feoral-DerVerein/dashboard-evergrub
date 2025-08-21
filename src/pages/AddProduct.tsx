@@ -524,17 +524,12 @@ const AddProduct = () => {
       setLoading(true);
 
       // Validate required fields
-      if (!formData.name || !formData.price || !formData.description || !formData.category || !formData.expirationDate) {
+      if (!formData.name || !formData.price || !formData.category || !formData.expirationDate) {
         throw new Error("Please fill in all required fields");
       }
 
-      // For brand, use custom brand if it's selected
+      // For brand, use custom brand if it's selected, or empty string if none selected
       const brandToUse = formData.brand === "other" ? formData.customBrand.trim() : formData.brand;
-
-      // Validate brand
-      if (!brandToUse) {
-        throw new Error("Please select a brand or enter a custom brand name");
-      }
 
       // Ensure price is a valid number
       if (isNaN(parseFloat(formData.price)) || parseFloat(formData.price) <= 0) {
@@ -719,12 +714,12 @@ const AddProduct = () => {
           {/* Description input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description <span className="text-red-500">*</span>
+              Description
             </label>
             <textarea value={formData.description} onChange={e => setFormData({
             ...formData,
             description: e.target.value
-          })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" rows={3} required />
+          })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" rows={3} />
           </div>
 
           {/* Category and brand inputs */}
@@ -745,7 +740,7 @@ const AddProduct = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Brand <span className="text-red-500">*</span>
+                Brand
               </label>
               
               {/* Brand Search Input */}
@@ -760,7 +755,7 @@ const AddProduct = () => {
                 />
               </div>
               
-              <select value={formData.brand} onChange={handleBrandChange} className="w-full p-2 glass-card border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
+              <select value={formData.brand} onChange={handleBrandChange} className="w-full p-2 glass-card border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option value="">Select brand</option>
                 {filteredBrands.map(brand => (
                   <option key={brand} value={brand}>
