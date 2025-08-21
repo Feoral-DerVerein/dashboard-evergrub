@@ -417,7 +417,7 @@ const AddProduct = () => {
     const finalPrice = price - price * discount / 100;
     return finalPrice.toFixed(2);
   };
-  const categories = ["Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts"];
+  const categories = ["Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "General Stock"];
   const brands = [
     // Coffee Roasters & Suppliers
     "Gloria Jean's", "The Coffee Club", "Campos Coffee", "Toby's Estate", "Five Senses Coffee",
