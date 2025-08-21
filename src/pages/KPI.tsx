@@ -15,6 +15,7 @@ import { AIRecommendations } from "@/components/AIRecommendations";
 import StockAlertsCard from "@/components/kpi/StockAlertsCard";
 import ExpiringSoonCard from "@/components/kpi/ExpiringSoonCard";
 import SuppliersCard from "@/components/kpi/SuppliersCard";
+import RatingInsightCard from "@/components/kpi/RatingInsightCard";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AustralianComplianceDialog } from "@/components/AustralianComplianceDialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -613,6 +614,17 @@ const KPI = () => {
                 <SustainabilityCard label="Overstocked Item" value={predictiveData.overstockedItem} subtext={predictiveData.overstockAmount} />
                 <SustainabilityCard label="Demand Forecast" value={predictiveData.demandForecast} subtext={predictiveData.forecastPeriod} />
                 <SustainabilityCard label="Optimal Reorder" value={`${predictiveData.optimalReorder} days`} subtext={`For ${predictiveData.reorderCategory}`} />
+              </div>
+            </section>
+
+            {/* Customer Satisfaction & Performance */}
+            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
+              <h3 className="text-lg font-semibold mb-4">Customer Satisfaction & Performance</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
+                <RatingInsightCard label="Surprise Bag rating" rating={4.72} status="Looks good" />
+                <RatingInsightCard label="Store experience rating" rating={4.75} status="Looks good" />
+                <RatingInsightCard label="Cancellations" percentage={0} status="Looks good" />
+                <RatingInsightCard label="Refunds" percentage={0} status="Looks good" />
               </div>
             </section>
 
