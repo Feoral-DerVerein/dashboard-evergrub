@@ -44,85 +44,29 @@ interface EnhancedSuggestion {
   recommendationScore: number;
 }
 const categories = [{
-  value: "Vegetarian",
-  label: "🥗 Vegetarian",
-  emoji: "🥗"
-}, {
-  value: "Breakfast",
-  label: "☕ Breakfast",
+  value: "Coffee",
+  label: "☕ Coffee",
   emoji: "☕"
 }, {
-  value: "Quick Dinner",
-  label: "🍝 Quick Dinner",
-  emoji: "🍝"
+  value: "Pastries",
+  label: "🥐 Pastries",
+  emoji: "🥐"
 }, {
-  value: "Sweet/Desserts",
-  label: "🍰 Sweet/Desserts",
-  emoji: "🍰"
-}, {
-  value: "Office Lunch",
-  label: "🥪 Office Lunch",
+  value: "Sandwiches",
+  label: "🥪 Sandwiches",
   emoji: "🥪"
 }, {
-  value: "Fresh Produce",
-  label: "🥕 Fresh Produce",
-  emoji: "🥕"
-}, {
-  value: "Bakery",
-  label: "🍞 Bakery",
-  emoji: "🍞"
-}, {
-  value: "Dairy",
-  label: "🧀 Dairy",
-  emoji: "🧀"
-}, {
-  value: "Meat & Fish",
-  label: "🥩 Meat & Fish",
-  emoji: "🥩"
-}, {
-  value: "Ready Meals",
-  label: "🍱 Ready Meals",
-  emoji: "🍱"
-}, {
-  value: "Frozen Foods",
-  label: "🧊 Frozen Foods",
-  emoji: "🧊"
-}, {
-  value: "Snacks",
-  label: "🍿 Snacks",
-  emoji: "🍿"
+  value: "Breakfast",
+  label: "🍳 Breakfast",
+  emoji: "🍳"
 }, {
   value: "Beverages",
-  label: "🥤 Beverages",
-  emoji: "🥤"
+  label: "🧃 Beverages",
+  emoji: "🧃"
 }, {
-  value: "Organic",
-  label: "🌱 Organic",
-  emoji: "🌱"
-}, {
-  value: "Vegan",
-  label: "🌿 Vegan",
-  emoji: "🌿"
-}, {
-  value: "Gluten Free",
-  label: "🌾 Gluten Free",
-  emoji: "🌾"
-}, {
-  value: "Baby Food",
-  label: "🍼 Baby Food",
-  emoji: "🍼"
-}, {
-  value: "Pet Food",
-  label: "🐕 Pet Food",
-  emoji: "🐕"
-}, {
-  value: "Health & Wellness",
-  label: "💊 Health & Wellness",
-  emoji: "💊"
-}, {
-  value: "International",
-  label: "🌍 International",
-  emoji: "🌍"
+  value: "Desserts",
+  label: "🍰 Desserts",
+  emoji: "🍰"
 }];
 export const SmartBagCreator = ({
   onSuccess
