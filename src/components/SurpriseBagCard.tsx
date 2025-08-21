@@ -5,10 +5,10 @@ import PointsBadge from "@/components/PointsBadge";
 
 interface SurpriseBagCardProps {
   product: Product;
-  onEdit: () => void;
-  onDelete: () => void;
-  onToggleVisibility: () => void;
-  isTogglingVisibility: boolean;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
+  onToggleVisibility: (product: Product) => void;
+  isTogglingVisibility?: boolean;
 }
 
 export const SurpriseBagCard = ({ 
@@ -16,7 +16,7 @@ export const SurpriseBagCard = ({
   onEdit, 
   onDelete, 
   onToggleVisibility,
-  isTogglingVisibility 
+  isTogglingVisibility = false
 }: SurpriseBagCardProps) => {
   const discount = product.originalPrice && product.price 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -34,7 +34,7 @@ export const SurpriseBagCard = ({
 
       {/* Visibility Toggle */}
       <button 
-        onClick={onToggleVisibility}
+        onClick={() => onToggleVisibility(product)}
         disabled={isTogglingVisibility}
         className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white border border-gray-200 text-gray-700 px-2 py-1 rounded-md shadow-sm disabled:opacity-60"
         title={(product as any).isMarketplaceVisible ? "Hide from marketplace" : "Show in marketplace"}
@@ -127,13 +127,13 @@ export const SurpriseBagCard = ({
         <div className="space-y-1">
           <div className="flex gap-1">
             <button 
-              onClick={onEdit}
+              onClick={() => product.id && onEdit(product.id)}
               className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-white/80 rounded hover:bg-white transition-colors border"
             >
               ✏️ Edit
             </button>
             <button 
-              onClick={onDelete}
+              onClick={() => product.id && onDelete(product.id)}
               className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors border border-red-200"
             >
               🗑️ Delete

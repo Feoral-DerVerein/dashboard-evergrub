@@ -403,6 +403,49 @@ const Products = () => {
           </div>
         </div>
 
+        {/* Marketplace Section */}
+        <div className="mb-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 border border-purple-100">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Store className="w-5 h-5 text-purple-600" />
+                WiseBite Marketplace
+              </h2>
+              <p className="text-sm text-gray-600">Discover surprise bags from local businesses</p>
+            </div>
+            <button 
+              onClick={() => setSurpriseBagFormOpen(true)}
+              className="bg-purple-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-purple-700 transition-colors text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Create Surprise Bag
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {products.filter(product => product.isSurpriseBag && product.isMarketplaceVisible).map(product => (
+              <SurpriseBagCard
+                key={product.id}
+                product={product}
+                onEdit={(id) => navigate(`/products/edit/${id}`)}
+                onDelete={handleDeleteProduct}
+                onToggleVisibility={handleToggleMarketplaceVisibility}
+              />
+            ))}
+            {products.filter(product => product.isSurpriseBag && product.isMarketplaceVisible).length === 0 && (
+              <div className="col-span-full text-center py-8">
+                <p className="text-gray-500 mb-2">No surprise bags available in the marketplace</p>
+                <button 
+                  onClick={() => setSurpriseBagFormOpen(true)}
+                  className="text-purple-600 hover:text-purple-700 font-medium"
+                >
+                  Create your first surprise bag
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
         {loading ? <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
           </div> : error ? <div className="text-center py-20">
