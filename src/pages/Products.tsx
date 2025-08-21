@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { wishlistService } from "@/services/wishlistService";
 import PointsBadge from "@/components/PointsBadge";
 import QuickInventory from "@/components/QuickInventory";
+import { calculateProductPoints, formatPoints } from "@/utils/pointsCalculator";
 import ApiImportDialog from "@/components/ApiImportDialog";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -502,16 +503,32 @@ const Products = () => {
                     </div>
                   </div>
                   
-                  <div className="p-2">
-                    <div className="mb-2">
-                      <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">
-                        {product.name}
-                      </h3>
-                      <p className="text-xs text-gray-500 mb-1">{product.category}</p>
-                      <p className="text-sm font-semibold text-green-600">
-                        ${product.price.toFixed(2)}
-                      </p>
-                    </div>
+                    <div className="p-2">
+                      <div className="mb-2">
+                        <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">
+                          {product.name}
+                        </h3>
+                        <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-semibold text-green-600">
+                            ${product.price.toFixed(2)}
+                          </p>
+                        </div>
+                        
+                        {/* Grains Earned Section */}
+                        <div className="mt-2 p-2 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
+                          <div className="flex items-center gap-1 mb-1">
+                            <span className="text-yellow-600">⭐</span>
+                            <span className="text-xs font-medium text-yellow-800">Grains Earned</span>
+                          </div>
+                          <p className="text-xs text-yellow-700 mb-1">
+                            Customers earn {formatPoints(calculateProductPoints(product.price))} with this product
+                          </p>
+                          <p className="text-xs text-yellow-600">
+                            2% cashback • 1 grain = $0.005 AUD
+                          </p>
+                        </div>
+                      </div>
                     
                     {/* Pickup Schedule Information */}
                     <div className="mb-2">
