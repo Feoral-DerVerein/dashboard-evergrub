@@ -514,8 +514,7 @@ export const SmartBagCreator = ({
         {/* Step 2: AI Suggestions */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="w-5 h-5 text-purple-600" />
+            <CardTitle>
               2. AI Product Suggestions
             </CardTitle>
             <CardDescription>
