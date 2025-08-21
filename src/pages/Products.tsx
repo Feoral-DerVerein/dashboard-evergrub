@@ -404,7 +404,7 @@ const Products = () => {
         </div>
 
         {/* Marketplace Section */}
-        <div className="mb-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg px-6 py-4 border border-purple-100">
+        <div className="mb-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg px-6 py-3 border border-purple-100">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
