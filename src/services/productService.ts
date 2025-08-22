@@ -117,7 +117,8 @@ export const productService = {
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('is_marketplace_visible', true);
+        .eq('is_marketplace_visible', true)
+        .neq('category', 'general stock');
       
       if (error) {
         console.error("Error fetching all products:", error);
@@ -200,7 +201,9 @@ export const productService = {
       // Ensure the product is assigned to Saffire Freycinet
       const productWithStore = {
         ...product,
-        storeId: SAFFIRE_FREYCINET_STORE_ID
+        storeId: SAFFIRE_FREYCINET_STORE_ID,
+        // Set marketplace visibility to false if category is "general stock"
+        isMarketplaceVisible: product.category === 'general stock' ? false : product.isMarketplaceVisible
       };
       
       console.log("Creating product with data:", productWithStore);
@@ -278,7 +281,14 @@ export const productService = {
     if (updates.brand !== undefined) dbUpdates.brand = updates.brand;
     if (updates.quantity !== undefined) dbUpdates.quantity = updates.quantity;
     if (updates.expirationDate !== undefined) dbUpdates.expirationdate = updates.expirationDate;
-    if ((updates as any).isMarketplaceVisible !== undefined) (dbUpdates as any).is_marketplace_visible = (updates as any).isMarketplaceVisible;
+    
+    // Handle marketplace visibility - set to false if category is "general stock"
+    if ((updates as any).isMarketplaceVisible !== undefined) {
+      (dbUpdates as any).is_marketplace_visible = (updates as any).isMarketplaceVisible;
+    }
+    if (updates.category === 'general stock') {
+      (dbUpdates as any).is_marketplace_visible = false;
+    }
     
     // Handle empty image to prevent upload errors
     if (updates.image !== undefined) {
