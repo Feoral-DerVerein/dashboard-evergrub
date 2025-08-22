@@ -17,7 +17,7 @@ import { PickupScheduleDisplay } from "@/components/PickupScheduleDisplay";
 import { SurpriseBagForm } from "@/components/SurpriseBagForm";
 import { SurpriseBagCard } from "@/components/SurpriseBagCard";
 import { SmartBagCreator } from "@/components/SmartBagCreator";
-const categories = ["All", "Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "Surprise Bag"];
+const categories = ["General Stock", "Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "Surprise Bag"];
 
 // Food banks from Australia
 const foodBanks = [{
@@ -42,7 +42,7 @@ const foodBanks = [{
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("General Stock");
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [notifyingProductId, setNotifyingProductId] = useState<number | null>(null);
@@ -248,7 +248,7 @@ const Products = () => {
     setDonationFormOpen(true);
   };
   const filteredProducts = products.filter(product => {
-    const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
+    const matchesCategory = selectedCategory === "General Stock" || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
