@@ -126,6 +126,13 @@ export const productService = {
       }
       
       console.log("All products fetched:", data ? data.length : 0);
+      if (data && data.length > 0) {
+        console.log("Sample products from marketplace:", data.slice(0, 3).map(p => ({ 
+          name: p.name, 
+          category: p.category, 
+          is_marketplace_visible: p.is_marketplace_visible 
+        })));
+      }
       return data ? (data as DbProduct[]).map(mapDbProductToProduct) : [];
     } catch (error) {
       console.error("Error in getAllProducts:", error);
@@ -318,6 +325,19 @@ export const productService = {
       }
       
       console.log("Product updated successfully:", data[0]);
+      console.log("Verification - is_marketplace_visible:", data[0].is_marketplace_visible);
+      
+      // Verify the update took effect by fetching the product again
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('products')
+        .select('id, name, category, is_marketplace_visible')
+        .eq('id', id)
+        .single();
+        
+      if (!verifyError && verifyData) {
+        console.log("VERIFICATION after update:", verifyData);
+      }
+      
       return mapDbProductToProduct(data[0] as DbProduct);
     } catch (error) {
       console.error("Error in updateProduct:", error);
