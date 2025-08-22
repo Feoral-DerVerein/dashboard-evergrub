@@ -13,9 +13,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Brain, Package, DollarSign, Clock, Target, Sparkles, CheckCircle, AlertTriangle, TrendingUp, Users, Calendar, Zap, Star, Bell } from "lucide-react";
 import { calculateProductPoints, formatPoints } from "@/utils/pointsCalculator";
+
 interface SmartBagCreatorProps {
   onSuccess?: () => void;
 }
+
 interface SmartBagFormData {
   category: string;
   name: string;
@@ -24,6 +26,7 @@ interface SmartBagFormData {
   maxQuantity: number;
   expiresAt: string;
 }
+
 interface ProductSuggestion {
   id: number;
   name: string;
@@ -36,6 +39,7 @@ interface ProductSuggestion {
   demand_level: string;
   suggestion_reason: string;
 }
+
 interface EnhancedSuggestion {
   id: number;
   emoji: string;
@@ -43,86 +47,107 @@ interface EnhancedSuggestion {
   urgencyLevel: string;
   recommendationScore: number;
 }
-const categories = [{
-  value: "Coffee",
-  label: "☕ Coffee",
-  emoji: "☕"
-}, {
-  value: "Pastries",
-  label: "🥐 Pastries",
-  emoji: "🥐"
-}, {
-  value: "Sandwiches",
-  label: "🥪 Sandwiches",
-  emoji: "🥪"
-}, {
-  value: "Breakfast",
-  label: "🍳 Breakfast",
-  emoji: "🍳"
-}, {
-  value: "Beverages",
-  label: "🧃 Beverages",
-  emoji: "🧃"
-}, {
-  value: "Desserts",
-  label: "🍰 Desserts",
-  emoji: "🍰"
-}];
-export const SmartBagCreator = ({
-  onSuccess
-}: SmartBagCreatorProps) => {
-  const {
-    user
-  } = useAuth();
-  const {
-    toast
-  } = useToast();
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+
+const categories = [
+  {
+    value: "Coffee",
+    label: "☕ Coffee",
+    emoji: "☕"
+  },
+  {
+    value: "Pastries",
+    label: "🥐 Pastries",
+    emoji: "🥐"
+  },
+  {
+    value: "Sandwiches",
+    label: "🥪 Sandwiches",
+    emoji: "🥪"
+  },
+  {
+    value: "Breakfast",
+    label: "🍳 Breakfast",
+    emoji: "🍳"
+  },
+  {
+    value: "Beverages",
+    label: "🧃 Beverages",
+    emoji: "🧃"
+  },
+  {
+    value: "Desserts",
+    label: "🍰 Desserts",
+    emoji: "🍰"
+  }
+];
+
+export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<any>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     reset,
-    formState: {
-      errors
-    }
+    formState: { errors }
   } = useForm<SmartBagFormData>();
-  const watchedCategory = watch("category");
 
-  // Auto-load suggestions when category changes
+  // Auto-load suggestions when categories change
   useEffect(() => {
-    if (watchedCategory && user) {
-      loadAISuggestions(watchedCategory);
+    if (selectedCategories.length > 0 && user) {
+      loadAISuggestions();
     }
-  }, [watchedCategory, user]);
-  const loadAISuggestions = async (category: string) => {
-    if (!user) return;
+  }, [selectedCategories, user]);
+
+  const loadAISuggestions = async () => {
+    if (!user || selectedCategories.length === 0) return;
     setIsLoadingSuggestions(true);
     try {
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('generate-smart-bag-suggestions', {
-        body: {
-          category,
-          userId: user.id
-        }
-      });
-      if (error) throw error;
-      setSuggestions(data);
+      // Load suggestions for all selected categories
+      const allSuggestions = await Promise.all(
+        selectedCategories.map(async (category) => {
+          const { data, error } = await supabase.functions.invoke('generate-smart-bag-suggestions', {
+            body: {
+              category,
+              userId: user.id
+            }
+          });
+          if (error) throw error;
+          return { category, data };
+        })
+      );
 
-      // Auto-suggest name based on category and AI insights
-      const categoryData = categories.find(c => c.value === category);
-      const defaultName = `Smart Bag ${categoryData?.label || category}`;
+      // Combine all suggestions
+      const combinedSuggestions = {
+        products: allSuggestions.flatMap(s => s.data.products || []),
+        enhanced: {
+          enhancedProducts: allSuggestions.flatMap(s => s.data.enhanced?.enhancedProducts || []),
+          suggestedCombinations: allSuggestions.flatMap(s => s.data.enhanced?.suggestedCombinations || []),
+          categoryInsights: `Mixed categories: ${selectedCategories.join(', ')}. Perfect for diverse customer preferences!`
+        },
+        categories: selectedCategories,
+        timestamp: new Date().toISOString()
+      };
+
+      setSuggestions(combinedSuggestions);
+
+      // Auto-suggest name based on categories
+      const categoryLabels = selectedCategories.map(cat => 
+        categories.find(c => c.value === cat)?.emoji || cat
+      ).join('');
+      const defaultName = `Mixed Smart Bag ${categoryLabels}`;
       setValue("name", defaultName);
+      
       toast({
         title: "AI Suggestions Generated!",
-        description: `Found ${data.products?.length || 0} recommended products`
+        description: `Found ${combinedSuggestions.products?.length || 0} products from ${selectedCategories.length} categories`
       });
     } catch (error: any) {
       console.error("Error loading AI suggestions:", error);
@@ -135,24 +160,31 @@ export const SmartBagCreator = ({
       setIsLoadingSuggestions(false);
     }
   };
+
   const toggleProductSelection = (productId: number) => {
-    setSelectedProducts(prev => prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId]);
+    setSelectedProducts(prev => 
+      prev.includes(productId) 
+        ? prev.filter(id => id !== productId) 
+        : [...prev, productId]
+    );
   };
+
   const calculateBagValue = () => {
-    if (!suggestions?.products) return {
-      totalValue: 0,
-      suggestedPrice: 0
-    };
-    const selectedProductsData = suggestions.products.filter((p: ProductSuggestion) => selectedProducts.includes(p.id));
-    const totalValue = selectedProductsData.reduce((sum: number, product: ProductSuggestion) => sum + product.price, 0);
+    if (!suggestions?.products) return { totalValue: 0, suggestedPrice: 0 };
+    
+    const selectedProductsData = suggestions.products.filter(
+      (p: ProductSuggestion) => selectedProducts.includes(p.id)
+    );
+    const totalValue = selectedProductsData.reduce(
+      (sum: number, product: ProductSuggestion) => sum + product.price, 
+      0
+    );
 
     // Suggest 50-70% discount
     const suggestedPrice = Math.round(totalValue * 0.4 * 100) / 100;
-    return {
-      totalValue,
-      suggestedPrice
-    };
+    return { totalValue, suggestedPrice };
   };
+
   const onSubmit = async (data: SmartBagFormData) => {
     if (!user) {
       toast({
@@ -162,6 +194,7 @@ export const SmartBagCreator = ({
       });
       return;
     }
+    
     if (selectedProducts.length === 0) {
       toast({
         title: "Error",
@@ -170,17 +203,17 @@ export const SmartBagCreator = ({
       });
       return;
     }
+
     setIsSubmitting(true);
     try {
-      const selectedProductsData = suggestions.products.filter((p: ProductSuggestion) => selectedProducts.includes(p.id));
-      const {
-        totalValue
-      } = calculateBagValue();
-      const {
-        error
-      } = await supabase.from('smart_bags').insert({
+      const selectedProductsData = suggestions.products.filter(
+        (p: ProductSuggestion) => selectedProducts.includes(p.id)
+      );
+      const { totalValue } = calculateBagValue();
+      
+      const { error } = await supabase.from('smart_bags').insert({
         user_id: user.id,
-        category: data.category,
+        category: selectedCategories.join(', '),
         name: data.name,
         description: data.description,
         total_value: totalValue,
@@ -191,11 +224,14 @@ export const SmartBagCreator = ({
         selected_products: selectedProductsData,
         is_active: true
       });
+
       if (error) throw error;
+
       toast({
         title: "Smart Bag Created!",
         description: "Your smart bag is now available in the marketplace"
       });
+      
       reset();
       setSelectedProducts([]);
       setSuggestions(null);
@@ -213,10 +249,10 @@ export const SmartBagCreator = ({
   };
 
   const handleSendToMarketplace = async () => {
-    if (!user || !selectedCategory || !suggestions) {
+    if (!user || selectedCategories.length === 0 || !suggestions) {
       toast({
         title: "Error", 
-        description: "Please select a category and generate suggestions first",
+        description: "Please select categories and generate suggestions first",
         variant: "destructive"
       });
       return;
@@ -224,14 +260,17 @@ export const SmartBagCreator = ({
 
     setIsSubmitting(true);
     try {
-      const selectedProductsData = suggestions.products.filter((p: ProductSuggestion) => selectedProducts.includes(p.id));
+      const selectedProductsData = suggestions.products.filter(
+        (p: ProductSuggestion) => selectedProducts.includes(p.id)
+      );
       const formData = watch();
+      const { totalValue, suggestedPrice } = calculateBagValue();
       
       const smartBagData = {
         user_id: user.id,
-        category: selectedCategory,
-        name: formData.name || `Smart Bag ${selectedCategory}`,
-        description: formData.description || `AI-curated ${selectedCategory} smart bag`,
+        category: selectedCategories.join(', '),
+        name: formData.name || `Mixed Smart Bag`,
+        description: formData.description || `AI-curated mixed category smart bag`,
         total_value: totalValue,
         sale_price: formData.salePrice || suggestedPrice,
         max_quantity: formData.maxQuantity || 10,
@@ -269,10 +308,10 @@ export const SmartBagCreator = ({
   };
 
   const handleSendNotification = async () => {
-    if (!user || !selectedCategory || !suggestions) {
+    if (!user || selectedCategories.length === 0 || !suggestions) {
       toast({
         title: "Error",
-        description: "Please select a category and generate suggestions first", 
+        description: "Please select categories and generate suggestions first", 
         variant: "destructive"
       });
       return;
@@ -280,14 +319,17 @@ export const SmartBagCreator = ({
 
     setIsSubmitting(true);
     try {
-      const selectedProductsData = suggestions.products.filter((p: ProductSuggestion) => selectedProducts.includes(p.id));
+      const selectedProductsData = suggestions.products.filter(
+        (p: ProductSuggestion) => selectedProducts.includes(p.id)
+      );
       const formData = watch();
+      const { totalValue, suggestedPrice } = calculateBagValue();
 
       const notificationData = {
         user_id: user.id,
-        category: selectedCategory,
-        name: formData.name || `Smart Bag ${selectedCategory}`,
-        description: formData.description || `AI-curated ${selectedCategory} smart bag`,
+        category: selectedCategories.join(', '),
+        name: formData.name || `Mixed Smart Bag`,
+        description: formData.description || `AI-curated mixed category smart bag`,
         total_value: totalValue,
         sale_price: formData.salePrice || suggestedPrice,
         selected_products: selectedProductsData,
@@ -317,11 +359,10 @@ export const SmartBagCreator = ({
     }
   };
 
-  const {
-    totalValue,
-    suggestedPrice
-  } = calculateBagValue();
-  return <div className="w-full max-w-6xl mx-auto space-y-6">
+  const { totalValue, suggestedPrice } = calculateBagValue();
+
+  return (
+    <div className="w-full max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
         <CardHeader className="text-center">
@@ -339,61 +380,79 @@ export const SmartBagCreator = ({
         {/* Step 1: Category Selection */}
         <Card className="lg:col-span-1">
           <CardHeader>
-            
+            <CardTitle>1. Bag Configuration</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <Label htmlFor="category">Bag Category</Label>
-                <Select onValueChange={value => {
-                setValue("category", value);
-                setSelectedCategory(value);
-              }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(category => <SelectItem key={category.value} value={category.value}>
-                        {category.label}
-                      </SelectItem>)}
-                  </SelectContent>
-                </Select>
-                {errors.category && <p className="text-sm text-red-600">{errors.category.message}</p>}
-                <input type="hidden" {...register("category", {
-                required: "Select a category"
-              })} />
+                <Label htmlFor="category">Bag Categories</Label>
+                <div className="space-y-2 mt-2">
+                  {categories.map(category => (
+                    <div key={category.value} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={category.value}
+                        checked={selectedCategories.includes(category.value)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedCategories(prev => [...prev, category.value]);
+                          } else {
+                            setSelectedCategories(prev => prev.filter(c => c !== category.value));
+                          }
+                        }}
+                      />
+                      <Label htmlFor={category.value} className="flex items-center gap-2">
+                        <span>{category.emoji}</span>
+                        <span>{category.label.replace(category.emoji + ' ', '')}</span>
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                {selectedCategories.length === 0 && (
+                  <p className="text-sm text-red-600 mt-1">Select at least one category</p>
+                )}
               </div>
 
               <div>
                 <Label htmlFor="name">Bag Name</Label>
-                <Input id="name" placeholder="e.g.: Smart Breakfast Bag" {...register("name", {
-                required: "Name required"
-              })} />
+                <Input 
+                  id="name" 
+                  placeholder="e.g.: Mixed Smart Bag" 
+                  {...register("name", { required: "Name required" })} 
+                />
                 {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
               </div>
 
               <div>
                 <Label htmlFor="description">Description</Label>
-                <Textarea id="description" placeholder="Describe what customers can expect..." {...register("description")} />
+                <Textarea 
+                  id="description" 
+                  placeholder="Describe what customers can expect..." 
+                  {...register("description")} 
+                />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="maxQuantity">Quantity</Label>
-                  <Input id="maxQuantity" type="number" min="1" placeholder="10" {...register("maxQuantity", {
-                  required: "Quantity required",
-                  min: {
-                    value: 1,
-                    message: "Minimum 1"
-                  }
-                })} />
+                  <Input 
+                    id="maxQuantity" 
+                    type="number" 
+                    min="1" 
+                    placeholder="10" 
+                    {...register("maxQuantity", {
+                      required: "Quantity required",
+                      min: { value: 1, message: "Minimum 1" }
+                    })} 
+                  />
                 </div>
 
                 <div className="col-span-2">
                   <Label htmlFor="expiresAt">Available until</Label>
-                  <Input id="expiresAt" type="datetime-local" {...register("expiresAt", {
-                  required: "Date required"
-                })} />
+                  <Input 
+                    id="expiresAt" 
+                    type="datetime-local" 
+                    {...register("expiresAt", { required: "Date required" })} 
+                  />
                 </div>
               </div>
 
@@ -401,19 +460,25 @@ export const SmartBagCreator = ({
                 <Label htmlFor="salePrice">Sale Price</Label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input id="salePrice" type="number" step="0.01" placeholder={suggestedPrice.toString()} className="pl-10" {...register("salePrice", {
-                  required: "Price required",
-                  min: {
-                    value: 0.01,
-                    message: "Price must be greater than 0"
-                  }
-                })} />
+                  <Input 
+                    id="salePrice" 
+                    type="number" 
+                    step="0.01" 
+                    placeholder={suggestedPrice.toString()} 
+                    className="pl-10" 
+                    {...register("salePrice", {
+                      required: "Price required",
+                      min: { value: 0.01, message: "Price must be greater than 0" }
+                    })} 
+                  />
                 </div>
-                {suggestedPrice > 0 && <p className="text-sm text-green-600 mt-1">
+                {suggestedPrice > 0 && (
+                  <p className="text-sm text-green-600 mt-1">
                     💡 Suggested price: ${suggestedPrice}
-                  </p>}
+                  </p>
+                )}
                 
-                {/* Grains Points Display - Always Visible */}
+                {/* Grains Points Display */}
                 <div className="mt-3 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
                   <div className="flex items-center gap-2 mb-1">
                     <Star className="w-4 h-4 text-yellow-600 fill-current" />
@@ -427,14 +492,14 @@ export const SmartBagCreator = ({
                   </p>
                 </div>
 
-                {/* Action Buttons - Fixed Position */}
+                {/* Action Buttons */}
                 <div className="mt-6 flex gap-2 justify-center">
                   <Button 
                     variant="outline" 
                     size="sm" 
                     className="flex items-center gap-1 text-xs"
                     onClick={handleSendToMarketplace}
-                    disabled={!selectedCategory || isSubmitting}
+                    disabled={selectedCategories.length === 0 || isSubmitting}
                   >
                     <Package className="w-3 h-3" />
                     Send to Marketplace
@@ -444,7 +509,7 @@ export const SmartBagCreator = ({
                     size="sm" 
                     className="flex items-center gap-1 text-xs"
                     onClick={handleSendNotification}
-                    disabled={!selectedCategory || isSubmitting}
+                    disabled={selectedCategories.length === 0 || isSubmitting}
                   >
                     <Bell className="w-3 h-3" />
                     Send Notification
@@ -458,107 +523,198 @@ export const SmartBagCreator = ({
         {/* Step 2: AI Suggestions */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>
-              2. AI Product Suggestions
-            </CardTitle>
+            <CardTitle>2. AI Product Suggestions</CardTitle>
             <CardDescription>
               AI analyses inventory, expiry dates and customer demand
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {!selectedCategory ? <div className="text-center py-8 text-gray-500">
+            {selectedCategories.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
                 <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Select a category to see AI suggestions</p>
-              </div> : isLoadingSuggestions ? <div className="text-center py-8">
+                <p>Select categories to see AI suggestions</p>
+              </div>
+            ) : isLoadingSuggestions ? (
+              <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
                 <p>Generating smart suggestions...</p>
-              </div> : suggestions?.products?.length > 0 ? <div className="space-y-4">
+              </div>
+            ) : suggestions?.products?.length > 0 ? (
+              <div className="space-y-4">
                 {/* AI Insights */}
-                {suggestions.enhanced?.categoryInsights && <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                {suggestions.enhanced?.categoryInsights && (
+                  <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
                     <div className="flex items-center gap-2 mb-2">
                       <Sparkles className="w-4 h-4 text-blue-600" />
                       <span className="font-medium text-blue-800">AI Insights</span>
                     </div>
                     <p className="text-blue-700 text-sm">{suggestions.enhanced.categoryInsights}</p>
-                  </div>}
+                  </div>
+                )}
 
-                {/* Product Suggestions */}
-                <div className="grid grid-cols-1 gap-4">
-                  {suggestions.products.map((product: ProductSuggestion) => {
-                const enhancement = suggestions.enhanced?.enhancedProducts?.find((e: EnhancedSuggestion) => e.id === product.id);
-                const isSelected = selectedProducts.includes(product.id);
-                const score = enhancement?.recommendationScore || 5;
-                
-                return (
-                  <Card 
-                    key={product.id} 
-                    className={`p-4 border transition-all ${
-                      isSelected 
-                        ? 'border-primary bg-primary/5 shadow-md' 
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-2xl">{enhancement?.emoji || '📦'}</span>
-                          <h4 className="font-semibold">{product.name}</h4>
-                          <div className="flex items-center gap-1">
-                            <Badge 
-                              variant={
-                                product.priority === 'high' ? 'destructive' : 
-                                product.priority === 'medium' ? 'default' : 'secondary'
-                              }
-                            >
-                              {product.priority}
-                            </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              ⭐ {score}/10
-                            </Badge>
-                          </div>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-3 font-medium">
-                          {enhancement?.enhancedReason || product.suggestion_reason}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm mb-3">
-                          <span className="font-semibold text-primary">${product.price}</span>
-                          <span className="text-muted-foreground">Stock: {product.quantity}</span>
-                          <span className="text-muted-foreground">
-                            {product.days_to_expire < 365 ? `${product.days_to_expire} days left` : 'Fresh'}
-                          </span>
-                          {product.wishlist_demand > 0 && (
-                            <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
-                              ❤️ {product.wishlist_demand} wishlists
-                            </span>
-                          )}
+                {/* Product Suggestions by Category */}
+                <div className="space-y-6">
+                  {selectedCategories.map(category => {
+                    const categoryProducts = suggestions.products.filter(
+                      (p: ProductSuggestion) => p.category === category
+                    );
+                    if (categoryProducts.length === 0) return null;
+                    
+                    return (
+                      <div key={category} className="space-y-3">
+                        <h3 className="font-semibold text-lg flex items-center gap-2">
+                          {categories.find(c => c.value === category)?.emoji}
+                          {category} Products
+                          <Badge variant="secondary">{categoryProducts.length}</Badge>
+                        </h3>
+                        <div className="grid grid-cols-1 gap-4">
+                          {categoryProducts.map((product: ProductSuggestion) => {
+                            const enhancement = suggestions.enhanced?.enhancedProducts?.find(
+                              (e: EnhancedSuggestion) => e.id === product.id
+                            );
+                            const isSelected = selectedProducts.includes(product.id);
+                            
+                            return (
+                              <Card 
+                                key={product.id} 
+                                className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                                  isSelected 
+                                    ? 'ring-2 ring-purple-400 bg-purple-50' 
+                                    : 'hover:bg-gray-50'
+                                }`} 
+                                onClick={() => toggleProductSelection(product.id)}
+                              >
+                                <CardContent className="p-4">
+                                  <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        {enhancement?.emoji && (
+                                          <span className="text-lg">{enhancement.emoji}</span>
+                                        )}
+                                        <h4 className="font-medium text-base">{product.name}</h4>
+                                        {enhancement?.recommendationScore && (
+                                          <Badge variant="secondary" className="ml-auto">
+                                            <Star className="w-3 h-3 mr-1 fill-current" />
+                                            {enhancement.recommendationScore}/10
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      
+                                      <div className="flex flex-wrap gap-2 mb-3">
+                                        <Badge variant="outline" className="text-xs">
+                                          ${product.price}
+                                        </Badge>
+                                        <Badge variant="outline" className="text-xs">
+                                          Stock: {product.quantity}
+                                        </Badge>
+                                        <Badge 
+                                          variant="outline" 
+                                          className={`text-xs ${
+                                            product.days_to_expire <= 3 
+                                              ? 'bg-red-100 text-red-700' 
+                                              : product.days_to_expire <= 7 
+                                                ? 'bg-orange-100 text-orange-700' 
+                                                : 'bg-green-100 text-green-700'
+                                          }`}
+                                        >
+                                          {product.days_to_expire}d left
+                                        </Badge>
+                                        {product.wishlist_demand > 0 && (
+                                          <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700">
+                                            {product.wishlist_demand} wishlists
+                                          </Badge>
+                                        )}
+                                      </div>
+
+                                      <div className="space-y-2">
+                                        {enhancement?.enhancedReason && (
+                                          <p className="text-sm text-purple-700 bg-purple-50 p-2 rounded flex items-center gap-1">
+                                            <Sparkles className="w-3 h-3" />
+                                            {enhancement.enhancedReason}
+                                          </p>
+                                        )}
+                                        
+                                        {product.suggestion_reason && (
+                                          <p className="text-sm text-gray-600 flex items-center gap-1">
+                                            <Target className="w-3 h-3" />
+                                            {product.suggestion_reason}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="ml-4 flex flex-col items-end gap-2">
+                                      {enhancement?.urgencyLevel && (
+                                        <Badge 
+                                          variant={
+                                            enhancement.urgencyLevel === 'high' 
+                                              ? 'destructive' 
+                                              : enhancement.urgencyLevel === 'medium' 
+                                                ? 'default' 
+                                                : 'secondary'
+                                          } 
+                                          className="text-xs"
+                                        >
+                                          {enhancement.urgencyLevel === 'high' && (
+                                            <AlertTriangle className="w-3 h-3 mr-1" />
+                                          )}
+                                          {enhancement.urgencyLevel === 'medium' && (
+                                            <Clock className="w-3 h-3 mr-1" />
+                                          )}
+                                          {enhancement.urgencyLevel === 'low' && (
+                                            <CheckCircle className="w-3 h-3 mr-1" />
+                                          )}
+                                          {enhancement.urgencyLevel}
+                                        </Badge>
+                                      )}
+                                      
+                                      <Button
+                                        size="sm"
+                                        variant={isSelected ? "default" : "outline"}
+                                        className={`${
+                                          isSelected 
+                                            ? 'bg-purple-600 hover:bg-purple-700' 
+                                            : 'border-purple-300 hover:bg-purple-50'
+                                        }`}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleProductSelection(product.id);
+                                        }}
+                                      >
+                                        {isSelected ? (
+                                          <>
+                                            <CheckCircle className="w-3 h-3 mr-1" />
+                                            Added
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Package className="w-3 h-3 mr-1" />
+                                            Add to Bag
+                                          </>
+                                        )}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            );
+                          })}
                         </div>
                       </div>
-                      <Button
-                        variant={isSelected ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleProductSelection(product.id)}
-                        className={`min-w-[110px] ${
-                          isSelected 
-                            ? 'bg-primary text-primary-foreground' 
-                            : 'hover:bg-primary hover:text-primary-foreground'
-                        }`}
-                      >
-                        {isSelected ? "✓ Added" : "Add to Bag"}
-                      </Button>
-                    </div>
-                  </Card>
-                );
-              })}
+                    );
+                  })}
                 </div>
 
                 {/* Suggested Combinations */}
-                {suggestions.enhanced?.suggestedCombinations?.length > 0 && <div className="border-t pt-4">
+                {suggestions.enhanced?.suggestedCombinations?.length > 0 && (
+                  <div className="border-t pt-4">
                     <h4 className="font-medium mb-3 flex items-center gap-2">
                       <Zap className="w-4 h-4 text-yellow-500" />
                       AI Suggested Combinations
                     </h4>
                     <div className="space-y-2">
-                      {suggestions.enhanced.suggestedCombinations.map((combo: any, index: number) => <div key={index} className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                      {suggestions.enhanced.suggestedCombinations.map((combo: any, index: number) => (
+                        <div key={index} className="bg-yellow-50 border border-yellow-200 rounded p-3">
                           <div className="flex justify-between items-start mb-2">
                             <span className="font-medium">{combo.name}</span>
                             <div className="text-right text-sm">
@@ -567,24 +723,33 @@ export const SmartBagCreator = ({
                             </div>
                           </div>
                           <p className="text-sm text-gray-600 mb-2">{combo.reason}</p>
-                          <Button size="sm" variant="outline" onClick={() => setSelectedProducts(combo.productIds)}>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => setSelectedProducts(combo.productIds)}
+                          >
                             Use this combination
                           </Button>
-                        </div>)}
+                        </div>
+                      ))}
                     </div>
-                  </div>}
-              </div> : <div className="text-center py-8 text-gray-500">
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
                 <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No products available for this category</p>
+                <p>No products available for selected categories</p>
                 <p className="text-sm">Make sure you have products with upcoming expiry dates</p>
-              </div>}
-
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
       {/* Step 3: Preview & Publish */}
-      {selectedProducts.length > 0 && <Card className="border-2 border-green-200 bg-green-50">
+      {selectedProducts.length > 0 && (
+        <Card className="border-2 border-green-200 bg-green-50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-600" />
@@ -596,13 +761,19 @@ export const SmartBagCreator = ({
               <div>
                 <h4 className="font-medium mb-3">Included Products:</h4>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {suggestions?.products?.filter((p: ProductSuggestion) => selectedProducts.includes(p.id))?.map((product: ProductSuggestion) => {
-                const enhancement = suggestions.enhanced?.enhancedProducts?.find((e: EnhancedSuggestion) => e.id === product.id);
-                return <div key={product.id} className="flex items-center gap-1 bg-white px-2 py-1 rounded text-sm">
+                  {suggestions?.products
+                    ?.filter((p: ProductSuggestion) => selectedProducts.includes(p.id))
+                    ?.map((product: ProductSuggestion) => {
+                      const enhancement = suggestions.enhanced?.enhancedProducts?.find(
+                        (e: EnhancedSuggestion) => e.id === product.id
+                      );
+                      return (
+                        <div key={product.id} className="flex items-center gap-1 bg-white px-2 py-1 rounded text-sm">
                           <span>{enhancement?.emoji || '📦'}</span>
                           <span>{product.name}</span>
-                        </div>;
-              })}
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
 
@@ -619,7 +790,9 @@ export const SmartBagCreator = ({
                       <span>${watch("salePrice") || suggestedPrice.toFixed(2)}</span>
                     </div>
                     <div className="text-sm text-green-600">
-                      {totalValue > 0 && <>Savings: {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}%</>}
+                      {totalValue > 0 && (
+                        <>Savings: {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}%</>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -627,14 +800,23 @@ export const SmartBagCreator = ({
             </div>
 
             <div className="mt-6 text-center">
-              <Button onClick={handleSubmit(onSubmit)} size="lg" disabled={isSubmitting} className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold px-8 py-3 text-lg">
-                {isSubmitting ? "Publishing..." : <>
+              <Button 
+                onClick={handleSubmit(onSubmit)} 
+                size="lg" 
+                disabled={isSubmitting} 
+                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold px-8 py-3 text-lg"
+              >
+                {isSubmitting ? "Publishing..." : (
+                  <>
                     <Sparkles className="w-5 h-5 mr-2" />
                     Publish Smart Bag
-                  </>}
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>
-        </Card>}
-    </div>;
+        </Card>
+      )}
+    </div>
+  );
 };
