@@ -577,27 +577,21 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                             return (
                               <Card 
                                 key={product.id} 
-                                className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                                className={`${
                                   isSelected 
                                     ? 'ring-2 ring-purple-400 bg-purple-50' 
-                                    : 'hover:bg-gray-50'
+                                    : 'bg-white border'
                                 }`} 
                                 onClick={() => toggleProductSelection(product.id)}
                               >
                                 <CardContent className="p-4 flex flex-col h-full">
                                   <div className="flex items-start justify-between mb-2">
                                     <div className="flex-1">
-                                      <div className="flex items-center gap-2 mb-2">
+                                      <div className="flex items-center gap-2 mb-3">
                                         {enhancement?.emoji && (
                                           <span className="text-lg">{enhancement.emoji}</span>
                                         )}
                                         <h4 className="font-medium text-base">{product.name}</h4>
-                                        {enhancement?.recommendationScore && (
-                                          <Badge variant="secondary" className="ml-auto">
-                                            <Star className="w-3 h-3 mr-1 fill-current" />
-                                            {enhancement.recommendationScore}/10
-                                          </Badge>
-                                        )}
                                       </div>
                                       
                                       <div className="flex flex-wrap gap-2 mb-3">
@@ -626,7 +620,7 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                                         )}
                                       </div>
 
-                                      <div className="space-y-2 mb-4 flex-1">
+                                      <div className="space-y-2 mb-4 flex-1 min-h-[60px]">
                                         {enhancement?.enhancedReason && (
                                           <p className="text-xs text-purple-700 bg-purple-50 p-2 rounded flex items-center gap-1">
                                             <Sparkles className="w-3 h-3" />
@@ -649,8 +643,8 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                                           variant={isSelected ? "default" : "outline"}
                                           className={`w-full ${
                                             isSelected 
-                                              ? 'bg-purple-600 hover:bg-purple-700' 
-                                              : 'border-purple-300 hover:bg-purple-50'
+                                              ? 'bg-purple-600' 
+                                              : 'border-purple-300'
                                           }`}
                                           onClick={(e) => {
                                             e.stopPropagation();
@@ -672,29 +666,38 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                                       </div>
                                     </div>
                                     
-                                    {enhancement?.urgencyLevel && (
-                                      <Badge 
-                                        variant={
-                                          enhancement.urgencyLevel === 'high' 
-                                            ? 'destructive' 
-                                            : enhancement.urgencyLevel === 'medium' 
-                                              ? 'default' 
-                                              : 'secondary'
-                                        } 
-                                        className="text-xs ml-2"
-                                      >
-                                        {enhancement.urgencyLevel === 'high' && (
-                                          <AlertTriangle className="w-3 h-3 mr-1" />
-                                        )}
-                                        {enhancement.urgencyLevel === 'medium' && (
-                                          <Clock className="w-3 h-3 mr-1" />
-                                        )}
-                                        {enhancement.urgencyLevel === 'low' && (
-                                          <CheckCircle className="w-3 h-3 mr-1" />
-                                        )}
-                                        {enhancement.urgencyLevel}
-                                      </Badge>
-                                    )}
+                                    <div className="flex flex-col items-end gap-2">
+                                      {enhancement?.recommendationScore && (
+                                        <Badge variant="secondary" className="text-xs">
+                                          <Star className="w-3 h-3 mr-1 fill-current" />
+                                          {enhancement.recommendationScore}/10
+                                        </Badge>
+                                      )}
+                                      
+                                      {enhancement?.urgencyLevel && (
+                                        <Badge 
+                                          variant={
+                                            enhancement.urgencyLevel === 'high' 
+                                              ? 'destructive' 
+                                              : enhancement.urgencyLevel === 'medium' 
+                                                ? 'default' 
+                                                : 'secondary'
+                                          } 
+                                          className="text-xs"
+                                        >
+                                          {enhancement.urgencyLevel === 'high' && (
+                                            <AlertTriangle className="w-3 h-3 mr-1" />
+                                          )}
+                                          {enhancement.urgencyLevel === 'medium' && (
+                                            <Clock className="w-3 h-3 mr-1" />
+                                          )}
+                                          {enhancement.urgencyLevel === 'low' && (
+                                            <CheckCircle className="w-3 h-3 mr-1" />
+                                          )}
+                                          {enhancement.urgencyLevel}
+                                        </Badge>
+                                      )}
+                                    </div>
                                   </div>
                                 </CardContent>
                               </Card>
