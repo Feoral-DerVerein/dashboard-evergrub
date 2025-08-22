@@ -384,33 +384,6 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <Label htmlFor="category">Bag Categories</Label>
-                <div className="space-y-2 mt-2">
-                  {categories.map(category => (
-                    <div key={category.value} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={category.value}
-                        checked={selectedCategories.includes(category.value)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setSelectedCategories(prev => [...prev, category.value]);
-                          } else {
-                            setSelectedCategories(prev => prev.filter(c => c !== category.value));
-                          }
-                        }}
-                      />
-                      <Label htmlFor={category.value} className="flex items-center gap-2">
-                        <span>{category.emoji}</span>
-                        <span>{category.label.replace(category.emoji + ' ', '')}</span>
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-                {selectedCategories.length === 0 && (
-                  <p className="text-sm text-red-600 mt-1">Select at least one category</p>
-                )}
-              </div>
 
               <div>
                 <Label htmlFor="name">Bag Name</Label>
