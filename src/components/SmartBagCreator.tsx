@@ -582,7 +582,6 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                                     ? 'ring-2 ring-purple-400 bg-purple-50' 
                                     : 'bg-white border'
                                 }`} 
-                                onClick={() => toggleProductSelection(product.id)}
                               >
                                 <CardContent className="p-4 flex flex-col h-full">
                                   <div className="flex items-start justify-between mb-2">
