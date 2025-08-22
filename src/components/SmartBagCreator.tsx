@@ -619,21 +619,6 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                                         )}
                                       </div>
 
-                                      <div className="space-y-2 mb-4 flex-1 min-h-[60px]">
-                                        {enhancement?.enhancedReason && (
-                                          <p className="text-xs text-purple-700 bg-purple-50 p-2 rounded flex items-center gap-1">
-                                            <Sparkles className="w-3 h-3" />
-                                            {enhancement.enhancedReason}
-                                          </p>
-                                        )}
-                                        
-                                        {product.suggestion_reason && (
-                                          <p className="text-xs text-gray-600 flex items-center gap-1">
-                                            <Target className="w-3 h-3" />
-                                            {product.suggestion_reason}
-                                          </p>
-                                        )}
-                                      </div>
 
                                       {/* Button at bottom */}
                                       <div className="mt-auto">
