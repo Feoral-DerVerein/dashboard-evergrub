@@ -483,56 +483,71 @@ export const SmartBagCreator = ({
                   </div>}
 
                 {/* Product Suggestions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-4">
                   {suggestions.products.map((product: ProductSuggestion) => {
                 const enhancement = suggestions.enhanced?.enhancedProducts?.find((e: EnhancedSuggestion) => e.id === product.id);
                 const isSelected = selectedProducts.includes(product.id);
-                return <div key={product.id} className={`border rounded-lg p-3 cursor-pointer transition-all ${isSelected ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`} onClick={() => toggleProductSelection(product.id)}>
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-lg">{enhancement?.emoji || '📦'}</span>
-                              <span className="font-medium text-sm">{product.name}</span>
-                              <Checkbox checked={isSelected} />
-                            </div>
-                            
-                            <div className="space-y-1 text-xs">
-                              <div className="flex items-center gap-1">
-                                <DollarSign className="w-3 h-3" />
-                                <span>${product.price}</span>
-                                <span className="text-gray-500">({product.quantity} pcs)</span>
-                              </div>
-                              
-                              {product.days_to_expire <= 2 && <div className="flex items-center gap-1 text-orange-600">
-                                  <AlertTriangle className="w-3 h-3" />
-                                  <span>Expires in {product.days_to_expire} days</span>
-                                </div>}
-                              
-                              {product.wishlist_demand > 0 && <div className="flex items-center gap-1 text-blue-600">
-                                  <Users className="w-3 h-3" />
-                                  <span>{product.wishlist_demand} customers want this</span>
-                                </div>}
-                            </div>
-                            
-                            <p className="text-xs text-gray-600 mt-2">
-                              {enhancement?.enhancedReason || product.suggestion_reason}
-                            </p>
-                          </div>
-
-                          <div className="flex flex-col items-end gap-1">
-                            <Badge variant={product.priority === 'urgent' ? 'destructive' : product.priority === 'high' ? 'default' : 'secondary'} className="text-xs">
+                const score = enhancement?.recommendationScore || 5;
+                
+                return (
+                  <Card 
+                    key={product.id} 
+                    className={`p-4 border transition-all ${
+                      isSelected 
+                        ? 'border-primary bg-primary/5 shadow-md' 
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">{enhancement?.emoji || '📦'}</span>
+                          <h4 className="font-semibold">{product.name}</h4>
+                          <div className="flex items-center gap-1">
+                            <Badge 
+                              variant={
+                                product.priority === 'high' ? 'destructive' : 
+                                product.priority === 'medium' ? 'default' : 'secondary'
+                              }
+                            >
                               {product.priority}
                             </Badge>
-                            
-                            {enhancement?.recommendationScore && <div className="flex items-center gap-1">
-                                <TrendingUp className="w-3 h-3 text-green-600" />
-                                <span className="text-xs text-green-600">
-                                  {enhancement.recommendationScore}/10
-                                </span>
-                              </div>}
+                            <Badge variant="outline" className="text-xs">
+                              ⭐ {score}/10
+                            </Badge>
                           </div>
                         </div>
-                      </div>;
+                        <p className="text-sm text-muted-foreground mb-3 font-medium">
+                          {enhancement?.enhancedReason || product.suggestion_reason}
+                        </p>
+                        <div className="flex items-center gap-4 text-sm mb-3">
+                          <span className="font-semibold text-primary">${product.price}</span>
+                          <span className="text-muted-foreground">Stock: {product.quantity}</span>
+                          <span className="text-muted-foreground">
+                            {product.days_to_expire < 365 ? `${product.days_to_expire} days left` : 'Fresh'}
+                          </span>
+                          {product.wishlist_demand > 0 && (
+                            <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
+                              ❤️ {product.wishlist_demand} wishlists
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        variant={isSelected ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleProductSelection(product.id)}
+                        className={`min-w-[110px] ${
+                          isSelected 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'hover:bg-primary hover:text-primary-foreground'
+                        }`}
+                      >
+                        {isSelected ? "✓ Added" : "Add to Bag"}
+                      </Button>
+                    </div>
+                  </Card>
+                );
               })}
                 </div>
 

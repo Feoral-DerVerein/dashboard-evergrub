@@ -7,6 +7,139 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Organic emoji mapping based on product names and categories
+const getProductEmoji = (name: string, category: string): string => {
+  const lowerName = name.toLowerCase();
+  const lowerCategory = category.toLowerCase();
+  
+  if (lowerName.includes('cookie') || lowerName.includes('galleta')) return '🍪';
+  if (lowerName.includes('croissant') || lowerName.includes('cruasán')) return '🥐';
+  if (lowerName.includes('bread') || lowerName.includes('pan')) return '🍞';
+  if (lowerName.includes('cake') || lowerName.includes('torta')) return '🎂';
+  if (lowerName.includes('donut') || lowerName.includes('dona')) return '🍩';
+  if (lowerName.includes('muffin')) return '🧁';
+  if (lowerName.includes('coffee') || lowerName.includes('café')) return '☕';
+  if (lowerName.includes('milk') || lowerName.includes('leche')) return '🥛';
+  if (lowerName.includes('juice') || lowerName.includes('jugo')) return '🥤';
+  if (lowerName.includes('sandwich')) return '🥪';
+  if (lowerName.includes('salad') || lowerName.includes('ensalada')) return '🥗';
+  if (lowerName.includes('fruit') || lowerName.includes('fruta')) return '🍎';
+  
+  // Category-based fallbacks
+  if (lowerCategory.includes('pastries') || lowerCategory.includes('dessert')) return '🥐';
+  if (lowerCategory.includes('coffee') || lowerCategory.includes('beverage')) return '☕';
+  if (lowerCategory.includes('breakfast')) return '🍳';
+  if (lowerCategory.includes('lunch')) return '🥪';
+  
+  return '📦';
+};
+
+// Calculate organic recommendation score (1-10)
+const calculateScore = (product: any): number => {
+  let score = 5; // Base score
+  
+  // Expiration urgency (40% weight)
+  if (product.days_to_expire <= 3) score += 2.5;
+  else if (product.days_to_expire <= 7) score += 2;
+  else if (product.days_to_expire <= 14) score += 1;
+  
+  // Wishlist demand (30% weight)
+  if (product.wishlist_demand > 5) score += 2;
+  else if (product.wishlist_demand > 2) score += 1.5;
+  else if (product.wishlist_demand > 0) score += 1;
+  
+  // Stock level (20% weight)
+  if (product.quantity > 50) score += 1.5;
+  else if (product.quantity > 20) score += 1;
+  else if (product.quantity < 5) score -= 0.5;
+  
+  // Category popularity (10% weight)
+  if (product.category.toLowerCase().includes('coffee') || 
+      product.category.toLowerCase().includes('pastries')) score += 0.5;
+  
+  return Math.min(Math.max(Math.round(score), 1), 10);
+};
+
+// Generate enhanced reason based on product data
+const generateEnhancedReason = (product: any): string => {
+  if (product.days_to_expire <= 3) {
+    return `⚡ Expires in ${product.days_to_expire} day${product.days_to_expire > 1 ? 's' : ''} - urgent clearance!`;
+  }
+  if (product.days_to_expire <= 7) {
+    return `🔥 Expires soon (${product.days_to_expire} days) - perfect for smart bag!`;
+  }
+  if (product.wishlist_demand > 5) {
+    return `⭐ High demand - ${product.wishlist_demand} people want this!`;
+  }
+  if (product.quantity > 50) {
+    return `📦 Bulk stock available (${product.quantity} units) - great value!`;
+  }
+  if (product.quantity > 20) {
+    return `💰 High stock - perfect for bulk savings!`;
+  }
+  if (product.wishlist_demand > 0) {
+    return `❤️ Popular choice - ${product.wishlist_demand} wishlists!`;
+  }
+  return '✨ Great addition to your smart bag!';
+};
+
+// Generate suggested combinations organically
+const generateSuggestedCombinations = (products: any[]): any[] => {
+  const combinations = [];
+  
+  // Coffee + Pastries combo
+  const coffeeProducts = products.filter(p => p.category.toLowerCase().includes('coffee'));
+  const pastryProducts = products.filter(p => p.category.toLowerCase().includes('pastries') || 
+                                              p.name.toLowerCase().includes('cookie') ||
+                                              p.name.toLowerCase().includes('croissant'));
+  
+  if (coffeeProducts.length > 0 && pastryProducts.length > 0) {
+    const combo = [coffeeProducts[0], ...pastryProducts.slice(0, 2)];
+    const totalValue = combo.reduce((sum, p) => sum + parseFloat(p.price), 0);
+    combinations.push({
+      name: "☕ Morning Energy Pack",
+      productIds: combo.map(p => p.id),
+      totalValue: totalValue,
+      suggestedPrice: Math.round(totalValue * 0.7 * 100) / 100,
+      reason: "Perfect combination for busy mornings - coffee with sweet treats!"
+    });
+  }
+  
+  // Breakfast combo
+  const breakfastProducts = products.filter(p => 
+    p.category.toLowerCase().includes('breakfast') || 
+    p.name.toLowerCase().includes('bread') ||
+    p.name.toLowerCase().includes('milk')
+  );
+  
+  if (breakfastProducts.length >= 2) {
+    const combo = breakfastProducts.slice(0, 3);
+    const totalValue = combo.reduce((sum, p) => sum + parseFloat(p.price), 0);
+    combinations.push({
+      name: "🍳 Breakfast Bundle",
+      productIds: combo.map(p => p.id),
+      totalValue: totalValue,
+      suggestedPrice: Math.round(totalValue * 0.65 * 100) / 100,
+      reason: "Complete breakfast essentials in one convenient bag!"
+    });
+  }
+  
+  // High-value combo (expensive items together)
+  const highValueProducts = products.filter(p => parseFloat(p.price) > 5).slice(0, 2);
+  if (highValueProducts.length >= 2) {
+    const totalValue = highValueProducts.reduce((sum, p) => sum + parseFloat(p.price), 0);
+    combinations.push({
+      name: "💎 Premium Selection",
+      productIds: highValueProducts.map(p => p.id),
+      totalValue: totalValue,
+      suggestedPrice: Math.round(totalValue * 0.6 * 100) / 100,
+      reason: "Premium quality items at an unbeatable price!"
+    });
+  }
+  
+  return combinations;
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -18,11 +151,6 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      throw new Error('OPENAI_API_KEY is not set');
-    }
 
     const { category, userId } = await req.json();
 
@@ -41,108 +169,46 @@ serve(async (req) => {
 
     console.log('Database suggestions:', suggestions);
 
-    // Enhance suggestions with AI analysis
-    const promptData = {
-      category,
-      products: suggestions || [],
-      categoryEmojis: {
-        'Vegetariana': '🥗',
-        'Desayuno': '☕',
-        'Cena Rápida': '🍝',
-        'Dulce/Postres': '🍰',
-        'Lunch Office': '🥪'
-      }
+    // Generate organic enhancements (no AI needed!)
+    const enhancedProducts = (suggestions || []).map((product: any) => ({
+      id: product.id,
+      emoji: getProductEmoji(product.name, product.category),
+      enhancedReason: generateEnhancedReason(product),
+      urgencyLevel: product.priority,
+      recommendationScore: calculateScore(product)
+    }));
+
+    // Generate suggested combinations organically
+    const suggestedCombinations = generateSuggestedCombinations(suggestions || []);
+
+    // Generate category insights organically
+    const categoryEmojis: { [key: string]: string } = {
+      'Pastries': '🥐',
+      'Coffee': '☕',
+      'Breakfast': '🍳',
+      'Lunch': '🥪',
+      'Dessert': '🍰',
+      'Beverages': '🥤'
     };
 
-    const enhancementPrompt = `
-Analyze these products for a smart bag in category "${category}":
-${JSON.stringify(promptData.products, null, 2)}
+    const urgentCount = (suggestions || []).filter((p: any) => p.days_to_expire <= 3).length;
+    const highDemandCount = (suggestions || []).filter((p: any) => p.wishlist_demand > 3).length;
+    const categoryInsights = urgentCount > 0 
+      ? `${urgentCount} items expire within 3 days - perfect for urgent smart bags! ${highDemandCount > 0 ? `Plus ${highDemandCount} high-demand items.` : ''}`
+      : `Great selection of ${category} items. ${highDemandCount > 0 ? `${highDemandCount} items are in high demand!` : 'Perfect for creating value bags.'}`;
 
-For each product, enhance the description with:
-1. An appropriate emoji based on the product type
-2. A compelling reason why it should be in the bag
-3. Urgency indicators (expiring soon, high demand, etc.)
-4. Suggested bag combinations (which products work well together)
+    const enhancedSuggestions = {
+      enhancedProducts,
+      suggestedCombinations,
+      categoryInsights
+    };
 
-Return a JSON object with:
-{
-  "enhancedProducts": [
-    {
-      "id": product_id,
-      "emoji": "🥤",
-      "enhancedReason": "Enhanced compelling reason",
-      "urgencyLevel": "high|medium|low",
-      "recommendationScore": 1-10
-    }
-  ],
-  "suggestedCombinations": [
-    {
-      "name": "Morning Energy Pack",
-      "productIds": [1, 2, 3],
-      "totalValue": 25.50,
-      "suggestedPrice": 12.99,
-      "reason": "Perfect combination for busy mornings"
-    }
-  ],
-  "categoryInsights": "Insights about this category and current demand"
-}`;
-
-    // Call OpenAI for enhanced suggestions
-    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an AI expert in food retail and waste reduction. Analyze products and suggest optimal smart bag combinations.'
-          },
-          {
-            role: 'user',
-            content: enhancementPrompt
-          }
-        ],
-        max_tokens: 1500,
-        temperature: 0.7,
-      }),
-    });
-
-    if (!openAIResponse.ok) {
-      console.error('OpenAI API error:', await openAIResponse.text());
-      throw new Error('Failed to get AI enhancements');
-    }
-
-    const aiData = await openAIResponse.json();
-    let enhancedSuggestions;
-
-    try {
-      enhancedSuggestions = JSON.parse(aiData.choices[0].message.content);
-    } catch (parseError) {
-      console.error('Failed to parse AI response:', aiData.choices[0].message.content);
-      // Fallback to basic suggestions
-      enhancedSuggestions = {
-        enhancedProducts: (suggestions || []).map((product: any, index: number) => ({
-          id: product.id,
-          emoji: '📦',
-          enhancedReason: product.suggestion_reason || 'Great for smart bag',
-          urgencyLevel: product.priority || 'medium',
-          recommendationScore: Math.max(1, 10 - index)
-        })),
-        suggestedCombinations: [],
-        categoryInsights: `Smart suggestions for ${category} category based on current inventory.`
-      };
-    }
-
-    // Merge database suggestions with AI enhancements
+    // Merge database suggestions with organic enhancements
     const finalSuggestions = {
       products: suggestions || [],
       enhanced: enhancedSuggestions,
       category,
-      categoryEmoji: promptData.categoryEmojis[category] || '📦',
+      categoryEmoji: categoryEmojis[category] || '📦',
       timestamp: new Date().toISOString()
     };
 
