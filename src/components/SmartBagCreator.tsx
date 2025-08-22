@@ -666,6 +666,237 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                   })}
                 </div>
 
+                {/* AI Surprise Bag Suggestions */}
+                <div className="border-t pt-6">
+                  <h4 className="font-medium mb-4 flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-purple-600" />
+                    AI Surprise Bag Suggestions
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                      Based on AI + Wishlists
+                    </Badge>
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Breakfast Special Bag */}
+                    <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50 hover:shadow-lg transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-2xl">🍳</span>
+                          <h5 className="font-semibold text-lg">Morning Energy Bag</h5>
+                        </div>
+                        
+                        <div className="space-y-2 mb-4">
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-orange-600">🥐</span>
+                            <span>Fresh Croissants (2x)</span>
+                            <Badge variant="outline" className="text-xs">High demand</Badge>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-amber-600">☕</span>
+                            <span>Premium Coffee</span>
+                            <Badge variant="outline" className="text-xs">Expires 2d</Badge>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-orange-500">🧈</span>
+                            <span>Artisan Butter</span>
+                            <Badge variant="outline" className="text-xs">5 wishlists</Badge>
+                          </div>
+                        </div>
+
+                        <div className="bg-white/50 rounded-lg p-3 mb-4">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-gray-600">Original value:</span>
+                            <span className="text-sm line-through text-gray-500">$18.50</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">Surprise price:</span>
+                            <span className="font-bold text-green-600 text-lg">$8.99</span>
+                          </div>
+                          <div className="text-xs text-green-600 text-center mt-1">51% savings</div>
+                        </div>
+
+                        <div className="bg-blue-50 border-l-4 border-blue-400 p-2 mb-4 rounded">
+                          <p className="text-xs text-blue-700">
+                            <Sparkles className="w-3 h-3 inline mr-1" />
+                            AI detected high morning demand + expiring premium items
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 mb-3">
+                          <Users className="w-4 h-4 text-purple-600" />
+                          <span className="text-sm font-medium">Customer Interest:</span>
+                          <div className="flex gap-1">
+                            {[1,2,3,4,5].map((star) => (
+                              <Star key={star} className="w-3 h-3 fill-purple-400 text-purple-400" />
+                            ))}
+                          </div>
+                        </div>
+
+                        <Button 
+                          size="sm" 
+                          className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600"
+                          onClick={() => {
+                            // Auto-select products that would be in this bag
+                            const bagProducts = [1, 2, 3]; // IDs would be dynamic based on available products
+                            setSelectedProducts(bagProducts);
+                            setValue("name", "Morning Energy Bag");
+                            setValue("description", "Perfect start to your day with fresh pastries, premium coffee and artisan butter");
+                            setValue("salePrice", 8.99);
+                          }}
+                        >
+                          <Package className="w-4 h-4 mr-2" />
+                          Create This Bag
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    {/* Lunch Special Bag */}
+                    <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-lg transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-2xl">🥪</span>
+                          <h5 className="font-semibold text-lg">Midday Feast Bag</h5>
+                        </div>
+                        
+                        <div className="space-y-2 mb-4">
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-green-600">🥪</span>
+                            <span>Gourmet Sandwiches (2x)</span>
+                            <Badge variant="outline" className="text-xs">8 wishlists</Badge>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-orange-600">🧃</span>
+                            <span>Fresh Juice</span>
+                            <Badge variant="outline" className="text-xs">Expires 1d</Badge>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-yellow-600">🍯</span>
+                            <span>Local Honey Pack</span>
+                            <Badge variant="outline" className="text-xs">Trending</Badge>
+                          </div>
+                        </div>
+
+                        <div className="bg-white/50 rounded-lg p-3 mb-4">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-gray-600">Original value:</span>
+                            <span className="text-sm line-through text-gray-500">$24.00</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">Surprise price:</span>
+                            <span className="font-bold text-green-600 text-lg">$12.99</span>
+                          </div>
+                          <div className="text-xs text-green-600 text-center mt-1">46% savings</div>
+                        </div>
+
+                        <div className="bg-purple-50 border-l-4 border-purple-400 p-2 mb-4 rounded">
+                          <p className="text-xs text-purple-700">
+                            <TrendingUp className="w-3 h-3 inline mr-1" />
+                            Most requested combo in customer wishlists this week
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 mb-3">
+                          <Users className="w-4 h-4 text-purple-600" />
+                          <span className="text-sm font-medium">Customer Interest:</span>
+                          <div className="flex gap-1">
+                            {[1,2,3,4].map((star) => (
+                              <Star key={star} className="w-3 h-3 fill-purple-400 text-purple-400" />
+                            ))}
+                            <Star className="w-3 h-3 text-purple-300" />
+                          </div>
+                        </div>
+
+                        <Button 
+                          size="sm" 
+                          className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+                          onClick={() => {
+                            const bagProducts = [4, 5, 6];
+                            setSelectedProducts(bagProducts);
+                            setValue("name", "Midday Feast Bag");
+                            setValue("description", "Satisfying lunch combination with gourmet sandwiches, fresh juice and local honey");
+                            setValue("salePrice", 12.99);
+                          }}
+                        >
+                          <Package className="w-4 h-4 mr-2" />
+                          Create This Bag
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    {/* Sweet Treats Bag */}
+                    <Card className="border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-rose-50 hover:shadow-lg transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-2xl">🍰</span>
+                          <h5 className="font-semibold text-lg">Sweet Escape Bag</h5>
+                        </div>
+                        
+                        <div className="space-y-2 mb-4">
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-pink-600">🍰</span>
+                            <span>Artisan Cakes (3x)</span>
+                            <Badge variant="outline" className="text-xs">Expires 2d</Badge>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-amber-600">🍪</span>
+                            <span>Fresh Cookies</span>
+                            <Badge variant="outline" className="text-xs">12 wishlists</Badge>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-purple-600">🧃</span>
+                            <span>Specialty Tea</span>
+                            <Badge variant="outline" className="text-xs">Premium</Badge>
+                          </div>
+                        </div>
+
+                        <div className="bg-white/50 rounded-lg p-3 mb-4">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-gray-600">Original value:</span>
+                            <span className="text-sm line-through text-gray-500">$21.50</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">Surprise price:</span>
+                            <span className="font-bold text-green-600 text-lg">$9.99</span>
+                          </div>
+                          <div className="text-xs text-green-600 text-center mt-1">54% savings</div>
+                        </div>
+
+                        <div className="bg-amber-50 border-l-4 border-amber-400 p-2 mb-4 rounded">
+                          <p className="text-xs text-amber-700">
+                            <Bell className="w-3 h-3 inline mr-1" />
+                            Perfect timing - dessert items expiring soon with high wishlist demand
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 mb-3">
+                          <Users className="w-4 h-4 text-purple-600" />
+                          <span className="text-sm font-medium">Customer Interest:</span>
+                          <div className="flex gap-1">
+                            {[1,2,3,4,5].map((star) => (
+                              <Star key={star} className="w-3 h-3 fill-purple-400 text-purple-400" />
+                            ))}
+                          </div>
+                        </div>
+
+                        <Button 
+                          size="sm" 
+                          className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600"
+                          onClick={() => {
+                            const bagProducts = [7, 8, 9];
+                            setSelectedProducts(bagProducts);
+                            setValue("name", "Sweet Escape Bag");
+                            setValue("description", "Indulgent dessert collection with artisan cakes, fresh cookies and specialty tea");
+                            setValue("salePrice", 9.99);
+                          }}
+                        >
+                          <Package className="w-4 h-4 mr-2" />
+                          Create This Bag
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+
                 {/* Suggested Combinations */}
                 {suggestions.enhanced?.suggestedCombinations?.length > 0 && (
                   <div className="border-t pt-4">
