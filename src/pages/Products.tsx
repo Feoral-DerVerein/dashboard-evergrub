@@ -17,7 +17,7 @@ import { PickupScheduleDisplay } from "@/components/PickupScheduleDisplay";
 import { SurpriseBagForm } from "@/components/SurpriseBagForm";
 import { SurpriseBagCard } from "@/components/SurpriseBagCard";
 import { SmartBagCreator } from "@/components/SmartBagCreator";
-const categories = ["All", "Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "Surprise Bag"];
+const categories = ["All", "Coffee", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "general stock", "Surprise Bag"];
 
 // Food banks from Australia
 const foodBanks = [{
