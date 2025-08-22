@@ -584,8 +584,8 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                                 }`} 
                                 onClick={() => toggleProductSelection(product.id)}
                               >
-                                <CardContent className="p-4">
-                                  <div className="flex items-start justify-between">
+                                <CardContent className="p-4 flex flex-col h-full">
+                                  <div className="flex items-start justify-between mb-2">
                                     <div className="flex-1">
                                       <div className="flex items-center gap-2 mb-2">
                                         {enhancement?.emoji && (
@@ -626,74 +626,75 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                                         )}
                                       </div>
 
-                                      <div className="space-y-2">
+                                      <div className="space-y-2 mb-4 flex-1">
                                         {enhancement?.enhancedReason && (
-                                          <p className="text-sm text-purple-700 bg-purple-50 p-2 rounded flex items-center gap-1">
+                                          <p className="text-xs text-purple-700 bg-purple-50 p-2 rounded flex items-center gap-1">
                                             <Sparkles className="w-3 h-3" />
                                             {enhancement.enhancedReason}
                                           </p>
                                         )}
                                         
                                         {product.suggestion_reason && (
-                                          <p className="text-sm text-gray-600 flex items-center gap-1">
+                                          <p className="text-xs text-gray-600 flex items-center gap-1">
                                             <Target className="w-3 h-3" />
                                             {product.suggestion_reason}
                                           </p>
                                         )}
                                       </div>
+
+                                      {/* Button at bottom */}
+                                      <div className="mt-auto">
+                                        <Button
+                                          size="sm"
+                                          variant={isSelected ? "default" : "outline"}
+                                          className={`w-full ${
+                                            isSelected 
+                                              ? 'bg-purple-600 hover:bg-purple-700' 
+                                              : 'border-purple-300 hover:bg-purple-50'
+                                          }`}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleProductSelection(product.id);
+                                          }}
+                                        >
+                                          {isSelected ? (
+                                            <>
+                                              <CheckCircle className="w-3 h-3 mr-1" />
+                                              Added
+                                            </>
+                                          ) : (
+                                            <>
+                                              <Package className="w-3 h-3 mr-1" />
+                                              Add to Bag
+                                            </>
+                                          )}
+                                        </Button>
+                                      </div>
                                     </div>
                                     
-                                    <div className="ml-4 flex flex-col items-end gap-2">
-                                      {enhancement?.urgencyLevel && (
-                                        <Badge 
-                                          variant={
-                                            enhancement.urgencyLevel === 'high' 
-                                              ? 'destructive' 
-                                              : enhancement.urgencyLevel === 'medium' 
-                                                ? 'default' 
-                                                : 'secondary'
-                                          } 
-                                          className="text-xs"
-                                        >
-                                          {enhancement.urgencyLevel === 'high' && (
-                                            <AlertTriangle className="w-3 h-3 mr-1" />
-                                          )}
-                                          {enhancement.urgencyLevel === 'medium' && (
-                                            <Clock className="w-3 h-3 mr-1" />
-                                          )}
-                                          {enhancement.urgencyLevel === 'low' && (
-                                            <CheckCircle className="w-3 h-3 mr-1" />
-                                          )}
-                                          {enhancement.urgencyLevel}
-                                        </Badge>
-                                      )}
-                                      
-                                      <Button
-                                        size="sm"
-                                        variant={isSelected ? "default" : "outline"}
-                                        className={`${
-                                          isSelected 
-                                            ? 'bg-purple-600 hover:bg-purple-700' 
-                                            : 'border-purple-300 hover:bg-purple-50'
-                                        }`}
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          toggleProductSelection(product.id);
-                                        }}
+                                    {enhancement?.urgencyLevel && (
+                                      <Badge 
+                                        variant={
+                                          enhancement.urgencyLevel === 'high' 
+                                            ? 'destructive' 
+                                            : enhancement.urgencyLevel === 'medium' 
+                                              ? 'default' 
+                                              : 'secondary'
+                                        } 
+                                        className="text-xs ml-2"
                                       >
-                                        {isSelected ? (
-                                          <>
-                                            <CheckCircle className="w-3 h-3 mr-1" />
-                                            Added
-                                          </>
-                                        ) : (
-                                          <>
-                                            <Package className="w-3 h-3 mr-1" />
-                                            Add to Bag
-                                          </>
+                                        {enhancement.urgencyLevel === 'high' && (
+                                          <AlertTriangle className="w-3 h-3 mr-1" />
                                         )}
-                                      </Button>
-                                    </div>
+                                        {enhancement.urgencyLevel === 'medium' && (
+                                          <Clock className="w-3 h-3 mr-1" />
+                                        )}
+                                        {enhancement.urgencyLevel === 'low' && (
+                                          <CheckCircle className="w-3 h-3 mr-1" />
+                                        )}
+                                        {enhancement.urgencyLevel}
+                                      </Badge>
+                                    )}
                                   </div>
                                 </CardContent>
                               </Card>
