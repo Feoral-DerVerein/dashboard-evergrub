@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Filter, Calendar, Eye, Target, TrendingUp, PiggyBank, BarChart3, Settings } from 'lucide-react';
+import { Search, Plus, Filter, Calendar, Eye, Target, TrendingUp, PiggyBank, BarChart3, Settings, Upload, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import AdPerformancePredictor from '@/components/ads/AdPerformancePredictor';
 import { adsService, type Ad, type AdCampaign } from '@/services/adsService';
+import { supabase } from '@/integrations/supabase/client';
 
 const StatusBadge = ({ status }: { status: string }) => {
   const getVariant = (status: string): "default" | "destructive" | "secondary" | "outline" => {
@@ -70,6 +71,8 @@ const Ads = () => {
     budget: 0,
     status: 'draft'
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingEditImage, setUploadingEditImage] = useState(false);
   
   const isMobile = useIsMobile();
   const { user } = useAuth();
@@ -137,6 +140,54 @@ const Ads = () => {
       const avgCost = totalClicks > 0 ? totalSpent / totalClicks : 0;
       
       return { totalReach, totalImpressions, totalClicks, avgCost, totalSpent };
+    }
+  };
+
+  const uploadImage = async (file: File, isEdit: boolean = false) => {
+    if (!user) return null;
+    
+    const setUploading = isEdit ? setUploadingEditImage : setUploadingImage;
+    setUploading(true);
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('ad-images')
+        .upload(fileName, file);
+      
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('ad-images')
+        .getPublicUrl(fileName);
+      
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Error",
+        description: "Could not upload image",
+        variant: "destructive"
+      });
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, isEdit: boolean = false) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const imageUrl = await uploadImage(file);
+    if (imageUrl) {
+      if (isEdit) {
+        setEditingAd(prev => prev ? ({ ...prev, image_url: imageUrl }) : null);
+      } else {
+        setNewAd(prev => ({ ...prev, image_url: imageUrl }));
+      }
     }
   };
 
@@ -282,13 +333,55 @@ const Ads = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="ad-image">Image URL</Label>
-                    <Input
-                      id="ad-image"
-                      value={newAd.image_url}
-                      onChange={(e) => setNewAd(prev => ({ ...prev, image_url: e.target.value }))}
-                      placeholder="https://example.com/image.jpg"
-                    />
+                    <Label htmlFor="ad-image">Banner Image</Label>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="file"
+                          id="ad-image-upload"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, false)}
+                          className="hidden"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => document.getElementById('ad-image-upload')?.click()}
+                          disabled={uploadingImage}
+                          className="flex items-center gap-2"
+                        >
+                          <Upload className="w-4 h-4" />
+                          {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                        </Button>
+                        {newAd.image_url && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setNewAd(prev => ({ ...prev, image_url: '' }))}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                      {newAd.image_url && (
+                        <div className="flex items-center gap-3">
+                          <img 
+                            src={newAd.image_url} 
+                            alt="Ad preview"
+                            className="w-16 h-16 object-cover rounded-lg border"
+                          />
+                          <div className="text-sm text-gray-600">
+                            Image uploaded successfully
+                          </div>
+                        </div>
+                      )}
+                      <Input
+                        placeholder="Or paste image URL here"
+                        value={newAd.image_url}
+                        onChange={(e) => setNewAd(prev => ({ ...prev, image_url: e.target.value }))}
+                      />
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="ad-url">Target URL</Label>
@@ -362,13 +455,55 @@ const Ads = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="edit-ad-image">Image URL</Label>
-                    <Input
-                      id="edit-ad-image"
-                      value={editingAd?.image_url || ''}
-                      onChange={(e) => setEditingAd(prev => prev ? ({ ...prev, image_url: e.target.value }) : null)}
-                      placeholder="https://example.com/image.jpg"
-                    />
+                    <Label htmlFor="edit-ad-image">Banner Image</Label>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="file"
+                          id="edit-ad-image-upload"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, true)}
+                          className="hidden"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => document.getElementById('edit-ad-image-upload')?.click()}
+                          disabled={uploadingEditImage}
+                          className="flex items-center gap-2"
+                        >
+                          <Upload className="w-4 h-4" />
+                          {uploadingEditImage ? 'Uploading...' : 'Upload Image'}
+                        </Button>
+                        {editingAd?.image_url && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setEditingAd(prev => prev ? ({ ...prev, image_url: '' }) : null)}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                      {editingAd?.image_url && (
+                        <div className="flex items-center gap-3">
+                          <img 
+                            src={editingAd.image_url} 
+                            alt="Ad preview"
+                            className="w-16 h-16 object-cover rounded-lg border"
+                          />
+                          <div className="text-sm text-gray-600">
+                            Current ad image
+                          </div>
+                        </div>
+                      )}
+                      <Input
+                        placeholder="Or paste image URL here"
+                        value={editingAd?.image_url || ''}
+                        onChange={(e) => setEditingAd(prev => prev ? ({ ...prev, image_url: e.target.value }) : null)}
+                      />
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="edit-ad-url">Target URL</Label>
