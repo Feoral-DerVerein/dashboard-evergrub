@@ -334,6 +334,7 @@ const Ads = () => {
                   </div>
                   <div>
                     <Label htmlFor="ad-image">Banner Image</Label>
+                    <div className="text-sm text-gray-500 mb-2">Recommended size: 728x90px or 300x250px for optimal display</div>
                     <div className="space-y-4">
                       <div className="flex items-center gap-4">
                         <input
@@ -456,6 +457,7 @@ const Ads = () => {
                   </div>
                   <div>
                     <Label htmlFor="edit-ad-image">Banner Image</Label>
+                    <div className="text-sm text-gray-500 mb-2">Recommended size: 728x90px or 300x250px for optimal display</div>
                     <div className="space-y-4">
                       <div className="flex items-center gap-4">
                         <input
