@@ -52,6 +52,8 @@ const Ads = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateAdDialog, setShowCreateAdDialog] = useState(false);
   const [showCreateCampaignDialog, setShowCreateCampaignDialog] = useState(false);
+  const [showEditAdDialog, setShowEditAdDialog] = useState(false);
+  const [editingAd, setEditingAd] = useState<Ad | null>(null);
   const [newAd, setNewAd] = useState<Partial<Ad>>({
     title: '',
     description: '',
@@ -135,6 +137,51 @@ const Ads = () => {
       const avgCost = totalClicks > 0 ? totalSpent / totalClicks : 0;
       
       return { totalReach, totalImpressions, totalClicks, avgCost, totalSpent };
+    }
+  };
+
+  const handleEditAd = (ad: Ad) => {
+    setEditingAd(ad);
+    setShowEditAdDialog(true);
+  };
+
+  const handleUpdateAd = async () => {
+    if (!editingAd || !editingAd.title) {
+      toast({
+        title: "Error",
+        description: "Title is required",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const updatedAd = await adsService.updateAd(editingAd.id, {
+        title: editingAd.title,
+        description: editingAd.description,
+        image_url: editingAd.image_url,
+        target_url: editingAd.target_url,
+        budget: Number(editingAd.budget),
+        daily_budget: Number(editingAd.daily_budget),
+        ad_type: editingAd.ad_type,
+        status: editingAd.status
+      });
+
+      setAds(prev => prev.map(ad => ad.id === updatedAd.id ? updatedAd : ad));
+      setShowEditAdDialog(false);
+      setEditingAd(null);
+      
+      toast({
+        title: "Success",
+        description: "Ad updated successfully"
+      });
+    } catch (error) {
+      console.error('Error updating ad:', error);
+      toast({
+        title: "Error",
+        description: "Could not update ad",
+        variant: "destructive"
+      });
     }
   };
 
@@ -285,6 +332,119 @@ const Ads = () => {
                 </div>
               </DialogContent>
             </Dialog>
+
+            {/* Edit Ad Dialog */}
+            <Dialog open={showEditAdDialog} onOpenChange={setShowEditAdDialog}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Edit Ad</DialogTitle>
+                  <DialogDescription>
+                    Update your ad details
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="edit-ad-title">Title *</Label>
+                    <Input
+                      id="edit-ad-title"
+                      value={editingAd?.title || ''}
+                      onChange={(e) => setEditingAd(prev => prev ? ({ ...prev, title: e.target.value }) : null)}
+                      placeholder="Ad title"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-ad-description">Description</Label>
+                    <Textarea
+                      id="edit-ad-description"
+                      value={editingAd?.description || ''}
+                      onChange={(e) => setEditingAd(prev => prev ? ({ ...prev, description: e.target.value }) : null)}
+                      placeholder="Ad description"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-ad-image">Image URL</Label>
+                    <Input
+                      id="edit-ad-image"
+                      value={editingAd?.image_url || ''}
+                      onChange={(e) => setEditingAd(prev => prev ? ({ ...prev, image_url: e.target.value }) : null)}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-ad-url">Target URL</Label>
+                    <Input
+                      id="edit-ad-url"
+                      value={editingAd?.target_url || ''}
+                      onChange={(e) => setEditingAd(prev => prev ? ({ ...prev, target_url: e.target.value }) : null)}
+                      placeholder="https://example.com"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="edit-ad-budget">Total Budget</Label>
+                      <Input
+                        id="edit-ad-budget"
+                        type="number"
+                        value={editingAd?.budget || 0}
+                        onChange={(e) => setEditingAd(prev => prev ? ({ ...prev, budget: Number(e.target.value) }) : null)}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-ad-daily-budget">Daily Budget</Label>
+                      <Input
+                        id="edit-ad-daily-budget"
+                        type="number"
+                        value={editingAd?.daily_budget || 0}
+                        onChange={(e) => setEditingAd(prev => prev ? ({ ...prev, daily_budget: Number(e.target.value) }) : null)}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-ad-status">Status</Label>
+                    <Select 
+                      value={editingAd?.status || 'draft'} 
+                      onValueChange={(value) => setEditingAd(prev => prev ? ({ ...prev, status: value as Ad['status'] }) : null)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="paused">Paused</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-ad-type">Ad Type</Label>
+                    <Select 
+                      value={editingAd?.ad_type || 'banner'} 
+                      onValueChange={(value) => setEditingAd(prev => prev ? ({ ...prev, ad_type: value as Ad['ad_type'] }) : null)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select ad type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="banner">Banner</SelectItem>
+                        <SelectItem value="sidebar">Sidebar</SelectItem>
+                        <SelectItem value="popup">Popup</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="outline" onClick={() => setShowEditAdDialog(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleUpdateAd}>
+                    Update Ad
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </header>
         
@@ -421,7 +581,7 @@ const Ads = () => {
                             ${ad.clicks > 0 ? (ad.total_spent / ad.clicks).toFixed(2) : '0.00'}
                           </TableCell>
                           <TableCell>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditAd(ad)}>
                               <Settings className="w-4 h-4" />
                             </Button>
                           </TableCell>
