@@ -103,67 +103,6 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
     formState: { errors }
   } = useForm<SmartBagFormData>();
 
-  // Auto-load suggestions when categories change
-  useEffect(() => {
-    if (selectedCategories.length > 0 && user) {
-      loadAISuggestions();
-    }
-  }, [selectedCategories, user]);
-
-  const loadAISuggestions = async () => {
-    if (!user || selectedCategories.length === 0) return;
-    setIsLoadingSuggestions(true);
-    try {
-      // Load suggestions for all selected categories
-      const allSuggestions = await Promise.all(
-        selectedCategories.map(async (category) => {
-          const { data, error } = await supabase.functions.invoke('generate-smart-bag-suggestions', {
-            body: {
-              category,
-              userId: user.id
-            }
-          });
-          if (error) throw error;
-          return { category, data };
-        })
-      );
-
-      // Combine all suggestions
-      const combinedSuggestions = {
-        products: allSuggestions.flatMap(s => s.data.products || []),
-        enhanced: {
-          enhancedProducts: allSuggestions.flatMap(s => s.data.enhanced?.enhancedProducts || []),
-          suggestedCombinations: allSuggestions.flatMap(s => s.data.enhanced?.suggestedCombinations || []),
-          categoryInsights: `Mixed categories: ${selectedCategories.join(', ')}. Perfect for diverse customer preferences!`
-        },
-        categories: selectedCategories,
-        timestamp: new Date().toISOString()
-      };
-
-      setSuggestions(combinedSuggestions);
-
-      // Auto-suggest name based on categories
-      const categoryLabels = selectedCategories.map(cat => 
-        categories.find(c => c.value === cat)?.emoji || cat
-      ).join('');
-      const defaultName = `Mixed Smart Bag ${categoryLabels}`;
-      setValue("name", defaultName);
-      
-      toast({
-        title: "AI Suggestions Generated!",
-        description: `Found ${combinedSuggestions.products?.length || 0} products from ${selectedCategories.length} categories`
-      });
-    } catch (error: any) {
-      console.error("Error loading AI suggestions:", error);
-      toast({
-        title: "Error",
-        description: "Could not load AI suggestions",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoadingSuggestions(false);
-    }
-  };
 
   const toggleProductSelection = (productId: number) => {
     setSelectedProducts(prev => 
