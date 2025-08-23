@@ -378,34 +378,6 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
         </CardHeader>
       </Card>
 
-      {/* Client Wishlist Cards */}
-      <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Customer Preferences from Wisebite Marketplace
-          </CardTitle>
-          <CardDescription>
-            Real customer wishlist data from connected marketplace - add these products for guaranteed demand
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4">
-            <Button
-              onClick={handleConnectWisebiteMarketplace}
-              disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            >
-              <Users className="w-4 h-4 mr-2" />
-              {isSubmitting ? "Connecting..." : "Sync with Wisebite Marketplace"}
-            </Button>
-          </div>
-          <ClientWishlistCards 
-            onProductAdd={handleProductAddFromWishlist}
-            selectedCategory={selectedCategories[0]}
-          />
-        </CardContent>
-      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Step 1: Category Selection */}
