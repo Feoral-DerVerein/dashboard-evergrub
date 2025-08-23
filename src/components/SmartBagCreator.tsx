@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Brain, Package, DollarSign, Clock, Target, Sparkles, CheckCircle, AlertTriangle, TrendingUp, Users, Calendar, Zap, Star, Bell } from "lucide-react";
 import { calculateProductPoints, formatPoints } from "@/utils/pointsCalculator";
+import { ClientWishlistCards } from "./ClientWishlistCards";
 
 interface SmartBagCreatorProps {
   onSuccess?: () => void;
@@ -91,6 +92,7 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
   const [suggestions, setSuggestions] = useState<any>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [wishlistProducts, setWishlistProducts] = useState<any[]>([]);
   
   const {
     register,
@@ -169,6 +171,32 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
         ? prev.filter(id => id !== productId) 
         : [...prev, productId]
     );
+  };
+
+  const handleProductAddFromWishlist = (product: any, clientId: string) => {
+    // Add the product to wishlistProducts state to show it was added from a client
+    const wishlistProduct = {
+      ...product,
+      id: parseInt(product.id) || Math.floor(Math.random() * 1000000),
+      clientId,
+      isWishlistItem: true,
+      source: 'client_wishlist',
+      priority: 'high',
+      wishlist_demand: 1,
+      days_to_expire: 365,
+      quantity: 1,
+      suggestion_reason: `Producto solicitado específicamente por cliente ${clientId}`
+    };
+
+    setWishlistProducts(prev => [...prev, wishlistProduct]);
+    
+    // Also add to current suggestions if they exist
+    if (suggestions) {
+      setSuggestions(prev => ({
+        ...prev,
+        products: [...(prev.products || []), wishlistProduct]
+      }));
+    }
   };
 
   const calculateBagValue = () => {
@@ -361,6 +389,39 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
     }
   };
 
+  const handleConnectWisebiteMarketplace = async () => {
+    if (!user) return;
+    
+    setIsSubmitting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('connect-wisebite-marketplace', {
+        body: {
+          action: 'get_client_wishlists',
+          data: { user_id: user.id }
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Marketplace Connected!",
+        description: `Found ${data.total_clients} client wishlists from Wisebite marketplace`,
+      });
+
+      console.log('Wisebite marketplace data:', data);
+      
+    } catch (error: any) {
+      console.error("Error connecting to Wisebite marketplace:", error);
+      toast({
+        title: "Connection Error",
+        description: error.message || "Could not connect to Wisebite marketplace",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const { totalValue, suggestedPrice } = calculateBagValue();
 
   return (
@@ -376,6 +437,35 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
             to create personalised bags automatically
           </CardDescription>
         </CardHeader>
+      </Card>
+
+      {/* Client Wishlist Cards */}
+      <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Customer Preferences from Wisebite Marketplace
+          </CardTitle>
+          <CardDescription>
+            Real customer wishlist data from connected marketplace - add these products for guaranteed demand
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4">
+            <Button
+              onClick={handleConnectWisebiteMarketplace}
+              disabled={isSubmitting}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              {isSubmitting ? "Connecting..." : "Sync with Wisebite Marketplace"}
+            </Button>
+          </div>
+          <ClientWishlistCards 
+            onProductAdd={handleProductAddFromWishlist}
+            selectedCategory={selectedCategories[0]}
+          />
+        </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
