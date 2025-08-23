@@ -498,7 +498,7 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
           <CardHeader>
             <CardTitle>2. AI Product Suggestions</CardTitle>
             <CardDescription>
-              AI analyses inventory, expiry dates and customer demand
+              AI analyses inventory, expiry dates and customer wishlists to prioritize products customers actually want
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -585,12 +585,24 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                                         >
                                           {product.days_to_expire}d left
                                         </Badge>
-                                        {product.wishlist_demand > 0 && (
-                                          <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700">
-                                            {product.wishlist_demand} wishlists
-                                          </Badge>
-                                        )}
-                                      </div>
+                                         {product.wishlist_demand > 0 && (
+                                           <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700">
+                                             ❤️ {product.wishlist_demand} wishlists
+                                           </Badge>
+                                         )}
+                                       </div>
+
+                                       {/* Enhanced suggestion reason */}
+                                       <div className="mb-3">
+                                         <p className="text-xs text-gray-600 italic">
+                                           {enhancement?.enhancedReason || product.suggestion_reason}
+                                         </p>
+                                         {product.wishlist_demand > 0 && (
+                                           <div className="mt-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                                             🎯 {product.wishlist_demand} customers want this product
+                                           </div>
+                                         )}
+                                       </div>
 
 
                                       {/* Button at bottom */}

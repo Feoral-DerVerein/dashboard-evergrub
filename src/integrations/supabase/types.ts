@@ -975,6 +975,7 @@ export type Database = {
           quantity: number
           suggestion_reason: string
           wishlist_demand: number
+          wishlist_users: Json
         }[]
       }
       get_pickup_availability: {
