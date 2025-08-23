@@ -513,76 +513,128 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
         </Card>
       </div>
 
-      {/* Step 3: Preview & Publish */}
-      {selectedProducts.length > 0 && (
-        <Card className="border-2 border-green-200 bg-green-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              3. Bag Preview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-medium mb-3">Included Products:</h4>
-                <div className="flex flex-wrap gap-2 mb-4">
+      {/* Smart Bag Visualization */}
+      <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="w-5 h-5 text-amber-600" />
+            Your Smart Bag
+          </CardTitle>
+          <CardDescription>
+            Visual representation of your created smart bag with selected products
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Bag Visualization */}
+            <div className="flex flex-col items-center justify-center">
+              <div className="relative">
+                {/* Bag Icon */}
+                <div className="w-48 h-56 bg-gradient-to-b from-amber-600 to-amber-800 rounded-t-3xl rounded-b-lg relative shadow-xl">
+                  {/* Bag handles */}
+                  <div className="absolute -top-4 left-8 w-8 h-12 border-4 border-amber-700 rounded-t-full bg-transparent"></div>
+                  <div className="absolute -top-4 right-8 w-8 h-12 border-4 border-amber-700 rounded-t-full bg-transparent"></div>
+                  
+                  {/* Bag content indicator */}
+                  <div className="absolute inset-4 top-8 bg-gradient-to-b from-amber-100 to-amber-200 rounded-lg flex flex-col items-center justify-center">
+                    <Package className="w-12 h-12 text-amber-700 mb-2" />
+                    <span className="text-sm font-bold text-amber-800">
+                      {selectedProducts.length} productos
+                    </span>
+                    {totalValue > 0 && (
+                      <span className="text-xs text-amber-600 mt-1">
+                        Valor: ${totalValue.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Value Summary */}
+              {totalValue > 0 && (
+                <div className="mt-6 bg-white rounded-lg p-4 shadow-md border border-amber-200 w-full max-w-xs">
+                  <div className="text-center space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Valor original:</span>
+                      <span className="line-through text-gray-500">${totalValue.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-amber-700">
+                      <span>Precio de bolsa:</span>
+                      <span>${watch("salePrice") || suggestedPrice.toFixed(2)}</span>
+                    </div>
+                    <div className="text-xs text-green-600 font-medium">
+                      {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}% de descuento
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Products List */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-amber-800 text-lg border-b border-amber-200 pb-2">
+                Productos en la bolsa
+              </h4>
+              
+              {selectedProducts.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p>No hay productos seleccionados</p>
+                  <p className="text-sm">Agrega productos de las sugerencias para ver tu bolsa</p>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-64 overflow-y-auto">
                   {suggestions?.products
                     ?.filter((p: ProductSuggestion) => selectedProducts.includes(p.id))
-                    ?.map((product: ProductSuggestion) => {
+                    ?.map((product: ProductSuggestion, index: number) => {
                       const enhancement = suggestions.enhanced?.enhancedProducts?.find(
                         (e: EnhancedSuggestion) => e.id === product.id
                       );
                       return (
-                        <div key={product.id} className="flex items-center gap-1 bg-white px-2 py-1 rounded text-sm">
-                          <span>{enhancement?.emoji || '📦'}</span>
-                          <span>{product.name}</span>
+                        <div key={product.id} className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm border border-amber-100">
+                          <div className="flex-shrink-0 w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                            <span className="text-lg">{enhancement?.emoji || '📦'}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h5 className="font-medium text-gray-900 truncate">{product.name}</h5>
+                            <p className="text-sm text-gray-500">{product.category}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-amber-700">${product.price.toFixed(2)}</p>
+                            {product.isWishlistItem && (
+                              <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
+                                Cliente
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
                 </div>
-              </div>
+              )}
 
-              <div className="text-center">
-                <h4 className="font-medium mb-3">Value Comparison:</h4>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Actual value:</span>
-                      <span className="line-through text-gray-500">${totalValue.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between font-bold text-green-600 text-lg">
-                      <span>Bag price:</span>
-                      <span>${watch("salePrice") || suggestedPrice.toFixed(2)}</span>
-                    </div>
-                    <div className="text-sm text-green-600">
-                      {totalValue > 0 && (
-                        <>Savings: {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}%</>
-                      )}
-                    </div>
-                  </div>
+              {/* Publish Button */}
+              {selectedProducts.length > 0 && (
+                <div className="pt-4 border-t border-amber-200">
+                  <Button 
+                    onClick={handleSubmit(onSubmit)} 
+                    size="lg" 
+                    disabled={isSubmitting} 
+                    className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold"
+                  >
+                    {isSubmitting ? "Publicando..." : (
+                      <>
+                        <Sparkles className="w-5 h-5 mr-2" />
+                        Publicar Smart Bag
+                      </>
+                    )}
+                  </Button>
                 </div>
-              </div>
+              )}
             </div>
-
-            <div className="mt-6 text-center">
-              <Button 
-                onClick={handleSubmit(onSubmit)} 
-                size="lg" 
-                disabled={isSubmitting} 
-                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold px-8 py-3 text-lg"
-              >
-                {isSubmitting ? "Publishing..." : (
-                  <>
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Publish Smart Bag
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
