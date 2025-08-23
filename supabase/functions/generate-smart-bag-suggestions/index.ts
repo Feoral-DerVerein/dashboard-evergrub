@@ -156,10 +156,10 @@ serve(async (req) => {
 
     console.log('Generating smart bag suggestions for:', { category, userId });
 
-    // Get AI product suggestions from database function
-    const { data: suggestions, error: dbError } = await supabaseClient.rpc(
+    // Get AI product suggestions from database function (existing inventory)
+    const { data: inventorySuggestions, error: dbError } = await supabaseClient.rpc(
       'get_ai_product_suggestions',
-      { p_user_id: userId, p_category: category, p_max_suggestions: 8 }
+      { p_user_id: userId, p_category: category, p_max_suggestions: 5 }
     );
 
     if (dbError) {
@@ -167,19 +167,48 @@ serve(async (req) => {
       throw new Error('Failed to get product suggestions');
     }
 
-    console.log('Database suggestions:', suggestions);
+    // Get wishlist-based suggestions (what customers want)
+    const { data: wishlistSuggestions, error: wishlistError } = await supabaseClient.rpc(
+      'get_wishlist_based_suggestions',
+      { p_store_user_id: userId, p_category: category, p_max_suggestions: 5 }
+    );
+
+    if (wishlistError) {
+      console.warn('Wishlist suggestions error:', wishlistError);
+    }
+
+    // Combine both types of suggestions
+    const allSuggestions = [
+      ...(inventorySuggestions || []),
+      ...(wishlistSuggestions || []).map(item => ({
+        ...item,
+        id: parseInt(item.id) || Math.floor(Math.random() * 1000000), // Convert to number for consistency
+        isWishlistItem: true,
+        source: 'wishlist'
+      }))
+    ];
+
+    console.log('Combined suggestions:', { 
+      inventory: inventorySuggestions?.length || 0, 
+      wishlist: wishlistSuggestions?.length || 0,
+      total: allSuggestions.length 
+    });
 
     // Generate organic enhancements (no AI needed!)
-    const enhancedProducts = (suggestions || []).map((product: any) => ({
+    const enhancedProducts = allSuggestions.map((product: any) => ({
       id: product.id,
       emoji: getProductEmoji(product.name, product.category),
-      enhancedReason: generateEnhancedReason(product),
+      enhancedReason: product.isWishlistItem 
+        ? `💝 Producto solicitado por clientes - ${product.suggestion_reason}` 
+        : generateEnhancedReason(product),
       urgencyLevel: product.priority,
-      recommendationScore: calculateScore(product)
+      recommendationScore: product.isWishlistItem ? 10 : calculateScore(product), // Max score for wishlist items
+      isWishlistItem: product.isWishlistItem || false,
+      source: product.source || 'inventory'
     }));
 
     // Generate suggested combinations organically
-    const suggestedCombinations = generateSuggestedCombinations(suggestions || []);
+    const suggestedCombinations = generateSuggestedCombinations(allSuggestions);
 
     // Generate category insights organically
     const categoryEmojis: { [key: string]: string } = {
@@ -191,11 +220,23 @@ serve(async (req) => {
       'Beverages': '🥤'
     };
 
-    const urgentCount = (suggestions || []).filter((p: any) => p.days_to_expire <= 3).length;
-    const highDemandCount = (suggestions || []).filter((p: any) => p.wishlist_demand > 3).length;
-    const categoryInsights = urgentCount > 0 
-      ? `${urgentCount} items expire within 3 days - perfect for urgent smart bags! ${highDemandCount > 0 ? `Plus ${highDemandCount} high-demand items.` : ''}`
-      : `Great selection of ${category} items. ${highDemandCount > 0 ? `${highDemandCount} items are in high demand!` : 'Perfect for creating value bags.'}`;
+    const urgentCount = allSuggestions.filter((p: any) => p.days_to_expire <= 3).length;
+    const wishlistCount = allSuggestions.filter((p: any) => p.isWishlistItem).length;
+    const highDemandCount = allSuggestions.filter((p: any) => p.wishlist_demand > 3).length;
+    
+    let categoryInsights = `Encontrados ${allSuggestions.length} productos para ${category}. `;
+    if (wishlistCount > 0) {
+      categoryInsights += `🎯 ${wishlistCount} productos solicitados por clientes en wishlist! `;
+    }
+    if (urgentCount > 0) {
+      categoryInsights += `⚡ ${urgentCount} productos expiran en 3 días. `;
+    }
+    if (highDemandCount > 0) {
+      categoryInsights += `📈 ${highDemandCount} productos de alta demanda.`;
+    }
+    if (wishlistCount === 0 && urgentCount === 0 && highDemandCount === 0) {
+      categoryInsights += 'Perfectos para crear smart bags con valor agregado.';
+    }
 
     const enhancedSuggestions = {
       enhancedProducts,
@@ -205,11 +246,18 @@ serve(async (req) => {
 
     // Merge database suggestions with organic enhancements
     const finalSuggestions = {
-      products: suggestions || [],
+      products: allSuggestions,
       enhanced: enhancedSuggestions,
       category,
       categoryEmoji: categoryEmojis[category] || '📦',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      stats: {
+        total: allSuggestions.length,
+        inventory: inventorySuggestions?.length || 0,
+        wishlist: wishlistSuggestions?.length || 0,
+        urgent: urgentCount,
+        highDemand: highDemandCount
+      }
     };
 
     console.log('Final suggestions generated:', finalSuggestions);

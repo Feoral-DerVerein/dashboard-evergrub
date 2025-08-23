@@ -38,6 +38,8 @@ interface ProductSuggestion {
   priority: string;
   demand_level: string;
   suggestion_reason: string;
+  isWishlistItem?: boolean;
+  source?: string;
 }
 
 interface EnhancedSuggestion {
@@ -498,7 +500,7 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
           <CardHeader>
             <CardTitle>2. AI Product Suggestions</CardTitle>
             <CardDescription>
-              AI analyses inventory, expiry dates and customer wishlists to prioritize products customers actually want
+              IA analiza inventario, fechas de vencimiento y wishlists de clientes para priorizar productos que realmente quieren los clientes
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -525,11 +527,93 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
                   </div>
                 )}
 
+                {/* Wishlist Products Section */}
+                {suggestions.products.some((p: any) => p.isWishlistItem) && (
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg p-4 mb-6">
+                    <h3 className="font-bold text-lg flex items-center gap-2 mb-4">
+                      💝 Productos Solicitados por Clientes
+                      <Badge variant="default" className="bg-blue-600">
+                        {suggestions.products.filter((p: any) => p.isWishlistItem).length} en wishlist
+                      </Badge>
+                    </h3>
+                    <p className="text-sm text-blue-700 mb-4">
+                      Estos productos fueron específicamente solicitados por tus clientes. ¡Inclúyelos para máxima satisfacción!
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {suggestions.products
+                        .filter((p: any) => p.isWishlistItem)
+                        .map((product: any) => {
+                          const enhancement = suggestions.enhanced?.enhancedProducts?.find(
+                            (e: any) => e.id === product.id
+                          );
+                          const isSelected = selectedProducts.includes(product.id);
+                          
+                          return (
+                            <Card 
+                              key={product.id} 
+                              className={`border-2 border-blue-300 ${
+                                isSelected 
+                                  ? 'ring-2 ring-blue-500 bg-blue-100' 
+                                  : 'bg-white hover:bg-blue-50'
+                              }`} 
+                            >
+                              <CardContent className="p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <span className="text-lg">💝</span>
+                                  <h4 className="font-medium text-base">{product.name}</h4>
+                                  <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700">
+                                    Wishlist
+                                  </Badge>
+                                </div>
+                                
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                  <Badge variant="outline" className="text-xs">
+                                    ${product.price}
+                                  </Badge>
+                                  <Badge variant="outline" className="text-xs bg-purple-100 text-purple-700">
+                                    ⭐ {product.wishlist_demand} clientes
+                                  </Badge>
+                                </div>
+
+                                <div className="mb-3 bg-blue-50 p-2 rounded text-xs text-blue-700">
+                                  {product.suggestion_reason}
+                                </div>
+
+                                <Button
+                                  size="sm"
+                                  variant={isSelected ? "default" : "outline"}
+                                  className={`w-full ${
+                                    isSelected 
+                                      ? 'bg-blue-600 hover:bg-blue-700' 
+                                      : 'border-blue-300 hover:bg-blue-100'
+                                  }`}
+                                  onClick={() => toggleProductSelection(product.id)}
+                                >
+                                  {isSelected ? (
+                                    <>
+                                      <CheckCircle className="w-3 h-3 mr-1" />
+                                      ¡Agregado!
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Package className="w-3 h-3 mr-1" />
+                                      Agregar al Bag
+                                    </>
+                                  )}
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Product Suggestions by Category */}
                 <div className="space-y-6">
                   {selectedCategories.map(category => {
                     const categoryProducts = suggestions.products.filter(
-                      (p: ProductSuggestion) => p.category === category
+                      (p: ProductSuggestion) => p.category === category && !p.isWishlistItem
                     );
                     if (categoryProducts.length === 0) return null;
                     

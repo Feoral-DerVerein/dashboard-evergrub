@@ -988,6 +988,29 @@ export type Database = {
           start_time: string
         }[]
       }
+      get_wishlist_based_suggestions: {
+        Args: {
+          p_category?: string
+          p_max_suggestions?: number
+          p_store_user_id: string
+        }
+        Returns: {
+          category: string
+          created_at: string
+          days_to_expire: number
+          demand_level: string
+          id: string
+          name: string
+          price: number
+          priority: string
+          quantity: number
+          source_type: string
+          suggestion_reason: string
+          user_id: string
+          wishlist_demand: number
+          wishlist_users: Json
+        }[]
+      }
       get_wishlist_by_category: {
         Args: { p_category_id: string; p_user_id: string }
         Returns: {
