@@ -251,6 +251,9 @@ const Orders = () => {
                     <Package className="h-3.5 w-3.5" />
                     <span>{order.items.length} items</span>
                   </div>
+                  <div className="text-xs text-gray-600 mt-1 font-medium">
+                    {order.status === "completed" ? "Paid" : "Pay in person"}
+                  </div>
                 </div>
               </div>
               
