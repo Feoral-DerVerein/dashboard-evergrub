@@ -435,12 +435,9 @@ const Products = () => {
             {products.filter(product => product.isSurpriseBag && product.isMarketplaceVisible).length === 0 && (
               <div className="col-span-full text-center py-8">
                 <p className="text-gray-500 mb-2">No surprise bags available in the marketplace</p>
-                <button 
-                  onClick={() => setSurpriseBagFormOpen(true)}
-                  className="text-purple-600 hover:text-purple-700 font-medium"
-                >
-                  Tienes food waste? haz una bolsa sorpresa para el marketplace.
-                </button>
+                <p className="text-purple-600 font-medium">
+                  Have food waste? Create a surprise bag for the marketplace.
+                </p>
               </div>
             )}
           </div>
