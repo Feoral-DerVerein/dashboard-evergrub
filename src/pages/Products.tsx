@@ -1,4 +1,4 @@
-import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info, Calendar, ShoppingBag } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info, Calendar, ShoppingBag, Package } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -531,9 +531,9 @@ const Products = () => {
                         </button>
                       </div>
                       
-                      <button onClick={() => product.id && handleNotifyWishlistUsers(product.id, product.name)} disabled={notifyingProductId === product.id} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-blue-600 bg-blue-50 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                        <Bell className="w-3 h-3" />
-                        {notifyingProductId === product.id ? "Notifying..." : "Notify Wishlist"}
+                      <button onClick={() => setSmartBagCreatorOpen(true)} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-primary bg-primary/10 rounded hover:bg-primary/20 transition-colors">
+                        <Package className="w-3 h-3" />
+                        Surprise Bag
                       </button>
                       
                       <button onClick={() => handleDonateProduct(product)} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors">
