@@ -616,8 +616,8 @@ const AddProduct = () => {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gray-50">
-      <div className="max-w-md mx-auto glass-card min-h-screen animate-fade-in">
+  return <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-4xl mx-auto glass-card min-h-screen animate-fade-in">
         <div className="px-4 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
