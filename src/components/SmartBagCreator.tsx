@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Brain, Package, DollarSign, Clock, Target, Sparkles, CheckCircle, AlertTriangle, TrendingUp, Users, Calendar, Zap, Star, Bell } from "lucide-react";
+import { Brain, Package, DollarSign, Clock, Target, Sparkles, CheckCircle, AlertTriangle, TrendingUp, Users, Calendar, Zap, Star, Bell, Search, Plus } from "lucide-react";
 import { calculateProductPoints, formatPoints } from "@/utils/pointsCalculator";
 import { ClientWishlistCards } from "./ClientWishlistCards";
 
@@ -94,6 +94,9 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [wishlistProducts, setWishlistProducts] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isLoadingSearch, setIsLoadingSearch] = useState(false);
   const [selectedProductFromInventory, setSelectedProductFromInventory] = useState<any>(null);
   
   const {
@@ -141,8 +144,8 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
         suggestion_reason: wishlistDemand > 0 
           ? `${wishlistDemand} customer${wishlistDemand > 1 ? 's' : ''} want${wishlistDemand === 1 ? 's' : ''} this product`
           : 'Selected from your inventory',
-        days_to_expire: product.expirationDate ? 
-          Math.max(0, Math.ceil((new Date(product.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 365,
+        days_to_expire: product.expirationdate ? 
+          Math.max(0, Math.ceil((new Date(product.expirationdate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 365,
         wishlistUsers
       };
 
@@ -184,6 +187,71 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
         variant: "destructive"
       });
     }
+  };
+
+  const handleSearchProducts = async (query: string) => {
+    if (!user || !query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsLoadingSearch(true);
+    try {
+      const { data: products, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('userid', user.id)
+        .eq('is_marketplace_visible', true)
+        .gt('quantity', 0)
+        .ilike('name', `%${query}%`)
+        .limit(10);
+
+      if (error) throw error;
+
+      // Get AI suggestions for each product
+      const productsWithSuggestions = await Promise.all(
+        products.map(async (product) => {
+          // Query wishlist demand for this product
+          const { data: wishlistData } = await supabase
+            .from('wishlists')
+            .select('user_id')
+            .eq('product_id', product.id.toString());
+
+          const wishlistDemand = wishlistData?.length || 0;
+          const daysToExpire = product.expirationdate ? 
+            Math.max(0, Math.ceil((new Date(product.expirationdate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 365;
+
+          return {
+            ...product,
+            wishlist_demand: wishlistDemand,
+            days_to_expire: daysToExpire,
+            priority: wishlistDemand > 0 ? 'high' : daysToExpire <= 7 ? 'medium' : 'low',
+            suggestion_reason: wishlistDemand > 0 
+              ? `${wishlistDemand} customer${wishlistDemand > 1 ? 's' : ''} want${wishlistDemand === 1 ? 's' : ''} this product`
+              : daysToExpire <= 7 
+                ? `Expires in ${daysToExpire} day${daysToExpire !== 1 ? 's' : ''}`
+                : 'Available in inventory'
+          };
+        })
+      );
+
+      setSearchResults(productsWithSuggestions);
+    } catch (error) {
+      console.error('Error searching products:', error);
+      toast({
+        title: "Error",
+        description: "Could not search products",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingSearch(false);
+    }
+  };
+
+  const handleAddSearchedProduct = (product: any) => {
+    handleAddProductFromInventory(product);
+    setSearchQuery("");
+    setSearchResults([]);
   };
 
 
@@ -678,17 +746,91 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
               </div>
             )}
 
-            {/* Products List */}
+            {/* Product Search */}
             <div className="space-y-4">
-              <h4 className="font-semibold text-amber-800 text-lg border-b border-amber-200 pb-2">
-                Products in the bag
-              </h4>
+              <div className="flex items-center gap-2 border-b border-amber-200 pb-2">
+                <h4 className="font-semibold text-amber-800 text-lg flex-1">
+                  Products in the bag
+                </h4>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      handleSearchProducts(e.target.value);
+                    }}
+                    className="pl-10 w-48 h-8 text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Search Results */}
+              {searchQuery && (
+                <div className="bg-white rounded-lg border border-amber-200 shadow-sm">
+                  <div className="p-3 border-b border-amber-100">
+                    <div className="flex items-center gap-2">
+                      <Brain className="w-4 h-4 text-purple-600" />
+                      <span className="text-sm font-medium text-purple-800">AI Product Suggestions</span>
+                    </div>
+                  </div>
+                  <div className="max-h-48 overflow-y-auto">
+                    {isLoadingSearch ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <div className="animate-spin w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+                        Searching products...
+                      </div>
+                    ) : searchResults.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <Search className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                        <p className="text-sm">No products found</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 p-3">
+                        {searchResults.map((product) => (
+                          <div key={product.id} className="flex items-center gap-3 p-2 hover:bg-amber-50 rounded-lg group">
+                            <img 
+                              src={product.image || "/placeholder.svg"} 
+                              alt={product.name}
+                              className="w-10 h-10 object-cover rounded-md"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <h5 className="font-medium text-gray-900 truncate text-sm">{product.name}</h5>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-gray-500">{product.category}</span>
+                                <span className="text-xs font-semibold text-green-600">${product.price.toFixed(2)}</span>
+                                {product.wishlist_demand > 0 && (
+                                  <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
+                                    {product.wishlist_demand} wants
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-purple-600 mt-1">{product.suggestion_reason}</p>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleAddSearchedProduct(product)}
+                              disabled={selectedProducts.includes(product.id)}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Plus className="w-3 h-3 mr-1" />
+                              Add
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               
               {selectedProducts.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                   <p>No products selected</p>
-                  <p className="text-sm">Add products from suggestions to see your bag</p>
+                  <p className="text-sm">Search and add products to see your bag</p>
                 </div>
               ) : (
                 <div className="space-y-3 max-h-64 overflow-y-auto">
