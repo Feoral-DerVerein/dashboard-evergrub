@@ -504,7 +504,7 @@ export const SmartBagCreator = ({
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <Label htmlFor="name">Bag Name</Label>
+              
               <Input id="name" placeholder="e.g.: Mixed Smart Bag" {...register("name", {
               required: "Name required"
             })} />
