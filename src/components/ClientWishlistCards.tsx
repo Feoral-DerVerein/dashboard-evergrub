@@ -194,83 +194,80 @@ export const ClientWishlistCards = ({ onProductAdd, selectedCategory }: ClientWi
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 mb-4">
+    <div className="space-y-6">
+      <div className="flex items-center gap-2 mb-6">
         <Users className="h-5 w-5 text-primary" />
         <h3 className="text-lg font-semibold">Client Preferences</h3>
         <Badge variant="secondary">{clientWishlists.length} clients</Badge>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+      <div className="space-y-6 max-h-96 overflow-y-auto pr-2">
         {clientWishlists.map((client, index) => (
-          <Card key={client.user_id} className="border-2 border-dashed border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-sm font-bold">Client Wishlist</CardTitle>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline" className="text-xs">
-                      {client.client_id}
-                    </Badge>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Calendar className="h-3 w-3" />
-                      {client.date}
-                    </div>
+          <div key={client.user_id} className="bg-background border border-border rounded-lg p-4">
+            {/* Client Header */}
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
+              <div>
+                <h4 className="text-lg font-semibold">Client Wishlist</h4>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className="text-lg font-bold text-primary">{client.client_id}</span>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    {client.date}
                   </div>
                 </div>
               </div>
-            </CardHeader>
-            
-            <CardContent className="pt-0">
-              <div className="grid grid-cols-2 gap-2">
-                {client.products.slice(0, 4).map((product, productIndex) => (
-                  <div key={`${product.id}-${productIndex}`} className="relative bg-white rounded-lg p-3 border shadow-sm">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="text-xs text-muted-foreground">{product.brand}</div>
+            </div>
+
+            {/* Products Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {client.products.slice(0, 4).map((product, productIndex) => (
+                <div key={`${product.id}-${productIndex}`} className="bg-card border border-border rounded-lg p-4 hover:shadow-sm transition-shadow">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="text-xs text-muted-foreground font-medium">{product.brand}</div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-primary/10"
+                      onClick={() => handleAddProduct(product, client.client_id)}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h5 className="text-sm font-semibold leading-tight">{product.name}</h5>
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-green-600">
+                        ${product.price.toFixed(2)}
+                      </span>
                       <Button
-                        variant="ghost"
                         size="sm"
-                        className="h-4 w-4 p-0"
+                        className="h-7 px-3 text-xs font-medium bg-green-600 hover:bg-green-700"
                         onClick={() => handleAddProduct(product, client.client_id)}
                       >
-                        <Plus className="h-3 w-3" />
+                        Add
                       </Button>
                     </div>
-                    
-                    <div className="space-y-1">
-                      <h4 className="text-sm font-medium line-clamp-2">{product.name}</h4>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-green-600">
-                          ${product.price.toFixed(2)}
-                        </span>
-                        <Button
-                          size="sm"
-                          className="h-6 text-xs"
-                          onClick={() => handleAddProduct(product, client.client_id)}
-                        >
-                          Add
-                        </Button>
-                      </div>
-                    </div>
                   </div>
-                ))}
-              </div>
-              
-              {client.products.length > 4 && (
-                <div className="mt-2 text-center">
-                  <Badge variant="secondary" className="text-xs">
-                    +{client.products.length - 4} more items
-                  </Badge>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              ))}
+            </div>
+            
+            {client.products.length > 4 && (
+              <div className="mt-4 text-center">
+                <Badge variant="secondary" className="text-xs text-green-600 bg-green-50 border-green-200">
+                  +{client.products.length - 4} more items
+                </Badge>
+              </div>
+            )}
+          </div>
         ))}
       </div>
       
-      <div className="text-center">
-        <p className="text-xs text-muted-foreground">
-          🎯 These are real customer preferences from the Wisebite marketplace
+      <div className="text-center pt-4 border-t border-border">
+        <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
+          <span className="text-sm">🎯</span>
+          These are real customer preferences from the Wisebite marketplace
         </p>
       </div>
     </div>
