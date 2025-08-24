@@ -85,7 +85,64 @@ export const ClientWishlistCards = ({ onProductAdd, selectedCategory }: ClientWi
         .filter((client: any) => client.products.length > 0)
         .slice(0, 6); // Show up to 6 client cards
 
-      setClientWishlists(clientWishlistsArray);
+      // Add 4 more mock client wishlists for demonstration
+      const mockClients = [
+        {
+          user_id: 'mock1',
+          client_id: 'CLI001',
+          date: '12/20/2024',
+          products: [
+            { id: 'mock1', name: 'Organic Avocados', category: 'Fruits', price: 3.99, brand: "Fresh Market" },
+            { id: 'mock2', name: 'Sourdough Bread', category: 'Bakery', price: 4.50, brand: "Local Bakery" },
+            { id: 'mock3', name: 'Greek Yogurt', category: 'Dairy', price: 5.25, brand: "Farm Fresh" }
+          ]
+        },
+        {
+          user_id: 'mock2',
+          client_id: 'CLI002',
+          date: '12/19/2024',
+          products: [
+            { id: 'mock4', name: 'Coffee Beans', category: 'Beverages', price: 12.99, brand: "Roaster Co" },
+            { id: 'mock5', name: 'Dark Chocolate', category: 'Sweets', price: 6.75, brand: "Artisan" },
+            { id: 'mock6', name: 'Quinoa Salad', category: 'Ready Meals', price: 8.50, brand: "Healthy Eats" },
+            { id: 'mock7', name: 'Kombucha', category: 'Beverages', price: 4.25, brand: "Fermented Co" }
+          ]
+        },
+        {
+          user_id: 'mock3',
+          client_id: 'CLI003',
+          date: '12/18/2024',
+          products: [
+            { id: 'mock8', name: 'Vegan Cheese', category: 'Dairy Alternatives', price: 7.99, brand: "Plant Based" },
+            { id: 'mock9', name: 'Almond Milk', category: 'Dairy Alternatives', price: 3.75, brand: "Nut Co" },
+            { id: 'mock10', name: 'Energy Bars', category: 'Snacks', price: 2.50, brand: "Power Foods" },
+            { id: 'mock11', name: 'Green Tea', category: 'Beverages', price: 8.99, brand: "Tea House" },
+            { id: 'mock12', name: 'Hummus', category: 'Dips', price: 4.99, brand: "Mediterranean" }
+          ]
+        },
+        {
+          user_id: 'mock4',
+          client_id: 'CLI004',
+          date: '12/17/2024',
+          products: [
+            { id: 'mock13', name: 'Pasta Sauce', category: 'Sauces', price: 3.25, brand: "Italian Style" },
+            { id: 'mock14', name: 'Whole Grain Pasta', category: 'Grains', price: 2.99, brand: "Healthy Grains" },
+            { id: 'mock15', name: 'Parmesan Cheese', category: 'Dairy', price: 9.50, brand: "Aged Cheese Co" },
+            { id: 'mock16', name: 'Fresh Basil', category: 'Herbs', price: 2.75, brand: "Garden Fresh" }
+          ]
+        }
+      ];
+
+      // Filter mock clients by category if needed
+      const filteredMockClients = mockClients.map(client => ({
+        ...client,
+        products: client.products.filter(product => 
+          !selectedCategory || product.category === selectedCategory
+        )
+      })).filter(client => client.products.length > 0);
+
+      const combinedClients = [...clientWishlistsArray, ...filteredMockClients];
+      setClientWishlists(combinedClients);
       
     } catch (error: any) {
       console.error("Error loading client wishlists:", error);
