@@ -634,50 +634,27 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Bag Visualization */}
-            <div className="flex flex-col items-center justify-center">
-              <div className="relative">
-                {/* Bag Icon */}
-                <div className="w-48 h-56 bg-gradient-to-b from-amber-600 to-amber-800 rounded-t-3xl rounded-b-lg relative shadow-xl">
-                  {/* Bag handles */}
-                  <div className="absolute -top-4 left-8 w-8 h-12 border-4 border-amber-700 rounded-t-full bg-transparent"></div>
-                  <div className="absolute -top-4 right-8 w-8 h-12 border-4 border-amber-700 rounded-t-full bg-transparent"></div>
-                  
-                  {/* Bag content indicator */}
-                  <div className="absolute inset-4 top-8 bg-gradient-to-b from-amber-100 to-amber-200 rounded-lg flex flex-col items-center justify-center">
-                    <Package className="w-12 h-12 text-amber-700 mb-2" />
-                    <span className="text-sm font-bold text-amber-800">
+          <div className="space-y-4">
+            {/* Compact Summary */}
+            {totalValue > 0 && (
+              <div className="bg-white rounded-lg p-3 shadow-sm border border-amber-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Package className="w-5 h-5 text-amber-700" />
+                    <span className="font-medium text-amber-800">
                       {selectedProducts.length} productos
                     </span>
-                    {totalValue > 0 && (
-                      <span className="text-xs text-amber-600 mt-1">
-                        Valor: ${totalValue.toFixed(2)}
-                      </span>
-                    )}
                   </div>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-500 line-through">${totalValue.toFixed(2)}</div>
+                    <div className="font-bold text-amber-700">${watch("salePrice") || suggestedPrice.toFixed(2)}</div>
+                  </div>
+                </div>
+                <div className="text-xs text-green-600 font-medium text-center mt-2">
+                  {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}% de descuento
                 </div>
               </div>
-
-              {/* Value Summary */}
-              {totalValue > 0 && (
-                <div className="mt-6 bg-white rounded-lg p-4 shadow-md border border-amber-200 w-full max-w-xs">
-                  <div className="text-center space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Valor original:</span>
-                      <span className="line-through text-gray-500">${totalValue.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between font-bold text-amber-700">
-                      <span>Precio de bolsa:</span>
-                      <span>${watch("salePrice") || suggestedPrice.toFixed(2)}</span>
-                    </div>
-                    <div className="text-xs text-green-600 font-medium">
-                      {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}% de descuento
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* Products List */}
             <div className="space-y-4">
