@@ -17,6 +17,7 @@ import { ClientWishlistCards } from "./ClientWishlistCards";
 
 interface SmartBagCreatorProps {
   onSuccess?: () => void;
+  selectedProduct?: any; // Product selected from Products page
 }
 
 interface SmartBagFormData {
@@ -84,7 +85,7 @@ const categories = [
   }
 ];
 
-export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
+export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -93,6 +94,7 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [wishlistProducts, setWishlistProducts] = useState<any[]>([]);
+  const [selectedProductFromInventory, setSelectedProductFromInventory] = useState<any>(null);
   
   const {
     register,
@@ -102,6 +104,87 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
     reset,
     formState: { errors }
   } = useForm<SmartBagFormData>();
+
+  // Handle selected product from Products page
+  useEffect(() => {
+    if (selectedProduct) {
+      handleAddProductFromInventory(selectedProduct);
+    }
+  }, [selectedProduct]);
+
+  const handleAddProductFromInventory = async (product: any) => {
+    try {
+      // Query wishlist demand for this product
+      const { data: wishlistData, error } = await supabase
+        .from('wishlists')
+        .select('user_id, product_data')
+        .eq('product_id', product.id.toString());
+      
+      if (error) {
+        console.error('Error fetching wishlist demand:', error);
+      }
+
+      const wishlistDemand = wishlistData?.length || 0;
+      const wishlistUsers = wishlistData?.map(w => ({
+        user_id: w.user_id,
+        client_id: w.user_id.substring(0, 8).toUpperCase()
+      })) || [];
+
+      // Add the product to the customer references section
+      const productWithWishlistData = {
+        ...product,
+        id: product.id,
+        wishlist_demand: wishlistDemand,
+        isWishlistItem: false,
+        source: 'inventory_selection',
+        priority: wishlistDemand > 0 ? 'high' : 'medium',
+        suggestion_reason: wishlistDemand > 0 
+          ? `${wishlistDemand} customer${wishlistDemand > 1 ? 's' : ''} want${wishlistDemand === 1 ? 's' : ''} this product`
+          : 'Selected from your inventory',
+        days_to_expire: product.expirationDate ? 
+          Math.max(0, Math.ceil((new Date(product.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 365,
+        wishlistUsers
+      };
+
+      setSelectedProductFromInventory(productWithWishlistData);
+      setSelectedProducts(prev => [...prev, product.id]);
+
+      // Also add to suggestions if they exist
+      if (suggestions) {
+        setSuggestions(prev => ({
+          ...prev,
+          products: [...(prev.products || []), productWithWishlistData]
+        }));
+      } else {
+        // Create initial suggestions with this product
+        setSuggestions({
+          products: [productWithWishlistData],
+          enhanced: {
+            enhancedProducts: [{
+              id: product.id,
+              emoji: '📦',
+              enhancedReason: productWithWishlistData.suggestion_reason,
+              urgencyLevel: productWithWishlistData.priority,
+              recommendationScore: wishlistDemand * 25 + 50
+            }]
+          }
+        });
+      }
+
+      toast({
+        title: "Product Added to Smart Bag",
+        description: `${product.name} added${wishlistDemand > 0 ? ` (${wishlistDemand} customer match${wishlistDemand > 1 ? 'es' : ''})` : ''}`,
+      });
+
+    } catch (error) {
+      console.error('Error adding product from inventory:', error);
+      toast({
+        title: "Error",
+        description: "Could not add product to smart bag",
+        variant: "destructive"
+      });
+    }
+  };
 
 
   const toggleProductSelection = (productId: number) => {
@@ -505,6 +588,67 @@ export const SmartBagCreator = ({ onSuccess }: SmartBagCreatorProps) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Selected Product from Inventory */}
+            {selectedProductFromInventory && (
+              <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-3">
+                  <Package className="h-5 w-5 text-green-600" />
+                  <h4 className="font-semibold text-green-800">Selected from Inventory</h4>
+                  <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    {selectedProductFromInventory.wishlist_demand} customer match{selectedProductFromInventory.wishlist_demand !== 1 ? 'es' : ''}
+                  </Badge>
+                </div>
+                
+                <div className="bg-white rounded-lg p-4 border shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <img 
+                      src={selectedProductFromInventory.image || "/placeholder.svg"} 
+                      alt={selectedProductFromInventory.name}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <div className="flex-1">
+                      <h5 className="font-medium text-gray-900">{selectedProductFromInventory.name}</h5>
+                      <p className="text-sm text-gray-500">{selectedProductFromInventory.category}</p>
+                      <p className="text-sm font-semibold text-green-600">${selectedProductFromInventory.price.toFixed(2)}</p>
+                      <p className="text-xs text-gray-600 mt-1">{selectedProductFromInventory.suggestion_reason}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-700">
+                          {selectedProductFromInventory.wishlist_demand} wishlist{selectedProductFromInventory.wishlist_demand !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      {selectedProductFromInventory.wishlist_demand > 0 && (
+                        <div className="text-xs text-blue-600">
+                          High demand product!
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Show which customers want this product */}
+                  {selectedProductFromInventory.wishlistUsers && selectedProductFromInventory.wishlistUsers.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <p className="text-xs font-medium text-gray-700 mb-2">Customers who want this:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {selectedProductFromInventory.wishlistUsers.slice(0, 5).map((user: any, index: number) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {user.client_id}
+                          </Badge>
+                        ))}
+                        {selectedProductFromInventory.wishlistUsers.length > 5 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{selectedProductFromInventory.wishlistUsers.length - 5} more
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
             <ClientWishlistCards 
               onProductAdd={handleProductAddFromWishlist}
               selectedCategory={selectedCategories[0]}

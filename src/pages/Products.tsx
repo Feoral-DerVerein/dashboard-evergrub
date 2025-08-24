@@ -64,6 +64,7 @@ const Products = () => {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [surpriseBagFormOpen, setSurpriseBagFormOpen] = useState(false);
   const [smartBagCreatorOpen, setSmartBagCreatorOpen] = useState(false);
+  const [selectedProductForBag, setSelectedProductForBag] = useState<Product | null>(null);
   useEffect(() => {
     const loadProducts = async () => {
       if (!user) {
@@ -531,7 +532,14 @@ const Products = () => {
                         </button>
                       </div>
                       
-                      <button onClick={() => setSmartBagCreatorOpen(true)} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-primary bg-primary/10 rounded hover:bg-primary/20 transition-colors">
+                      <button 
+                        onClick={() => {
+                          // Pass the product data to SmartBagCreator
+                          setSelectedProductForBag(product);
+                          setSmartBagCreatorOpen(true);
+                        }} 
+                        className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-primary bg-primary/10 rounded hover:bg-primary/20 transition-colors"
+                      >
                         <Package className="w-3 h-3" />
                         Surprise Bag
                       </button>
@@ -637,28 +645,32 @@ const Products = () => {
         <DialogContent className="sm:max-w-7xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
           </DialogHeader>
-          <SmartBagCreator onSuccess={() => {
-            setSmartBagCreatorOpen(false);
-            // Reload products to show new smart bags
-            if (user) {
-              const loadProducts = async () => {
-                try {
-                  const userProducts = await productService.getProductsByUser(user.id);
-                  const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
-                  const combinedProducts = [...userProducts];
-                  storeProducts.forEach(storeProduct => {
-                    if (!combinedProducts.some(p => p.id === storeProduct.id)) {
-                      combinedProducts.push(storeProduct);
-                    }
-                  });
-                  setProducts(combinedProducts);
-                } catch (error) {
-                  console.error("Error reloading products:", error);
-                }
-              };
-              loadProducts();
-            }
-          }} />
+          <SmartBagCreator 
+            selectedProduct={selectedProductForBag}
+            onSuccess={() => {
+              setSmartBagCreatorOpen(false);
+              setSelectedProductForBag(null);
+              // Reload products to show new smart bags
+              if (user) {
+                const loadProducts = async () => {
+                  try {
+                    const userProducts = await productService.getProductsByUser(user.id);
+                    const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
+                    const combinedProducts = [...userProducts];
+                    storeProducts.forEach(storeProduct => {
+                      if (!combinedProducts.some(p => p.id === storeProduct.id)) {
+                        combinedProducts.push(storeProduct);
+                      }
+                    });
+                    setProducts(combinedProducts);
+                  } catch (error) {
+                    console.error("Error reloading products:", error);
+                  }
+                };
+                loadProducts();
+              }
+            }} 
+          />
         </DialogContent>
       </Dialog>
 
