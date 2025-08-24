@@ -496,35 +496,33 @@ export const SmartBagCreator = ({
         </CardHeader>
       </Card>
 
-      {/* Bag Configuration - Full Width */}
-      <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
-        <CardHeader>
-          <CardTitle>Bag Configuration</CardTitle>
+      {/* Bag Configuration - Compact */}
+      <Card className="border border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Bag Configuration</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <CardContent className="pt-0">
+          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              
-              <Input id="name" placeholder="e.g.: Mixed Smart Bag" {...register("name", {
+              <Label htmlFor="name" className="text-sm">Name</Label>
+              <Input id="name" placeholder="Mixed Smart Bag" className="h-8" {...register("name", {
               required: "Name required"
             })} />
-              {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
+              {errors.name && <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>}
             </div>
 
-            
-
             <div>
-              <Label htmlFor="expiresAt">Available until</Label>
-              <Input id="expiresAt" type="datetime-local" {...register("expiresAt", {
+              <Label htmlFor="expiresAt" className="text-sm">Available until</Label>
+              <Input id="expiresAt" type="datetime-local" className="h-8" {...register("expiresAt", {
               required: "Date required"
             })} />
             </div>
 
             <div>
-              <Label htmlFor="salePrice">Sale Price</Label>
+              <Label htmlFor="salePrice" className="text-sm">Sale Price</Label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input id="salePrice" type="number" step="0.01" placeholder={suggestedPrice.toString()} className="pl-10" {...register("salePrice", {
+                <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3" />
+                <Input id="salePrice" type="number" step="0.01" placeholder={suggestedPrice.toString()} className="pl-7 h-8" {...register("salePrice", {
                 required: "Price required",
                 min: {
                   value: 0.01,
@@ -532,34 +530,32 @@ export const SmartBagCreator = ({
                 }
               })} />
               </div>
-              {suggestedPrice > 0 && <p className="text-sm text-green-600 mt-1">
-                  💡 Suggested price: ${suggestedPrice}
+              {suggestedPrice > 0 && <p className="text-xs text-green-600 mt-1">
+                  💡 ${suggestedPrice}
                 </p>}
             </div>
 
-            <div className="md:col-span-4">
-              <Label htmlFor="description">Description</Label>
-              <Textarea id="description" placeholder="Describe what customers can expect..." {...register("description")} />
+            <div className="md:col-span-3">
+              <Label htmlFor="description" className="text-sm">Description</Label>
+              <Textarea id="description" placeholder="Describe what customers can expect..." className="min-h-[60px] resize-none" {...register("description")} />
             </div>
             
-            {/* Grains Points Display */}
-            <div className="md:col-span-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-1">
-                <Star className="w-4 h-4 text-yellow-600 fill-current" />
-                <span className="text-sm font-medium text-yellow-800">Grains Earned</span>
+            {/* Grains Points Display - Compact */}
+            <div className="md:col-span-3 p-2 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-md">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <Star className="w-3 h-3 text-yellow-600 fill-current" />
+                  <span className="text-xs font-medium text-yellow-800">
+                    Grains: {watch("salePrice") ? formatPoints(calculateProductPoints(watch("salePrice"))) : "0 pts"}
+                  </span>
+                </div>
+                <span className="text-xs text-yellow-600">2% cashback</span>
               </div>
-              <p className="text-sm text-yellow-700">
-                Customers earn {watch("salePrice") ? formatPoints(calculateProductPoints(watch("salePrice"))) : "0 pts"} with this bag
-              </p>
-              <p className="text-xs text-yellow-600 mt-1">
-                2% cashback • 1 grain = $0.005 AUD
-              </p>
             </div>
 
-            {/* Action Buttons */}
-            <div className="md:col-span-4 flex gap-2 justify-center">
-              
-              <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs" onClick={handleSendNotification} disabled={selectedCategories.length === 0 || isSubmitting}>
+            {/* Action Button - Compact */}
+            <div className="md:col-span-3 flex justify-center">
+              <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs px-3 py-1" onClick={handleSendNotification} disabled={selectedCategories.length === 0 || isSubmitting}>
                 <Bell className="w-3 h-3" />
                 Send Notification
               </Button>
