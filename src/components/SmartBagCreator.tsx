@@ -511,16 +511,7 @@ export const SmartBagCreator = ({
               {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
             </div>
 
-            <div>
-              <Label htmlFor="maxQuantity">Quantity</Label>
-              <Input id="maxQuantity" type="number" min="1" placeholder="10" {...register("maxQuantity", {
-              required: "Quantity required",
-              min: {
-                value: 1,
-                message: "Minimum 1"
-              }
-            })} />
-            </div>
+            
 
             <div>
               <Label htmlFor="expiresAt">Available until</Label>
