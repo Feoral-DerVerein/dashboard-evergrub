@@ -212,13 +212,35 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
 
     setWishlistProducts(prev => [...prev, wishlistProduct]);
     
+    // AUTOMATICALLY add to selected products so it shows in "Your Smart Bag"
+    setSelectedProducts(prev => [...prev, wishlistProduct.id]);
+    
     // Also add to current suggestions if they exist
     if (suggestions) {
       setSuggestions(prev => ({
         ...prev,
         products: [...(prev.products || []), wishlistProduct]
       }));
+    } else {
+      // Create initial suggestions with this product if none exist
+      setSuggestions({
+        products: [wishlistProduct],
+        enhanced: {
+          enhancedProducts: [{
+            id: wishlistProduct.id,
+            emoji: '🛒',
+            enhancedReason: wishlistProduct.suggestion_reason,
+            urgencyLevel: 'high',
+            recommendationScore: 100
+          }]
+        }
+      });
     }
+
+    toast({
+      title: "Added to Smart Bag",
+      description: `${product.name} from client ${clientId} automatically added to your smart bag`,
+    });
   };
 
   const calculateBagValue = () => {
