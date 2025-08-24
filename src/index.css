@@ -78,22 +78,27 @@
   @apply text-emerald-500 text-sm font-medium;
 }
 
-/* Glass card utility classes */
+/* Apple-style card utility classes */
+.apple-card {
+  @apply bg-white/90 backdrop-blur-xl border-0 rounded-2xl shadow-sm;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.apple-card-hover {
+  @apply apple-card transition-all duration-300 hover:shadow-lg hover:scale-[1.02];
+}
+
+.apple-card-hover:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Legacy glass card classes for backward compatibility */
 .glass-card {
-  background: rgba(var(--glass-bg));
-  backdrop-filter: var(--glass-backdrop);
-  border: 1px solid rgba(var(--glass-border));
-  box-shadow: var(--glass-shadow);
+  @apply apple-card;
 }
 
 .glass-card-hover {
-  @apply glass-card transition-all duration-200 hover:scale-105;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.glass-card-hover:hover {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 6px 20px rgba(31, 38, 135, 0.12);
+  @apply apple-card-hover;
 }
 
 /* Add scrollbar utilities */

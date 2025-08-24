@@ -12,16 +12,16 @@ const RatingInsightCard = ({ label, rating, percentage, status }: RatingInsightC
   const showStar = rating !== undefined;
   
   return (
-    <div className="glass-card rounded-xl p-4 h-full min-h-28 flex flex-col justify-between">
-      <div className="text-gray-500 text-sm mb-2">{label}</div>
+    <div className="apple-card-hover p-6 h-full min-h-32 flex flex-col justify-between">
+      <div className="text-muted-foreground text-sm font-medium mb-3">{label}</div>
       <div className="flex flex-col">
-        <div className="flex items-center gap-1 mb-2">
-          <span className="text-2xl font-semibold">{displayValue}</span>
-          {showStar && <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />}
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-3xl font-semibold text-foreground tracking-tight">{displayValue}</span>
+          {showStar && <Star className="w-6 h-6 text-amber-500 fill-amber-500" />}
         </div>
-        <div className="flex items-center gap-1">
-          <ThumbsUp className="w-4 h-4 text-emerald-500" />
-          <span className="text-sm text-emerald-500">{status}</span>
+        <div className="flex items-center gap-2">
+          <ThumbsUp className="w-4 h-4 text-emerald-600" />
+          <span className="text-sm font-medium text-emerald-600">{status}</span>
         </div>
       </div>
     </div>
