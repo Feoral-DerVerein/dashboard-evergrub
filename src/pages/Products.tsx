@@ -436,7 +436,7 @@ const Products = () => {
               <div className="col-span-full text-center py-8">
                 <p className="text-gray-500 mb-2">No surprise bags available in the marketplace</p>
                 <p className="text-purple-600 font-medium">
-                  Have food waste? Create a surprise bag for the marketplace.
+                  Do you have food waste? Create a surprise bag for the market.
                 </p>
               </div>
             )}
