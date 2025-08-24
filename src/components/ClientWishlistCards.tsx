@@ -159,8 +159,8 @@ export const ClientWishlistCards = ({ onProductAdd, selectedCategory }: ClientWi
   const handleAddProduct = (product: any, clientId: string) => {
     onProductAdd?.(product, clientId);
     toast({
-      title: "Product Added",
-      description: `${product.name} added from client ${clientId}'s wishlist`,
+      title: "Added to Smart Bag",
+      description: `${product.name} from client ${clientId} added to your smart bag`,
     });
   };
 
