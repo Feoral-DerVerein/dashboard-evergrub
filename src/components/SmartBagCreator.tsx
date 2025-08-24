@@ -664,7 +664,7 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
                   <div className="flex items-center gap-2">
                     <Package className="w-5 h-5 text-amber-700" />
                     <span className="font-medium text-amber-800">
-                      {selectedProducts.length} productos
+                      {selectedProducts.length} products
                     </span>
                   </div>
                   <div className="text-right">
@@ -673,7 +673,7 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
                   </div>
                 </div>
                 <div className="text-xs text-green-600 font-medium text-center mt-2">
-                  {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}% de descuento
+                  {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}% discount
                 </div>
               </div>
             )}
@@ -681,14 +681,14 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
             {/* Products List */}
             <div className="space-y-4">
               <h4 className="font-semibold text-amber-800 text-lg border-b border-amber-200 pb-2">
-                Productos en la bolsa
+                Products in the bag
               </h4>
               
               {selectedProducts.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                  <p>No hay productos seleccionados</p>
-                  <p className="text-sm">Agrega productos de las sugerencias para ver tu bolsa</p>
+                  <p>No products selected</p>
+                  <p className="text-sm">Add products from suggestions to see your bag</p>
                 </div>
               ) : (
                 <div className="space-y-3 max-h-64 overflow-y-auto">
@@ -711,7 +711,7 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
                             <p className="font-semibold text-amber-700">${product.price.toFixed(2)}</p>
                             {product.isWishlistItem && (
                               <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
-                                Cliente
+                                Client
                               </Badge>
                             )}
                           </div>
@@ -730,10 +730,10 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
                     disabled={isSubmitting} 
                     className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold"
                   >
-                    {isSubmitting ? "Publicando..." : (
+                    {isSubmitting ? "Publishing..." : (
                       <>
                         <Sparkles className="w-5 h-5 mr-2" />
-                        Publicar Smart Bag
+                        Publish Smart Bag
                       </>
                     )}
                   </Button>
