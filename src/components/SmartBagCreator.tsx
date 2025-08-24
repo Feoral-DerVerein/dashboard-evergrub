@@ -551,128 +551,124 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
         </CardHeader>
       </Card>
 
+      {/* Bag Configuration - Full Width */}
+      <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
+        <CardHeader>
+          <CardTitle>Bag Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="name">Bag Name</Label>
+              <Input 
+                id="name" 
+                placeholder="e.g.: Mixed Smart Bag" 
+                {...register("name", { required: "Name required" })} 
+              />
+              {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
+            </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Step 1: Category Selection */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle>1. Bag Configuration</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <Label htmlFor="maxQuantity">Quantity</Label>
+              <Input 
+                id="maxQuantity" 
+                type="number" 
+                min="1" 
+                placeholder="10" 
+                {...register("maxQuantity", {
+                  required: "Quantity required",
+                  min: { value: 1, message: "Minimum 1" }
+                })} 
+              />
+            </div>
 
-              <div>
-                <Label htmlFor="name">Bag Name</Label>
+            <div>
+              <Label htmlFor="expiresAt">Available until</Label>
+              <Input 
+                id="expiresAt" 
+                type="datetime-local" 
+                {...register("expiresAt", { required: "Date required" })} 
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="salePrice">Sale Price</Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input 
-                  id="name" 
-                  placeholder="e.g.: Mixed Smart Bag" 
-                  {...register("name", { required: "Name required" })} 
-                />
-                {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea 
-                  id="description" 
-                  placeholder="Describe what customers can expect..." 
-                  {...register("description")} 
+                  id="salePrice" 
+                  type="number" 
+                  step="0.01" 
+                  placeholder={suggestedPrice.toString()} 
+                  className="pl-10" 
+                  {...register("salePrice", {
+                    required: "Price required",
+                    min: { value: 0.01, message: "Price must be greater than 0" }
+                  })} 
                 />
               </div>
+              {suggestedPrice > 0 && (
+                <p className="text-sm text-green-600 mt-1">
+                  💡 Suggested price: ${suggestedPrice}
+                </p>
+              )}
+            </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="maxQuantity">Quantity</Label>
-                  <Input 
-                    id="maxQuantity" 
-                    type="number" 
-                    min="1" 
-                    placeholder="10" 
-                    {...register("maxQuantity", {
-                      required: "Quantity required",
-                      min: { value: 1, message: "Minimum 1" }
-                    })} 
-                  />
-                </div>
-
-                <div className="col-span-2">
-                  <Label htmlFor="expiresAt">Available until</Label>
-                  <Input 
-                    id="expiresAt" 
-                    type="datetime-local" 
-                    {...register("expiresAt", { required: "Date required" })} 
-                  />
-                </div>
+            <div className="md:col-span-4">
+              <Label htmlFor="description">Description</Label>
+              <Textarea 
+                id="description" 
+                placeholder="Describe what customers can expect..." 
+                {...register("description")} 
+              />
+            </div>
+            
+            {/* Grains Points Display */}
+            <div className="md:col-span-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <Star className="w-4 h-4 text-yellow-600 fill-current" />
+                <span className="text-sm font-medium text-yellow-800">Grains Earned</span>
               </div>
+              <p className="text-sm text-yellow-700">
+                Customers earn {watch("salePrice") ? formatPoints(calculateProductPoints(watch("salePrice"))) : "0 pts"} with this bag
+              </p>
+              <p className="text-xs text-yellow-600 mt-1">
+                2% cashback • 1 grain = $0.005 AUD
+              </p>
+            </div>
 
-              <div>
-                <Label htmlFor="salePrice">Sale Price</Label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input 
-                    id="salePrice" 
-                    type="number" 
-                    step="0.01" 
-                    placeholder={suggestedPrice.toString()} 
-                    className="pl-10" 
-                    {...register("salePrice", {
-                      required: "Price required",
-                      min: { value: 0.01, message: "Price must be greater than 0" }
-                    })} 
-                  />
-                </div>
-                {suggestedPrice > 0 && (
-                  <p className="text-sm text-green-600 mt-1">
-                    💡 Suggested price: ${suggestedPrice}
-                  </p>
-                )}
-                
-                {/* Grains Points Display */}
-                <div className="mt-3 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Star className="w-4 h-4 text-yellow-600 fill-current" />
-                    <span className="text-sm font-medium text-yellow-800">Grains Earned</span>
-                  </div>
-                  <p className="text-sm text-yellow-700">
-                    Customers earn {watch("salePrice") ? formatPoints(calculateProductPoints(watch("salePrice"))) : "0 pts"} with this bag
-                  </p>
-                  <p className="text-xs text-yellow-600 mt-1">
-                    2% cashback • 1 grain = $0.005 AUD
-                  </p>
-                </div>
+            {/* Action Buttons */}
+            <div className="md:col-span-4 flex gap-2 justify-center">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-1 text-xs"
+                onClick={handleSendToMarketplace}
+                disabled={selectedCategories.length === 0 || isSubmitting}
+              >
+                <Package className="w-3 h-3" />
+                Send to Marketplace
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-1 text-xs"
+                onClick={handleSendNotification}
+                disabled={selectedCategories.length === 0 || isSubmitting}
+              >
+                <Bell className="w-3 h-3" />
+                Send Notification
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
 
-                {/* Action Buttons */}
-                <div className="mt-6 flex gap-2 justify-center">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex items-center gap-1 text-xs"
-                    onClick={handleSendToMarketplace}
-                    disabled={selectedCategories.length === 0 || isSubmitting}
-                  >
-                    <Package className="w-3 h-3" />
-                    Send to Marketplace
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex items-center gap-1 text-xs"
-                    onClick={handleSendNotification}
-                    disabled={selectedCategories.length === 0 || isSubmitting}
-                  >
-                    <Bell className="w-3 h-3" />
-                    Send Notification
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Step 2: Customer References */}
-        <Card className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Client Preferences */}
+        <Card>
           <CardHeader>
-            <CardTitle>2. Customer References</CardTitle>
+            <CardTitle>Client Preferences</CardTitle>
             <CardDescription>
               View customer wishlist data from Wisebite marketplace to create personalized smart bags
             </CardDescription>
@@ -710,41 +706,40 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
             />
           </CardContent>
         </Card>
-      </div>
 
-      {/* Smart Bag Visualization */}
-      <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-amber-600" />
-            Your Smart Bag
-          </CardTitle>
-          <CardDescription>
-            Visual representation of your created smart bag with selected products
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Compact Summary */}
-            {totalValue > 0 && (
-              <div className="bg-white rounded-lg p-3 shadow-sm border border-amber-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Package className="w-5 h-5 text-amber-700" />
-                    <span className="font-medium text-amber-800">
-                      {selectedProducts.length} products
-                    </span>
+        {/* Your Smart Bag */}
+        <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Package className="w-5 h-5 text-amber-600" />
+              Your Smart Bag
+            </CardTitle>
+            <CardDescription>
+              Visual representation of your created smart bag with selected products
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Compact Summary */}
+              {totalValue > 0 && (
+                <div className="bg-white rounded-lg p-3 shadow-sm border border-amber-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Package className="w-5 h-5 text-amber-700" />
+                      <span className="font-medium text-amber-800">
+                        {selectedProducts.length} products
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-gray-500 line-through">${totalValue.toFixed(2)}</div>
+                      <div className="font-bold text-amber-700">${watch("salePrice") || suggestedPrice.toFixed(2)}</div>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm text-gray-500 line-through">${totalValue.toFixed(2)}</div>
-                    <div className="font-bold text-amber-700">${watch("salePrice") || suggestedPrice.toFixed(2)}</div>
+                  <div className="text-xs text-green-600 font-medium text-center mt-2">
+                    {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}% discount
                   </div>
                 </div>
-                <div className="text-xs text-green-600 font-medium text-center mt-2">
-                  {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}% discount
-                </div>
-              </div>
-            )}
+              )}
 
             {/* Product Search */}
             <div className="space-y-4">
@@ -883,8 +878,9 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
               )}
             </div>
           </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
