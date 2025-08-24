@@ -439,7 +439,7 @@ const Products = () => {
                   onClick={() => setSurpriseBagFormOpen(true)}
                   className="text-purple-600 hover:text-purple-700 font-medium"
                 >
-                  Create your first surprise bag
+                  Tienes food waste? haz una bolsa sorpresa para el marketplace.
                 </button>
               </div>
             )}
