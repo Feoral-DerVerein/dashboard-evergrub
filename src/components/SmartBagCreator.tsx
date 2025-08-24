@@ -14,12 +14,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Brain, Package, DollarSign, Clock, Target, Sparkles, CheckCircle, AlertTriangle, TrendingUp, Users, Calendar, Zap, Star, Bell, Search, Plus } from "lucide-react";
 import { calculateProductPoints, formatPoints } from "@/utils/pointsCalculator";
 import { ClientWishlistCards } from "./ClientWishlistCards";
-
 interface SmartBagCreatorProps {
   onSuccess?: () => void;
   selectedProduct?: any; // Product selected from Products page
 }
-
 interface SmartBagFormData {
   category: string;
   name: string;
@@ -28,7 +26,6 @@ interface SmartBagFormData {
   maxQuantity: number;
   expiresAt: string;
 }
-
 interface ProductSuggestion {
   id: number;
   name: string;
@@ -43,7 +40,6 @@ interface ProductSuggestion {
   isWishlistItem?: boolean;
   source?: string;
 }
-
 interface EnhancedSuggestion {
   id: number;
   emoji: string;
@@ -51,43 +47,41 @@ interface EnhancedSuggestion {
   urgencyLevel: string;
   recommendationScore: number;
 }
-
-const categories = [
-  {
-    value: "Coffee",
-    label: "☕ Coffee",
-    emoji: "☕"
-  },
-  {
-    value: "Pastries",
-    label: "🥐 Pastries",
-    emoji: "🥐"
-  },
-  {
-    value: "Sandwiches",
-    label: "🥪 Sandwiches",
-    emoji: "🥪"
-  },
-  {
-    value: "Breakfast",
-    label: "🍳 Breakfast",
-    emoji: "🍳"
-  },
-  {
-    value: "Beverages",
-    label: "🧃 Beverages",
-    emoji: "🧃"
-  },
-  {
-    value: "Desserts",
-    label: "🍰 Desserts",
-    emoji: "🍰"
-  }
-];
-
-export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorProps) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
+const categories = [{
+  value: "Coffee",
+  label: "☕ Coffee",
+  emoji: "☕"
+}, {
+  value: "Pastries",
+  label: "🥐 Pastries",
+  emoji: "🥐"
+}, {
+  value: "Sandwiches",
+  label: "🥪 Sandwiches",
+  emoji: "🥪"
+}, {
+  value: "Breakfast",
+  label: "🍳 Breakfast",
+  emoji: "🍳"
+}, {
+  value: "Beverages",
+  label: "🧃 Beverages",
+  emoji: "🧃"
+}, {
+  value: "Desserts",
+  label: "🍰 Desserts",
+  emoji: "🍰"
+}];
+export const SmartBagCreator = ({
+  onSuccess,
+  selectedProduct
+}: SmartBagCreatorProps) => {
+  const {
+    user
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<any>(null);
@@ -98,14 +92,15 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isLoadingSearch, setIsLoadingSearch] = useState(false);
   const [selectedProductFromInventory, setSelectedProductFromInventory] = useState<any>(null);
-  
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     reset,
-    formState: { errors }
+    formState: {
+      errors
+    }
   } = useForm<SmartBagFormData>();
 
   // Handle selected product from Products page
@@ -114,19 +109,16 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       handleAddProductFromInventory(selectedProduct);
     }
   }, [selectedProduct]);
-
   const handleAddProductFromInventory = async (product: any) => {
     try {
       // Query wishlist demand for this product
-      const { data: wishlistData, error } = await supabase
-        .from('wishlists')
-        .select('user_id, product_data')
-        .eq('product_id', product.id.toString());
-      
+      const {
+        data: wishlistData,
+        error
+      } = await supabase.from('wishlists').select('user_id, product_data').eq('product_id', product.id.toString());
       if (error) {
         console.error('Error fetching wishlist demand:', error);
       }
-
       const wishlistDemand = wishlistData?.length || 0;
       const wishlistUsers = wishlistData?.map(w => ({
         user_id: w.user_id,
@@ -141,14 +133,10 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
         isWishlistItem: false,
         source: 'inventory_selection',
         priority: wishlistDemand > 0 ? 'high' : 'medium',
-        suggestion_reason: wishlistDemand > 0 
-          ? `${wishlistDemand} customer${wishlistDemand > 1 ? 's' : ''} want${wishlistDemand === 1 ? 's' : ''} this product`
-          : 'Selected from your inventory',
-        days_to_expire: product.expirationdate ? 
-          Math.max(0, Math.ceil((new Date(product.expirationdate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 365,
+        suggestion_reason: wishlistDemand > 0 ? `${wishlistDemand} customer${wishlistDemand > 1 ? 's' : ''} want${wishlistDemand === 1 ? 's' : ''} this product` : 'Selected from your inventory',
+        days_to_expire: product.expirationdate ? Math.max(0, Math.ceil((new Date(product.expirationdate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 365,
         wishlistUsers
       };
-
       setSelectedProductFromInventory(productWithWishlistData);
       setSelectedProducts(prev => [...prev, product.id]);
 
@@ -173,12 +161,10 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
           }
         });
       }
-
       toast({
         title: "Product Added to Smart Bag",
-        description: `${product.name} added${wishlistDemand > 0 ? ` (${wishlistDemand} customer match${wishlistDemand > 1 ? 'es' : ''})` : ''}`,
+        description: `${product.name} added${wishlistDemand > 0 ? ` (${wishlistDemand} customer match${wishlistDemand > 1 ? 'es' : ''})` : ''}`
       });
-
     } catch (error) {
       console.error('Error adding product from inventory:', error);
       toast({
@@ -188,53 +174,35 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       });
     }
   };
-
   const handleSearchProducts = async (query: string) => {
     if (!user || !query.trim()) {
       setSearchResults([]);
       return;
     }
-
     setIsLoadingSearch(true);
     try {
-      const { data: products, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('userid', user.id)
-        .eq('is_marketplace_visible', true)
-        .gt('quantity', 0)
-        .ilike('name', `%${query}%`)
-        .limit(10);
-
+      const {
+        data: products,
+        error
+      } = await supabase.from('products').select('*').eq('userid', user.id).eq('is_marketplace_visible', true).gt('quantity', 0).ilike('name', `%${query}%`).limit(10);
       if (error) throw error;
 
       // Get AI suggestions for each product
-      const productsWithSuggestions = await Promise.all(
-        products.map(async (product) => {
-          // Query wishlist demand for this product
-          const { data: wishlistData } = await supabase
-            .from('wishlists')
-            .select('user_id')
-            .eq('product_id', product.id.toString());
-
-          const wishlistDemand = wishlistData?.length || 0;
-          const daysToExpire = product.expirationdate ? 
-            Math.max(0, Math.ceil((new Date(product.expirationdate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 365;
-
-          return {
-            ...product,
-            wishlist_demand: wishlistDemand,
-            days_to_expire: daysToExpire,
-            priority: wishlistDemand > 0 ? 'high' : daysToExpire <= 7 ? 'medium' : 'low',
-            suggestion_reason: wishlistDemand > 0 
-              ? `${wishlistDemand} customer${wishlistDemand > 1 ? 's' : ''} want${wishlistDemand === 1 ? 's' : ''} this product`
-              : daysToExpire <= 7 
-                ? `Expires in ${daysToExpire} day${daysToExpire !== 1 ? 's' : ''}`
-                : 'Available in inventory'
-          };
-        })
-      );
-
+      const productsWithSuggestions = await Promise.all(products.map(async product => {
+        // Query wishlist demand for this product
+        const {
+          data: wishlistData
+        } = await supabase.from('wishlists').select('user_id').eq('product_id', product.id.toString());
+        const wishlistDemand = wishlistData?.length || 0;
+        const daysToExpire = product.expirationdate ? Math.max(0, Math.ceil((new Date(product.expirationdate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 365;
+        return {
+          ...product,
+          wishlist_demand: wishlistDemand,
+          days_to_expire: daysToExpire,
+          priority: wishlistDemand > 0 ? 'high' : daysToExpire <= 7 ? 'medium' : 'low',
+          suggestion_reason: wishlistDemand > 0 ? `${wishlistDemand} customer${wishlistDemand > 1 ? 's' : ''} want${wishlistDemand === 1 ? 's' : ''} this product` : daysToExpire <= 7 ? `Expires in ${daysToExpire} day${daysToExpire !== 1 ? 's' : ''}` : 'Available in inventory'
+        };
+      }));
       setSearchResults(productsWithSuggestions);
     } catch (error) {
       console.error('Error searching products:', error);
@@ -247,22 +215,14 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       setIsLoadingSearch(false);
     }
   };
-
   const handleAddSearchedProduct = (product: any) => {
     handleAddProductFromInventory(product);
     setSearchQuery("");
     setSearchResults([]);
   };
-
-
   const toggleProductSelection = (productId: number) => {
-    setSelectedProducts(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId) 
-        : [...prev, productId]
-    );
+    setSelectedProducts(prev => prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId]);
   };
-
   const handleProductAddFromWishlist = (product: any, clientId: string) => {
     // Add the product to wishlistProducts state to show it was added from a client
     const wishlistProduct = {
@@ -277,12 +237,11 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       quantity: 1,
       suggestion_reason: `Producto solicitado específicamente por cliente ${clientId}`
     };
-
     setWishlistProducts(prev => [...prev, wishlistProduct]);
-    
+
     // AUTOMATICALLY add to selected products so it shows in "Your Smart Bag"
     setSelectedProducts(prev => [...prev, wishlistProduct.id]);
-    
+
     // Also add to current suggestions if they exist
     if (suggestions) {
       setSuggestions(prev => ({
@@ -304,29 +263,26 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
         }
       });
     }
-
     toast({
       title: "Added to Smart Bag",
-      description: `${product.name} from client ${clientId} automatically added to your smart bag`,
+      description: `${product.name} from client ${clientId} automatically added to your smart bag`
     });
   };
-
   const calculateBagValue = () => {
-    if (!suggestions?.products) return { totalValue: 0, suggestedPrice: 0 };
-    
-    const selectedProductsData = suggestions.products.filter(
-      (p: ProductSuggestion) => selectedProducts.includes(p.id)
-    );
-    const totalValue = selectedProductsData.reduce(
-      (sum: number, product: ProductSuggestion) => sum + product.price, 
-      0
-    );
+    if (!suggestions?.products) return {
+      totalValue: 0,
+      suggestedPrice: 0
+    };
+    const selectedProductsData = suggestions.products.filter((p: ProductSuggestion) => selectedProducts.includes(p.id));
+    const totalValue = selectedProductsData.reduce((sum: number, product: ProductSuggestion) => sum + product.price, 0);
 
     // Suggest 50-70% discount
     const suggestedPrice = Math.round(totalValue * 0.4 * 100) / 100;
-    return { totalValue, suggestedPrice };
+    return {
+      totalValue,
+      suggestedPrice
+    };
   };
-
   const onSubmit = async (data: SmartBagFormData) => {
     if (!user) {
       toast({
@@ -336,7 +292,6 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       });
       return;
     }
-    
     if (selectedProducts.length === 0) {
       toast({
         title: "Error",
@@ -345,15 +300,15 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       });
       return;
     }
-
     setIsSubmitting(true);
     try {
-      const selectedProductsData = suggestions.products.filter(
-        (p: ProductSuggestion) => selectedProducts.includes(p.id)
-      );
-      const { totalValue } = calculateBagValue();
-      
-      const { error } = await supabase.from('smart_bags').insert({
+      const selectedProductsData = suggestions.products.filter((p: ProductSuggestion) => selectedProducts.includes(p.id));
+      const {
+        totalValue
+      } = calculateBagValue();
+      const {
+        error
+      } = await supabase.from('smart_bags').insert({
         user_id: user.id,
         category: selectedCategories.join(', '),
         name: data.name,
@@ -366,14 +321,11 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
         selected_products: selectedProductsData,
         is_active: true
       });
-
       if (error) throw error;
-
       toast({
         title: "Smart Bag Created!",
         description: "Your smart bag is now available in the marketplace"
       });
-      
       reset();
       setSelectedProducts([]);
       setSuggestions(null);
@@ -389,25 +341,23 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       setIsSubmitting(false);
     }
   };
-
   const handleSendToMarketplace = async () => {
     if (!user || selectedCategories.length === 0 || !suggestions) {
       toast({
-        title: "Error", 
+        title: "Error",
         description: "Please select categories and generate suggestions first",
         variant: "destructive"
       });
       return;
     }
-
     setIsSubmitting(true);
     try {
-      const selectedProductsData = suggestions.products.filter(
-        (p: ProductSuggestion) => selectedProducts.includes(p.id)
-      );
+      const selectedProductsData = suggestions.products.filter((p: ProductSuggestion) => selectedProducts.includes(p.id));
       const formData = watch();
-      const { totalValue, suggestedPrice } = calculateBagValue();
-      
+      const {
+        totalValue,
+        suggestedPrice
+      } = calculateBagValue();
       const smartBagData = {
         user_id: user.id,
         category: selectedCategories.join(', '),
@@ -423,20 +373,20 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       };
 
       // Send to external marketplace
-      const { data, error } = await supabase.functions.invoke('send-to-marketplace', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('send-to-marketplace', {
         body: {
           smartBagData,
           marketplaceUrl: 'https://lovable.dev/projects/45195c06-d75b-4bb9-880e-7c6af20b31b5'
         }
       });
-
       if (error) throw error;
-
       toast({
         title: "Sent to Marketplace!",
         description: "Smart bag data has been sent to wisebite-marketplace"
       });
-
     } catch (error: any) {
       console.error("Error sending to marketplace:", error);
       toast({
@@ -448,25 +398,23 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       setIsSubmitting(false);
     }
   };
-
   const handleSendNotification = async () => {
     if (!user || selectedCategories.length === 0 || !suggestions) {
       toast({
         title: "Error",
-        description: "Please select categories and generate suggestions first", 
+        description: "Please select categories and generate suggestions first",
         variant: "destructive"
       });
       return;
     }
-
     setIsSubmitting(true);
     try {
-      const selectedProductsData = suggestions.products.filter(
-        (p: ProductSuggestion) => selectedProducts.includes(p.id)
-      );
+      const selectedProductsData = suggestions.products.filter((p: ProductSuggestion) => selectedProducts.includes(p.id));
       const formData = watch();
-      const { totalValue, suggestedPrice } = calculateBagValue();
-
+      const {
+        totalValue,
+        suggestedPrice
+      } = calculateBagValue();
       const notificationData = {
         user_id: user.id,
         category: selectedCategories.join(', '),
@@ -477,22 +425,20 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
         selected_products: selectedProductsData,
         product_count: selectedProductsData.length
       };
-
-      const { error } = await supabase.functions.invoke('send-smart-bag-notification', {
+      const {
+        error
+      } = await supabase.functions.invoke('send-smart-bag-notification', {
         body: notificationData
       });
-
       if (error) throw error;
-
       toast({
         title: "Notification Sent!",
         description: "Smart bag notification has been sent to customers"
       });
-
     } catch (error: any) {
       console.error("Error sending notification:", error);
       toast({
-        title: "Error", 
+        title: "Error",
         description: error.message || "Could not send notification",
         variant: "destructive"
       });
@@ -500,28 +446,27 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       setIsSubmitting(false);
     }
   };
-
   const handleConnectWisebiteMarketplace = async () => {
     if (!user) return;
-    
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase.functions.invoke('connect-wisebite-marketplace', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('connect-wisebite-marketplace', {
         body: {
           action: 'get_client_wishlists',
-          data: { user_id: user.id }
+          data: {
+            user_id: user.id
+          }
         }
       });
-
       if (error) throw error;
-
       toast({
         title: "Marketplace Connected!",
-        description: `Found ${data.total_clients} client wishlists from Wisebite marketplace`,
+        description: `Found ${data.total_clients} client wishlists from Wisebite marketplace`
       });
-
       console.log('Wisebite marketplace data:', data);
-      
     } catch (error: any) {
       console.error("Error connecting to Wisebite marketplace:", error);
       toast({
@@ -533,11 +478,11 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
       setIsSubmitting(false);
     }
   };
-
-  const { totalValue, suggestedPrice } = calculateBagValue();
-
-  return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
+  const {
+    totalValue,
+    suggestedPrice
+  } = calculateBagValue();
+  return <div className="w-full max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
         <CardHeader className="text-center">
@@ -560,67 +505,50 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
           <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <Label htmlFor="name">Bag Name</Label>
-              <Input 
-                id="name" 
-                placeholder="e.g.: Mixed Smart Bag" 
-                {...register("name", { required: "Name required" })} 
-              />
+              <Input id="name" placeholder="e.g.: Mixed Smart Bag" {...register("name", {
+              required: "Name required"
+            })} />
               {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
             </div>
 
             <div>
               <Label htmlFor="maxQuantity">Quantity</Label>
-              <Input 
-                id="maxQuantity" 
-                type="number" 
-                min="1" 
-                placeholder="10" 
-                {...register("maxQuantity", {
-                  required: "Quantity required",
-                  min: { value: 1, message: "Minimum 1" }
-                })} 
-              />
+              <Input id="maxQuantity" type="number" min="1" placeholder="10" {...register("maxQuantity", {
+              required: "Quantity required",
+              min: {
+                value: 1,
+                message: "Minimum 1"
+              }
+            })} />
             </div>
 
             <div>
               <Label htmlFor="expiresAt">Available until</Label>
-              <Input 
-                id="expiresAt" 
-                type="datetime-local" 
-                {...register("expiresAt", { required: "Date required" })} 
-              />
+              <Input id="expiresAt" type="datetime-local" {...register("expiresAt", {
+              required: "Date required"
+            })} />
             </div>
 
             <div>
               <Label htmlFor="salePrice">Sale Price</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input 
-                  id="salePrice" 
-                  type="number" 
-                  step="0.01" 
-                  placeholder={suggestedPrice.toString()} 
-                  className="pl-10" 
-                  {...register("salePrice", {
-                    required: "Price required",
-                    min: { value: 0.01, message: "Price must be greater than 0" }
-                  })} 
-                />
+                <Input id="salePrice" type="number" step="0.01" placeholder={suggestedPrice.toString()} className="pl-10" {...register("salePrice", {
+                required: "Price required",
+                min: {
+                  value: 0.01,
+                  message: "Price must be greater than 0"
+                }
+              })} />
               </div>
-              {suggestedPrice > 0 && (
-                <p className="text-sm text-green-600 mt-1">
+              {suggestedPrice > 0 && <p className="text-sm text-green-600 mt-1">
                   💡 Suggested price: ${suggestedPrice}
-                </p>
-              )}
+                </p>}
             </div>
 
             <div className="md:col-span-4">
               <Label htmlFor="description">Description</Label>
-              <Textarea 
-                id="description" 
-                placeholder="Describe what customers can expect..." 
-                {...register("description")} 
-              />
+              <Textarea id="description" placeholder="Describe what customers can expect..." {...register("description")} />
             </div>
             
             {/* Grains Points Display */}
@@ -639,23 +567,8 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
 
             {/* Action Buttons */}
             <div className="md:col-span-4 flex gap-2 justify-center">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center gap-1 text-xs"
-                onClick={handleSendToMarketplace}
-                disabled={selectedCategories.length === 0 || isSubmitting}
-              >
-                <Package className="w-3 h-3" />
-                Send to Marketplace
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center gap-1 text-xs"
-                onClick={handleSendNotification}
-                disabled={selectedCategories.length === 0 || isSubmitting}
-              >
+              
+              <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs" onClick={handleSendNotification} disabled={selectedCategories.length === 0 || isSubmitting}>
                 <Bell className="w-3 h-3" />
                 Send Notification
               </Button>
@@ -675,14 +588,9 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
           </CardHeader>
           <CardContent>
             {/* Selected Product from Inventory - Compact Version */}
-            {selectedProductFromInventory && (
-              <div className="mb-4 p-3 bg-white border border-green-200 rounded-lg shadow-sm">
+            {selectedProductFromInventory && <div className="mb-4 p-3 bg-white border border-green-200 rounded-lg shadow-sm">
                 <div className="flex items-center gap-3">
-                  <img 
-                    src={selectedProductFromInventory.image || "/placeholder.svg"} 
-                    alt={selectedProductFromInventory.name}
-                    className="w-12 h-12 object-cover rounded-md"
-                  />
+                  <img src={selectedProductFromInventory.image || "/placeholder.svg"} alt={selectedProductFromInventory.name} className="w-12 h-12 object-cover rounded-md" />
                   <div className="flex-1 min-w-0">
                     <h5 className="font-medium text-gray-900 truncate">{selectedProductFromInventory.name}</h5>
                     <div className="flex items-center gap-2 mt-1">
@@ -697,13 +605,9 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
                     </Badge>
                   </div>
                 </div>
-              </div>
-            )}
+              </div>}
             
-            <ClientWishlistCards 
-              onProductAdd={handleProductAddFromWishlist}
-              selectedCategory={selectedCategories[0]}
-            />
+            <ClientWishlistCards onProductAdd={handleProductAddFromWishlist} selectedCategory={selectedCategories[0]} />
           </CardContent>
         </Card>
 
@@ -721,8 +625,7 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
           <CardContent>
             <div className="space-y-4">
               {/* Compact Summary */}
-              {totalValue > 0 && (
-                <div className="bg-white rounded-lg p-3 shadow-sm border border-amber-200">
+              {totalValue > 0 && <div className="bg-white rounded-lg p-3 shadow-sm border border-amber-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Package className="w-5 h-5 text-amber-700" />
@@ -738,8 +641,7 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
                   <div className="text-xs text-green-600 font-medium text-center mt-2">
                     {Math.round((1 - (watch("salePrice") || suggestedPrice) / totalValue) * 100)}% discount
                   </div>
-                </div>
-              )}
+                </div>}
 
             {/* Product Search */}
             <div className="space-y-4">
@@ -749,21 +651,15 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
                 </h4>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      handleSearchProducts(e.target.value);
-                    }}
-                    className="pl-10 w-48 h-8 text-sm"
-                  />
+                  <Input placeholder="Search products..." value={searchQuery} onChange={e => {
+                    setSearchQuery(e.target.value);
+                    handleSearchProducts(e.target.value);
+                  }} className="pl-10 w-48 h-8 text-sm" />
                 </div>
               </div>
 
               {/* Search Results */}
-              {searchQuery && (
-                <div className="bg-white rounded-lg border border-amber-200 shadow-sm">
+              {searchQuery && <div className="bg-white rounded-lg border border-amber-200 shadow-sm">
                   <div className="p-3 border-b border-amber-100">
                     <div className="flex items-center gap-2">
                       <Brain className="w-4 h-4 text-purple-600" />
@@ -771,72 +667,43 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
                     </div>
                   </div>
                   <div className="max-h-48 overflow-y-auto">
-                    {isLoadingSearch ? (
-                      <div className="p-4 text-center text-gray-500">
+                    {isLoadingSearch ? <div className="p-4 text-center text-gray-500">
                         <div className="animate-spin w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full mx-auto mb-2"></div>
                         Searching products...
-                      </div>
-                    ) : searchResults.length === 0 ? (
-                      <div className="p-4 text-center text-gray-500">
+                      </div> : searchResults.length === 0 ? <div className="p-4 text-center text-gray-500">
                         <Search className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                         <p className="text-sm">No products found</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2 p-3">
-                        {searchResults.map((product) => (
-                          <div key={product.id} className="flex items-center gap-3 p-2 hover:bg-amber-50 rounded-lg group">
-                            <img 
-                              src={product.image || "/placeholder.svg"} 
-                              alt={product.name}
-                              className="w-10 h-10 object-cover rounded-md"
-                            />
+                      </div> : <div className="space-y-2 p-3">
+                        {searchResults.map(product => <div key={product.id} className="flex items-center gap-3 p-2 hover:bg-amber-50 rounded-lg group">
+                            <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-10 h-10 object-cover rounded-md" />
                             <div className="flex-1 min-w-0">
                               <h5 className="font-medium text-gray-900 truncate text-sm">{product.name}</h5>
                               <div className="flex items-center gap-2 mt-1">
                                 <span className="text-xs text-gray-500">{product.category}</span>
                                 <span className="text-xs font-semibold text-green-600">${product.price.toFixed(2)}</span>
-                                {product.wishlist_demand > 0 && (
-                                  <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
+                                {product.wishlist_demand > 0 && <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
                                     {product.wishlist_demand} wants
-                                  </Badge>
-                                )}
+                                  </Badge>}
                               </div>
                               <p className="text-xs text-purple-600 mt-1">{product.suggestion_reason}</p>
                             </div>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleAddSearchedProduct(product)}
-                              disabled={selectedProducts.includes(product.id)}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
+                            <Button size="sm" variant="outline" onClick={() => handleAddSearchedProduct(product)} disabled={selectedProducts.includes(product.id)} className="opacity-0 group-hover:opacity-100 transition-opacity">
                               <Plus className="w-3 h-3 mr-1" />
                               Add
                             </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          </div>)}
+                      </div>}
                   </div>
-                </div>
-              )}
+                </div>}
               
-              {selectedProducts.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+              {selectedProducts.length === 0 ? <div className="text-center py-8 text-gray-500">
                   <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                   <p>No products selected</p>
                   <p className="text-sm">Search and add products to see your bag</p>
-                </div>
-              ) : (
-                <div className="space-y-3 max-h-64 overflow-y-auto">
-                  {suggestions?.products
-                    ?.filter((p: ProductSuggestion) => selectedProducts.includes(p.id))
-                    ?.map((product: ProductSuggestion, index: number) => {
-                      const enhancement = suggestions.enhanced?.enhancedProducts?.find(
-                        (e: EnhancedSuggestion) => e.id === product.id
-                      );
-                      return (
-                        <div key={product.id} className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm border border-amber-100">
+                </div> : <div className="space-y-3 max-h-64 overflow-y-auto">
+                  {suggestions?.products?.filter((p: ProductSuggestion) => selectedProducts.includes(p.id))?.map((product: ProductSuggestion, index: number) => {
+                  const enhancement = suggestions.enhanced?.enhancedProducts?.find((e: EnhancedSuggestion) => e.id === product.id);
+                  return <div key={product.id} className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm border border-amber-100">
                           <div className="flex-shrink-0 w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
                             <span className="text-lg">{enhancement?.emoji || '📦'}</span>
                           </div>
@@ -846,41 +713,27 @@ export const SmartBagCreator = ({ onSuccess, selectedProduct }: SmartBagCreatorP
                           </div>
                           <div className="text-right">
                             <p className="font-semibold text-amber-700">${product.price.toFixed(2)}</p>
-                            {product.isWishlistItem && (
-                              <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
+                            {product.isWishlistItem && <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
                                 Client
-                              </Badge>
-                            )}
+                              </Badge>}
                           </div>
-                        </div>
-                      );
-                    })}
-                </div>
-              )}
+                        </div>;
+                })}
+                </div>}
 
               {/* Publish Button */}
-              {selectedProducts.length > 0 && (
-                <div className="pt-4 border-t border-amber-200">
-                  <Button 
-                    onClick={handleSubmit(onSubmit)} 
-                    size="lg" 
-                    disabled={isSubmitting} 
-                    className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold"
-                  >
-                    {isSubmitting ? "Publishing..." : (
-                      <>
+              {selectedProducts.length > 0 && <div className="pt-4 border-t border-amber-200">
+                  <Button onClick={handleSubmit(onSubmit)} size="lg" disabled={isSubmitting} className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold">
+                    {isSubmitting ? "Publishing..." : <>
                         <Sparkles className="w-5 h-5 mr-2" />
                         Publish Smart Bag
-                      </>
-                    )}
+                      </>}
                   </Button>
-                </div>
-              )}
+                </div>}
             </div>
           </div>
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
