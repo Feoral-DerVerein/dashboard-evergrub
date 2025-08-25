@@ -325,7 +325,7 @@ export const SmartBagCreator = ({
       if (smartBagError) throw smartBagError;
 
       // Also create it as a Surprise Bag product so it appears in the Surprise Bag category
-      const surpriseBagContents = selectedProductsData.map(p => p.name).join(', ');
+      const surpriseBagContents = JSON.stringify(selectedProductsData.map(p => p.name));
       const expirationDate = new Date(data.expiresAt).toISOString().split('T')[0];
       const pickupTimes = extractPickupTimes(data.expiresAt);
       

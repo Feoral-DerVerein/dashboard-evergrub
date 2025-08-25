@@ -25,7 +25,15 @@ export const mapDbProductToProduct = (dbProduct: DbProduct): Product => {
     originalPrice: dbProduct.original_price,
     pickupTimeStart: dbProduct.pickup_time_start,
     pickupTimeEnd: dbProduct.pickup_time_end,
-    surpriseBagContents: dbProduct.surprise_bag_contents ? JSON.parse(dbProduct.surprise_bag_contents) : undefined
+    surpriseBagContents: dbProduct.surprise_bag_contents ? (() => {
+      try {
+        // Try parsing as JSON first (new format)
+        return JSON.parse(dbProduct.surprise_bag_contents);
+      } catch {
+        // If parsing fails, treat as comma-separated string (old format)
+        return dbProduct.surprise_bag_contents.split(', ').map(item => item.trim());
+      }
+    })() : undefined
   };
   
   console.log(`Mapped DB product ${dbProduct.id} to client product:`, 
