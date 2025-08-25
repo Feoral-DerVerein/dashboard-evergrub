@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Slider } from "./ui/slider";
 import { Switch } from "./ui/switch";
 import { Progress } from "./ui/progress";
+import { useSurpriseBags } from "@/hooks/useSurpriseBags";
 type QuickAccessItemProps = {
   icon: React.ComponentType<{
     className?: string;
@@ -113,6 +114,7 @@ const Dashboard = () => {
     orderCount,
     notificationCount
   } = useNotificationsAndOrders();
+  const { surpriseBagCount } = useSurpriseBags();
   const [recentActivity, setRecentActivity] = useState<RecentActivityItemProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -347,9 +349,63 @@ const Dashboard = () => {
                 </p>
               </div>
               
-              {/* Dashboard content would go here */}
-              <div className="space-y-6">
-                {/* Placeholder for dashboard widgets */}
+              {/* Quick Access Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <QuickAccessItem icon={ShoppingCart} label="Products" to="/products" />
+                <QuickAccessItem icon={ShoppingBasket} label="Orders" to="/orders" badgeCount={orderCount} />
+                <QuickAccessItem icon={Bell} label="Notifications" to="/notifications" badgeCount={notificationCount} />
+                <QuickAccessItem icon={Recycle} label="Surprise Bag" to="/products" badgeCount={surpriseBagCount} />
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                <StatCard 
+                  label="Total Sales" 
+                  value={stats.totalSales} 
+                  trend="5.2% vs last week"
+                  isLoading={stats.isLoading}
+                />
+                <StatCard 
+                  label="Revenue" 
+                  value={`$${stats.totalRevenue.toFixed(2)}`} 
+                  trend="12.8% vs last week"
+                  isLoading={stats.isLoading}
+                />
+                <StatCard 
+                  label="Active Users" 
+                  value={stats.activeUsers} 
+                  trend="3.1% vs last week"
+                  isLoading={stats.isLoading}
+                />
+              </div>
+
+              {/* Recent Activity */}
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+                <div className="space-y-4">
+                  {isLoading ? (
+                    <div className="space-y-3">
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="flex items-center space-x-4">
+                          <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+                          <div className="h-4 flex-1 bg-gray-200 rounded animate-pulse"></div>
+                          <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    recentActivity.map((activity, index) => (
+                      <RecentActivityItem 
+                        key={index}
+                        title={activity.title}
+                        time={activity.time}
+                        amount={activity.amount}
+                        type={activity.type}
+                        orderItems={activity.orderItems}
+                      />
+                    ))
+                  )}
+                </div>
               </div>
             </main>
 
