@@ -45,7 +45,7 @@ export const SurpriseBagCard = ({
       {/* Image Section */}
       <div className="relative h-24">
         <img 
-          src={product.image || "/placeholder.svg"} 
+          src={product.image || "/lovable-uploads/eba1971f-71fd-474e-9eb1-aefb4afe9ebb.png"} 
           alt={product.name} 
           className="w-full h-full object-cover"
         />
