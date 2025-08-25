@@ -249,7 +249,6 @@ const Products = () => {
     setDonationFormOpen(true);
   };
   const filteredProducts = products.filter(product => {
-    const matchesCategory = selectedCategory === "General Stock" || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     
     // Special handling for Surprise Bag category - show future surprise bags
@@ -275,7 +274,16 @@ const Products = () => {
       return isFutureBag && matchesSearch;
     }
     
-    return matchesCategory && matchesSearch;
+    // For General Stock, exclude surprise bags
+    if (selectedCategory === "General Stock") {
+      return !product.isSurpriseBag && product.category !== "Surprise Bag" && matchesSearch;
+    }
+    
+    // For other specific categories, exclude surprise bags and match category
+    const matchesCategory = product.category === selectedCategory;
+    const isNotSurpriseBag = !product.isSurpriseBag && product.category !== "Surprise Bag";
+    
+    return matchesCategory && isNotSurpriseBag && matchesSearch;
   });
 
   // Debug information about the products
