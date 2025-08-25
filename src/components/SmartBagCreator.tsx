@@ -361,7 +361,11 @@ export const SmartBagCreator = ({
       reset();
       setSelectedProducts([]);
       setSuggestions(null);
-      onSuccess?.();
+      
+      // Small delay to ensure database consistency before triggering parent refresh
+      setTimeout(() => {
+        onSuccess?.();
+      }, 500);
     } catch (error: any) {
       console.error("Error creating smart bag:", error);
       toast({
