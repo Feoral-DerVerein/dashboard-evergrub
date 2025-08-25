@@ -20,6 +20,12 @@ type ProductFormData = {
   expirationDate: string;
   image: string;
   barcode?: string;
+  // Surprise bag fields
+  isSurpriseBag: boolean;
+  originalPrice: string;
+  pickupTimeStart: string;
+  pickupTimeEnd: string;
+  surpriseBagContents: string;
 };
 const AddProduct = () => {
   const {
@@ -39,7 +45,13 @@ const AddProduct = () => {
     quantity: "1",
     expirationDate: "",
     image: "",
-    barcode: ""
+    barcode: "",
+    // Surprise bag fields
+    isSurpriseBag: false,
+    originalPrice: "",
+    pickupTimeStart: "",
+    pickupTimeEnd: "",
+    surpriseBagContents: ""
   });
   const [showCustomBrand, setShowCustomBrand] = useState(false);
   const [brandSearchTerm, setBrandSearchTerm] = useState("");
@@ -174,7 +186,15 @@ const AddProduct = () => {
               quantity: product.quantity.toString(),
               expirationDate: product.expirationDate,
               image: product.image,
-              barcode: ""
+              barcode: "",
+              // Surprise bag fields
+              isSurpriseBag: product.isSurpriseBag || false,
+              originalPrice: product.originalPrice?.toString() || "",
+              pickupTimeStart: product.pickupTimeStart || "",
+              pickupTimeEnd: product.pickupTimeEnd || "",
+              surpriseBagContents: Array.isArray(product.surpriseBagContents) 
+                ? product.surpriseBagContents.join(', ') 
+                : product.surpriseBagContents || ""
             });
             setShowCustomBrand(isCustomBrand);
             if (product.image && product.image !== '/placeholder.svg') {
@@ -562,13 +582,22 @@ const AddProduct = () => {
         price: parseFloat(formData.price),
         discount: parseFloat(formData.discount) || 0,
         description: formData.description.trim(),
-        category: formData.category,
+        category: formData.isSurpriseBag ? "Surprise Bag" : formData.category,
         brand: brandToUse,
         quantity: parseInt(formData.quantity) || 1,
         expirationDate: formData.expirationDate,
         image: finalImage,
         userId: user.id,
-        storeId: SAFFIRE_FREYCINET_STORE_ID
+        storeId: SAFFIRE_FREYCINET_STORE_ID,
+        // Surprise bag fields
+        isSurpriseBag: formData.isSurpriseBag,
+        originalPrice: formData.isSurpriseBag ? parseFloat(formData.originalPrice) || 0 : undefined,
+        pickupTimeStart: formData.isSurpriseBag ? formData.pickupTimeStart : undefined,
+        pickupTimeEnd: formData.isSurpriseBag ? formData.pickupTimeEnd : undefined,
+        surpriseBagContents: formData.isSurpriseBag ? 
+          formData.surpriseBagContents.split(',').map(item => item.trim()).filter(item => item) : 
+          undefined,
+        isMarketplaceVisible: true // Auto-enable for marketplace visibility
       };
       console.log("Submitting product with data:", productData);
       let result;
@@ -808,10 +837,116 @@ const AddProduct = () => {
             </div>
           </div>
 
+          {/* Surprise Bag Section */}
+          <div className="border-t pt-6">
+            <div className="flex items-center gap-2 mb-4">
+              <input 
+                type="checkbox" 
+                id="isSurpriseBag"
+                checked={formData.isSurpriseBag}
+                onChange={e => setFormData({
+                  ...formData,
+                  isSurpriseBag: e.target.checked,
+                  category: e.target.checked ? "Surprise Bag" : formData.category
+                })}
+                className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+              />
+              <label htmlFor="isSurpriseBag" className="text-sm font-medium text-gray-700">
+                Is Surprise Bag (Too Good To Go)
+              </label>
+            </div>
+
+            {formData.isSurpriseBag && (
+              <div className="space-y-4 pl-6 border-l-2 border-green-200">
+                {/* Original Price */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Original Price <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2 text-green-600">$</span>
+                    <input 
+                      type="number" 
+                      step="0.01" 
+                      min="0.01" 
+                      value={formData.originalPrice} 
+                      onChange={e => setFormData({
+                        ...formData,
+                        originalPrice: e.target.value
+                      })} 
+                      className="w-full pl-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" 
+                      required={formData.isSurpriseBag}
+                    />
+                  </div>
+                  {formData.originalPrice && formData.price && (
+                    <p className="text-sm text-green-600 mt-1">
+                      Discount: {Math.round((1 - parseFloat(formData.price) / parseFloat(formData.originalPrice)) * 100)}%
+                    </p>
+                  )}
+                </div>
+
+                {/* Pickup Times */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Pickup Start Time <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      type="time" 
+                      value={formData.pickupTimeStart} 
+                      onChange={e => setFormData({
+                        ...formData,
+                        pickupTimeStart: e.target.value
+                      })} 
+                      className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" 
+                      required={formData.isSurpriseBag}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Pickup End Time <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                      type="time" 
+                      value={formData.pickupTimeEnd} 
+                      onChange={e => setFormData({
+                        ...formData,
+                        pickupTimeEnd: e.target.value
+                      })} 
+                      className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" 
+                      required={formData.isSurpriseBag}
+                    />
+                  </div>
+                </div>
+
+                {/* Surprise Bag Contents */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Surprise Bag Contents <span className="text-red-500">*</span>
+                  </label>
+                  <textarea 
+                    value={formData.surpriseBagContents} 
+                    onChange={e => setFormData({
+                      ...formData,
+                      surpriseBagContents: e.target.value
+                    })} 
+                    className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" 
+                    rows={3}
+                    placeholder="Describe possible contents (e.g., Pastries, Sandwiches, Coffee)"
+                    required={formData.isSurpriseBag}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Separate items with commas. Describe what customers might find in this surprise bag.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Expiration date input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Expiration Date <span className="text-red-500">*</span>
+              {formData.isSurpriseBag ? "Pickup Deadline" : "Expiration Date"} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input type="date" value={formData.expirationDate} onChange={e => setFormData({
@@ -820,6 +955,11 @@ const AddProduct = () => {
             })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required />
               <Calendar className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
             </div>
+            {formData.isSurpriseBag && (
+              <p className="text-xs text-gray-500 mt-1">
+                Last date customers can pick up this surprise bag
+              </p>
+            )}
           </div>
 
           {/* Image upload */}
