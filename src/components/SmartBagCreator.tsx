@@ -306,9 +306,9 @@ export const SmartBagCreator = ({
       const {
         totalValue
       } = calculateBagValue();
-      const {
-        error
-      } = await supabase.from('smart_bags').insert({
+      
+      // Create the smart bag record
+      const { data: smartBagData, error: smartBagError } = await supabase.from('smart_bags').insert({
         user_id: user.id,
         category: selectedCategories.join(', '),
         name: data.name,
@@ -320,11 +320,43 @@ export const SmartBagCreator = ({
         ai_suggestions: suggestions,
         selected_products: selectedProductsData,
         is_active: true
+      }).select().single();
+      
+      if (smartBagError) throw smartBagError;
+
+      // Also create it as a Surprise Bag product so it appears in the Surprise Bag category
+      const surpriseBagContents = selectedProductsData.map(p => p.name).join(', ');
+      const expirationDate = new Date(data.expiresAt).toISOString().split('T')[0];
+      const pickupTimes = extractPickupTimes(data.expiresAt);
+      
+      const { error: productError } = await supabase.from('products').insert({
+        name: data.name,
+        description: data.description,
+        price: data.salePrice,
+        discount: Math.round(((totalValue - data.salePrice) / totalValue) * 100),
+        original_price: totalValue,
+        category: "Surprise Bag",
+        brand: "Smart Bag AI",
+        quantity: data.maxQuantity,
+        expirationdate: expirationDate,
+        image: "/placeholder.svg", // Default image for smart bags
+        userid: user.id,
+        storeid: "4", // SAFFIRE_FREYCINET_STORE_ID
+        is_marketplace_visible: true,
+        is_surprise_bag: true,
+        pickup_time_start: pickupTimes.start,
+        pickup_time_end: pickupTimes.end,
+        surprise_bag_contents: surpriseBagContents
       });
-      if (error) throw error;
+
+      if (productError) {
+        console.error("Error creating surprise bag product:", productError);
+        // Don't fail the whole operation, just log the error
+      }
+
       toast({
         title: "Smart Bag Created!",
-        description: "Your smart bag is now available in the marketplace"
+        description: "Your smart bag is now available in the marketplace and Surprise Bag section"
       });
       reset();
       setSelectedProducts([]);
@@ -339,6 +371,30 @@ export const SmartBagCreator = ({
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Helper function to extract pickup times from expiration date
+  const extractPickupTimes = (expiresAt: string) => {
+    const expireDate = new Date(expiresAt);
+    const now = new Date();
+    
+    // If expires today, use current time to end of day
+    if (expireDate.toDateString() === now.toDateString()) {
+      const currentHour = now.getHours();
+      const startHour = Math.max(currentHour, 9); // Don't start before 9 AM
+      const endHour = Math.min(startHour + 8, 21); // Max 8 hours window, don't go past 9 PM
+      
+      return {
+        start: `${startHour.toString().padStart(2, '0')}:00`,
+        end: `${endHour.toString().padStart(2, '0')}:00`
+      };
+    } else {
+      // Default pickup window for future dates
+      return {
+        start: "09:00",
+        end: "17:00"
+      };
     }
   };
   const handleSendToMarketplace = async () => {
