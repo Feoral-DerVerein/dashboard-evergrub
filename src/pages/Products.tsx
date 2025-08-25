@@ -251,6 +251,30 @@ const Products = () => {
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === "General Stock" || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Special handling for Surprise Bag category - show future surprise bags
+    if (selectedCategory === "Surprise Bag") {
+      const isFutureBag = product.isSurpriseBag && (() => {
+        // Check if pickup time is in the future
+        if (product.pickupTimeEnd) {
+          const today = new Date();
+          const todayDateStr = today.toISOString().split('T')[0];
+          const pickupEndTime = new Date(`${todayDateStr}T${product.pickupTimeEnd}`);
+          return pickupEndTime > today;
+        }
+        
+        // Check if expiration date is in the future
+        if (product.expirationDate) {
+          const expirationDate = new Date(product.expirationDate);
+          return expirationDate > new Date();
+        }
+        
+        return true; // Show all surprise bags if no time constraints
+      })();
+      
+      return isFutureBag && matchesSearch;
+    }
+    
     return matchesCategory && matchesSearch;
   });
 
