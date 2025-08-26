@@ -116,6 +116,16 @@ const Login = () => {
       }} />
       </div>
       
+      {/* Hide Spline watermark */}
+      <style>{`
+        spline-viewer .logo {
+          display: none !important;
+        }
+        spline-viewer a[href*="spline.design"] {
+          display: none !important;
+        }
+      `}</style>
+      
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 relative z-10">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8 space-y-3">
