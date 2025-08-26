@@ -128,7 +128,7 @@ const Login = () => {
       `}</style>
       
       {/* Weather Card - iPhone style */}
-      <div className="absolute bottom-6 right-6 z-20 hidden lg:block">
+      <div className="absolute bottom-3 right-3 z-20 hidden lg:block">
         <img 
           src="/lovable-uploads/c2f2d672-9d3d-4f21-b32a-587a384d6de4.png" 
           alt="Weather Widget" 
