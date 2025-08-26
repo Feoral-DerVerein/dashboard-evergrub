@@ -6,6 +6,7 @@ import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
+import MelbourneWeatherCard from "@/components/widgets/MelbourneWeatherCard";
 
 
 // Declare the spline-viewer custom element for TypeScript
@@ -127,13 +128,9 @@ const Login = () => {
         }
       `}</style>
       
-      {/* Weather Card - iPhone style */}
+      {/* Weather Card - Real Melbourne Weather */}
       <div className="absolute bottom-3 right-3 z-20 hidden lg:block">
-        <img 
-          src="/lovable-uploads/c2f2d672-9d3d-4f21-b32a-587a384d6de4.png" 
-          alt="Weather Widget" 
-          className="w-48 h-auto rounded-2xl shadow-lg"
-        />
+        <MelbourneWeatherCard />
       </div>
       
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 relative z-10">
