@@ -5,7 +5,7 @@ import PointsBadge from "@/components/PointsBadge";
 
 interface SurpriseBagCardProps {
   product: Product;
-  onEdit: (id: number) => void;
+  onEdit: (product: Product) => void;
   onDelete: (id: number) => void;
   onToggleVisibility: (product: Product) => void;
   isTogglingVisibility?: boolean;
@@ -127,7 +127,7 @@ export const SurpriseBagCard = ({
         <div className="space-y-1">
           <div className="flex gap-1">
             <button 
-              onClick={() => product.id && onEdit(product.id)}
+              onClick={() => onEdit(product)}
               className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-white/80 rounded hover:bg-white transition-colors border"
             >
               ✏️ Edit

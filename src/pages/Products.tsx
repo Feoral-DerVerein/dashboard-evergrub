@@ -457,9 +457,8 @@ const Products = () => {
                   <SurpriseBagCard
                     key={product.id}
                     product={product}
-                    onEdit={() => {
-                      // Use React Router navigation instead of window.location
-                      navigate(`/products/edit/${product.id}`);
+                    onEdit={(product) => {
+                      setSmartBagCreatorOpen(true);
                     }}
                     onDelete={() => product.id && handleDeleteProduct(product.id)}
                     onToggleVisibility={() => handleToggleMarketplaceVisibility(product)}
