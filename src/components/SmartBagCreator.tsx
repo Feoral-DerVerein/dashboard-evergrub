@@ -17,6 +17,7 @@ import { ClientWishlistCards } from "./ClientWishlistCards";
 interface SmartBagCreatorProps {
   onSuccess?: () => void;
   selectedProduct?: any; // Product selected from Products page
+  editingProduct?: any; // Product being edited
 }
 interface SmartBagFormData {
   category: string;
@@ -72,10 +73,7 @@ const categories = [{
   label: "🍰 Desserts",
   emoji: "🍰"
 }];
-export const SmartBagCreator = ({
-  onSuccess,
-  selectedProduct
-}: SmartBagCreatorProps) => {
+export const SmartBagCreator = ({ onSuccess, selectedProduct, editingProduct }: SmartBagCreatorProps) => {
   const {
     user
   } = useAuth();
@@ -109,6 +107,59 @@ export const SmartBagCreator = ({
       handleAddProductFromInventory(selectedProduct);
     }
   }, [selectedProduct]);
+
+  // Handle editing existing product
+  useEffect(() => {
+    if (editingProduct) {
+      // Pre-populate form with editing product data
+      setValue("name", editingProduct.name);
+      setValue("description", editingProduct.description || "");
+      setValue("salePrice", editingProduct.price);
+      setValue("maxQuantity", editingProduct.quantity);
+      
+      // Set expiration date
+      if (editingProduct.expirationDate) {
+        const date = new Date(editingProduct.expirationDate);
+        setValue("expiresAt", date.toISOString().slice(0, 16));
+      }
+
+      // If it has surprise bag contents, try to recreate the product list
+      if (editingProduct.surpriseBagContents) {
+        const contents = typeof editingProduct.surpriseBagContents === 'string' 
+          ? JSON.parse(editingProduct.surpriseBagContents) 
+          : editingProduct.surpriseBagContents;
+        
+        // Create a mock suggestions object with the editing product
+        const mockSuggestions = {
+          products: [{
+            id: editingProduct.id,
+            name: editingProduct.name,
+            category: editingProduct.category,
+            price: editingProduct.originalPrice || editingProduct.price,
+            quantity: editingProduct.quantity,
+            days_to_expire: 1,
+            wishlist_demand: 0,
+            priority: 'medium',
+            suggestion_reason: 'From edited surprise bag',
+            isWishlistItem: false,
+            source: 'editing'
+          }],
+          enhanced: {
+            enhancedProducts: [{
+              id: editingProduct.id,
+              emoji: '📦',
+              enhancedReason: 'Editing existing surprise bag',
+              urgencyLevel: 'medium',
+              recommendationScore: 75
+            }]
+          }
+        };
+        
+        setSuggestions(mockSuggestions);
+        setSelectedProducts([editingProduct.id]);
+      }
+    }
+  }, [editingProduct, setValue]);
   const handleAddProductFromInventory = async (product: any) => {
     try {
       // Query wishlist demand for this product

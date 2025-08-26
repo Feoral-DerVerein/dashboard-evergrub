@@ -64,6 +64,7 @@ const Products = () => {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [surpriseBagFormOpen, setSurpriseBagFormOpen] = useState(false);
   const [smartBagCreatorOpen, setSmartBagCreatorOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedProductForBag, setSelectedProductForBag] = useState<Product | null>(null);
   useEffect(() => {
     const loadProducts = async () => {
@@ -398,13 +399,17 @@ const Products = () => {
           <DialogHeader>
             <DialogTitle>Create Smart Bag</DialogTitle>
           </DialogHeader>
-          <SmartBagCreator onSuccess={() => {
-            setSmartBagCreatorOpen(false);
-            toast({
-              title: "Smart Bag Created",
-              description: "Your smart bag has been successfully published to the marketplace"
-            });
-          }} />
+          <SmartBagCreator 
+            editingProduct={editingProduct}
+            onSuccess={() => {
+              setSmartBagCreatorOpen(false);
+              setEditingProduct(null);
+              toast({
+                title: "Smart Bag Updated",
+                description: "Your smart bag has been successfully updated"
+              });
+            }} 
+          />
         </DialogContent>
       </Dialog>
 
@@ -458,6 +463,7 @@ const Products = () => {
                     key={product.id}
                     product={product}
                     onEdit={(product) => {
+                      setEditingProduct(product);
                       setSmartBagCreatorOpen(true);
                     }}
                     onDelete={() => product.id && handleDeleteProduct(product.id)}
