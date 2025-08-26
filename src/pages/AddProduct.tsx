@@ -81,7 +81,7 @@ const AddProduct = () => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const currentTime = Date.now();
-      
+
       // If Enter key is pressed and we have accumulated input
       if (event.key === 'Enter' && barcodeInput.length > 0) {
         event.preventDefault();
@@ -90,12 +90,12 @@ const AddProduct = () => {
         setLastKeyTime(0);
         return;
       }
-      
+
       // If it's been more than 100ms since last key, start fresh
       if (currentTime - lastKeyTime > 100) {
         setBarcodeInput("");
       }
-      
+
       // Only accumulate if it's a valid barcode character and typed quickly
       if (/^[0-9]$/.test(event.key) && currentTime - lastKeyTime < 100) {
         setBarcodeInput(prev => prev + event.key);
@@ -108,7 +108,7 @@ const AddProduct = () => {
 
     // Add event listener when component mounts
     document.addEventListener('keydown', handleKeyDown);
-    
+
     // Cleanup event listener when component unmounts
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
@@ -192,9 +192,7 @@ const AddProduct = () => {
               originalPrice: product.originalPrice?.toString() || "",
               pickupTimeStart: product.pickupTimeStart || "",
               pickupTimeEnd: product.pickupTimeEnd || "",
-              surpriseBagContents: Array.isArray(product.surpriseBagContents) 
-                ? product.surpriseBagContents.join(', ') 
-                : product.surpriseBagContents || ""
+              surpriseBagContents: Array.isArray(product.surpriseBagContents) ? product.surpriseBagContents.join(', ') : product.surpriseBagContents || ""
             });
             setShowCustomBrand(isCustomBrand);
             if (product.image && product.image !== '/placeholder.svg') {
@@ -322,14 +320,12 @@ const AddProduct = () => {
 
       // Get product data from Open Food Facts (includes Australian products)
       const productData = await productImageSuggestService.getProductData(barcode);
-      
       if (productData && productData.name) {
         // Map category to our available categories
         let mappedCategory = "Restaurant"; // default
         if (productData.category) {
           const categoryLower = productData.category.toLowerCase();
-          if (categoryLower.includes("cosmetic") || categoryLower.includes("beauty") || 
-              categoryLower.includes("care") || categoryLower.includes("soap")) {
+          if (categoryLower.includes("cosmetic") || categoryLower.includes("beauty") || categoryLower.includes("care") || categoryLower.includes("soap")) {
             mappedCategory = "SPA Products";
           }
         }
@@ -342,12 +338,10 @@ const AddProduct = () => {
               title: "Downloading Image",
               description: "Automatically downloading product image..."
             });
-            
             const filePath = `${user.id}/${Date.now()}-barcode-${barcode}.jpg`;
             const uploadedUrl = await productImageService.uploadImageFromUrl(productData.imageUrl, filePath);
             finalImageUrl = uploadedUrl;
             setPreviewImage(uploadedUrl);
-            
             toast({
               title: "Image Downloaded",
               description: "Product image downloaded successfully!"
@@ -371,7 +365,6 @@ const AddProduct = () => {
           barcode: barcode,
           image: finalImageUrl
         });
-
         toast({
           title: "Product Found",
           description: `Australian product "${productData.name}" loaded with image from Open Food Facts!`
@@ -385,13 +378,11 @@ const AddProduct = () => {
           brand: "Generic",
           expirationDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split("T")[0]
         };
-        
         setFormData({
           ...formData,
           ...genericProduct,
           barcode: barcode
         });
-
         toast({
           title: "Barcode Scanned",
           description: "Product not found in database. Please complete the form manually.",
@@ -439,27 +430,17 @@ const AddProduct = () => {
   };
   const categories = ["Coffee", "Tea", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "general stock"];
   const brands = [
-    // Coffee Roasters & Suppliers
-    "Gloria Jean's", "The Coffee Club", "Campos Coffee", "Toby's Estate", "Five Senses Coffee",
-    "Single O", "Industry Beans", "St. Ali", "Allpress Espresso", "Coffee Supreme",
-    
-    // Food & Beverage Brands
-    "Bundaberg", "Golden Circle", "Cottee's", "Arnott's", "Tim Tam", "Lamington",
-    "Vegemite", "Weet-Bix", "Milo", "ANZAC", "Pavlova Co", "Fantales",
-    
-    // Bakery & Pastry Suppliers
-    "Bakers Delight", "Brumby's", "Michel's Patisserie", "Sumo Salad", "Boost Juice",
-    "Guzman y Gomez", "Mad Mex", "Zambrero", "Schnitz", "Grill'd",
-    
-    // Dairy & Local Producers
-    "Pauls", "Dairy Farmers", "A2 Milk", "Bega", "Devondale", "Mainland",
-    "King Island Dairy", "Tasmanian Heritage", "Coopers", "James Boag's"
-  ];
+  // Coffee Roasters & Suppliers
+  "Gloria Jean's", "The Coffee Club", "Campos Coffee", "Toby's Estate", "Five Senses Coffee", "Single O", "Industry Beans", "St. Ali", "Allpress Espresso", "Coffee Supreme",
+  // Food & Beverage Brands
+  "Bundaberg", "Golden Circle", "Cottee's", "Arnott's", "Tim Tam", "Lamington", "Vegemite", "Weet-Bix", "Milo", "ANZAC", "Pavlova Co", "Fantales",
+  // Bakery & Pastry Suppliers
+  "Bakers Delight", "Brumby's", "Michel's Patisserie", "Sumo Salad", "Boost Juice", "Guzman y Gomez", "Mad Mex", "Zambrero", "Schnitz", "Grill'd",
+  // Dairy & Local Producers
+  "Pauls", "Dairy Farmers", "A2 Milk", "Bega", "Devondale", "Mainland", "King Island Dairy", "Tasmanian Heritage", "Coopers", "James Boag's"];
 
   // Filter brands based on search term
-  const filteredBrands = brands.filter(brand => 
-    brand.toLowerCase().includes(brandSearchTerm.toLowerCase())
-  );
+  const filteredBrands = brands.filter(brand => brand.toLowerCase().includes(brandSearchTerm.toLowerCase()));
 
   // Handle brand selection change
   const handleBrandChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -594,9 +575,7 @@ const AddProduct = () => {
         originalPrice: formData.isSurpriseBag ? parseFloat(formData.originalPrice) || 0 : undefined,
         pickupTimeStart: formData.isSurpriseBag ? formData.pickupTimeStart : undefined,
         pickupTimeEnd: formData.isSurpriseBag ? formData.pickupTimeEnd : undefined,
-        surpriseBagContents: formData.isSurpriseBag ? 
-          formData.surpriseBagContents.split(',').map(item => item.trim()).filter(item => item) : 
-          undefined,
+        surpriseBagContents: formData.isSurpriseBag ? formData.surpriseBagContents.split(',').map(item => item.trim()).filter(item => item) : undefined,
         isMarketplaceVisible: true // Auto-enable for marketplace visibility
       };
       console.log("Submitting product with data:", productData);
@@ -688,25 +667,13 @@ const AddProduct = () => {
               Search by Barcode
             </label>
             <div className="flex gap-2">
-              <Input 
-                type="text" 
-                value={barcodeSearchInput} 
-                onChange={e => setBarcodeSearchInput(e.target.value)}
-                placeholder="Enter barcode number"
-                className="flex-1"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleBarcodeSearch();
-                  }
-                }}
-              />
-              <button 
-                type="button" 
-                onClick={handleBarcodeSearch}
-                disabled={loading || !barcodeSearchInput.trim()}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
-              >
+              <Input type="text" value={barcodeSearchInput} onChange={e => setBarcodeSearchInput(e.target.value)} placeholder="Enter barcode number" className="flex-1" onKeyPress={e => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleBarcodeSearch();
+              }
+            }} />
+              <button type="button" onClick={handleBarcodeSearch} disabled={loading || !barcodeSearchInput.trim()} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2">
                 <Search className="w-4 h-4" />
                 Search
               </button>
@@ -775,40 +742,23 @@ const AddProduct = () => {
               {/* Brand Search Input */}
               <div className="relative mb-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  type="text"
-                  placeholder="Search brands..."
-                  value={brandSearchTerm}
-                  onChange={(e) => setBrandSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+                <Input type="text" placeholder="Search brands..." value={brandSearchTerm} onChange={e => setBrandSearchTerm(e.target.value)} className="pl-10" />
               </div>
               
               <select value={formData.brand} onChange={handleBrandChange} className="w-full p-2 glass-card border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option value="">Select brand</option>
-                {filteredBrands.map(brand => (
-                  <option key={brand} value={brand}>
+                {filteredBrands.map(brand => <option key={brand} value={brand}>
                     {brand}
-                  </option>
-                ))}
+                  </option>)}
                 <option value="other">+ Add New Brand</option>
               </select>
               
-              {showCustomBrand && (
-                <div className="mt-2">
-                  <Input 
-                    type="text" 
-                    value={formData.customBrand} 
-                    onChange={e => setFormData({
-                      ...formData,
-                      customBrand: e.target.value
-                    })} 
-                    placeholder="Enter new brand name" 
-                    className="w-full" 
-                    required={formData.brand === "other"} 
-                  />
-                </div>
-              )}
+              {showCustomBrand && <div className="mt-2">
+                  <Input type="text" value={formData.customBrand} onChange={e => setFormData({
+                ...formData,
+                customBrand: e.target.value
+              })} placeholder="Enter new brand name" className="w-full" required={formData.brand === "other"} />
+                </div>}
             </div>
           </div>
 
@@ -840,24 +790,15 @@ const AddProduct = () => {
           {/* Surprise Bag Section */}
           <div className="border-t pt-6">
             <div className="flex items-center gap-2 mb-4">
-              <input 
-                type="checkbox" 
-                id="isSurpriseBag"
-                checked={formData.isSurpriseBag}
-                onChange={e => setFormData({
-                  ...formData,
-                  isSurpriseBag: e.target.checked,
-                  category: e.target.checked ? "Surprise Bag" : formData.category
-                })}
-                className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
-              />
-              <label htmlFor="isSurpriseBag" className="text-sm font-medium text-gray-700">
-                Is Surprise Bag (Too Good To Go)
-              </label>
+              <input type="checkbox" id="isSurpriseBag" checked={formData.isSurpriseBag} onChange={e => setFormData({
+              ...formData,
+              isSurpriseBag: e.target.checked,
+              category: e.target.checked ? "Surprise Bag" : formData.category
+            })} className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500" />
+              
             </div>
 
-            {formData.isSurpriseBag && (
-              <div className="space-y-4 pl-6 border-l-2 border-green-200">
+            {formData.isSurpriseBag && <div className="space-y-4 pl-6 border-l-2 border-green-200">
                 {/* Original Price */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -865,24 +806,14 @@ const AddProduct = () => {
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-2 text-green-600">$</span>
-                    <input 
-                      type="number" 
-                      step="0.01" 
-                      min="0.01" 
-                      value={formData.originalPrice} 
-                      onChange={e => setFormData({
-                        ...formData,
-                        originalPrice: e.target.value
-                      })} 
-                      className="w-full pl-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" 
-                      required={formData.isSurpriseBag}
-                    />
+                    <input type="number" step="0.01" min="0.01" value={formData.originalPrice} onChange={e => setFormData({
+                  ...formData,
+                  originalPrice: e.target.value
+                })} className="w-full pl-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required={formData.isSurpriseBag} />
                   </div>
-                  {formData.originalPrice && formData.price && (
-                    <p className="text-sm text-green-600 mt-1">
+                  {formData.originalPrice && formData.price && <p className="text-sm text-green-600 mt-1">
                       Discount: {Math.round((1 - parseFloat(formData.price) / parseFloat(formData.originalPrice)) * 100)}%
-                    </p>
-                  )}
+                    </p>}
                 </div>
 
                 {/* Pickup Times */}
@@ -891,31 +822,19 @@ const AddProduct = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Pickup Start Time <span className="text-red-500">*</span>
                     </label>
-                    <input 
-                      type="time" 
-                      value={formData.pickupTimeStart} 
-                      onChange={e => setFormData({
-                        ...formData,
-                        pickupTimeStart: e.target.value
-                      })} 
-                      className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" 
-                      required={formData.isSurpriseBag}
-                    />
+                    <input type="time" value={formData.pickupTimeStart} onChange={e => setFormData({
+                  ...formData,
+                  pickupTimeStart: e.target.value
+                })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required={formData.isSurpriseBag} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Pickup End Time <span className="text-red-500">*</span>
                     </label>
-                    <input 
-                      type="time" 
-                      value={formData.pickupTimeEnd} 
-                      onChange={e => setFormData({
-                        ...formData,
-                        pickupTimeEnd: e.target.value
-                      })} 
-                      className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" 
-                      required={formData.isSurpriseBag}
-                    />
+                    <input type="time" value={formData.pickupTimeEnd} onChange={e => setFormData({
+                  ...formData,
+                  pickupTimeEnd: e.target.value
+                })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required={formData.isSurpriseBag} />
                   </div>
                 </div>
 
@@ -924,23 +843,15 @@ const AddProduct = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Surprise Bag Contents <span className="text-red-500">*</span>
                   </label>
-                  <textarea 
-                    value={formData.surpriseBagContents} 
-                    onChange={e => setFormData({
-                      ...formData,
-                      surpriseBagContents: e.target.value
-                    })} 
-                    className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" 
-                    rows={3}
-                    placeholder="Describe possible contents (e.g., Pastries, Sandwiches, Coffee)"
-                    required={formData.isSurpriseBag}
-                  />
+                  <textarea value={formData.surpriseBagContents} onChange={e => setFormData({
+                ...formData,
+                surpriseBagContents: e.target.value
+              })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" rows={3} placeholder="Describe possible contents (e.g., Pastries, Sandwiches, Coffee)" required={formData.isSurpriseBag} />
                   <p className="text-xs text-gray-500 mt-1">
                     Separate items with commas. Describe what customers might find in this surprise bag.
                   </p>
                 </div>
-              </div>
-            )}
+              </div>}
           </div>
 
           {/* Expiration date input */}
@@ -955,11 +866,9 @@ const AddProduct = () => {
             })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required />
               <Calendar className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
             </div>
-            {formData.isSurpriseBag && (
-              <p className="text-xs text-gray-500 mt-1">
+            {formData.isSurpriseBag && <p className="text-xs text-gray-500 mt-1">
                 Last date customers can pick up this surprise bag
-              </p>
-            )}
+              </p>}
           </div>
 
           {/* Image upload */}
