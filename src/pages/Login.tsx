@@ -6,6 +6,7 @@ import { Eye, EyeOff, Smartphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
+import WeatherWidget from "@/components/widgets/WeatherWidget";
 
 // Declare the spline-viewer custom element for TypeScript
 declare global {
@@ -125,6 +126,11 @@ const Login = () => {
           display: none !important;
         }
       `}</style>
+      
+      {/* Weather Widget - iPhone style */}
+      <div className="absolute top-6 right-6 z-20 hidden lg:block">
+        <WeatherWidget />
+      </div>
       
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 relative z-10">
         {/* Logo */}
