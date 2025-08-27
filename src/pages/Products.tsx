@@ -477,7 +477,7 @@ const Products = () => {
               return (
                 <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
                   <div className="relative">
-                    <button onClick={() => handleToggleMarketplaceVisibility(product)} disabled={togglingMarketplaceId === product.id} className={`absolute top-2 left-2 z-10 backdrop-blur px-2 py-1 rounded-md shadow-sm border disabled:opacity-60 ${
+                    <button onClick={() => handleToggleMarketplaceVisibility(product)} disabled={togglingMarketplaceId === product.id} className={`absolute top-2 left-2 z-1 backdrop-blur px-2 py-1 rounded-md shadow-sm border disabled:opacity-60 ${
                       (product as any).isMarketplaceVisible 
                         ? "bg-white/90 border-gray-200 text-gray-700 hover:bg-white" 
                         : "bg-red-100/90 border-red-200 text-red-700 hover:bg-red-100"

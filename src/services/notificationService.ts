@@ -9,10 +9,11 @@ export interface Notification {
   type: string;
   order_id?: string;
   for_marketplace?: boolean;
-  product_id?: number;
+  product_id?: string;
   product_image?: string;
   product_price?: string;
   customer_name?: string;
+  user_id?: string;
 }
 
 export const notificationService = {
@@ -80,7 +81,7 @@ export const notificationService = {
           title: `New wishlist item: ${productName}`,
           description: `Someone added ${productName} to their wishlist`,
           type: 'wishlist',
-          product_id: productId,
+          product_id: productId.toString(),
           product_image: productImage,
           product_price: productPrice,
           customer_name: customerName || 'Anonymous Customer'

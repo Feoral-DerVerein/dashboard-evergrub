@@ -71,7 +71,7 @@ const WishlistNotificationCard = ({
           <Button 
             variant="default"
             size="sm"
-            onClick={() => notification.product_id && onNotifyUsers(notification.product_id)}
+            onClick={() => notification.product_id && onNotifyUsers(parseInt(notification.product_id))}
             className="flex-1 bg-blue-600 hover:bg-blue-700"
           >
             <Bookmark className="w-4 h-4 mr-1" />

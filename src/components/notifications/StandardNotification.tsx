@@ -53,7 +53,7 @@ const StandardNotification = ({
                 variant="outline" 
                 size="sm" 
                 className="h-8 text-xs bg-blue-50 text-blue-700 hover:bg-blue-100" 
-                onClick={() => notification.product_id && onNotifyUsers(notification.product_id)}
+                onClick={() => notification.product_id && onNotifyUsers(parseInt(notification.product_id))}
               >
                 <Bookmark className="w-3 h-3 mr-1" />
                 Notify Users
