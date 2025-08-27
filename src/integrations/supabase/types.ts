@@ -244,33 +244,45 @@ export type Database = {
       }
       notifications: {
         Row: {
+          customer_name: string | null
           description: string
           for_marketplace: boolean
           id: string
           is_read: boolean
           order_id: string | null
+          product_id: string | null
+          product_image: string | null
+          product_price: string | null
           timestamp: string
           title: string
           type: string
           user_id: string | null
         }
         Insert: {
+          customer_name?: string | null
           description: string
           for_marketplace?: boolean
           id?: string
           is_read?: boolean
           order_id?: string | null
+          product_id?: string | null
+          product_image?: string | null
+          product_price?: string | null
           timestamp?: string
           title: string
           type: string
           user_id?: string | null
         }
         Update: {
+          customer_name?: string | null
           description?: string
           for_marketplace?: boolean
           id?: string
           is_read?: boolean
           order_id?: string | null
+          product_id?: string | null
+          product_image?: string | null
+          product_price?: string | null
           timestamp?: string
           title?: string
           type?: string
@@ -797,6 +809,45 @@ export type Database = {
           socialFacebook?: string
           socialInstagram?: string
           userId?: string
+        }
+        Relationships: []
+      }
+      stores: {
+        Row: {
+          address: string
+          closing_hours: string
+          created_at: string
+          id: string
+          image_url: string | null
+          logo_url: string | null
+          name: string
+          opening_hours: string
+          store_type: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          closing_hours: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          logo_url?: string | null
+          name: string
+          opening_hours: string
+          store_type: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          closing_hours?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          logo_url?: string | null
+          name?: string
+          opening_hours?: string
+          store_type?: string
+          updated_at?: string
         }
         Relationships: []
       }
