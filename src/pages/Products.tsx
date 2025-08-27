@@ -254,7 +254,11 @@ const Products = () => {
     
     // Special handling for Surprise Bag category - show future surprise bags
     if (selectedCategory === "Surprise Bag") {
-      const isFutureBag = product.isSurpriseBag && (() => {
+      const isSurpriseBag = product.isSurpriseBag || product.category === "Surprise Bag";
+      
+      if (!isSurpriseBag) return false;
+      
+      const isFutureBag = (() => {
         // Check if pickup time is in the future
         if (product.pickupTimeEnd) {
           const today = new Date();
