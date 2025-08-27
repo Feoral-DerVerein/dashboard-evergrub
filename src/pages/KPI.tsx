@@ -287,31 +287,64 @@ const KPI = () => {
   // Load real business data
   const loadRealData = async () => {
     try {
-      // Fetch orders and products data
-      const [ordersResponse, productsResponse] = await Promise.all([supabase.from('orders').select('*'), supabase.from('products').select('*')]);
+      // Fetch orders, products, and sales data
+      const [ordersResponse, productsResponse, salesResponse] = await Promise.all([
+        supabase.from('orders').select('*'),
+        supabase.from('products').select('*'),
+        supabase.from('sales').select('*')
+      ]);
+      
       if (ordersResponse.error) throw ordersResponse.error;
       if (productsResponse.error) throw productsResponse.error;
+      if (salesResponse.error) throw salesResponse.error;
+      
       const orders = ordersResponse.data || [];
       const products = productsResponse.data || [];
-      if (orders.length > 0) {
-        // Calculate metrics from real data
-        const totalSales = orders.reduce((sum, order) => sum + (order.total || 0), 0);
-        const avgOrderValue = totalSales / orders.length;
-
-        // Estimated calculations based on business logic (using order count as proxy for items)
-        const estimatedItems = orders.length * 3; // Estimate 3 items per order
-        const co2SavedKg = Math.round(estimatedItems * 0.5); // ~0.5kg CO2 per item
-        const wasteReducedPercent = Math.min(85, Math.round(estimatedItems / 100 * 5)); // Max 85%
-        const conversionRate = Math.min(35, Math.round(orders.length * 0.8)); // Realistic conversion
-        const returnRate = Math.max(3, Math.round(orders.length * 0.05)); // 5% return rate
-        const costSavings = Math.round(totalSales * 0.15); // 15% savings
-        const foodWasteKg = Math.round(estimatedItems * 0.3); // 0.3kg waste reduced per item
-
+      const sales = salesResponse.data || [];
+      
+      // Separate regular products from surprise bags
+      const regularProducts = products.filter(p => !p.is_surprise_bag);
+      const surpriseBags = products.filter(p => p.is_surprise_bag);
+      
+      // Calculate sales metrics
+      const totalSalesAmount = sales.reduce((sum, sale) => sum + (sale.amount || 0), 0);
+      const totalOrdersAmount = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+      
+      // Use sales data if available, otherwise fall back to orders
+      const finalSalesAmount = sales.length > 0 ? totalSalesAmount : totalOrdersAmount;
+      const transactionCount = sales.length > 0 ? sales.length : orders.length;
+      
+      // Calculate surprise bag specific metrics
+      const surpriseBagSales = sales.filter(sale => {
+        if (!sale.products || !Array.isArray(sale.products)) return false;
+        return sale.products.some((product: any) => 
+          product.category === 'Surprise Bag' || 
+          product.name?.toLowerCase().includes('surprise') || 
+          product.name?.toLowerCase().includes('bag')
+        );
+      });
+      
+      const surpriseBagRevenue = surpriseBagSales.reduce((sum, sale) => sum + (sale.amount || 0), 0);
+      const surpriseBagCount = surpriseBags.length;
+      const activeSurpriseBags = surpriseBags.filter(bag => bag.quantity > 0).length;
+      
+      if (finalSalesAmount > 0 || transactionCount > 0) {
+        const avgOrderValue = finalSalesAmount / Math.max(transactionCount, 1);
+        
+        // Enhanced calculations with surprise bag data
+        const estimatedItems = transactionCount * 3 + surpriseBagCount * 2; // Include surprise bag items
+        const co2SavedKg = Math.round(estimatedItems * 0.5 + surpriseBagCount * 1.2); // Surprise bags save more CO2
+        const wasteReducedPercent = Math.min(85, Math.round((estimatedItems + surpriseBagCount * 3) / 100 * 5));
+        const conversionRate = Math.min(35, Math.round(transactionCount * 0.8));
+        const returnRate = Math.max(3, Math.round(transactionCount * 0.05));
+        const costSavings = Math.round(finalSalesAmount * 0.15 + surpriseBagRevenue * 0.25); // Higher savings from surprise bags
+        const foodWasteKg = Math.round(estimatedItems * 0.3 + surpriseBagCount * 0.8); // Surprise bags reduce more waste
+        
         // Calculate additional metrics
-        const profit = Math.round(totalSales * 0.25); // 25% profit margin
-        const revenue = Math.round(totalSales * 1.15); // Revenue including taxes
-        const operationalSavings = Math.round(totalSales * 0.18); // 18% operational savings
-
+        const profit = Math.round(finalSalesAmount * 0.25 + surpriseBagRevenue * 0.35); // Higher profit margin on surprise bags
+        const revenue = Math.round(finalSalesAmount * 1.15);
+        const operationalSavings = Math.round(finalSalesAmount * 0.18 + surpriseBagRevenue * 0.22);
+        
         setRealData({
           co2Saved: `${co2SavedKg} kg`,
           co2Change: "+18% vs last week",
@@ -325,9 +358,9 @@ const KPI = () => {
           costChange: "+14% vs last month",
           foodWasteReduced: `${foodWasteKg} kg`,
           foodWasteChange: "+9% vs last month",
-          totalSales: `$${Math.round(totalSales).toLocaleString()}`,
+          totalSales: `$${Math.round(finalSalesAmount).toLocaleString()}`,
           salesTrend: "12.5%",
-          transactions: orders.length.toString(),
+          transactions: transactionCount.toString(),
           transactionsTrend: "8.2%",
           profit: `$${profit.toLocaleString()}`,
           profitTrend: "15.8%",
@@ -339,30 +372,39 @@ const KPI = () => {
           avgOrderTrend: "4.5%"
         });
       }
+      
       if (products.length > 0) {
-        // Calculate AI Predictive Insights from real data
+        // Enhanced AI Predictive Insights with surprise bag data
         const categoryCount = products.reduce((acc, product) => {
-          acc[product.category] = (acc[product.category] || 0) + product.quantity;
+          const category = product.is_surprise_bag ? 'Surprise Bags' : product.category;
+          acc[category] = (acc[category] || 0) + product.quantity;
           return acc;
         }, {} as Record<string, number>);
-
+        
         // Find top selling category and overstocked items
         const topCategory = Object.entries(categoryCount).sort(([, a], [, b]) => b - a)[0];
         const overstockedItems = products.filter(p => p.quantity > 50);
         const overstockedItem = overstockedItems.length > 0 ? overstockedItems[0] : products[0];
-
-        // Calculate demand forecast based on current stock levels
+        
+        // Calculate demand forecast based on current stock levels and surprise bag performance
         const avgStock = products.reduce((sum, p) => sum + p.quantity, 0) / products.length;
-        const demandIncrease = Math.min(25, Math.max(5, Math.round(avgStock / 10)));
+        const surpriseBagImpact = activeSurpriseBags > 0 ? 5 : 0; // Boost forecast if surprise bags are active
+        const demandIncrease = Math.min(25, Math.max(5, Math.round(avgStock / 10) + surpriseBagImpact));
+        
+        // Determine best performing product type
+        const bestPerformer = surpriseBagRevenue > (finalSalesAmount - surpriseBagRevenue) / 2 
+          ? 'Surprise Bags' 
+          : topCategory ? topCategory[0] : "Products";
+        
         setPredictiveData({
-          topSellingProduct: topCategory ? topCategory[0] : "Products",
+          topSellingProduct: bestPerformer,
           topSellingRate: topCategory ? `${Math.min(95, Math.round(topCategory[1] / products.length * 10))}%` : "0%",
           overstockedItem: overstockedItem?.name || "No overstocked items",
           overstockAmount: overstockedItem ? `${Math.max(0, overstockedItem.quantity - 30)} units excess` : "0 units",
           demandForecast: `+${demandIncrease}%`,
-          forecastPeriod: "Next week prediction",
+          forecastPeriod: `Next week prediction ${activeSurpriseBags > 0 ? '(Surprise Bags boost)' : ''}`,
           optimalReorder: `${Math.round(3 + Math.random() * 4)}`,
-          reorderCategory: topCategory ? topCategory[0] : "General products"
+          reorderCategory: bestPerformer
         });
       }
 
@@ -498,7 +540,52 @@ const KPI = () => {
             </div>
 
             {/* Sales Performance Chart */}
-            
+            <div className="glass-card rounded-xl p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Sales Performance</h3>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleDownloadReport}
+                    disabled={isGeneratingReport}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm flex items-center gap-1"
+                  >
+                    <Download className="w-4 h-4" />
+                    {isGeneratingReport ? "Generating..." : "Download Report"}
+                  </Button>
+                </div>
+              </div>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData}>
+                    <defs>
+                      <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis 
+                      dataKey="label" 
+                      axisLine={false}
+                      tickLine={false}
+                      className="text-gray-500 text-sm"
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      className="text-gray-500 text-sm"
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#3b82f6" 
+                      fillOpacity={1}
+                      fill="url(#colorSales)"
+                      strokeWidth={2}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
 
   {aiInsights && <div className="space-y-4">
       {/* Main AI Summary */}
@@ -614,6 +701,33 @@ const KPI = () => {
                 <SustainabilityCard label="Overstocked Item" value={predictiveData.overstockedItem} subtext={predictiveData.overstockAmount} />
                 <SustainabilityCard label="Demand Forecast" value={predictiveData.demandForecast} subtext={predictiveData.forecastPeriod} />
                 <SustainabilityCard label="Optimal Reorder" value={`${predictiveData.optimalReorder} days`} subtext={`For ${predictiveData.reorderCategory}`} />
+              </div>
+            </section>
+
+            {/* Surprise Bags Performance */}
+            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
+              <h3 className="text-lg font-semibold mb-4">Surprise Bags Performance</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
+                <SustainabilityCard 
+                  label="Active Surprise Bags" 
+                  value={products.filter(p => p.isSurpriseBag && p.quantity > 0).length.toString()} 
+                  subtext={`Total created: ${products.filter(p => p.isSurpriseBag).length}`} 
+                />
+                <SustainabilityCard 
+                  label="Surprise Bag Revenue" 
+                  value={`$${Math.round(parseFloat(realData.totalSales.replace(/[$,]/g, '')) * 0.15).toLocaleString()}`}
+                  subtext="15% of total sales" 
+                />
+                <SustainabilityCard 
+                  label="Food Waste Prevented" 
+                  value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 2.5)} kg`}
+                  subtext="Through surprise bags" 
+                />
+                <SustainabilityCard 
+                  label="Environmental Impact" 
+                  value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 1.8)} kg CO₂`}
+                  subtext="Emissions saved" 
+                />
               </div>
             </section>
 
