@@ -254,9 +254,14 @@ const Products = () => {
     
     // Special handling for Surprise Bag category - show future surprise bags
     if (selectedCategory === "Surprise Bag") {
+      console.log(`Checking product ${product.name}: isSurpriseBag=${product.isSurpriseBag}, category=${product.category}`);
+      
       const isSurpriseBag = product.isSurpriseBag || product.category === "Surprise Bag";
       
-      if (!isSurpriseBag) return false;
+      if (!isSurpriseBag) {
+        console.log(`Product ${product.name} is not a surprise bag`);
+        return false;
+      }
       
       const isFutureBag = (() => {
         // Check if pickup time is in the future
@@ -264,19 +269,26 @@ const Products = () => {
           const today = new Date();
           const todayDateStr = today.toISOString().split('T')[0];
           const pickupEndTime = new Date(`${todayDateStr}T${product.pickupTimeEnd}`);
-          return pickupEndTime > today;
+          const isFuture = pickupEndTime > today;
+          console.log(`Product ${product.name} pickup time check: ${product.pickupTimeEnd} > now = ${isFuture}`);
+          return isFuture;
         }
         
         // Check if expiration date is in the future
         if (product.expirationDate) {
           const expirationDate = new Date(product.expirationDate);
-          return expirationDate > new Date();
+          const isFuture = expirationDate > new Date();
+          console.log(`Product ${product.name} expiration check: ${product.expirationDate} > now = ${isFuture}`);
+          return isFuture;
         }
         
+        console.log(`Product ${product.name} has no time constraints, showing by default`);
         return true; // Show all surprise bags if no time constraints
       })();
       
-      return isFutureBag && matchesSearch;
+      const result = isFutureBag && matchesSearch;
+      console.log(`Product ${product.name} final result: ${result} (isFutureBag=${isFutureBag}, matchesSearch=${matchesSearch})`);
+      return result;
     }
     
     // For General Stock, exclude surprise bags
