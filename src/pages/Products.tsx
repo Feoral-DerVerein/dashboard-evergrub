@@ -498,7 +498,7 @@ const Products = () => {
                         ? "bg-white/90 border-gray-200 text-gray-700 hover:bg-white" 
                         : "bg-red-100/90 border-red-200 text-red-700 hover:bg-red-100"
                     }`} aria-label={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"} title={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"}>
-                      {(product as any).isMarketplaceVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      {(product as any).isMarketplaceVisible ? <Store className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </button>
                     <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-20 object-cover" onError={e => {
                 console.error("Image failed to load:", product.image);
