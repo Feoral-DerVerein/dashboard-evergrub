@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { User, Mail, Phone, Lock, Camera, Bell, Shield, Palette, Globe, Save, Eye, EyeOff, CreditCard } from 'lucide-react';
+import { User, Mail, Phone, Lock, Camera, Bell, Shield, Palette, Globe, Save, Eye, EyeOff, CreditCard, Cloud } from 'lucide-react';
 const Configuration = () => {
   const {
     user
@@ -46,6 +46,13 @@ const Configuration = () => {
     routingNumber: '',
     accountType: 'checking',
     country: 'US'
+  });
+
+  // API settings state
+  const [apiSettings, setApiSettings] = useState({
+    lovableDashboardUrl: '',
+    apiKey: '',
+    enableInsights: true
   });
 
   // Password change state
@@ -123,6 +130,23 @@ const Configuration = () => {
     }
   };
 
+  const handleApiSettingsUpdate = async () => {
+    try {
+      localStorage.setItem('apiSettings', JSON.stringify(apiSettings));
+      toast({
+        title: "API settings updated",
+        description: "Your Lovable dashboard integration has been configured"
+      });
+    } catch (error) {
+      console.error('Error saving API settings:', error);
+      toast({
+        title: "Error",
+        description: "Could not save API settings",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Load settings from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem('userSettings');
@@ -146,6 +170,17 @@ const Configuration = () => {
         setBankAccount(prev => ({ ...prev, ...parsed }));
       } catch (error) {
         console.error('Error loading saved bank account:', error);
+      }
+    }
+
+    // Load API settings from localStorage
+    const savedApiSettings = localStorage.getItem('apiSettings');
+    if (savedApiSettings) {
+      try {
+        const parsed = JSON.parse(savedApiSettings);
+        setApiSettings(prev => ({ ...prev, ...parsed }));
+      } catch (error) {
+        console.error('Error loading saved API settings:', error);
       }
     }
   }, []);
@@ -570,6 +605,80 @@ const Configuration = () => {
             </CardContent>
           </Card>
           
+          {/* API Integration Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Cloud className="w-5 h-5" />
+                API Integration
+              </CardTitle>
+              <p className="text-sm text-gray-500">
+                Configure your Lovable.dev dashboard API for AI insights integration with n8n
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="lovable-api-url">Lovable Dashboard API URL</Label>
+                  <Input 
+                    id="lovable-api-url" 
+                    value={apiSettings.lovableDashboardUrl} 
+                    onChange={e => setApiSettings(prev => ({ ...prev, lovableDashboardUrl: e.target.value }))}
+                    placeholder="https://api.lovable.dev/v1/insights" 
+                  />
+                  <p className="text-sm text-gray-500">
+                    URL endpoint from your Lovable dashboard for receiving AI insights
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="api-key">API Key (Optional)</Label>
+                  <Input 
+                    id="api-key" 
+                    type="password"
+                    value={apiSettings.apiKey} 
+                    onChange={e => setApiSettings(prev => ({ ...prev, apiKey: e.target.value }))}
+                    placeholder="••••••••••••••••••••••••••••••••" 
+                  />
+                  <p className="text-sm text-gray-500">
+                    API key for authenticating with your dashboard (if required)
+                  </p>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Enable Insights Sync</p>
+                    <p className="text-sm text-gray-500">
+                      Automatically send AI insights to your dashboard via n8n
+                    </p>
+                  </div>
+                  <Switch 
+                    checked={apiSettings.enableInsights} 
+                    onCheckedChange={checked => setApiSettings(prev => ({ ...prev, enableInsights: checked }))} 
+                  />
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Cloud className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-blue-900">n8n Integration Setup</h4>
+                    <p className="text-sm text-blue-700 mt-1">
+                      This API URL will be used by n8n workflows to send AI-generated insights to your Lovable dashboard. 
+                      Create an HTTP node in n8n that makes POST requests to this endpoint with the insights data.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <Button onClick={handleApiSettingsUpdate} className="w-full md:w-auto">
+                <Save className="w-4 h-4 mr-2" />
+                Save API Settings
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Preferences */}
           <Card>
             <CardHeader>
