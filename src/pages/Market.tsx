@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const Market = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All Products");
 
   // Mock data for market offers
   const marketOffers = [
@@ -30,7 +31,8 @@ const Market = () => {
           pricePerUnit: 4.00,
           totalPrice: 18000.00,
           status: "Offer Under Review",
-          configuration: "18.00 kilos x carton, 3 x 5.00kg units per carton"
+          configuration: "18.00 kilos x carton, 3 x 5.00kg units per carton",
+          category: "Meat"
         }
       ]
     },
@@ -51,7 +53,8 @@ const Market = () => {
           pricePerUnit: 10.00,
           totalPrice: 1200.00,
           status: "Offer Under Review",
-          configuration: "6 x 0.60kg units per carton"
+          configuration: "6 x 0.60kg units per carton",
+          category: "Prepared Meals"
         },
         {
           id: 3,
@@ -64,7 +67,8 @@ const Market = () => {
           pricePerUnit: 2.00,
           totalPrice: 450.00,
           status: "Offer Under Review",
-          configuration: "6 x 0.60kg units per carton"
+          configuration: "6 x 0.60kg units per carton",
+          category: "Prepared Meals"
         },
         {
           id: 4,
@@ -77,19 +81,42 @@ const Market = () => {
           pricePerUnit: 0,
           totalPrice: 8377.20,
           status: "Offer Under Review",
-          configuration: "5.20 kilos x carton, 4 x 1.00kg units per carton"
+          configuration: "5.20 kilos x carton, 4 x 1.00kg units per carton",
+          category: "Poultry"
         }
       ]
     }
   ];
 
+  const categories = [
+    "All Products", "Meat", "Poultry", "Seafood", "Dairy", 
+    "Dry Goods", "Beverages", "Prepared Meals", "Fruit & Veg", "Snacks & Confectionary"
+  ];
+
   const filteredOffers = marketOffers.filter(offer => 
-    offer.products.some(product => 
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.ean.includes(searchQuery)
-    )
-  );
+    offer.products.some(product => {
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.ean.includes(searchQuery);
+      
+      const matchesCategory = selectedCategory === "All Products" || 
+        product.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    })
+  ).map(offer => ({
+    ...offer,
+    products: offer.products.filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.ean.includes(searchQuery);
+      
+      const matchesCategory = selectedCategory === "All Products" || 
+        product.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    })
+  })).filter(offer => offer.products.length > 0);
 
   const renderProductCard = (product: any, offer: any) => (
     <Card key={product.id} className="mb-4">
@@ -170,16 +197,19 @@ const Market = () => {
         {/* Category Navigation */}
         <div className="bg-primary/10 p-4 rounded-lg mb-6">
           <div className="flex flex-wrap gap-4 text-sm">
-            <span className="font-medium text-primary">All Products</span>
-            <span className="text-muted-foreground hover:text-primary cursor-pointer">Meat</span>
-            <span className="text-muted-foreground hover:text-primary cursor-pointer">Poultry</span>
-            <span className="text-muted-foreground hover:text-primary cursor-pointer">Seafood</span>
-            <span className="text-muted-foreground hover:text-primary cursor-pointer">Dairy</span>
-            <span className="text-muted-foreground hover:text-primary cursor-pointer">Dry Goods</span>
-            <span className="text-muted-foreground hover:text-primary cursor-pointer">Beverages</span>
-            <span className="text-muted-foreground hover:text-primary cursor-pointer">Prepared Meals</span>
-            <span className="text-muted-foreground hover:text-primary cursor-pointer">Fruit & Veg</span>
-            <span className="text-muted-foreground hover:text-primary cursor-pointer">Snacks & Confectionary</span>
+            {categories.map((category) => (
+              <span
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`cursor-pointer transition-colors ${
+                  selectedCategory === category
+                    ? "font-medium text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                {category}
+              </span>
+            ))}
           </div>
         </div>
 
