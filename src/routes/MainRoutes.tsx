@@ -31,6 +31,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
 import AI from "@/pages/AI";
+import Market from "@/pages/Market";
 
 const MainRoutes = () => {
   const { user } = useAuth();
@@ -68,6 +69,7 @@ const MainRoutes = () => {
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
         <Route path="/ai" element={<AI />} />
+        <Route path="/market" element={<Market />} />
       </Route>
       
       {/* Default redirects */}
