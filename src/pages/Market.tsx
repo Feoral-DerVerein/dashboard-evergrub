@@ -6,11 +6,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const Market = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Products");
+  const [selectedOffer, setSelectedOffer] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const { toast } = useToast();
 
   // Mock data for market offers
   const marketOffers = [
@@ -118,6 +124,33 @@ const Market = () => {
     })
   })).filter(offer => offer.products.length > 0);
 
+  const handleReviewOffer = (product: any, offer: any) => {
+    setSelectedProduct(product);
+    setSelectedOffer(offer);
+    setShowReviewDialog(true);
+  };
+
+  const handleAcceptOffer = () => {
+    toast({
+      title: "Offer Accepted",
+      description: `Successfully accepted offer for ${selectedProduct?.name}`,
+    });
+    setShowReviewDialog(false);
+    setSelectedProduct(null);
+    setSelectedOffer(null);
+  };
+
+  const handleRejectOffer = () => {
+    toast({
+      title: "Offer Rejected",
+      description: `Offer for ${selectedProduct?.name} has been rejected`,
+      variant: "destructive",
+    });
+    setShowReviewDialog(false);
+    setSelectedProduct(null);
+    setSelectedOffer(null);
+  };
+
   const renderProductCard = (product: any, offer: any) => (
     <Card key={product.id} className="mb-4">
       <CardContent className="p-6">
@@ -171,7 +204,11 @@ const Market = () => {
                   <Badge variant="secondary" className="mb-2">
                     {product.status}
                   </Badge>
-                  <Button size="sm" className="w-full">
+                  <Button 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleReviewOffer(product, offer)}
+                  >
                     Review Offer
                   </Button>
                 </div>
@@ -341,6 +378,97 @@ const Market = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Review Offer Dialog */}
+      <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Review Offer</DialogTitle>
+          </DialogHeader>
+          
+          {selectedProduct && selectedOffer && (
+            <div className="space-y-6">
+              {/* Product Info */}
+              <div className="flex gap-4">
+                <img 
+                  src={selectedProduct.image} 
+                  alt={selectedProduct.name}
+                  className="w-24 h-24 object-cover rounded-md"
+                />
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold mb-2">{selectedProduct.name}</h3>
+                  <p className="text-sm text-muted-foreground">EAN: {selectedProduct.ean}</p>
+                  <p className="text-sm text-muted-foreground">SKU: {selectedProduct.sku}</p>
+                </div>
+              </div>
+
+              {/* Offer Details */}
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-medium mb-3">Product Details</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Total Quantity:</span>
+                      <span>{selectedProduct.quantity} cartons</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Price per unit:</span>
+                      <span>${selectedProduct.pricePerUnit.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">BBD Range:</span>
+                      <span>{selectedProduct.bbdRange || "N/A"}</span>
+                    </div>
+                    <div className="flex justify-between font-medium">
+                      <span>Total Price:</span>
+                      <span>${selectedProduct.totalPrice.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-3">Delivery Information</h4>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Date:</span>
+                      <p>{selectedOffer.date}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Address:</span>
+                      <p className="text-xs">{selectedOffer.deliveryAddress}</p>
+                    </div>
+                    {selectedOffer.deliveryNote && (
+                      <div>
+                        <span className="text-muted-foreground">Note:</span>
+                        <p>{selectedOffer.deliveryNote}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Configuration */}
+              <div>
+                <h4 className="font-medium mb-2">Configuration</h4>
+                <p className="text-sm text-muted-foreground">{selectedProduct.configuration}</p>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleRejectOffer}
+              className="bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+            >
+              Reject Offer
+            </Button>
+            <Button onClick={handleAcceptOffer}>
+              Accept Offer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
