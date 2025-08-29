@@ -278,9 +278,14 @@ const Market = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="nsw">NSW</SelectItem>
-                  <SelectItem value="vic">VIC</SelectItem>
-                  <SelectItem value="qld">QLD</SelectItem>
+                  <SelectItem value="nsw">New South Wales (NSW)</SelectItem>
+                  <SelectItem value="vic">Victoria (VIC)</SelectItem>
+                  <SelectItem value="qld">Queensland (QLD)</SelectItem>
+                  <SelectItem value="wa">Western Australia (WA)</SelectItem>
+                  <SelectItem value="sa">South Australia (SA)</SelectItem>
+                  <SelectItem value="tas">Tasmania (TAS)</SelectItem>
+                  <SelectItem value="act">Australian Capital Territory (ACT)</SelectItem>
+                  <SelectItem value="nt">Northern Territory (NT)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
