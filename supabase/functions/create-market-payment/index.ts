@@ -24,24 +24,47 @@ serve(async (req) => {
 
     console.log("Payment request:", { offer, products, deliveryLocation });
 
+    // Get Stripe secret key
+    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeSecretKey) {
+      console.error("STRIPE_SECRET_KEY environment variable is not set");
+      throw new Error("Stripe configuration error. Please check your secret key setup.");
+    }
+
+    console.log("Stripe secret key found, initializing Stripe...");
+
     // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    const stripe = new Stripe(stripeSecretKey, {
       apiVersion: "2023-10-16",
     });
 
     // Create line items from the products in the offer
-    const lineItems = products.map((product: any) => ({
-      price_data: {
-        currency: "aud", // Australian dollars
-        product_data: {
-          name: product.name,
-          description: `${product.quantity}${product.unit} - ${product.category}`,
-          images: product.image ? [product.image] : undefined,
+    const lineItems = products.map((product: any) => {
+      // Ensure we have valid pricing data
+      const unitPrice = typeof product.pricePerUnit === 'number' && !isNaN(product.pricePerUnit) 
+        ? product.pricePerUnit 
+        : (product.totalPrice / product.quantity || 0);
+      
+      const unitAmount = Math.round(unitPrice * 100); // Convert to cents
+      
+      // Extract unit from configuration or use default
+      const unit = product.configuration?.includes('kg') ? 'kg' : 'units';
+      
+      console.log(`Processing product: ${product.name}, unit price: ${unitPrice}, unit amount: ${unitAmount}`);
+      
+      return {
+        price_data: {
+          currency: "aud", // Australian dollars
+          product_data: {
+            name: product.name,
+            description: `${product.quantity} ${unit} - ${product.category}`,
+            images: product.image ? [product.image] : undefined,
+          },
+          unit_amount: unitAmount,
         },
-        unit_amount: Math.round(product.price * 100), // Convert to cents
-      },
-      quantity: 1,
-    }));
+        quantity: 1,
+      };
+    });
 
     console.log("Line items created:", lineItems);
 
