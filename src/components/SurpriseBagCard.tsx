@@ -36,10 +36,14 @@ export const SurpriseBagCard = ({
       <button 
         onClick={() => onToggleVisibility(product)}
         disabled={isTogglingVisibility}
-        className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white border border-gray-200 text-gray-700 px-2 py-1 rounded-md shadow-sm disabled:opacity-60"
+        className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white border border-gray-200 text-gray-700 p-2 rounded-md shadow-sm disabled:opacity-60"
         title={(product as any).isMarketplaceVisible ? "Hide from marketplace" : "Show in marketplace"}
       >
-        {(product as any).isMarketplaceVisible ? "👁️" : "👁️‍🗨️"}
+        <img 
+          src={(product as any).isMarketplaceVisible ? "/lovable-uploads/a6f4e209-0a4e-4886-80a0-cde19ac7c9fa.png" : "/lovable-uploads/7bb995a3-71fc-41d1-825f-21c3eed83e32.png"}
+          alt={(product as any).isMarketplaceVisible ? "Visible in marketplace" : "Hidden from marketplace"}
+          className="w-4 h-4"
+        />
       </button>
 
       {/* Image Section */}
