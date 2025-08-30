@@ -1,4 +1,4 @@
-import { Clock, Package, DollarSign, Percent, MapPin } from "lucide-react";
+import { Clock, Package, DollarSign, Percent, MapPin, Store, EyeOff } from "lucide-react";
 import { Product } from "@/types/product.types";
 import { Badge } from "@/components/ui/badge";
 import PointsBadge from "@/components/PointsBadge";
@@ -39,11 +39,7 @@ export const SurpriseBagCard = ({
         className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white border border-gray-200 text-gray-700 p-2 rounded-md shadow-sm disabled:opacity-60"
         title={(product as any).isMarketplaceVisible ? "Hide from marketplace" : "Show in marketplace"}
       >
-        <img 
-          src={(product as any).isMarketplaceVisible ? "/lovable-uploads/a6f4e209-0a4e-4886-80a0-cde19ac7c9fa.png" : "/lovable-uploads/7bb995a3-71fc-41d1-825f-21c3eed83e32.png"}
-          alt={(product as any).isMarketplaceVisible ? "Visible in marketplace" : "Hidden from marketplace"}
-          className="w-4 h-4"
-        />
+        {(product as any).isMarketplaceVisible ? <Store className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
       </button>
 
       {/* Image Section */}
