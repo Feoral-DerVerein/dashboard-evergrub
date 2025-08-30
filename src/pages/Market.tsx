@@ -167,8 +167,8 @@ const Market = () => {
 
   const handlePaymentSuccess = () => {
     toast({
-      title: "¡Pago exitoso!",
-      description: "Tu pedido ha sido confirmado. Recibirás actualizaciones por email.",
+      title: "Payment Successful!",
+      description: "Your order has been confirmed. You will receive updates via email.",
     });
     
     setShowPaymentForm(false);
