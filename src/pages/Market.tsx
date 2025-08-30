@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import PaymentForm from "@/components/PaymentForm";
 import { supabase } from "@/integrations/supabase/client";
 
 const Market = () => {
@@ -17,6 +18,7 @@ const Market = () => {
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
   const { toast } = useToast();
 
   // Check for payment status on component mount
@@ -158,56 +160,24 @@ const Market = () => {
   const handleAcceptOffer = async () => {
     if (!selectedOffer || !selectedProduct) return;
     
-    try {
-      toast({
-        title: "Processing...",
-        description: "Redirecting to payment portal...",
-      });
+    // Close review dialog and show payment form
+    setShowReviewDialog(false);
+    setShowPaymentForm(true);
+  };
 
-      // Calculate total price for all products in the offer
-      const totalPrice = selectedOffer.products.reduce((sum: number, product: any) => sum + product.totalPrice, 0);
+  const handlePaymentSuccess = () => {
+    toast({
+      title: "¡Pago exitoso!",
+      description: "Tu pedido ha sido confirmado. Recibirás actualizaciones por email.",
+    });
+    
+    setShowPaymentForm(false);
+    setSelectedProduct(null);
+    setSelectedOffer(null);
+  };
 
-      // Call the payment edge function
-      const response = await supabase.functions.invoke('create-market-payment', {
-        body: {
-          offer: { ...selectedOffer, totalPrice },
-          products: selectedOffer.products,
-          deliveryLocation: selectedLocation !== 'all' ? selectedLocation : undefined
-        }
-      });
-
-      if (response.error) {
-        throw new Error(response.error.message);
-      }
-
-      // Open Stripe checkout in a new popup window
-      const popup = window.open(
-        response.data.url, 
-        'stripe-checkout',
-        'width=800,height=600,scrollbars=yes,resizable=yes'
-      );
-
-      // Optional: Listen for popup close to refresh the page
-      const checkClosed = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(checkClosed);
-          // Refresh the current page to check for payment status
-          window.location.reload();
-        }
-      }, 1000);
-
-      setSelectedProduct(null);
-      setSelectedOffer(null);
-      setShowReviewDialog(false);
-
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast({
-        title: "Payment Error",
-        description: error.message || "Failed to process payment. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const handlePaymentCancel = () => {
+    setShowPaymentForm(false);
   };
 
   const handleRejectOffer = () => {
@@ -544,6 +514,16 @@ const Market = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Payment Form */}
+      {showPaymentForm && selectedOffer && (
+        <PaymentForm
+          offer={selectedOffer}
+          products={selectedOffer.products}
+          onPaymentSuccess={handlePaymentSuccess}
+          onCancel={handlePaymentCancel}
+        />
+      )}
     </div>
   );
 };
