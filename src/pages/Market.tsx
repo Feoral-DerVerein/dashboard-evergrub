@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Calendar, MapPin, Package } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Market = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +18,30 @@ const Market = () => {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const { toast } = useToast();
+
+  // Check for payment status on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    const sessionId = urlParams.get('session_id');
+
+    if (paymentStatus === 'success' && sessionId) {
+      toast({
+        title: "Payment Successful!",
+        description: "Your order has been confirmed. You will receive updates via email.",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (paymentStatus === 'cancelled') {
+      toast({
+        title: "Payment Cancelled",
+        description: "Your payment was cancelled. You can try again anytime.",
+        variant: "destructive",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [toast]);
 
   // Mock data for market offers
   const marketOffers = [
@@ -130,14 +155,59 @@ const Market = () => {
     setShowReviewDialog(true);
   };
 
-  const handleAcceptOffer = () => {
-    toast({
-      title: "Offer Accepted",
-      description: `Successfully accepted offer for ${selectedProduct?.name}`,
-    });
-    setShowReviewDialog(false);
-    setSelectedProduct(null);
-    setSelectedOffer(null);
+  const handleAcceptOffer = async () => {
+    if (!selectedOffer || !selectedProduct) return;
+    
+    try {
+      toast({
+        title: "Processing...",
+        description: "Redirecting to payment portal...",
+      });
+
+      // Calculate total price for all products in the offer
+      const totalPrice = selectedOffer.products.reduce((sum: number, product: any) => sum + product.totalPrice, 0);
+
+      // Call the payment edge function
+      const response = await supabase.functions.invoke('create-market-payment', {
+        body: {
+          offer: { ...selectedOffer, totalPrice },
+          products: selectedOffer.products,
+          deliveryLocation: selectedLocation !== 'all' ? selectedLocation : undefined
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      // Open Stripe checkout in a new popup window
+      const popup = window.open(
+        response.data.url, 
+        'stripe-checkout',
+        'width=800,height=600,scrollbars=yes,resizable=yes'
+      );
+
+      // Optional: Listen for popup close to refresh the page
+      const checkClosed = setInterval(() => {
+        if (popup?.closed) {
+          clearInterval(checkClosed);
+          // Refresh the current page to check for payment status
+          window.location.reload();
+        }
+      }, 1000);
+
+      setSelectedProduct(null);
+      setSelectedOffer(null);
+      setShowReviewDialog(false);
+
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Payment Error",
+        description: error.message || "Failed to process payment. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleRejectOffer = () => {
