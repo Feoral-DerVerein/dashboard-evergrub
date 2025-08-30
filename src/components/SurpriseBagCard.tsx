@@ -2,6 +2,7 @@ import { Clock, Package, DollarSign, Percent, MapPin, Store, EyeOff } from "luci
 import { Product } from "@/types/product.types";
 import { Badge } from "@/components/ui/badge";
 import PointsBadge from "@/components/PointsBadge";
+import surpriseBagDefault from "@/assets/surprise-bag-default.png";
 
 interface SurpriseBagCardProps {
   product: Product;
@@ -45,7 +46,7 @@ export const SurpriseBagCard = ({
       {/* Image Section */}
       <div className="relative h-24">
         <img 
-          src={product.image || "/lovable-uploads/eba1971f-71fd-474e-9eb1-aefb4afe9ebb.png"} 
+          src={product.image || surpriseBagDefault} 
           alt={product.name} 
           className="w-full h-full object-cover"
         />
