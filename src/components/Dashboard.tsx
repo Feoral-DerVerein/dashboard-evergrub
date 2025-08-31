@@ -256,7 +256,7 @@ const Dashboard = () => {
           {/* Sidebar - desktop only */}
           <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen md:rounded-l-xl">
             <div className="mb-6 px-2">
-              <img src="/lovable-uploads/d8132be2-4da1-4c2a-977d-523ba0397acd.png" alt="Main Logo" className="h-8 w-auto" />
+              <img src="/lovable-uploads/d8132be2-4da1-4c2a-977d-523ba0397acd.png" alt="Main Logo" className="h-10 w-auto" />
             </div>
             <nav className="space-y-1">
               <Link to="/kpi" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
@@ -314,7 +314,7 @@ const Dashboard = () => {
             <header className="px-6 pt-8 pb-6">
               <div className="flex justify-between items-center mb-1">
                 <div>
-                  <img src="/lovable-uploads/d8132be2-4da1-4c2a-977d-523ba0397acd.png" alt="Main Logo" className="h-9 w-auto mb-0" />
+                  <img src="/lovable-uploads/d8132be2-4da1-4c2a-977d-523ba0397acd.png" alt="Main Logo" className="h-12 w-auto mb-0" />
                   <p className="text-gray-500">Welcome, Felipe</p>
                   <p className="text-gray-400 text-sm">Ortega's account</p>
                 </div>
