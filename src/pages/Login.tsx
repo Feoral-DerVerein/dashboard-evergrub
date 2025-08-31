@@ -136,8 +136,7 @@ const Login = () => {
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 relative z-10">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8 space-y-3">
-          <img src="/lovable-uploads/030dbcde-90ed-4ac5-a577-ac0ec9e12bdd.png" alt="Negentropy" className="h-12 w-auto" />
-          <img src="/lovable-uploads/b197d668-ff8d-49cd-8132-e5a66b06de54.png" alt="Wisebite" className="h-6 w-auto" />
+          <img src="/lovable-uploads/d8132be2-4da1-4c2a-977d-523ba0397acd.png" alt="Main Logo" className="h-12 w-auto" />
         </div>
 
         {/* Login Title */}

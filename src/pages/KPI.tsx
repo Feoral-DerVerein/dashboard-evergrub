@@ -486,7 +486,7 @@ const KPI = () => {
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
               <div>
-                <img src="/lovable-uploads/f5d89a50-1053-4a70-b915-ef437feec2b3.png" alt="Negentropy AI" className="h-9 w-auto mb-4 mx-auto" />
+                <img src="/lovable-uploads/d8132be2-4da1-4c2a-977d-523ba0397acd.png" alt="Main Logo" className="h-9 w-auto mb-4 mx-auto" />
                 <div className="flex justify-center mb-4">
                   <Avatar className="h-16 w-16 cursor-pointer">
                     <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
