@@ -13,6 +13,7 @@ import WeatherWidget from "@/components/widgets/WeatherWidget";
 import VisitorPredictionWidget from "@/components/widgets/VisitorPredictionWidget";
 import { ActionDetailsDialog } from "@/components/ActionDetailsDialog";
 import { aiInsightsService } from "@/services/aiInsightsService";
+import ChatBot from "@/components/ChatBot";
 const AI = () => {
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -765,6 +766,9 @@ const AI = () => {
           onConfirm={handleConfirmAction}
           onCancel={handleCancelAction}
         />
+
+        {/* ChatBot */}
+        <ChatBot />
       </div>
     </div>;
 };
