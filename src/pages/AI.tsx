@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { generateKpiReport, TimeFilterPeriod } from "@/utils/reportGenerator";
+import { generateKpiReport, generateAIReportWithEPACompliance, TimeFilterPeriod } from "@/utils/reportGenerator";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AIRecommendations } from "@/components/AIRecommendations";
 import { supabase } from "@/integrations/supabase/client";
@@ -133,9 +133,9 @@ const AI = () => {
   const handleDownloadReport = async () => {
     try {
       setIsGeneratingReport(true);
-      toast.info("Generating AI report...");
-      await generateKpiReport(activeTimeFilter);
-      toast.success("AI report generated successfully!");
+      toast.info("Generating AI report with NSW EPA compliance data...");
+      await generateAIReportWithEPACompliance(activeTimeFilter);
+      toast.success("NSW EPA compliance report generated successfully!");
     } catch (error) {
       console.error("Error generating report:", error);
       toast.error("Failed to generate report. Please try again.");
@@ -360,25 +360,27 @@ const AI = () => {
 
   const handleDownloadReportWithDetails = () => {
     const details = {
-      title: 'Download AI Report',
-      description: 'This action will generate a complete PDF report with detailed analysis, recommendations and projections for your coffee shop.',
+      title: 'Download NSW EPA Compliance Report',
+      description: 'This action will generate a comprehensive PDF report with detailed NSW EPA food waste compliance data, business analysis, and Negentropy platform impact metrics.',
       impact: {
-        financial: 'Complete financial KPIs analysis',
-        inventory: 'Detailed optimization report',
-        environmental: 'Sustainability metrics',
+        financial: 'Complete financial KPIs and cost savings analysis',
+        inventory: 'Detailed waste reduction and optimization metrics',
+        environmental: 'NSW EPA compliance data and CO₂ impact reporting',
         timeframe: 'Report generated in 15-30 seconds'
       },
       changes: [
-        'Compilation of all relevant data',
-        'Generation of charts and visualizations',
-        'Inclusion of priority recommendations',
-        'Professional PDF document creation'
+        'Food waste volume and separation rate documentation',
+        'General waste to landfill reporting',
+        'Collection service provider details',
+        'Evidence of waste reduction through Negentropy AI',
+        'Professional EPA-compliant PDF document creation'
       ],
       benefits: [
-        'Complete documentation for decision making',
-        'Material for stakeholder meetings',
-        'Historical tracking of improvements',
-        'Foundation for strategic planning'
+        'Full NSW EPA compliance documentation',
+        'Evidence of environmental impact reduction',
+        'Regulatory reporting made simple',
+        'Demonstrable ROI from Negentropy platform',
+        'Professional documentation for government submissions'
       ]
     };
     
@@ -746,16 +748,16 @@ const AI = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-green-600" />
-                AI Report
+                NSW EPA Compliance Report
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600 mb-4">
-                Generate comprehensive AI-powered business reports with predictions.
+                Generate comprehensive NSW EPA food waste compliance reports with Negentropy platform impact data.
               </p>
               <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReportWithDetails} disabled={isGeneratingReport}>
                 <Download className="w-4 h-4 mr-2" />
-                {isGeneratingReport ? "Generating..." : "Download AI Report"}
+                {isGeneratingReport ? "Generating EPA Report..." : "Download EPA Compliance Report"}
               </Button>
             </CardContent>
           </Card>
