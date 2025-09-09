@@ -402,7 +402,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
         <div className="flex items-center justify-between p-4 border-b bg-blue-50">
           <div className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-blue-600" />
-            <span className="font-medium text-blue-800">AI Assistant - Ask me about your business</span>
+            <span className="font-medium text-blue-800">What information do you need today?</span>
           </div>
           <Button
             size="sm"
