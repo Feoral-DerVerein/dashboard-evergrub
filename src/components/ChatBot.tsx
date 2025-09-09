@@ -48,7 +48,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
     {
       id: '1',
       type: 'bot',
-      content: '¡Hola! Soy tu asistente de IA. Pregúntame sobre inventario, ventas, predicciones de visitantes, alertas de productos o cualquier información de tu negocio.',
+      content: 'Hello! I\'m your AI assistant. Ask me about inventory, sales, visitor predictions, product alerts, or any information about your business.',
       timestamp: new Date()
     }
   ]);
@@ -69,16 +69,16 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
     const cards: InfoCard[] = [];
 
     // Inventory-related cards
-    if (lowerQuestion.includes('inventario') || lowerQuestion.includes('stock') || lowerQuestion.includes('productos')) {
+    if (lowerQuestion.includes('inventory') || lowerQuestion.includes('stock') || lowerQuestion.includes('products')) {
       cards.push({
         id: 'inventory-1',
         type: 'inventory',
-        title: 'Recomendaciones de Inventario',
+        title: 'Inventory Recommendations',
         data: {
-          product: 'Café Descafeinado',
+          product: 'Decaf Coffee Beans',
           current: '12 kg',
           recommended: '8 kg (-33%)',
-          reason: 'Baja demanda, rotación lenta en el mercado',
+          reason: 'Low demand, slow rotation in market',
           priority: 'high',
           savings: '$180'
         }
@@ -86,11 +86,11 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
     }
 
     // Sales and predictions
-    if (lowerQuestion.includes('ventas') || lowerQuestion.includes('prediccion') || lowerQuestion.includes('tendencia')) {
+    if (lowerQuestion.includes('sales') || lowerQuestion.includes('prediction') || lowerQuestion.includes('trends')) {
       cards.push({
         id: 'sales-1',
         type: 'sales',
-        title: 'Análisis de Ventas',
+        title: 'Sales Analysis',
         data: {
           topProduct: 'Flat White Blend',
           salesIncrease: '+18%',
@@ -101,49 +101,49 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
     }
 
     // Visitor predictions
-    if (lowerQuestion.includes('visitantes') || lowerQuestion.includes('clientes') || lowerQuestion.includes('flujo')) {
+    if (lowerQuestion.includes('visitors') || lowerQuestion.includes('customers') || lowerQuestion.includes('flow')) {
       cards.push({
         id: 'visitors-1',
         type: 'prediction',
-        title: 'Predicción de Visitantes',
+        title: 'Visitor Prediction',
         data: {
           expected: 86,
           confidence: '83%',
           peakHour: '1:00 PM',
           trend: 'stable',
-          factors: ['Día laboral', 'Patrones históricos', 'Horas regulares']
+          factors: ['Weekday', 'Historical patterns', 'Regular hours']
         }
       });
     }
 
     // Alerts and expiration
-    if (lowerQuestion.includes('alerta') || lowerQuestion.includes('vencimiento') || lowerQuestion.includes('expira')) {
+    if (lowerQuestion.includes('alert') || lowerQuestion.includes('expiration') || lowerQuestion.includes('expires')) {
       cards.push({
         id: 'alert-1',
         type: 'alert',
-        title: 'Alertas Prioritarias',
+        title: 'Priority Alerts',
         data: {
-          product: 'Croissants de Almendra',
+          product: 'Almond Croissants',
           daysLeft: 2,
-          quantity: '18 unidades',
-          suggestion: '50% descuento después de 3pm o donar al refugio',
+          quantity: '18 units',
+          suggestion: '50% discount after 3pm or donate to shelter',
           priority: 'critical'
         }
       });
     }
 
     // General business info
-    if (lowerQuestion.includes('negocio') || lowerQuestion.includes('resumen') || lowerQuestion.includes('estado')) {
+    if (lowerQuestion.includes('business') || lowerQuestion.includes('summary') || lowerQuestion.includes('status')) {
       cards.push({
         id: 'general-1',
         type: 'general',
-        title: 'Estado del Negocio',
+        title: 'Business Status',
         data: {
           totalProducts: 45,
           todayOrders: 23,
           revenue: '$1,245',
           efficiency: '92%',
-          status: 'Excelente'
+          status: 'Excellent'
         }
       });
     }
@@ -173,7 +173,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
 
       if (error) throw error;
 
-      const botResponse = data?.response || 'Lo siento, no pude procesar tu consulta en este momento.';
+      const botResponse = data?.response || 'Sorry, I couldn\'t process your query at the moment.';
       const cards = generateInfoCards(inputValue, botResponse);
 
       const botMessage: ChatMessage = {
@@ -209,23 +209,23 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
   const generateFallbackResponse = (question: string): string => {
     const lowerQuestion = question.toLowerCase();
 
-    if (lowerQuestion.includes('inventario') || lowerQuestion.includes('stock')) {
-      return 'Basado en el análisis de tu inventario actual, he identificado algunas recomendaciones importantes para optimizar tu stock y reducir desperdicios.';
+    if (lowerQuestion.includes('inventory') || lowerQuestion.includes('stock')) {
+      return 'Based on analysis of your current inventory, I\'ve identified some important recommendations to optimize your stock and reduce waste.';
     }
     
-    if (lowerQuestion.includes('ventas') || lowerQuestion.includes('prediccion')) {
-      return 'Aquí tienes el análisis de ventas más reciente con predicciones basadas en patrones históricos y tendencias del mercado.';
+    if (lowerQuestion.includes('sales') || lowerQuestion.includes('prediction')) {
+      return 'Here\'s the latest sales analysis with predictions based on historical patterns and market trends.';
     }
     
-    if (lowerQuestion.includes('visitantes') || lowerQuestion.includes('clientes')) {
-      return 'He generado una predicción de visitantes para hoy basada en patrones históricos, día de la semana y factores externos.';
+    if (lowerQuestion.includes('visitors') || lowerQuestion.includes('customers')) {
+      return 'I\'ve generated a visitor prediction for today based on historical patterns, day of the week, and external factors.';
     }
     
-    if (lowerQuestion.includes('alerta') || lowerQuestion.includes('vencimiento')) {
-      return 'He detectado algunos productos que requieren atención inmediata para evitar desperdicios y maximizar ganancias.';
+    if (lowerQuestion.includes('alert') || lowerQuestion.includes('expiration')) {
+      return 'I\'ve detected some products that require immediate attention to avoid waste and maximize profits.';
     }
 
-    return 'He analizado tu consulta y generado información relevante basada en los datos actuales de tu negocio.';
+    return 'I\'ve analyzed your query and generated relevant information based on your business\'s current data.';
   };
 
   const renderInfoCard = (card: InfoCard) => {
@@ -244,15 +244,15 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
                 <div className="flex justify-between items-center">
                   <span className="font-medium">{card.data.product}</span>
                   <Badge variant={card.data.priority === 'high' ? 'destructive' : 'secondary'}>
-                    {card.data.priority === 'high' ? 'Alta' : 'Media'}
+                    {card.data.priority === 'high' ? 'High' : 'Medium'}
                   </Badge>
                 </div>
                 <p className="text-sm text-gray-600">{card.data.reason}</p>
                 <div className="flex justify-between">
-                  <span>Actual: {card.data.current}</span>
+                  <span>Current: {card.data.current}</span>
                   <span className="text-green-600">Rec: {card.data.recommended}</span>
                 </div>
-                <div className="text-sm text-green-600">Ahorro: {card.data.savings}</div>
+                <div className="text-sm text-green-600">Savings: {card.data.savings}</div>
               </div>
             </CardContent>
           </Card>
@@ -270,11 +270,11 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
             <CardContent className="pt-0">
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>Producto Top:</span>
+                  <span>Top Product:</span>
                   <span className="font-medium">{card.data.topProduct}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span>Crecimiento:</span>
+                  <span>Growth:</span>
                   <div className="flex items-center gap-1">
                     {card.data.trend === 'up' ? <ArrowUp className="w-4 h-4 text-green-600" /> : <ArrowDown className="w-4 h-4 text-red-600" />}
                     <span className={card.data.trend === 'up' ? 'text-green-600' : 'text-red-600'}>
@@ -283,7 +283,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <span>Ingresos:</span>
+                  <span>Revenue:</span>
                   <span className="font-medium text-green-600">{card.data.revenue}</span>
                 </div>
               </div>
@@ -303,19 +303,19 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
             <CardContent className="pt-0">
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>Visitantes esperados:</span>
+                  <span>Expected visitors:</span>
                   <span className="text-2xl font-bold">{card.data.expected}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Confianza:</span>
+                  <span>Confidence:</span>
                   <span className="text-green-600">{card.data.confidence}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Hora pico:</span>
+                  <span>Peak hour:</span>
                   <span className="font-medium">{card.data.peakHour}</span>
                 </div>
                 <div className="text-xs">
-                  <span className="text-gray-500">Factores: </span>
+                  <span className="text-gray-500">Factors: </span>
                   {card.data.factors.join(', ')}
                 </div>
               </div>
@@ -359,19 +359,19 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
             <CardContent className="pt-0">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm text-gray-500">Productos</div>
+                  <div className="text-sm text-gray-500">Products</div>
                   <div className="font-bold">{card.data.totalProducts}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">Órdenes Hoy</div>
+                  <div className="text-sm text-gray-500">Orders Today</div>
                   <div className="font-bold">{card.data.todayOrders}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">Ingresos</div>
+                  <div className="text-sm text-gray-500">Revenue</div>
                   <div className="font-bold text-green-600">{card.data.revenue}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">Eficiencia</div>
+                  <div className="text-sm text-gray-500">Efficiency</div>
                   <div className="font-bold">{card.data.efficiency}</div>
                 </div>
               </div>
@@ -402,7 +402,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
         <div className="flex items-center justify-between p-4 border-b bg-blue-50">
           <div className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-blue-600" />
-            <span className="font-medium text-blue-800">Asistente IA - Pregúntame sobre tu negocio</span>
+            <span className="font-medium text-blue-800">AI Assistant - Ask me about your business</span>
           </div>
           <Button
             size="sm"
@@ -421,7 +421,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="¿Qué quieres saber sobre tu inventario, ventas, visitantes o alertas?"
+                placeholder="What would you like to know about your inventory, sales, visitors, or alerts?"
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 disabled={isLoading}
                 className="flex-1"
@@ -481,7 +481,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
       <div className="flex items-center justify-between p-4 border-b bg-blue-600 text-white rounded-t-lg">
         <div className="flex items-center gap-2">
           <Bot className="w-5 h-5" />
-          <span className="font-medium">Asistente IA</span>
+          <span className="font-medium">AI Assistant</span>
         </div>
         <div className="flex gap-2">
           <Button
@@ -535,7 +535,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
                 <div className="inline-block bg-gray-100 p-2 rounded-lg">
                   <div className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                    <span className="text-sm text-gray-600">Pensando...</span>
+                    <span className="text-sm text-gray-600">Thinking...</span>
                   </div>
                 </div>
               </div>
@@ -549,7 +549,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Pregúntame sobre tu negocio..."
+                placeholder="Ask me about your business..."
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 disabled={isLoading}
               />

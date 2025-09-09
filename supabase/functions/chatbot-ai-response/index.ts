@@ -31,20 +31,20 @@ serve(async (req) => {
     }
 
     // Create a comprehensive prompt for the AI
-    const systemPrompt = `Eres un asistente de inteligencia artificial especializado en analizar negocios de cafeterías y restaurantes. Tu trabajo es proporcionar respuestas útiles, concisas y accionables sobre:
+    const systemPrompt = `You are an artificial intelligence assistant specialized in analyzing coffee shops and restaurant businesses. Your job is to provide useful, concise and actionable responses about:
 
-1. Gestión de inventario y stock
-2. Análisis de ventas y tendencias
-3. Predicciones de visitantes y clientes
-4. Alertas de productos próximos a vencer
-5. Recomendaciones de optimización operacional
-6. Insights de sustentabilidad y reducción de desperdicios
+1. Inventory and stock management
+2. Sales analysis and trends
+3. Visitor and customer predictions
+4. Alerts for products about to expire
+5. Operational optimization recommendations
+6. Sustainability and waste reduction insights
 
-Responde en español de manera profesional pero amigable. Mantén las respuestas entre 50-150 palabras y enfócate en insights prácticos y accionables. Si la pregunta no está relacionada con el negocio, redirige amablemente hacia temas relevantes del negocio.`;
+Respond in English in a professional but friendly manner. Keep responses between 50-150 words and focus on practical and actionable insights. If the question is not related to the business, gently redirect towards relevant business topics.`;
 
-    const userPrompt = `Pregunta del usuario: ${question}
+    const userPrompt = `User question: ${question}
 
-Por favor proporciona una respuesta útil y específica relacionada con la gestión del negocio. Si es sobre inventario, menciona productos específicos como café, leche, pasteles. Si es sobre ventas, incluye datos realistas. Si es sobre predicciones, menciona factores específicos como hora del día, día de la semana, clima, etc.`;
+Please provide a useful and specific response related to business management. If it's about inventory, mention specific products like coffee, milk, pastries. If it's about sales, include realistic data. If it's about predictions, mention specific factors like time of day, day of the week, weather, etc.`;
 
     // Call OpenAI API
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -85,7 +85,7 @@ Por favor proporciona una respuesta útil y específica relacionada con la gesti
     const { question } = await req.json().catch(() => ({ question: '' }));
     
     return new Response(JSON.stringify({ 
-      response: generateFallbackResponse(question || 'consulta general')
+      response: generateFallbackResponse(question || 'general query')
     }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -96,34 +96,34 @@ Por favor proporciona una respuesta útil y específica relacionada con la gesti
 function generateFallbackResponse(question: string): string {
   const lowerQuestion = question.toLowerCase();
 
-  if (lowerQuestion.includes('inventario') || lowerQuestion.includes('stock') || lowerQuestion.includes('productos')) {
-    return 'Basado en el análisis de tu inventario actual, he identificado que el café descafeinado tiene baja rotación y podrías reducir el stock un 33% para ahorrar $180. Recomiendo enfocar recursos en productos de alta demanda como el Flat White Blend que muestra excelente rendimiento.';
+  if (lowerQuestion.includes('inventory') || lowerQuestion.includes('stock') || lowerQuestion.includes('products')) {
+    return 'Based on analysis of your current inventory, I\'ve identified that decaf coffee has low rotation and you could reduce stock by 33% to save $180. I recommend focusing resources on high-demand products like Flat White Blend which shows excellent performance.';
   }
   
-  if (lowerQuestion.includes('ventas') || lowerQuestion.includes('ingresos') || lowerQuestion.includes('ganancias')) {
-    return 'El análisis de ventas muestra que el Flat White Blend es tu producto estrella con un crecimiento del 18% este mes. Los ingresos actuales están en $2,450 con tendencia positiva. Te recomiendo promocionar este producto y considerar variaciones similares para capitalizar esta tendencia.';
+  if (lowerQuestion.includes('sales') || lowerQuestion.includes('revenue') || lowerQuestion.includes('earnings')) {
+    return 'Sales analysis shows that Flat White Blend is your star product with 18% growth this month. Current revenue is at $2,450 with positive trend. I recommend promoting this product and considering similar variations to capitalize on this trend.';
   }
   
-  if (lowerQuestion.includes('visitantes') || lowerQuestion.includes('clientes') || lowerQuestion.includes('flujo') || lowerQuestion.includes('prediccion')) {
-    return 'Para hoy espero aproximadamente 86 visitantes con un 83% de confianza. La hora pico será alrededor de la 1:00 PM. Esto se basa en patrones históricos de días laborales, horarios regulares y tendencias estacionales. Recomiendo tener personal adicional durante la hora pico.';
+  if (lowerQuestion.includes('visitors') || lowerQuestion.includes('customers') || lowerQuestion.includes('flow') || lowerQuestion.includes('prediction')) {
+    return 'For today I expect approximately 86 visitors with 83% confidence. Peak hour will be around 1:00 PM. This is based on historical patterns of weekdays, regular hours, and seasonal trends. I recommend having additional staff during peak hour.';
   }
   
-  if (lowerQuestion.includes('alerta') || lowerQuestion.includes('vencimiento') || lowerQuestion.includes('expira') || lowerQuestion.includes('caducidad')) {
-    return 'Tengo una alerta crítica: los croissants de almendra (18 unidades) vencen en 2 días. Te sugiero aplicar un 50% de descuento después de las 3pm o considerar donarlos al refugio local. Esto te ayudará a evitar pérdidas y mantener tu compromiso con la sostenibilidad.';
+  if (lowerQuestion.includes('alert') || lowerQuestion.includes('expiration') || lowerQuestion.includes('expires') || lowerQuestion.includes('expires')) {
+    return 'I have a critical alert: almond croissants (18 units) expire in 2 days. I suggest applying a 50% discount after 3pm or considering donating them to the local shelter. This will help you avoid losses and maintain your sustainability commitment.';
   }
 
-  if (lowerQuestion.includes('tiempo') || lowerQuestion.includes('clima') || lowerQuestion.includes('temperatura')) {
-    return 'El clima actual muestra 16°C con condiciones ideales para bebidas calientes. Con humedad del 63% y viento ligero, es perfecto para promocionar cafés especiales, chocolate caliente y bebidas de temporada que pueden incrementar tus ventas promedio por cliente.';
+  if (lowerQuestion.includes('weather') || lowerQuestion.includes('climate') || lowerQuestion.includes('temperature')) {
+    return 'Current weather shows 16°C with ideal conditions for hot beverages. With 63% humidity and light wind, it\'s perfect for promoting specialty coffees, hot chocolate, and seasonal drinks that can increase your average sales per customer.';
   }
 
-  if (lowerQuestion.includes('optimizaci') || lowerQuestion.includes('mejora') || lowerQuestion.includes('eficiencia')) {
-    return 'Para optimizar tu negocio recomiendo: 1) Reducir stock de productos de baja rotación, 2) Implementar promociones para productos próximos a vencer, 3) Enfocar marketing en productos estrella como Flat White, y 4) Ajustar horarios de personal según predicciones de flujo de clientes.';
+  if (lowerQuestion.includes('optimization') || lowerQuestion.includes('improvement') || lowerQuestion.includes('efficiency')) {
+    return 'To optimize your business I recommend: 1) Reduce stock of low-rotation products, 2) Implement promotions for products about to expire, 3) Focus marketing on star products like Flat White, and 4) Adjust staff schedules according to customer flow predictions.';
   }
 
-  if (lowerQuestion.includes('sustentabilidad') || lowerQuestion.includes('desperdicio') || lowerQuestion.includes('sostenible')) {
-    return 'Tu score de sustentabilidad actual es 85%. Has logrado reducir desperdicios en un 95% y ahorrado aproximadamente 12 kg de CO2 este mes. Para mejorar, implementa descuentos automáticos para productos próximos a vencer y considera alianzas con organizaciones locales para donaciones.';
+  if (lowerQuestion.includes('sustainability') || lowerQuestion.includes('waste') || lowerQuestion.includes('sustainable')) {
+    return 'Your current sustainability score is 85%. You\'ve achieved 95% waste reduction and saved approximately 12 kg of CO2 this month. To improve, implement automatic discounts for products about to expire and consider partnerships with local organizations for donations.';
   }
 
-  // Respuesta general por defecto
-  return 'He analizado tu consulta y puedo ayudarte con información específica sobre inventario, ventas, predicciones de visitantes, alertas de productos, clima y recomendaciones de optimización. ¿Podrías ser más específico sobre qué aspecto de tu negocio te interesa conocer?';
+  // Default general response
+  return 'I\'ve analyzed your query and can help you with specific information about inventory, sales, visitor predictions, product alerts, weather, and optimization recommendations. Could you be more specific about which aspect of your business you\'d like to know about?';
 }
