@@ -124,7 +124,12 @@ async function fetchBusinessData(userId: string | null) {
     products: [],
     orders: [],
     todaySales: { count: 0, total: 0 },
-    monthlySales: { count: 0, total: 0 }
+    monthlySales: { count: 0, total: 0 },
+    weather: null,
+    visitorPrediction: null,
+    expiringProducts: [],
+    grains: { total: 0, lifetime_earned: 0, lifetime_redeemed: 0 },
+    points: { total: 0 }
   };
 
   try {
@@ -176,10 +181,48 @@ async function fetchBusinessData(userId: string | null) {
         .from('products')
         .select('*')
         .eq('userid', userId)
-        .limit(20);
+        .limit(50);
       
       if (!productsError) {
         data.products = productsData || [];
+        
+        // Identify expiring products (within 14 days)
+        data.expiringProducts = (productsData || []).filter((product: any) => {
+          if (product.expirationdate && product.expirationdate !== '') {
+            try {
+              const expDate = new Date(product.expirationdate);
+              const diffTime = expDate.getTime() - today.getTime();
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              return diffDays <= 14 && diffDays > 0;
+            } catch (e) {
+              return false;
+            }
+          }
+          return false;
+        }).sort((a: any, b: any) => new Date(a.expirationdate).getTime() - new Date(b.expirationdate).getTime())
+          .slice(0, 5);
+      }
+
+      // Fetch user grains
+      const { data: grainsData, error: grainsError } = await supabase
+        .from('user_grain_balance')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (!grainsError && grainsData) {
+        data.grains = grainsData;
+      }
+
+      // Fetch user points
+      const { data: pointsData, error: pointsError } = await supabase
+        .from('user_points')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (!pointsError && pointsData) {
+        data.points = pointsData;
       }
     }
 
@@ -193,6 +236,51 @@ async function fetchBusinessData(userId: string | null) {
     if (!ordersError) {
       data.orders = ordersData || [];
     }
+
+    // Generate simulated weather data (matching WeatherWidget logic)
+    data.weather = {
+      temperature: Math.round(15 + Math.random() * 10),
+      condition: ["cloudy", "partly cloudy", "sunny", "rainy"][Math.floor(Math.random() * 4)],
+      humidity: Math.round(60 + Math.random() * 20),
+      windSpeed: Math.round(10 + Math.random() * 15),
+      feelsLike: Math.round(16 + Math.random() * 10),
+      description: "Melbourne weather conditions",
+      city: "Melbourne, AU"
+    };
+
+    // Generate visitor prediction (matching VisitorPredictionWidget logic)
+    const currentHour = new Date().getHours();
+    const dayOfWeek = new Date().getDay();
+    
+    let baseVisitors = 100;
+    
+    // Weekend boost
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      baseVisitors += 40;
+    }
+    
+    // Time of day adjustments
+    if (currentHour >= 18 && currentHour <= 21) {
+      baseVisitors += 30;
+    } else if (currentHour >= 12 && currentHour <= 14) {
+      baseVisitors += 20;
+    }
+    
+    // Random variation
+    const variation = Math.floor(Math.random() * 30) - 15;
+    const finalVisitors = Math.max(50, baseVisitors + variation);
+    
+    data.visitorPrediction = {
+      expectedVisitors: finalVisitors,
+      confidence: Math.floor(Math.random() * 20) + 75, // 75-95%
+      peakHour: currentHour < 12 ? "7:30 PM" : "1:00 PM",
+      trend: ["up", "down", "stable"][Math.floor(Math.random() * 3)],
+      factors: [
+        dayOfWeek === 0 || dayOfWeek === 6 ? "Weekend" : "Weekday",
+        "Historical patterns",
+        currentHour >= 18 ? "Dinner rush" : "Regular hours"
+      ]
+    };
 
   } catch (error) {
     console.error('Error fetching business data:', error);
@@ -224,32 +312,64 @@ function createBusinessContext(businessData: any): string {
     if (lowStockProducts.length > 0) {
       context += `${lowStockProducts.length} products have low stock (under 10 units). `;
     }
+  }
 
-    // Check for products expiring soon
-    const today = new Date();
-    const expiringProducts = businessData.products.filter((p: any) => {
-      if (p.expirationdate && p.expirationdate !== '') {
-        try {
-          const expDate = new Date(p.expirationdate);
-          const diffTime = expDate.getTime() - today.getTime();
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          return diffDays <= 7 && diffDays > 0;
-        } catch (e) {
-          return false;
-        }
-      }
-      return false;
+  // Expiring products alert
+  if (businessData.expiringProducts && businessData.expiringProducts.length > 0) {
+    const criticalProducts = businessData.expiringProducts.filter((p: any) => {
+      const expDate = new Date(p.expirationdate);
+      const diffTime = expDate.getTime() - new Date().getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays <= 3;
     });
     
-    if (expiringProducts.length > 0) {
-      context += `Alert: ${expiringProducts.length} products expire within 7 days: ${expiringProducts.map((p: any) => p.name).slice(0, 3).join(', ')}. `;
+    context += `🚨 Expiring Products Alert: ${businessData.expiringProducts.length} products expire within 14 days. `;
+    if (criticalProducts.length > 0) {
+      context += `URGENT: ${criticalProducts.length} products expire within 3 days: ${criticalProducts.map((p: any) => `${p.name} (${p.quantity} units)`).join(', ')}. `;
     }
+  }
+
+  // Weather information
+  if (businessData.weather) {
+    const w = businessData.weather;
+    context += `🌤️ Current Weather: ${w.temperature}°C, ${w.condition}, feels like ${w.feelsLike}°C. Humidity: ${w.humidity}%, Wind: ${w.windSpeed} km/h. `;
+    
+    // Business recommendations based on weather
+    if (w.temperature > 20) {
+      context += `Great weather for outdoor seating and cold beverages. `;
+    } else {
+      context += `Perfect weather for hot beverages and cozy indoor atmosphere. `;
+    }
+  }
+
+  // Visitor predictions
+  if (businessData.visitorPrediction) {
+    const vp = businessData.visitorPrediction;
+    context += `📊 Visitor Prediction: Expecting ${vp.expectedVisitors} visitors today with ${vp.confidence}% confidence. Peak hour: ${vp.peakHour}. Trend: ${vp.trend}. Key factors: ${vp.factors.join(', ')}. `;
+    
+    if (vp.expectedVisitors > 130) {
+      context += `High traffic expected - consider extra staffing. `;
+    }
+  }
+
+  // Grains/Points information
+  if (businessData.grains && businessData.grains.total > 0) {
+    context += `💰 Grains Balance: ${businessData.grains.total} grains available. Lifetime earned: ${businessData.grains.lifetime_earned}, redeemed: ${businessData.grains.lifetime_redeemed}. `;
+  }
+
+  if (businessData.points && businessData.points.total > 0) {
+    context += `⭐ Points Balance: ${businessData.points.total} points accumulated. `;
   }
 
   // Orders information
   if (businessData.orders.length > 0) {
     const pendingOrders = businessData.orders.filter((o: any) => o.status === 'pending');
-    context += `Orders: ${pendingOrders.length} pending orders awaiting processing. `;
+    context += `📋 Orders: ${pendingOrders.length} pending orders awaiting processing. `;
+    
+    if (pendingOrders.length > 0) {
+      const totalPendingValue = pendingOrders.reduce((sum: number, order: any) => sum + Number(order.total || 0), 0);
+      context += `Pending orders worth $${totalPendingValue.toFixed(2)} total. `;
+    }
   }
 
   return context;
@@ -343,14 +463,92 @@ function generateDataBasedResponse(question: string, businessData: any): string 
     return 'Please ensure your products have expiration dates set for better inventory tracking.';
   }
 
+  if (lowerQuestion.includes('weather') || lowerQuestion.includes('climate') || lowerQuestion.includes('temperature')) {
+    if (businessData.weather) {
+      const w = businessData.weather;
+      let response = `🌤️ Current Weather in ${w.city}: ${w.temperature}°C (feels like ${w.feelsLike}°C), ${w.condition}. `;
+      response += `Humidity: ${w.humidity}%, Wind: ${w.windSpeed} km/h. `;
+      
+      if (w.temperature > 20) {
+        response += `Perfect weather for outdoor seating! Consider promoting cold beverages, iced coffees, and smoothies. `;
+      } else {
+        response += `Great weather for hot beverages! Perfect time to promote specialty coffees, hot chocolate, and warm pastries. `;
+      }
+      
+      return response;
+    }
+    return 'Weather information is currently unavailable. The weather widget may need configuration.';
+  }
+
+  if (lowerQuestion.includes('visitors') || lowerQuestion.includes('customers') || lowerQuestion.includes('prediction') || lowerQuestion.includes('flow') || lowerQuestion.includes('traffic')) {
+    if (businessData.visitorPrediction) {
+      const vp = businessData.visitorPrediction;
+      let response = `📊 Visitor Prediction: Expecting ${vp.expectedVisitors} visitors today with ${vp.confidence}% confidence. `;
+      response += `Peak hour will be around ${vp.peakHour}. Current trend: ${vp.trend}. `;
+      response += `Key factors: ${vp.factors.join(', ')}. `;
+      
+      if (vp.expectedVisitors > 130) {
+        response += `⚠️ High traffic expected - consider scheduling extra staff during peak hours.`;
+      } else {
+        response += `Normal traffic expected - current staffing should be sufficient.`;
+      }
+      
+      return response;
+    }
+    return 'Visitor prediction data is being calculated. Check back in a moment for AI-powered insights.';
+  }
+
+  if (lowerQuestion.includes('grains') || lowerQuestion.includes('grain') || lowerQuestion.includes('loyalty') || lowerQuestion.includes('rewards')) {
+    if (businessData.grains && businessData.grains.total > 0) {
+      const g = businessData.grains;
+      let response = `💰 Grains Summary: You have ${g.total} grains available in your balance. `;
+      response += `Lifetime earned: ${g.lifetime_earned} grains, lifetime redeemed: ${g.lifetime_redeemed} grains. `;
+      
+      if (g.total > 100) {
+        response += `You have a healthy grain balance! Consider using some for store improvements or customer promotions.`;
+      } else {
+        response += `Build up your grain balance by completing more sales and achieving business milestones.`;
+      }
+      
+      return response;
+    }
+    return 'Grains data not available. Complete sales and achieve milestones to start earning grains!';
+  }
+
+  if (lowerQuestion.includes('points') || lowerQuestion.includes('point') || lowerQuestion.includes('score')) {
+    if (businessData.points && businessData.points.total > 0) {
+      return `⭐ Points Summary: You have accumulated ${businessData.points.total} points through your business activities. Points are earned through sales, customer satisfaction, and operational excellence.`;
+    }
+    return 'Points data not available. Keep making sales and providing excellent service to earn points!';
+  }
   if (lowerQuestion.includes('performance') || lowerQuestion.includes('summary') || lowerQuestion.includes('overview')) {
     const todayTotal = businessData.todaySales?.total || 0;
     const todayCount = businessData.todaySales?.count || 0;
     const monthlyTotal = businessData.monthlySales?.total || 0;
     const productsCount = businessData.products?.length || 0;
     const ordersCount = businessData.orders?.length || 0;
+    const expiringCount = businessData.expiringProducts?.length || 0;
     
-    return `📈 Business Overview: Today: ${todayCount} sales ($${todayTotal.toFixed(2)}). Month: $${monthlyTotal.toFixed(2)} total revenue. You have ${productsCount} products in inventory and ${ordersCount} recent orders. Your business is running smoothly!`;
+    let response = `📈 Business Overview - Today: ${todayCount} sales ($${todayTotal.toFixed(2)}). Month: $${monthlyTotal.toFixed(2)} total revenue. `;
+    response += `Inventory: ${productsCount} products, ${ordersCount} recent orders. `;
+    
+    if (expiringCount > 0) {
+      response += `⚠️ ${expiringCount} products expiring soon. `;
+    }
+    
+    if (businessData.weather) {
+      response += `Weather: ${businessData.weather.temperature}°C, ${businessData.weather.condition}. `;
+    }
+    
+    if (businessData.visitorPrediction) {
+      response += `Expected visitors: ${businessData.visitorPrediction.expectedVisitors}. `;
+    }
+    
+    if (businessData.grains && businessData.grains.total > 0) {
+      response += `Grains: ${businessData.grains.total} available. `;
+    }
+    
+    return response + 'Your business is running well!';
   }
 
   if (lowerQuestion.includes('customer') || lowerQuestion.includes('who bought') || lowerQuestion.includes('recent customer')) {
@@ -365,8 +563,17 @@ function generateDataBasedResponse(question: string, businessData: any): string 
   // Default response with actual data summary
   const todayTotal = businessData.todaySales?.total || 0;
   const productsCount = businessData.products?.length || 0;
+  const expiringCount = businessData.expiringProducts?.length || 0;
   
-  return `I can help you with your business data! Today you've earned $${todayTotal.toFixed(2)} and have ${productsCount} products in inventory. Ask me about sales, inventory, orders, expiring products, or business performance for detailed insights.`;
+  let response = `I can help you with your business data! Today you've earned $${todayTotal.toFixed(2)} and have ${productsCount} products in inventory. `;
+  
+  if (expiringCount > 0) {
+    response += `⚠️ ${expiringCount} products are expiring soon. `;
+  }
+  
+  response += `Ask me about: sales performance, inventory management, orders, expiring products, weather conditions, visitor predictions, grains & points, or get a complete business overview.`;
+  
+  return response;
 }
 
 function generateFallbackResponse(question: string): string {
