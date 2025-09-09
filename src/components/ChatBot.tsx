@@ -37,8 +37,12 @@ interface InfoCard {
   data: any;
 }
 
-const ChatBot = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface ChatBotProps {
+  variant?: 'floating' | 'inline';
+}
+
+const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
+  const [isOpen, setIsOpen] = useState(variant === 'inline' ? true : false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -380,7 +384,7 @@ const ChatBot = () => {
     }
   };
 
-  if (!isOpen) {
+  if (!isOpen && variant === 'floating') {
     return (
       <Button
         onClick={() => setIsOpen(true)}
@@ -390,6 +394,86 @@ const ChatBot = () => {
       </Button>
     );
   }
+
+  if (variant === 'inline') {
+    return (
+      <Card className="w-full mb-6 shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b bg-blue-50">
+          <div className="flex items-center gap-2">
+            <Bot className="w-5 h-5 text-blue-600" />
+            <span className="font-medium text-blue-800">Asistente IA - Pregúntame sobre tu negocio</span>
+          </div>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setIsMinimized(!isMinimized)}
+            className="text-blue-600 hover:bg-blue-100 h-8 w-8 p-0"
+          >
+            <Minimize2 className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {!isMinimized && (
+          <CardContent className="p-4">
+            {/* Input Section */}
+            <div className="flex gap-3 mb-4">
+              <Input
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="¿Qué quieres saber sobre tu inventario, ventas, visitantes o alertas?"
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                disabled={isLoading}
+                className="flex-1"
+              />
+              <Button 
+                onClick={handleSendMessage}
+                disabled={isLoading || !inputValue.trim()}
+                className="bg-blue-600 hover:bg-blue-700 px-6"
+              >
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+
+            {/* Recent Messages - Show last 2 messages only in inline mode */}
+            {messages.length > 1 && (
+              <div className="space-y-3">
+                {messages.slice(-2).map((message) => (
+                  <div key={message.id} className={`${message.type === 'user' ? 'text-right' : ''}`}>
+                    <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
+                      message.type === 'user' 
+                        ? 'bg-blue-600 text-white ml-auto' 
+                        : 'bg-gray-50 text-gray-800 border'
+                    }`}>
+                      <div className="text-sm">{message.content}</div>
+                      {message.type === 'bot' && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          {message.timestamp.toLocaleTimeString()}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Render info cards horizontally for bot messages */}
+                    {message.type === 'bot' && message.cards && message.cards.length > 0 && (
+                      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-left">
+                        {message.cards.map(renderInfoCard)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        )}
+      </Card>
+    );
+  }
+
+  // Floating version (original design)
 
   return (
     <div className={`fixed bottom-6 right-6 w-96 bg-white rounded-lg shadow-xl border z-50 transition-all duration-300 ${isMinimized ? 'h-14' : 'h-96'}`}>

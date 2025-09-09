@@ -413,6 +413,9 @@ const AI = () => {
           <DynamicGreeting />
         </div>
 
+        {/* AI ChatBot - Inline */}
+        <ChatBot variant="inline" />
+
         {/* Widgets */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <WeatherWidget />
@@ -766,9 +769,6 @@ const AI = () => {
           onConfirm={handleConfirmAction}
           onCancel={handleCancelAction}
         />
-
-        {/* ChatBot */}
-        <ChatBot />
       </div>
     </div>;
 };
