@@ -17,7 +17,8 @@ import {
   Clock,
   ArrowUp,
   ArrowDown,
-  Bot
+  Bot,
+  Zap
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -401,7 +402,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-blue-50">
           <div className="flex items-center gap-2">
-            <Bot className="w-5 h-5 text-blue-600" />
+            <Zap className="w-5 h-5 text-blue-600" />
             <span className="font-medium text-blue-800">What information do you need today?</span>
           </div>
           <Button
@@ -480,7 +481,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-blue-600 text-white rounded-t-lg">
         <div className="flex items-center gap-2">
-          <Bot className="w-5 h-5" />
+          <Zap className="w-5 h-5" />
           <span className="font-medium">AI Assistant</span>
         </div>
         <div className="flex gap-2">
