@@ -402,7 +402,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-blue-50">
           <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-blue-600" />
+            <img src="/lovable-uploads/36df130d-8ed4-4575-83ca-48fceb08f995.png" alt="Gro Logo" className="w-5 h-5 object-contain" />
             <span className="font-medium text-blue-800">What information do you need today?</span>
           </div>
           <Button
@@ -481,7 +481,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-blue-600 text-white rounded-t-lg">
         <div className="flex items-center gap-2">
-          <Zap className="w-5 h-5" />
+          <img src="/lovable-uploads/36df130d-8ed4-4575-83ca-48fceb08f995.png" alt="Gro Logo" className="w-5 h-5 object-contain" />
           <span className="font-medium">AI Assistant</span>
         </div>
         <div className="flex gap-2">
