@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Product } from "@/services/productService";
 import { DonationForm } from "@/components/DonationForm";
-import { Store, Heart } from "lucide-react";
+import { Store, Heart, X } from "lucide-react";
 import { useState } from "react";
 import { productService } from "@/services/productService";
 import { toast } from "sonner";
@@ -83,12 +83,23 @@ export default function ExpiringSoonCard({
             const urgencyBg = sev === "high" ? "bg-red-100 border-red-200 dark:bg-red-900/20 dark:border-red-800" : sev === "medium" ? "bg-yellow-100 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800" : "bg-muted border-border";
             return <div 
                 key={item.id} 
-                className={`${bgGradient} border rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.01] group cursor-pointer`}
-                onClick={() => handleHideItem(item.id)}
+                className={`${bgGradient} border rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.01] group relative`}
               >
+                {/* X button to remove item */}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleHideItem(item.id);
+                  }}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
                     <div className="flex items-start justify-between gap-4">
                       {/* Product Info - Takes more space */}
-                      <div className="flex-1 min-w-0 space-y-2">
+                      <div className="flex-1 min-w-0 space-y-2 pr-8">
                         <h4 className="font-bold text-base text-foreground group-hover:text-primary transition-colors truncate">{item.name}</h4>
                         <div className="flex flex-wrap items-center gap-2">
                           <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${urgencyBg}`}>
