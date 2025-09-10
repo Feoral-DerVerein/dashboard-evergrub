@@ -188,7 +188,7 @@ const MetricCard = ({
   value: string;
   label: string;
   trend?: string;
-}) => <div className="glass-card rounded-xl p-4 h-full min-h-28 flex flex-col justify-between">
+}) => <div className="bg-white/80 rounded-xl p-4 h-full min-h-28 flex flex-col justify-between border">
     <div className="flex items-center gap-2 mb-1">
       <Icon className="w-4 h-4 text-blue-500" />
       <span className="text-gray-500 text-sm">{label}</span>
@@ -206,7 +206,7 @@ const SustainabilityCard = ({
   label: string;
   value: string;
   subtext: string;
-}) => <div className="glass-card rounded-xl p-4 h-full min-h-28 flex flex-col justify-between">
+}) => <div className="bg-white/80 rounded-xl p-4 h-full min-h-28 flex flex-col justify-between border">
     <div className="flex items-center gap-2 mb-3">
       <span className="text-gray-600">{label}</span>
     </div>
@@ -223,7 +223,7 @@ const InsightCard = ({
   label: string;
   value: string;
   trend: string;
-}) => <div className="glass-card rounded-xl p-4 h-full min-h-28 flex flex-col justify-between">
+}) => <div className="bg-white/80 rounded-xl p-4 h-full min-h-28 flex flex-col justify-between border">
     <div className="text-gray-500 mb-2">{label}</div>
     <div className="flex items-baseline gap-2">
       <span className="text-2xl font-semibold">{value}</span>
@@ -683,7 +683,7 @@ const KPI = () => {
 
             {/* Weather and Visitor Prediction Cards */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <div className="glass-card rounded-xl p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200">
+              <div className="bg-white/80 rounded-xl p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-blue-500 rounded-full">
                     <Sun className="w-5 h-5 text-white" />
@@ -748,7 +748,7 @@ const KPI = () => {
                 </div>
               </div>
 
-              <div className="glass-card rounded-xl p-6 bg-gradient-to-br from-purple-50 to-indigo-100 border border-purple-200">
+              <div className="bg-white/80 rounded-xl p-6 bg-gradient-to-br from-purple-50 to-indigo-100 border border-purple-200">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-purple-500 rounded-full">
                     <Users className="w-5 h-5 text-white" />
@@ -796,7 +796,7 @@ const KPI = () => {
             </div>
 
             {/* Sales Performance Chart */}
-            <div className="glass-card rounded-xl p-6">
+            <div className="bg-white/80 rounded-xl p-6 border">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Sales Performance</h3>
                 <div className="flex gap-2">
@@ -845,7 +845,7 @@ const KPI = () => {
 
   {aiInsights && <div className="space-y-4">
       {/* Main AI Summary */}
-      <div className="glass-card rounded-xl p-4 border">
+      <div className="bg-white/80 rounded-xl p-4 border">
         <h4 className="font-semibold mb-2">AI Summary</h4>
         <p className="text-sm text-gray-600 mb-3">{aiInsights.executive_summary}</p>
         {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && <div>
@@ -858,7 +858,7 @@ const KPI = () => {
 
       {/* Sustainability Impact Cards */}
       {aiInsights.sustainability_impact && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="glass-card rounded-xl p-4 border">
+          <div className="bg-white/80 rounded-xl p-4 border">
             <h4 className="font-semibold text-green-700 mb-2">Sustainability Impact</h4>
             <div className="space-y-3">
               <div>
@@ -874,7 +874,7 @@ const KPI = () => {
             </div>
           </div>
 
-          <div className="glass-card rounded-xl p-4 border">
+          <div className="bg-white/80 rounded-xl p-4 border">
             <h4 className="font-semibold text-blue-700 mb-2">Customer Insights</h4>
             <div className="space-y-3">
               <div>
@@ -890,7 +890,7 @@ const KPI = () => {
             </div>
           </div>
 
-          <div className="glass-card rounded-xl p-4 border">
+          <div className="bg-white/80 rounded-xl p-4 border">
             <h4 className="font-semibold text-emerald-700 mb-2">Savings & Food Waste</h4>
             <div className="space-y-3">
               <div>
