@@ -84,7 +84,7 @@ const ChatBot = ({
       console.error('Error sending message:', error);
 
       // Fallback response
-      const fallbackResponse = BusinessIntelligenceService.getResponseText(inputValue);
+      const fallbackResponse = 'Add any potential changes to your to-do list so that you can make the best decisions for your business.';
       const cards = generateInfoCards(inputValue);
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),

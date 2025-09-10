@@ -376,6 +376,6 @@ export class BusinessIntelligenceService {
       return 'Active alerts requiring your immediate attention:';
     }
 
-    return 'Here\'s a comprehensive overview of your business with updated information and recommendations:';
+    return 'Add any potential changes to your to-do list so that you can make the best decisions for your business.';
   }
 }
