@@ -19,10 +19,6 @@ const AppLayout = () => {
                 <img src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" alt="Main Logo" className="h-10 w-auto" />
               </div>
               <nav className="space-y-1">
-                <Link to="/ai" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <Sparkles className="w-4 h-4" />
-                  <span>Negentropy AI</span>
-                </Link>
                 <Link to="/kpi" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <BarChart3 className="w-4 h-4" />
                   <span>Performance</span>
