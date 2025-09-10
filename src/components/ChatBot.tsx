@@ -145,7 +145,7 @@ const ChatBot = ({
                           {message.type === 'bot' && <Bot className="w-4 h-4" />}
                           {message.type === 'user' && <User className="w-4 h-4" />}
                           <span className="text-sm font-medium">
-                            {message.type === 'bot' ? 'AI Assistant' : 'You'}
+                            {message.type === 'bot' ? 'Negentropy Assistant' : 'You'}
                           </span>
                         </div>
                         <div className="mt-2">{message.content}</div>
@@ -192,7 +192,7 @@ const ChatBot = ({
           <div className="p-1 bg-white/20 rounded-full">
             <Bot className="w-4 h-4" />
           </div>
-          <span className="font-medium">AI Assistant</span>
+          <span className="font-medium">Negentropy Assistant</span>
         </div>
         <div className="flex gap-2">
           <Button size="sm" variant="ghost" onClick={() => setIsMinimized(!isMinimized)} className="text-white hover:bg-blue-700 h-6 w-6 p-0">
