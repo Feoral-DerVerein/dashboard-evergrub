@@ -196,7 +196,7 @@ const ChatBot = ({
       <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-t-lg">
         <div className="flex items-center gap-3">
           <div className="p-1 bg-white/20 rounded-full">
-            <Bot className="w-4 h-4" />
+            <Bot className="w-4 h-4 animate-spin" />
           </div>
           <span className="font-medium">Negentropy Assistant</span>
         </div>
