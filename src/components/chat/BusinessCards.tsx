@@ -49,30 +49,30 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     </p>
                   </div>
                   <Badge variant={card.data.status === 'in_stock' ? 'secondary' : card.data.status === 'low_stock' ? 'destructive' : 'outline'}>
-                    {card.data.status === 'in_stock' ? 'En Stock' : 
-                     card.data.status === 'low_stock' ? 'Stock Bajo' : 
-                     card.data.status === 'expiring_soon' ? 'Próximo a Vencer' : 'Sin Stock'}
+                    {card.data.status === 'in_stock' ? 'In Stock' : 
+                     card.data.status === 'low_stock' ? 'Low Stock' : 
+                     card.data.status === 'expiring_soon' ? 'Expiring Soon' : 'Out of Stock'}
                   </Badge>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-blue-50 p-3 rounded-lg">
-                    <p className="text-xs text-blue-600 font-medium">Cantidad</p>
+                    <p className="text-xs text-blue-600 font-medium">Quantity</p>
                     <p className="text-xl font-bold text-blue-900">{card.data.quantity}</p>
-                    <p className="text-xs text-blue-600">unidades</p>
+                    <p className="text-xs text-blue-600">units</p>
                   </div>
                   <div className="bg-green-50 p-3 rounded-lg">
-                    <p className="text-xs text-green-600 font-medium">Precio Venta</p>
+                    <p className="text-xs text-green-600 font-medium">Sale Price</p>
                     <p className="text-xl font-bold text-green-900">${card.data.sell_price}</p>
-                    <p className="text-xs text-green-600">por unidad</p>
+                    <p className="text-xs text-green-600">per unit</p>
                   </div>
                 </div>
 
                 {card.data.expiry_date && (
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar className="w-4 h-4 text-orange-500" />
-                    <span className="text-gray-600">Vence:</span>
-                    <span className="font-medium">{new Date(card.data.expiry_date).toLocaleDateString('es-ES')}</span>
+                    <span className="text-gray-600">Expires:</span>
+                    <span className="font-medium">{new Date(card.data.expiry_date).toLocaleDateString('en-GB')}</span>
                   </div>
                 )}
               </div>
@@ -99,32 +99,32 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                 <div className="flex justify-between items-center">
                   <h4 className="font-semibold text-gray-900">{card.data.product}</h4>
                   <Badge variant={isUrgent ? 'destructive' : 'outline'} className="animate-pulse">
-                    {daysLeft} día{daysLeft !== 1 ? 's' : ''}
+                    {daysLeft} day{daysLeft !== 1 ? 's' : ''}
                   </Badge>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900">{card.data.quantity}</div>
-                    <div className="text-xs text-gray-600">unidades</div>
+                    <div className="text-xs text-gray-600">units</div>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-green-600">${(card.data.quantity * card.data.sell_price).toFixed(2)}</div>
-                    <div className="text-xs text-gray-600">valor total</div>
+                    <div className="text-xs text-gray-600">total value</div>
                   </div>
                 </div>
 
                 <div className="bg-white bg-opacity-60 p-3 rounded-lg border border-white border-opacity-50">
-                  <p className="text-sm font-medium text-gray-800 mb-2">💡 Recomendación:</p>
+                  <p className="text-sm font-medium text-gray-800 mb-2">💡 Recommendation:</p>
                   <p className="text-sm text-gray-700">{card.data.recommendation}</p>
                 </div>
 
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" className="flex-1 hover-scale">
-                    Aplicar Descuento
+                    Apply Discount
                   </Button>
                   <Button size="sm" variant="outline" className="flex-1 hover-scale">
-                    Donar
+                    Donate
                   </Button>
                 </div>
               </div>
@@ -146,22 +146,22 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="text-center bg-green-50 p-3 rounded-lg">
                     <div className="text-xl font-bold text-green-900">${card.data.revenue}</div>
-                    <div className="text-xs text-green-600">Ingresos</div>
+                    <div className="text-xs text-green-600">Revenue</div>
                   </div>
                   <div className="text-center bg-blue-50 p-3 rounded-lg">
                     <div className="text-xl font-bold text-blue-900">{card.data.units}</div>
-                    <div className="text-xs text-blue-600">Unidades</div>
+                    <div className="text-xs text-blue-600">Units</div>
                   </div>
                   <div className="text-center bg-purple-50 p-3 rounded-lg">
                     <div className="text-xl font-bold text-purple-900">{(card.data.margin * 100).toFixed(1)}%</div>
-                    <div className="text-xs text-purple-600">Margen</div>
+                    <div className="text-xs text-purple-600">Margin</div>
                   </div>
                 </div>
 
                 {card.data.topProduct && (
                   <div className="flex justify-between items-center p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg">
                     <div>
-                      <p className="text-sm font-medium text-gray-800">Producto Top</p>
+                      <p className="text-sm font-medium text-gray-800">Top Product</p>
                       <p className="text-lg font-bold text-gray-900">{card.data.topProduct}</p>
                     </div>
                     <div className="flex items-center gap-1">
@@ -198,17 +198,17 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-white bg-opacity-60 p-3 rounded-lg">
-                    <p className="text-xs text-purple-600 font-medium">Impacto Esperado</p>
+                    <p className="text-xs text-purple-600 font-medium">Expected Impact</p>
                     <p className="text-lg font-bold text-purple-900">{card.data.impact}</p>
                   </div>
                   <div className="bg-white bg-opacity-60 p-3 rounded-lg">
-                    <p className="text-xs text-green-600 font-medium">Ahorro Potencial</p>
+                    <p className="text-xs text-green-600 font-medium">Potential Savings</p>
                     <p className="text-lg font-bold text-green-900">{card.data.savings}</p>
                   </div>
                 </div>
 
                 <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white hover-scale">
-                  Implementar Recomendación
+                  Implement Recommendation
                 </Button>
               </div>
             </CardContent>
@@ -229,24 +229,24 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                 <div className="flex justify-between items-center">
                   <h4 className="font-semibold text-gray-900">{card.data.message}</h4>
                   <Badge variant="destructive" className={card.data.severity === 'critical' ? 'animate-pulse' : ''}>
-                    {card.data.severity === 'critical' ? 'Crítico' : 
-                     card.data.severity === 'high' ? 'Alto' : 
-                     card.data.severity === 'medium' ? 'Medio' : 'Bajo'}
+                    {card.data.severity === 'critical' ? 'Critical' : 
+                     card.data.severity === 'high' ? 'High' : 
+                     card.data.severity === 'medium' ? 'Medium' : 'Low'}
                   </Badge>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Clock className="w-4 h-4" />
-                  <span>Detectado: {new Date(card.data.created_at).toLocaleString('es-ES')}</span>
+                  <span>Detected: {new Date(card.data.created_at).toLocaleString('en-GB')}</span>
                 </div>
 
                 {card.data.action_required && (
                   <div className="flex gap-2">
                     <Button size="sm" variant="destructive" className="flex-1 hover-scale">
-                      Acción Inmediata
+                      Immediate Action
                     </Button>
                     <Button size="sm" variant="outline" className="flex-1 hover-scale">
-                      Ver Detalles
+                      View Details
                     </Button>
                   </div>
                 )}

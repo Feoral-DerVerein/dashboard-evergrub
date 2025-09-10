@@ -39,67 +39,67 @@ export const inventoryData: InventoryItem[] = [
   {
     id: "INV001",
     sku: "APPLE-RED-001",
-    product: "Manzanas Rojas Premium",
+    product: "Premium Red Apples",
     quantity: 150,
-    location: "Almacén A - Sección 2",
+    location: "Warehouse A - Section 2",
     expiry_date: "2025-09-15",
     cost: 2.50,
     sell_price: 4.99,
     last_updated: "2025-09-10T14:30:00Z",
     status: "in_stock",
-    category: "Frutas"
+    category: "Fruit"
   },
   {
     id: "INV002", 
     sku: "MILK-WHOLE-500",
-    product: "Leche Entera 500ml",
+    product: "Whole Milk 500ml",
     quantity: 45,
-    location: "Refrigerador 1",
+    location: "Refrigerator 1",
     expiry_date: "2025-09-12",
     cost: 1.20,
     sell_price: 2.49,
     last_updated: "2025-09-10T08:15:00Z",
     status: "low_stock",
-    category: "Lácteos"
+    category: "Dairy"
   },
   {
     id: "INV003",
     sku: "BREAD-WHITE-001",
-    product: "Pan Blanco Artesanal",
+    product: "Artisan White Bread",
     quantity: 25,
-    location: "Panadería - Estante 1",
+    location: "Bakery - Shelf 1",
     expiry_date: "2025-09-11",
     cost: 0.80,
     sell_price: 2.20,
     last_updated: "2025-09-10T06:00:00Z",
     status: "expiring_soon",
-    category: "Panadería"
+    category: "Bakery"
   },
   {
     id: "INV004",
     sku: "TOMATO-FRESH-001",
-    product: "Tomates Frescos",
+    product: "Fresh Tomatoes",
     quantity: 89,
-    location: "Almacén A - Sección 1",
+    location: "Warehouse A - Section 1",
     expiry_date: "2025-09-14",
     cost: 1.80,
     sell_price: 3.45,
     last_updated: "2025-09-10T10:20:00Z",
     status: "in_stock",
-    category: "Verduras"
+    category: "Vegetables"
   },
   {
     id: "INV005",
     sku: "CHICKEN-FRESH-001",
-    product: "Pollo Fresco Premium",
+    product: "Premium Fresh Chicken",
     quantity: 12,
-    location: "Refrigerador 2",
+    location: "Refrigerator 2",
     expiry_date: "2025-09-13",
     cost: 4.50,
     sell_price: 8.99,
     last_updated: "2025-09-10T12:45:00Z",
     status: "low_stock",
-    category: "Carnes"
+    category: "Meat"
   }
 ];
 
@@ -108,47 +108,47 @@ export const salesData: SalesData[] = [
   {
     date: "2025-09-10",
     sku: "APPLE-RED-001",
-    product: "Manzanas Rojas Premium",
+    product: "Premium Red Apples",
     units_sold: 25,
     revenue: 124.75,
     profit_margin: 0.49,
-    category: "Frutas"
+    category: "Fruit"
   },
   {
     date: "2025-09-10",
     sku: "MILK-WHOLE-500",
-    product: "Leche Entera 500ml",
+    product: "Whole Milk 500ml",
     units_sold: 34,
     revenue: 84.66,
     profit_margin: 0.52,
-    category: "Lácteos"
+    category: "Dairy"
   },
   {
     date: "2025-09-10",
     sku: "BREAD-WHITE-001",
-    product: "Pan Blanco Artesanal",
+    product: "Artisan White Bread",
     units_sold: 18,
     revenue: 39.60,
     profit_margin: 0.64,
-    category: "Panadería"
+    category: "Bakery"
   },
   {
     date: "2025-09-09",
     sku: "APPLE-RED-001",
-    product: "Manzanas Rojas Premium",
+    product: "Premium Red Apples",
     units_sold: 32,
     revenue: 159.68,
     profit_margin: 0.49,
-    category: "Frutas"
+    category: "Fruit"
   },
   {
     date: "2025-09-09",
     sku: "CHICKEN-FRESH-001",
-    product: "Pollo Fresco Premium",
+    product: "Premium Fresh Chicken",
     units_sold: 8,
     revenue: 71.92,
     profit_margin: 0.50,
-    category: "Carnes"
+    category: "Meat"
   }
 ];
 
@@ -157,27 +157,27 @@ export const alertsData: AlertData[] = [
   {
     id: "ALERT001",
     type: "expiry",
-    product: "Pan Blanco Artesanal",
+    product: "Artisan White Bread",
     severity: "critical",
-    message: "Vence en 1 día - 25 unidades disponibles",
+    message: "Expires in 1 day - 25 units available",
     action_required: true,
     created_at: "2025-09-10T14:30:00Z"
   },
   {
     id: "ALERT002",
     type: "low_stock",
-    product: "Pollo Fresco Premium",
+    product: "Premium Fresh Chicken",
     severity: "high",
-    message: "Stock bajo - Solo 12 unidades restantes",
+    message: "Low stock - Only 12 units remaining",
     action_required: true,
     created_at: "2025-09-10T13:15:00Z"
   },
   {
     id: "ALERT003",
     type: "expiry",
-    product: "Leche Entera 500ml",
+    product: "Whole Milk 500ml",
     severity: "medium",
-    message: "Vence en 2 días - 45 unidades disponibles",
+    message: "Expires in 2 days - 45 units available",
     action_required: false,
     created_at: "2025-09-10T12:00:00Z"
   }

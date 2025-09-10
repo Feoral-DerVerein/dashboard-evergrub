@@ -35,7 +35,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
     {
       id: '1',
       type: 'bot',
-      content: '¡Hola! Soy tu asistente de inteligencia de negocios. Puedo ayudarte con consultas sobre inventario, ventas, productos próximos a vencer, análisis de rentabilidad y mucho más. ¿Qué te gustaría saber?',
+      content: 'G\'day! I\'m your business intelligence assistant. I can help you with queries about inventory, sales, products nearing expiry, profitability analysis, and much more. What would you like to know?',
       timestamp: new Date()
     }
   ]);
@@ -136,8 +136,8 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
               <Bot className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-primary">Asistente IA de Negocios</h3>
-              <p className="text-sm text-muted-foreground">¿Qué información necesitas hoy?</p>
+              <h3 className="font-semibold text-primary">Business Intelligence AI</h3>
+              <p className="text-sm text-muted-foreground">What information do you need today?</p>
             </div>
           </div>
           <Button
@@ -157,7 +157,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Pregúntame sobre inventario, ventas, productos próximos a vencer, análisis de rentabilidad..."
+                placeholder="Ask me about inventory, sales, products nearing expiry, profitability analysis..."
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 disabled={isLoading}
                 className="flex-1"
@@ -189,13 +189,13 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
                         {message.type === 'bot' && <Bot className="w-4 h-4" />}
                         {message.type === 'user' && <User className="w-4 h-4" />}
                         <span className="text-sm font-medium">
-                          {message.type === 'bot' ? 'Asistente IA' : 'Tú'}
+                          {message.type === 'bot' ? 'AI Assistant' : 'You'}
                         </span>
                       </div>
                       <div className="mt-2">{message.content}</div>
                       {message.type === 'bot' && (
                         <div className="text-xs opacity-70 mt-2">
-                          {message.timestamp.toLocaleTimeString('es-ES')}
+                          {message.timestamp.toLocaleTimeString('en-GB')}
                         </div>
                       )}
                     </div>
@@ -226,7 +226,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
           <div className="p-1 bg-white/20 rounded-full">
             <Bot className="w-4 h-4" />
           </div>
-          <span className="font-medium">Asistente IA</span>
+          <span className="font-medium">AI Assistant</span>
         </div>
         <div className="flex gap-2">
           <Button
