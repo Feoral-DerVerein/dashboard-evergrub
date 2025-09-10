@@ -380,7 +380,7 @@ function generateDataBasedResponse(question: string, businessData: any): string 
   const lowerQuestion = question.toLowerCase();
 
   if (!businessData) {
-    return 'I\'m currently unable to access your business data. Please try again in a moment, or be more specific about what information you need regarding inventory, sales, orders, or business performance.';
+    return 'Add any potential changes to your to-do list so that you can make the best decisions for your business.';
   }
 
   if (lowerQuestion.includes('inventory') || lowerQuestion.includes('stock') || lowerQuestion.includes('products')) {
