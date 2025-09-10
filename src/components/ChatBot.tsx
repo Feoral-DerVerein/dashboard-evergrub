@@ -104,20 +104,7 @@ const ChatBot = ({
   if (variant === 'inline') {
     return <Card className="w-full mb-6 shadow-lg border-primary/20">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary/10 to-secondary/10">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/20 rounded-full">
-              <Bot className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-primary">Hello, I'm Negen. How can I help you today?</h3>
-              
-            </div>
-          </div>
-          <Button size="sm" variant="ghost" onClick={() => setIsMinimized(!isMinimized)} className="text-primary hover:bg-primary/10 h-8 w-8 p-0">
-            <Minimize2 className="w-4 h-4" />
-          </Button>
-        </div>
+        
 
         {!isMinimized && <CardContent className="p-4">
             {/* Input Section */}
