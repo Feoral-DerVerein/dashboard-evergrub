@@ -48,10 +48,6 @@ const AppLayout = () => {
                   <span>Ads</span>
                 </Link>
                 
-                <Link to="/grains" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <Coins className="w-4 h-4" />
-                  <span>Grains</span>
-                </Link>
                 <Link to="/market" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <Store className="w-4 h-4" />
                   <span>Market</span>
