@@ -28,7 +28,7 @@ const ChatBot = ({
   const [messages, setMessages] = useState<ChatMessage[]>([{
     id: '1',
     type: 'bot',
-    content: 'G\'day! I\'m your business intelligence assistant. I can help you with queries about inventory, sales, products nearing expiry, profitability analysis, and much more. What would you like to know?',
+    content: 'Add any potential changes to your to-do list so that you can make the best decisions for your business.',
     timestamp: new Date()
   }]);
   const [inputValue, setInputValue] = useState('');
