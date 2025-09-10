@@ -372,26 +372,12 @@ export const generateAIReportWithEPACompliance = async (period: TimeFilterPeriod
     doc.text("Negentropy Impact Certification", 105, 30, { align: "center" });
     doc.setTextColor(0, 0, 0);
     
-    // Add certification seals image centered on page 2
-    try {
-      const imgData = '/lovable-uploads/d0af2da5-9cb2-4665-beba-30c706d5a37c.png';
-      const imgWidth = 150;
-      const imgHeight = 80;
-      const xPosition = (doc.internal.pageSize.width - imgWidth) / 2;
-      const yPosition = 60; // Well within page bounds
-      
-      doc.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
-      
-      // EPA compliance summary below the image
-      yPos = yPosition + imgHeight + 20;
-    } catch (error) {
-      // Fallback if image fails
-      doc.setFontSize(12);
-      doc.text("Negentropy Impact Seals", 105, 80, { align: "center" });
-      doc.setFontSize(10);
-      doc.text("Green Seal (+30%) | Orange Seal (+60%) | Blue Seal (+90%)", 105, 95, { align: "center" });
-      yPos = 120;
-    }
+    // Negentropy Impact Seals section
+    doc.setFontSize(12);
+    doc.text("Negentropy Impact Seals", 105, 80, { align: "center" });
+    doc.setFontSize(10);
+    doc.text("Green Seal (+30%) | Orange Seal (+60%) | Blue Seal (+90%)", 105, 95, { align: "center" });
+    yPos = 120;
     
     // EPA Compliance Summary
     doc.setFontSize(12);
