@@ -9,6 +9,8 @@ import { generateKpiReport, generateAIReportWithEPACompliance, TimeFilterPeriod 
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AIRecommendations } from "@/components/AIRecommendations";
 import { supabase } from "@/integrations/supabase/client";
+import WeatherWidget from "@/components/widgets/WeatherWidget";
+import VisitorPredictionWidget from "@/components/widgets/VisitorPredictionWidget";
 import { ActionDetailsDialog } from "@/components/ActionDetailsDialog";
 import { aiInsightsService } from "@/services/aiInsightsService";
 import ChatBot from "@/components/ChatBot";
@@ -87,7 +89,7 @@ const AI = () => {
     impact: "+$280 weekly revenue"
   }, {
     id: 2,
-    product: "Vegan Muffins", 
+    product: "Vegan Muffins",
     currentPrice: "$5.00",
     suggestedPrice: "$4.50 (-10%)",
     reason: "Clear stock before weekend batch, attract price-sensitive customers",
@@ -111,14 +113,15 @@ const AI = () => {
     setIsGeneratingInsights(true);
     try {
       // Import the service dynamically to avoid issues
-      const { aiInsightsService } = await import('@/services/aiInsightsService');
-      
+      const {
+        aiInsightsService
+      } = await import('@/services/aiInsightsService');
+
       // Fetch real-time data from database
       const realTimeData = await aiInsightsService.fetchRealTimeData();
-      
+
       // Generate AI insights using real data
       const insights = await aiInsightsService.generateAIInsights(realTimeData);
-      
       setAiInsights(insights);
       toast.success("Insights reales generados con IA exitosamente");
     } catch (error) {
@@ -146,7 +149,6 @@ const AI = () => {
     setPendingAction(() => action);
     setDialogOpen(true);
   };
-
   const handleConfirmAction = () => {
     if (pendingAction) {
       pendingAction();
@@ -155,13 +157,11 @@ const AI = () => {
       setCurrentActionDetails(null);
     }
   };
-
   const handleCancelAction = () => {
     setDialogOpen(false);
     setPendingAction(null);
     setCurrentActionDetails(null);
   };
-
   const handleAcceptRecommendation = (id: number, type: string, product?: string) => {
     const details = {
       title: `Accept ${type === 'reduce' ? 'Reduction' : 'Increase'} Inventory Recommendation`,
@@ -172,29 +172,14 @@ const AI = () => {
         environmental: type === 'reduce' ? '15% waste reduction' : 'Higher customer satisfaction',
         timeframe: 'Effective immediately, results in 3-5 days'
       },
-      changes: [
-        `Automatic order adjustment for ${product}`,
-        'Update minimum stock levels',
-        'Notify suppliers about changes',
-        'Recalibrate inventory alerts'
-      ],
-      benefits: [
-        'Automatic cash flow optimization',
-        'Reduction in expired products',
-        'Better inventory turnover',
-        'Increased profit margins'
-      ],
-      risks: [
-        'Possible temporary stockout if demand unexpectedly increases',
-        'Need for monitoring during first week'
-      ]
+      changes: [`Automatic order adjustment for ${product}`, 'Update minimum stock levels', 'Notify suppliers about changes', 'Recalibrate inventory alerts'],
+      benefits: ['Automatic cash flow optimization', 'Reduction in expired products', 'Better inventory turnover', 'Increased profit margins'],
+      risks: ['Possible temporary stockout if demand unexpectedly increases', 'Need for monitoring during first week']
     };
-    
     showActionDetails(details, () => {
       toast.success(`${type} recommendation applied automatically for ${product}`);
     });
   };
-
   const handleSendToMarketplace = (product: string) => {
     const details = {
       title: `Send ${product} to Marketplace`,
@@ -205,29 +190,14 @@ const AI = () => {
         environmental: '100% waste prevention',
         timeframe: 'Immediate listing, expected sale in 2-6 hours'
       },
-      changes: [
-        `Create automatic marketplace listing for ${product}`,
-        'Apply 40-60% discount based on urgency',
-        'Configure real-time sale notifications',
-        'Automatically update inventory after sale'
-      ],
-      benefits: [
-        'Partial investment recovery',
-        'Avoid total product loss',
-        'Contribute to circular economy',
-        'Gain sustainability reputation'
-      ],
-      risks: [
-        'Reduced margin due to necessary discount',
-        'Dependence on marketplace demand'
-      ]
+      changes: [`Create automatic marketplace listing for ${product}`, 'Apply 40-60% discount based on urgency', 'Configure real-time sale notifications', 'Automatically update inventory after sale'],
+      benefits: ['Partial investment recovery', 'Avoid total product loss', 'Contribute to circular economy', 'Gain sustainability reputation'],
+      risks: ['Reduced margin due to necessary discount', 'Dependence on marketplace demand']
     };
-    
     showActionDetails(details, () => {
       toast.success(`${product} sent to marketplace with automatic discount`);
     });
   };
-
   const handleReduceOrder = (product: string, percentage: string) => {
     const details = {
       title: `Reduce ${product} Order`,
@@ -238,29 +208,14 @@ const AI = () => {
         environmental: 'Less potential waste',
         timeframe: 'Applied to next order (3-5 days)'
       },
-      changes: [
-        `Adjust ${product} quantity by ${percentage}`,
-        'Automatically notify supplier of changes',
-        'Recalibrate minimum stock alerts',
-        'Update demand forecasts'
-      ],
-      benefits: [
-        'Better cash flow management',
-        'Reduction in expired products',
-        'Storage space optimization',
-        'More accurate data for future orders'
-      ],
-      risks: [
-        'Possible shortage if demand suddenly increases',
-        'Need for close monitoring during transition'
-      ]
+      changes: [`Adjust ${product} quantity by ${percentage}`, 'Automatically notify supplier of changes', 'Recalibrate minimum stock alerts', 'Update demand forecasts'],
+      benefits: ['Better cash flow management', 'Reduction in expired products', 'Storage space optimization', 'More accurate data for future orders'],
+      risks: ['Possible shortage if demand suddenly increases', 'Need for close monitoring during transition']
     };
-    
     showActionDetails(details, () => {
       toast.success(`${product} order reduced by ${percentage} for next week`);
     });
   };
-
   const handleApplyPromotion = (product: string, days: number) => {
     const details = {
       title: `Apply Promotion to ${product}`,
@@ -271,29 +226,14 @@ const AI = () => {
         environmental: 'Prevention of food waste',
         timeframe: 'Promotion active immediately for 24-48 hours'
       },
-      changes: [
-        `Automatic ${days <= 1 ? '50%' : '30%'} discount applied`,
-        'Push notification to regular customers',
-        'Update on cafe digital displays',
-        'Automatic social media promotion'
-      ],
-      benefits: [
-        'Significant investment recovery',
-        'Increased customer traffic',
-        'Improved sustainability perception',
-        'Cross-selling opportunity'
-      ],
-      risks: [
-        'Temporarily reduced margin',
-        'Possible customer conditioning to discounts'
-      ]
+      changes: [`Automatic ${days <= 1 ? '50%' : '30%'} discount applied`, 'Push notification to regular customers', 'Update on cafe digital displays', 'Automatic social media promotion'],
+      benefits: ['Significant investment recovery', 'Increased customer traffic', 'Improved sustainability perception', 'Cross-selling opportunity'],
+      risks: ['Temporarily reduced margin', 'Possible customer conditioning to discounts']
     };
-    
     showActionDetails(details, () => {
       toast.success(`Promotion automatically applied to ${product}`);
     });
   };
-
   const handleApplyDynamicPricing = (product: string, currentPrice: string, newPrice: string) => {
     const details = {
       title: `Apply Dynamic Pricing to ${product}`,
@@ -304,29 +244,14 @@ const AI = () => {
         environmental: 'Better valuation of premium products',
         timeframe: 'Change effective immediately'
       },
-      changes: [
-        `Update price from ${currentPrice} to ${newPrice}`,
-        'Automatically modify POS system',
-        'Update digital and physical menus',
-        'Notify barista team of changes'
-      ],
-      benefits: [
-        'Direct increase in margins',
-        'Better premium brand positioning',
-        'Price-based demand optimization',
-        'Improved data for future decisions'
-      ],
-      risks: [
-        'Possible initial resistance from some customers',
-        'Need to clearly communicate added value'
-      ]
+      changes: [`Update price from ${currentPrice} to ${newPrice}`, 'Automatically modify POS system', 'Update digital and physical menus', 'Notify barista team of changes'],
+      benefits: ['Direct increase in margins', 'Better premium brand positioning', 'Price-based demand optimization', 'Improved data for future decisions'],
+      risks: ['Possible initial resistance from some customers', 'Need to clearly communicate added value']
     };
-    
     showActionDetails(details, () => {
       toast.success(`Dynamic pricing applied: ${product} now ${newPrice}`);
     });
   };
-
   const handleGenerateInsightsWithDetails = () => {
     const details = {
       title: 'Generate AI Insights',
@@ -337,25 +262,13 @@ const AI = () => {
         environmental: 'Sustainability recommendations',
         timeframe: 'Complete analysis in 30-60 seconds'
       },
-      changes: [
-        'Complete analysis of last 30 days sales data',
-        'Comparison with Melbourne market trends',
-        'Identification of demand patterns',
-        'Generation of personalized recommendations'
-      ],
-      benefits: [
-        'Real data-based decisions',
-        'Identification of non-obvious trends',
-        'Business-specific recommendations',
-        'Competitive market advantage'
-      ]
+      changes: ['Complete analysis of last 30 days sales data', 'Comparison with Melbourne market trends', 'Identification of demand patterns', 'Generation of personalized recommendations'],
+      benefits: ['Real data-based decisions', 'Identification of non-obvious trends', 'Business-specific recommendations', 'Competitive market advantage']
     };
-    
     showActionDetails(details, () => {
       handleGenerateInsights();
     });
   };
-
   const handleDownloadReportWithDetails = () => {
     const details = {
       title: 'Download NSW EPA Compliance Report',
@@ -366,22 +279,9 @@ const AI = () => {
         environmental: 'NSW EPA compliance data and CO₂ impact reporting',
         timeframe: 'Report generated in 15-30 seconds'
       },
-      changes: [
-        'Food waste volume and separation rate documentation',
-        'General waste to landfill reporting',
-        'Collection service provider details',
-        'Evidence of waste reduction through Negentropy AI',
-        'Professional EPA-compliant PDF document creation'
-      ],
-      benefits: [
-        'Full NSW EPA compliance documentation',
-        'Evidence of environmental impact reduction',
-        'Regulatory reporting made simple',
-        'Demonstrable ROI from Negentropy platform',
-        'Professional documentation for government submissions'
-      ]
+      changes: ['Food waste volume and separation rate documentation', 'General waste to landfill reporting', 'Collection service provider details', 'Evidence of waste reduction through Negentropy AI', 'Professional EPA-compliant PDF document creation'],
+      benefits: ['Full NSW EPA compliance documentation', 'Evidence of environmental impact reduction', 'Regulatory reporting made simple', 'Demonstrable ROI from Negentropy platform', 'Professional documentation for government submissions']
     };
-    
     showActionDetails(details, () => {
       handleDownloadReport();
     });
@@ -404,7 +304,7 @@ const AI = () => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             
-            <img src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" alt="Main Logo" className="h-20 w-auto mx-auto" />
+            
           </div>
           <p className="text-gray-600">
             Harness the power of artificial intelligence to optimize your business operations, 
@@ -416,6 +316,11 @@ const AI = () => {
         {/* AI ChatBot - Inline */}
         <ChatBot variant="inline" />
 
+        {/* Widgets */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <WeatherWidget />
+          <VisitorPredictionWidget />
+        </div>
 
         {/* Main Content Grid - 2 columns */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -429,8 +334,7 @@ const AI = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3 max-h-64 overflow-y-auto">
-                {inventoryRecommendations.slice(0, 3).map(rec => 
-                  <div key={rec.id} className="border rounded-lg p-3 bg-gray-50">
+                {inventoryRecommendations.slice(0, 3).map(rec => <div key={rec.id} className="border rounded-lg p-3 bg-gray-50">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
@@ -455,8 +359,7 @@ const AI = () => {
                         Decline
                       </Button>
                     </div>
-                  </div>
-                )}
+                  </div>)}
               </div>
             </CardContent>
           </Card>
@@ -471,8 +374,7 @@ const AI = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3 max-h-64 overflow-y-auto">
-                {expirationAlerts.slice(0, 3).map(alert => 
-                  <div key={alert.id} className="border rounded-lg p-3 bg-red-50">
+                {expirationAlerts.slice(0, 3).map(alert => <div key={alert.id} className="border rounded-lg p-3 bg-red-50">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
@@ -495,8 +397,7 @@ const AI = () => {
                         Decline
                       </Button>
                     </div>
-                  </div>
-                )}
+                  </div>)}
               </div>
             </CardContent>
           </Card>
@@ -511,8 +412,7 @@ const AI = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3 max-h-64 overflow-y-auto">
-                {pricingSuggestions.slice(0, 3).map(suggestion => 
-                  <div key={suggestion.id} className="border rounded-lg p-3 bg-green-50">
+                {pricingSuggestions.slice(0, 3).map(suggestion => <div key={suggestion.id} className="border rounded-lg p-3 bg-green-50">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <h4 className="font-medium text-sm text-gray-900 mb-1">{suggestion.product}</h4>
@@ -532,8 +432,7 @@ const AI = () => {
                         Decline
                       </Button>
                     </div>
-                  </div>
-                )}
+                  </div>)}
               </div>
             </CardContent>
           </Card>
@@ -618,12 +517,10 @@ const AI = () => {
                   </div>
 
                   {/* Recommendations */}
-                  {aiInsights.recommendations && aiInsights.recommendations.length > 0 && (
-                    <div>
+                  {aiInsights.recommendations && aiInsights.recommendations.length > 0 && <div>
                       <h5 className="text-sm font-semibold mb-3 text-green-800">🎯 Recomendaciones Prioritarias</h5>
                       <div className="space-y-2">
-                        {aiInsights.recommendations.slice(0, 3).map((rec: any, i: number) => (
-                          <div key={i} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                        {aiInsights.recommendations.slice(0, 3).map((rec: any, i: number) => <div key={i} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <h6 className="font-medium text-sm text-gray-900">{rec.title}</h6>
@@ -634,11 +531,9 @@ const AI = () => {
                                 {rec.priority}
                               </Badge>
                             </div>
-                          </div>
-                        ))}
+                          </div>)}
                       </div>
-                    </div>
-                  )}
+                    </div>}
                 </div>
 
                 {/* Sustainability and Forecast */}
@@ -677,12 +572,10 @@ const AI = () => {
                 </div>
 
                 {/* Alerts */}
-                {aiInsights.alerts && aiInsights.alerts.length > 0 && (
-                  <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
+                {aiInsights.alerts && aiInsights.alerts.length > 0 && <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
                     <h4 className="font-semibold text-orange-700 mb-3">⚠️ Alertas Críticas</h4>
                     <div className="space-y-2">
-                      {aiInsights.alerts.map((alert: any, i: number) => (
-                        <div key={i} className="bg-white rounded-lg p-3 border border-orange-200">
+                      {aiInsights.alerts.map((alert: any, i: number) => <div key={i} className="bg-white rounded-lg p-3 border border-orange-200">
                           <div className="flex items-start gap-2">
                             <AlertTriangle className={`w-4 h-4 mt-1 ${alert.type === 'critical' ? 'text-red-500' : 'text-orange-500'}`} />
                             <div className="flex-1">
@@ -691,11 +584,9 @@ const AI = () => {
                               <p className="text-xs font-medium text-orange-600 mt-1">{alert.value}</p>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        </div>)}
                     </div>
-                  </div>
-                )}
+                  </div>}
               </div>
             </CardContent>
           </Card>}
@@ -756,13 +647,7 @@ const AI = () => {
         </div>
 
         {/* Action Details Dialog */}
-        <ActionDetailsDialog
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          actionDetails={currentActionDetails}
-          onConfirm={handleConfirmAction}
-          onCancel={handleCancelAction}
-        />
+        <ActionDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} actionDetails={currentActionDetails} onConfirm={handleConfirmAction} onCancel={handleCancelAction} />
       </div>
     </div>;
 };
