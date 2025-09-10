@@ -249,6 +249,7 @@ const KPI = () => {
   // AI insights state
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [aiInsights, setAiInsights] = useState<any | null>(null);
+  const [showExpiringSoon, setShowExpiringSoon] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentActionDetails, setCurrentActionDetails] = useState<any>(null);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -596,6 +597,19 @@ const KPI = () => {
             </div>
           </header>
 
+          {/* Marketplace Button */}
+          <div className="px-6 mb-4">
+            <div className="flex justify-end">
+              <Button 
+                onClick={() => setShowExpiringSoon(false)}
+                className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Marketplace
+              </Button>
+            </div>
+          </div>
+
           {/* AI ChatBot - Inline */}
           <div className="px-6 mb-6">
             <ChatBot variant="inline" />
@@ -903,7 +917,7 @@ const KPI = () => {
           <section className="px-6">
             <div className="grid md:grid-cols-3 gap-6 mt-6">
               <StockAlertsCard products={products} />
-              <ExpiringSoonCard products={products} />
+              {showExpiringSoon && <ExpiringSoonCard products={products} />}
               <SuppliersCard suppliers={suppliers} />
             </div>
 

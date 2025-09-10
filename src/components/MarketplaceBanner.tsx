@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { adsService, type Ad } from "@/services/adsService";
 
-const MarketplaceBanner = () => {
+interface MarketplaceBannerProps {
+  onMarketplaceClick?: () => void;
+}
+
+const MarketplaceBanner = ({ onMarketplaceClick }: MarketplaceBannerProps) => {
   const [currentAd, setCurrentAd] = useState<Ad | null>(null);
   const [isVisible, setIsVisible] = useState(true);
 
@@ -32,6 +36,10 @@ const MarketplaceBanner = () => {
         await adsService.trackClick(currentAd.id);
         if (currentAd.target_url) {
           window.open(currentAd.target_url, '_blank');
+        }
+        // Call the callback when marketplace is clicked
+        if (onMarketplaceClick) {
+          onMarketplaceClick();
         }
       } catch (error) {
         console.error('Error tracking click:', error);
