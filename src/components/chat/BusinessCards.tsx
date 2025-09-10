@@ -35,47 +35,47 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
     switch (cardType) {
       case 'inventory':
         return {
-          title: `Gestionar inventario: ${cardData.product}`,
-          description: `${cardData.quantity} unidades en ${cardData.location}. Estado: ${cardData.status}`,
+          title: `Manage inventory: ${cardData.product}`,
+          description: `${cardData.quantity} units in ${cardData.location}. Status: ${cardData.status}`,
           priority: (cardData.status === 'out_of_stock' ? 'critical' : 
                    cardData.status === 'low_stock' ? 'high' : 'medium') as 'low' | 'medium' | 'high' | 'critical'
         };
       case 'expiry':
         const daysLeft = Math.ceil((new Date(cardData.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
         return {
-          title: `Producto por vencer: ${cardData.product}`,
-          description: `${cardData.quantity} unidades vencen en ${daysLeft} días`,
+          title: `Product expiring: ${cardData.product}`,
+          description: `${cardData.quantity} units expire in ${daysLeft} days`,
           priority: (daysLeft <= 2 ? 'critical' : daysLeft <= 7 ? 'high' : 'medium') as 'low' | 'medium' | 'high' | 'critical'
         };
       case 'sales':
         return {
-          title: `Revisar rendimiento de ventas`,
-          description: `Producto destacado: ${cardData.topProduct}. Ingresos: $${cardData.revenue}`,
+          title: `Review sales performance`,
+          description: `Top product: ${cardData.topProduct}. Revenue: $${cardData.revenue}`,
           priority: 'medium' as const
         };
       case 'recommendation':
         return {
-          title: `Implementar recomendación: ${cardData.action}`,
+          title: `Implement recommendation: ${cardData.action}`,
           description: cardData.description,
           priority: 'medium' as const
         };
       case 'alert':
         return {
-          title: `Atender alerta: ${cardData.message}`,
-          description: `Severidad: ${cardData.severity}`,
+          title: `Address alert: ${cardData.message}`,
+          description: `Severity: ${cardData.severity}`,
           priority: (cardData.severity === 'critical' ? 'critical' : 
                    cardData.severity === 'high' ? 'high' : 'medium') as 'low' | 'medium' | 'high' | 'critical'
         };
       case 'analytics':
         return {
-          title: `Revisar análisis: ${cardData.metric}`,
-          description: `Valor: ${cardData.value}`,
+          title: `Review analytics: ${cardData.metric}`,
+          description: `Value: ${cardData.value}`,
           priority: 'low' as const
         };
       default:
         return {
-          title: 'Revisar información',
-          description: 'Nueva información disponible',
+          title: 'Review information',
+          description: 'New information available',
           priority: 'medium' as const
         };
     }
