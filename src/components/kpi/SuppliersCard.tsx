@@ -14,22 +14,22 @@ export default function SuppliersCard({
   suppliers
 }: SuppliersCardProps) {
   return (
-    <Card className="bg-white/80">
+    <Card className="bg-gradient-to-br from-cyan-50/80 to-blue-100/80 backdrop-blur-sm border border-cyan-200/50">
       <CardHeader>
-        <CardTitle>Suppliers</CardTitle>
+        <CardTitle className="text-cyan-900">Suppliers</CardTitle>
       </CardHeader>
       <CardContent>
         {suppliers.length === 0 ? (
-          <p className="text-muted-foreground">No suppliers found</p>
+          <p className="text-cyan-700/80">No suppliers found</p>
         ) : (
           <div className="space-y-3">
             {suppliers.map((supplier) => (
-              <div key={supplier.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div key={supplier.id} className="flex items-center justify-between p-3 bg-cyan-100/60 rounded-lg border border-cyan-200/50">
                 <div>
-                  <h4 className="font-medium">{supplier.name}</h4>
-                  <p className="text-sm text-muted-foreground capitalize">{supplier.type}</p>
+                  <h4 className="font-medium text-cyan-900">{supplier.name}</h4>
+                  <p className="text-sm text-cyan-700/80 capitalize">{supplier.type}</p>
                 </div>
-                <div className="text-primary text-sm">
+                <div className="text-cyan-600 text-sm font-medium">
                   Active
                 </div>
               </div>

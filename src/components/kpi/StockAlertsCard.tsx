@@ -10,25 +10,25 @@ export default function StockAlertsCard({ products }: StockAlertsCardProps) {
   const alerts = products.filter((p) => p.quantity > 0 && p.quantity <= 5).slice(0, 5);
 
   return (
-    <Card className="bg-white/80">
+    <Card className="bg-gradient-to-br from-amber-50/80 to-orange-100/80 backdrop-blur-sm border border-amber-200/50">
       <CardHeader>
-        <CardTitle className="text-lg">Stock Alerts</CardTitle>
+        <CardTitle className="text-lg text-amber-900">Stock Alerts</CardTitle>
       </CardHeader>
       <CardContent>
         {alerts.length === 0 ? (
-          <p className="text-sm text-gray-500">No alerts</p>
+          <p className="text-sm text-amber-700/80">No alerts</p>
         ) : (
           <div className="space-y-2">
             {alerts.map((item) => (
               <div
                 key={item.id}
-                className="bg-yellow-50 p-3 rounded-lg flex items-center justify-between"
+                className="bg-amber-100/60 p-3 rounded-lg flex items-center justify-between border border-amber-200/50"
               >
                 <div>
-                  <h4 className="font-medium text-gray-900 text-sm line-clamp-1">{item.name}</h4>
-                  <p className="text-xs text-gray-600">Stock: {item.quantity}</p>
+                  <h4 className="font-medium text-amber-900 text-sm line-clamp-1">{item.name}</h4>
+                  <p className="text-xs text-amber-700/80">Stock: {item.quantity}</p>
                 </div>
-                <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
               </div>
             ))}
           </div>

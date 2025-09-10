@@ -380,8 +380,8 @@ const Dashboard = () => {
               </div>
 
               {/* Recent Activity */}
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+              <div className="apple-card-hover p-6 bg-gradient-to-br from-slate-50/80 to-blue-50/80 backdrop-blur-sm border border-slate-200/50 shadow-sm">
+                <h3 className="text-lg font-semibold mb-4 text-slate-900">Recent Activity</h3>
                 <div className="space-y-4">
                   {isLoading ? (
                     <div className="space-y-3">

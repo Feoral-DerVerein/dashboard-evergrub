@@ -188,14 +188,14 @@ const MetricCard = ({
   value: string;
   label: string;
   trend?: string;
-}) => <div className="bg-white/80 rounded-xl p-4 h-full min-h-28 flex flex-col justify-between border">
+}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-gradient-to-br from-blue-50/80 to-indigo-100/80 backdrop-blur-sm border border-blue-200/50">
     <div className="flex items-center gap-2 mb-1">
-      <Icon className="w-4 h-4 text-blue-500" />
-      <span className="text-gray-500 text-sm">{label}</span>
+      <Icon className="w-4 h-4 text-blue-600" />
+      <span className="text-blue-700/80 text-sm font-medium">{label}</span>
     </div>
     <div className="flex items-baseline gap-2">
-      <span className="text-2xl font-semibold">{value}</span>
-      {trend && <span className="text-emerald-500 text-sm">+{trend}</span>}
+      <span className="text-2xl font-semibold text-blue-900">{value}</span>
+      {trend && <span className="text-emerald-600 text-sm font-medium">+{trend}</span>}
     </div>
   </div>;
 const SustainabilityCard = ({
@@ -206,13 +206,13 @@ const SustainabilityCard = ({
   label: string;
   value: string;
   subtext: string;
-}) => <div className="bg-white/80 rounded-xl p-4 h-full min-h-28 flex flex-col justify-between border">
+}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-gradient-to-br from-emerald-50/80 to-green-100/80 backdrop-blur-sm border border-emerald-200/50">
     <div className="flex items-center gap-2 mb-3">
-      <span className="text-gray-600">{label}</span>
+      <span className="text-emerald-700/80 font-medium">{label}</span>
     </div>
     <div className="flex flex-col">
-      <span className="text-2xl font-semibold mb-1">{value}</span>
-      <span className="text-sm text-emerald-500">{subtext}</span>
+      <span className="text-2xl font-semibold mb-1 text-emerald-900">{value}</span>
+      <span className="text-sm text-emerald-600 font-medium">{subtext}</span>
     </div>
   </div>;
 const InsightCard = ({
@@ -223,11 +223,11 @@ const InsightCard = ({
   label: string;
   value: string;
   trend: string;
-}) => <div className="bg-white/80 rounded-xl p-4 h-full min-h-28 flex flex-col justify-between border">
-    <div className="text-gray-500 mb-2">{label}</div>
+}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-gradient-to-br from-purple-50/80 to-indigo-100/80 backdrop-blur-sm border border-purple-200/50">
+    <div className="text-purple-700/80 mb-2 font-medium">{label}</div>
     <div className="flex items-baseline gap-2">
-      <span className="text-2xl font-semibold">{value}</span>
-      <span className="text-emerald-500 text-sm">+{trend}</span>
+      <span className="text-2xl font-semibold text-purple-900">{value}</span>
+      <span className="text-emerald-600 text-sm font-medium">+{trend}</span>
     </div>
   </div>;
 const KPI = () => {
@@ -725,14 +725,14 @@ const KPI = () => {
             </div>
 
 
-  {aiInsights && <div className="space-y-4">
+      {aiInsights && <div className="space-y-4">
       {/* Main AI Summary */}
-      <div className="bg-white/80 rounded-xl p-4 border">
-        <h4 className="font-semibold mb-2">AI Summary</h4>
-        <p className="text-sm text-gray-600 mb-3">{aiInsights.executive_summary}</p>
+      <div className="apple-card-hover p-6 bg-gradient-to-br from-indigo-50/80 to-blue-100/80 backdrop-blur-sm border border-indigo-200/50">
+        <h4 className="font-semibold mb-2 text-indigo-900">AI Summary</h4>
+        <p className="text-sm text-indigo-700/80 mb-3">{aiInsights.executive_summary}</p>
         {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && <div>
-            <h5 className="text-sm font-medium mb-1">Recommendations</h5>
-            <ul className="list-disc pl-5 text-sm text-gray-700">
+            <h5 className="text-sm font-medium mb-1 text-indigo-800">Recommendations</h5>
+            <ul className="list-disc pl-5 text-sm text-indigo-700">
               {aiInsights.recommendations.slice(0, 3).map((r: any, i: number) => <li key={i}>{typeof r === 'string' ? r : r.title || JSON.stringify(r)}</li>)}
             </ul>
           </div>}
@@ -740,50 +740,50 @@ const KPI = () => {
 
       {/* Sustainability Impact Cards */}
       {aiInsights.sustainability_impact && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white/80 rounded-xl p-4 border">
-            <h4 className="font-semibold text-green-700 mb-2">Sustainability Impact</h4>
+          <div className="apple-card-hover p-4 bg-gradient-to-br from-emerald-50/80 to-green-100/80 backdrop-blur-sm border border-emerald-200/50">
+            <h4 className="font-semibold text-emerald-800 mb-2">Sustainability Impact</h4>
             <div className="space-y-3">
               <div>
-                <p className="text-gray-600 text-sm">CO₂ Saved</p>
-                <p className="text-2xl font-bold">{aiInsights.sustainability_impact.co2_saved_kg} kg</p>
-                <p className="text-green-600 text-sm">{aiInsights.sustainability_impact.co2_saved_change}</p>
+                <p className="text-emerald-700/80 text-sm font-medium">CO₂ Saved</p>
+                <p className="text-2xl font-bold text-emerald-900">{aiInsights.sustainability_impact.co2_saved_kg} kg</p>
+                <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.co2_saved_change}</p>
               </div>
               <div>
-                <p className="text-gray-600 text-sm">Waste Reduced</p>
-                <p className="text-2xl font-bold">{aiInsights.sustainability_impact.waste_reduced_percentage}%</p>
-                <p className="text-green-600 text-sm">Target: {aiInsights.sustainability_impact.waste_target}%</p>
+                <p className="text-emerald-700/80 text-sm font-medium">Waste Reduced</p>
+                <p className="text-2xl font-bold text-emerald-900">{aiInsights.sustainability_impact.waste_reduced_percentage}%</p>
+                <p className="text-emerald-600 text-sm font-medium">Target: {aiInsights.sustainability_impact.waste_target}%</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 rounded-xl p-4 border">
-            <h4 className="font-semibold text-blue-700 mb-2">Customer Insights</h4>
+          <div className="apple-card-hover p-4 bg-gradient-to-br from-blue-50/80 to-indigo-100/80 backdrop-blur-sm border border-blue-200/50">
+            <h4 className="font-semibold text-blue-800 mb-2">Customer Insights</h4>
             <div className="space-y-3">
               <div>
-                <p className="text-gray-600 text-sm">Conversion Rate</p>
-                <p className="text-2xl font-bold">{aiInsights.customer_insights.conversion_rate}%</p>
-                <p className="text-green-600 text-sm">{aiInsights.customer_insights.conversion_change}</p>
+                <p className="text-blue-700/80 text-sm font-medium">Conversion Rate</p>
+                <p className="text-2xl font-bold text-blue-900">{aiInsights.customer_insights.conversion_rate}%</p>
+                <p className="text-emerald-600 text-sm font-medium">{aiInsights.customer_insights.conversion_change}</p>
               </div>
               <div>
-                <p className="text-gray-600 text-sm">Return Rate</p>
-                <p className="text-2xl font-bold">{aiInsights.customer_insights.return_rate}%</p>
-                <p className="text-orange-600 text-sm">{aiInsights.customer_insights.return_change}</p>
+                <p className="text-blue-700/80 text-sm font-medium">Return Rate</p>
+                <p className="text-2xl font-bold text-blue-900">{aiInsights.customer_insights.return_rate}%</p>
+                <p className="text-orange-600 text-sm font-medium">{aiInsights.customer_insights.return_change}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 rounded-xl p-4 border">
-            <h4 className="font-semibold text-emerald-700 mb-2">Savings & Food Waste</h4>
+          <div className="apple-card-hover p-4 bg-gradient-to-br from-purple-50/80 to-indigo-100/80 backdrop-blur-sm border border-purple-200/50">
+            <h4 className="font-semibold text-purple-800 mb-2">Savings & Food Waste</h4>
             <div className="space-y-3">
               <div>
-                <p className="text-gray-600 text-sm">Cost Savings</p>
-                <p className="text-2xl font-bold">${aiInsights.sustainability_impact.cost_savings}</p>
-                <p className="text-green-600 text-sm">{aiInsights.sustainability_impact.cost_savings_change}</p>
+                <p className="text-purple-700/80 text-sm font-medium">Cost Savings</p>
+                <p className="text-2xl font-bold text-purple-900">${aiInsights.sustainability_impact.cost_savings}</p>
+                <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.cost_savings_change}</p>
               </div>
               <div>
-                <p className="text-gray-600 text-sm">Food Waste Reduced</p>
-                <p className="text-2xl font-bold">{aiInsights.sustainability_impact.food_waste_reduced_kg} kg</p>
-                <p className="text-green-600 text-sm">{aiInsights.sustainability_impact.food_waste_change}</p>
+                <p className="text-purple-700/80 text-sm font-medium">Food Waste Reduced</p>
+                <p className="text-2xl font-bold text-purple-900">{aiInsights.sustainability_impact.food_waste_reduced_kg} kg</p>
+                <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.food_waste_change}</p>
               </div>
             </div>
           </div>
