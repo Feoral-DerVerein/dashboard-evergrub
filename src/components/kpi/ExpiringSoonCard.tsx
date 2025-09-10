@@ -27,7 +27,17 @@ export default function ExpiringSoonCard({
   const [donationDialogOpen, setDonationDialogOpen] = useState(false);
   const [donationFormOpen, setDonationFormOpen] = useState(false);
   const [publishingToMarketplace, setPublishingToMarketplace] = useState<number | null>(null);
-  const items = products.filter(p => daysUntil(p.expirationDate) <= 14).sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime()).slice(0, 5);
+  const [hiddenItems, setHiddenItems] = useState<Set<number>>(new Set());
+  
+  const items = products
+    .filter(p => daysUntil(p.expirationDate) <= 14 && !hiddenItems.has(p.id))
+    .sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime())
+    .slice(0, 5);
+
+  const handleHideItem = (productId: number) => {
+    setHiddenItems(prev => new Set([...prev, productId]));
+    toast.success("Item removed from expiring soon list");
+  };
   const handlePublishToMarketplace = async (product: Product) => {
     try {
       setPublishingToMarketplace(product.id);
@@ -71,7 +81,11 @@ export default function ExpiringSoonCard({
             const bgGradient = sev === "high" ? "bg-gradient-to-r from-red-50 to-red-100 border-red-200 dark:from-red-950/30 dark:to-red-900/20 dark:border-red-800" : sev === "medium" ? "bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 dark:from-yellow-950/30 dark:to-yellow-900/20 dark:border-yellow-800" : "bg-gradient-to-r from-muted/30 to-muted/50 border-border";
             const urgencyColor = sev === "high" ? "text-red-700 dark:text-red-400" : sev === "medium" ? "text-yellow-700 dark:text-yellow-400" : "text-muted-foreground";
             const urgencyBg = sev === "high" ? "bg-red-100 border-red-200 dark:bg-red-900/20 dark:border-red-800" : sev === "medium" ? "bg-yellow-100 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800" : "bg-muted border-border";
-            return <div key={item.id} className={`${bgGradient} border rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.01] group`}>
+            return <div 
+                key={item.id} 
+                className={`${bgGradient} border rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.01] group cursor-pointer`}
+                onClick={() => handleHideItem(item.id)}
+              >
                     <div className="flex items-start justify-between gap-4">
                       {/* Product Info - Takes more space */}
                       <div className="flex-1 min-w-0 space-y-2">
@@ -91,11 +105,28 @@ export default function ExpiringSoonCard({
                       
                       {/* Action Buttons - Stacked vertically and smaller */}
                       <div className="flex flex-col gap-2 flex-shrink-0">
-                        <Button size="sm" variant="outline" className="h-8 px-3 text-xs font-medium bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 hover:shadow-sm hover:scale-105 transition-all duration-200 group/btn" onClick={() => handlePublishToMarketplace(item)} disabled={publishingToMarketplace === item.id}>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="h-8 px-3 text-xs font-medium bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 hover:shadow-sm hover:scale-105 transition-all duration-200 group/btn" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePublishToMarketplace(item);
+                          }} 
+                          disabled={publishingToMarketplace === item.id}
+                        >
                           <Store className="w-3 h-3 mr-1.5 group-hover/btn:scale-110 transition-transform" />
                           {publishingToMarketplace === item.id ? "Publishing..." : "Marketplace"}
                         </Button>
-                        <Button size="sm" variant="outline" className="h-8 px-3 text-xs font-medium bg-gradient-to-r from-green-50 to-green-100 border-green-200 text-green-700 hover:from-green-100 hover:to-green-200 hover:border-green-300 hover:shadow-sm hover:scale-105 transition-all duration-200 group/btn" onClick={() => handleDonateProduct(item)}>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="h-8 px-3 text-xs font-medium bg-gradient-to-r from-green-50 to-green-100 border-green-200 text-green-700 hover:from-green-100 hover:to-green-200 hover:border-green-300 hover:shadow-sm hover:scale-105 transition-all duration-200 group/btn" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDonateProduct(item);
+                          }}
+                        >
                           <Heart className="w-3 h-3 mr-1.5 group-hover/btn:scale-110 transition-transform" />
                           Donation
                         </Button>
