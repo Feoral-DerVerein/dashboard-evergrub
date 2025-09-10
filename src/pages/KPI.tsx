@@ -738,53 +738,6 @@ const KPI = () => {
               </div>
             </div>
 
-            {/* Sales Performance Chart */}
-            <div className="bg-white/80 rounded-xl p-6 border">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Sales Performance</h3>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleDownloadReport}
-                    disabled={isGeneratingReport}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm flex items-center gap-1"
-                  >
-                    <Download className="w-4 h-4" />
-                    {isGeneratingReport ? "Generating..." : "Download Report"}
-                  </Button>
-                </div>
-              </div>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
-                    <defs>
-                      <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <XAxis 
-                      dataKey="label" 
-                      axisLine={false}
-                      tickLine={false}
-                      className="text-gray-500 text-sm"
-                    />
-                    <YAxis 
-                      axisLine={false}
-                      tickLine={false}
-                      className="text-gray-500 text-sm"
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="value" 
-                      stroke="#3b82f6" 
-                      fillOpacity={1}
-                      fill="url(#colorSales)"
-                      strokeWidth={2}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
 
   {aiInsights && <div className="space-y-4">
       {/* Main AI Summary */}
