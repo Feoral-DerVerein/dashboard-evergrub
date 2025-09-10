@@ -57,7 +57,7 @@ export default function ExpiringSoonCard({
     setDonationFormOpen(true);
   };
   return <>
-      <Card className="overflow-hidden">
+      <Card className="bg-white/80 overflow-hidden">
         <CardHeader className="pb-4 bg-gradient-to-r from-background to-muted/30">
           <CardTitle className="text-lg font-bold text-foreground">Expiring Soon</CardTitle>
         </CardHeader>

@@ -10,7 +10,7 @@ export default function StockAlertsCard({ products }: StockAlertsCardProps) {
   const alerts = products.filter((p) => p.quantity > 0 && p.quantity <= 5).slice(0, 5);
 
   return (
-    <Card>
+    <Card className="bg-white/80">
       <CardHeader>
         <CardTitle className="text-lg">Stock Alerts</CardTitle>
       </CardHeader>

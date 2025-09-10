@@ -14,7 +14,7 @@ export default function SuppliersCard({
   suppliers
 }: SuppliersCardProps) {
   return (
-    <Card>
+    <Card className="bg-white/80">
       <CardHeader>
         <CardTitle>Suppliers</CardTitle>
       </CardHeader>
