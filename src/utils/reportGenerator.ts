@@ -374,16 +374,16 @@ export const generateAIReportWithEPACompliance = async (period: TimeFilterPeriod
     
     // Add certification seals image centered on page 2
     try {
-      const imgData = '/lovable-uploads/472a9d68-3432-4dfc-8b0b-7c9544821d44.png';
-      const imgWidth = 170;
-      const imgHeight = 120;
+      const imgData = '/lovable-uploads/d0af2da5-9cb2-4665-beba-30c706d5a37c.png';
+      const imgWidth = 150;
+      const imgHeight = 80;
       const xPosition = (doc.internal.pageSize.width - imgWidth) / 2;
-      const yPosition = 50; // Well within page bounds
+      const yPosition = 60; // Well within page bounds
       
       doc.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
       
       // EPA compliance summary below the image
-      yPos = yPosition + imgHeight + 15;
+      yPos = yPosition + imgHeight + 20;
     } catch (error) {
       // Fallback if image fails
       doc.setFontSize(12);
