@@ -392,6 +392,40 @@ export const generateAIReportWithEPACompliance = async (period: TimeFilterPeriod
     doc.text("• Automated donation program integration", 20, yPosition + 21);
     doc.text("• Continuous improvement through machine learning", 20, yPosition + 28);
     
+    // Add new page for certification seals
+    doc.addPage();
+    yPosition = 20;
+    
+    // Add certification header
+    doc.setFontSize(18);
+    doc.setTextColor(0, 100, 0);
+    doc.text("Negentropy Impact Certification", 105, yPosition, { align: "center" });
+    doc.setTextColor(0, 0, 0);
+    yPosition += 20;
+    
+    // Add certification seals image using the uploaded image
+    try {
+      // Use the uploaded image directly
+      const imgData = '/lovable-uploads/9240be3b-9144-47c2-81e5-7bcb548d1fe6.png';
+      
+      // Add image to PDF (centered)
+      const imgWidth = 180; // Adjust size as needed
+      const imgHeight = 120; // Approximate height based on aspect ratio
+      const xPosition = (doc.internal.pageSize.width - imgWidth) / 2;
+      
+      doc.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight + 10;
+    } catch (error) {
+      console.warn('Could not load certification image:', error);
+      // Fallback text if image can't be loaded
+      doc.setFontSize(12);
+      doc.text("Negentropy Impact Seals", 105, yPosition + 50, { align: "center" });
+      doc.setFontSize(10);
+      doc.text("Green Seal (+30%) | Orange Seal (+60%) | Blue Seal (+90%)", 105, yPosition + 65, { align: "center" });
+      doc.text("Certification system for food waste reduction achievements", 105, yPosition + 75, { align: "center" });
+      yPosition += 90;
+    }
+    
     // Add EPA compliance footer
     yPosition = doc.internal.pageSize.height - 30;
     doc.setFontSize(8);
