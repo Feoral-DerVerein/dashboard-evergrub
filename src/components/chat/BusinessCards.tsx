@@ -111,11 +111,11 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                 )}
 
                 {/* Action buttons for Marketplace and POS */}
-                <div className="flex gap-2 mt-3">
+                <div className="grid grid-cols-2 gap-2 mt-3">
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="flex-1 hover:bg-blue-50"
+                    className="text-xs py-1 px-2 h-8 hover:bg-blue-50"
                     onClick={() => handleMarketplaceAction('update_inventory', {
                       product: card.data.product,
                       quantity: card.data.quantity,
@@ -124,12 +124,12 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     })}
                   >
                     <ShoppingCart className="w-3 h-3 mr-1" />
-                    Update Marketplace
+                    Marketplace
                   </Button>
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="flex-1 hover:bg-green-50"
+                    className="text-xs py-1 px-2 h-8 hover:bg-green-50"
                     onClick={() => handlePOSAction('sync_inventory', {
                       product: card.data.product,
                       quantity: card.data.quantity,
@@ -137,7 +137,7 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     })}
                   >
                     <Monitor className="w-3 h-3 mr-1" />
-                    Sync POS
+                    POS
                   </Button>
                 </div>
               </div>
@@ -184,23 +184,23 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                   <p className="text-sm text-gray-700">{card.data.recommendation}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 mt-3">
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="hover-scale"
+                    className="text-xs py-1 px-2 h-8 hover-scale"
                     onClick={() => handleMarketplaceAction('apply_discount', {
                       product: card.data.product,
                       quantity: card.data.quantity,
                       discount_percentage: 25
                     })}
                   >
-                    Apply Discount
+                    Discount
                   </Button>
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="hover-scale"
+                    className="text-xs py-1 px-2 h-8 hover-scale"
                     onClick={() => handlePOSAction('mark_for_donation', {
                       product: card.data.product,
                       quantity: card.data.quantity
@@ -211,7 +211,7 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="col-span-1"
+                    className="text-xs py-1 px-2 h-8"
                     onClick={() => handleMarketplaceAction('list_expiring_product', {
                       product: card.data.product,
                       quantity: card.data.quantity,
@@ -220,12 +220,12 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     })}
                   >
                     <ShoppingCart className="w-3 h-3 mr-1" />
-                    List on Market
+                    Market
                   </Button>
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="col-span-1"
+                    className="text-xs py-1 px-2 h-8"
                     onClick={() => handlePOSAction('update_pricing', {
                       product: card.data.product,
                       new_price: card.data.sell_price * 0.75,
@@ -233,7 +233,7 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     })}
                   >
                     <Monitor className="w-3 h-3 mr-1" />
-                    Update POS
+                    POS
                   </Button>
                 </div>
               </div>
@@ -281,11 +281,11 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                 )}
 
                 {/* Sales actions */}
-                <div className="flex gap-2 mt-3">
+                <div className="grid grid-cols-2 gap-2 mt-3">
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="flex-1"
+                    className="text-xs py-1 px-2 h-8"
                     onClick={() => handleMarketplaceAction('promote_product', {
                       product: card.data.topProduct,
                       promotion_type: 'featured',
@@ -293,12 +293,12 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     })}
                   >
                     <ShoppingCart className="w-3 h-3 mr-1" />
-                    Promote on Market
+                    Promote
                   </Button>
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="flex-1"
+                    className="text-xs py-1 px-2 h-8"
                     onClick={() => handlePOSAction('create_promotion', {
                       product: card.data.topProduct,
                       discount: 15,
@@ -306,7 +306,7 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     })}
                   >
                     <Monitor className="w-3 h-3 mr-1" />
-                    Create POS Promo
+                    POS Promo
                   </Button>
                 </div>
               </div>
@@ -346,9 +346,10 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="grid grid-cols-2 gap-2 mt-3">
                   <Button 
-                    className="flex-1 bg-purple-600 hover:bg-purple-700 text-white hover-scale"
+                    size="sm"
+                    className="text-xs py-1 px-2 h-8 bg-purple-600 hover:bg-purple-700 text-white hover-scale"
                     onClick={() => handleMarketplaceAction('implement_recommendation', {
                       action: card.data.action,
                       expected_impact: card.data.impact,
@@ -356,10 +357,11 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     })}
                   >
                     <ShoppingCart className="w-3 h-3 mr-1" />
-                    Apply to Market
+                    Market
                   </Button>
                   <Button 
-                    className="flex-1 bg-purple-600 hover:bg-purple-700 text-white hover-scale"
+                    size="sm"
+                    className="text-xs py-1 px-2 h-8 bg-purple-600 hover:bg-purple-700 text-white hover-scale"
                     onClick={() => handlePOSAction('implement_recommendation', {
                       action: card.data.action,
                       expected_impact: card.data.impact,
@@ -367,7 +369,7 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     })}
                   >
                     <Monitor className="w-3 h-3 mr-1" />
-                    Apply to POS
+                    POS
                   </Button>
                 </div>
               </div>
@@ -401,11 +403,11 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                 </div>
 
                 {card.data.action_required && (
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2 mt-3">
                     <Button 
                       size="sm" 
                       variant="destructive" 
-                      className="hover-scale"
+                      className="text-xs py-1 px-2 h-8 hover-scale col-span-2"
                       onClick={() => handlePOSAction('immediate_action', {
                         alert_type: card.data.severity,
                         message: card.data.message,
@@ -414,32 +416,29 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     >
                       Immediate Action
                     </Button>
-                    <Button size="sm" variant="outline" className="hover-scale">
-                      View Details
-                    </Button>
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      className="col-span-1"
+                      className="text-xs py-1 px-2 h-8"
                       onClick={() => handleMarketplaceAction('alert_action', {
                         alert_type: card.data.severity,
                         message: card.data.message
                       })}
                     >
                       <ShoppingCart className="w-3 h-3 mr-1" />
-                      Market Alert
+                      Market
                     </Button>
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      className="col-span-1"
+                      className="text-xs py-1 px-2 h-8"
                       onClick={() => handlePOSAction('system_alert', {
                         severity: card.data.severity,
                         message: card.data.message
                       })}
                     >
                       <Monitor className="w-3 h-3 mr-1" />
-                      POS Alert
+                      POS
                     </Button>
                   </div>
                 )}
@@ -475,30 +474,30 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
               )}
 
               {/* Analytics actions */}
-              <div className="flex gap-2 mt-3">
+              <div className="grid grid-cols-2 gap-2 mt-3">
                 <Button 
                   size="sm" 
                   variant="outline" 
-                  className="flex-1"
+                  className="text-xs py-1 px-2 h-8"
                   onClick={() => handleMarketplaceAction('sync_analytics', {
                     metrics: card.data.metrics,
                     insights: card.data.insights
                   })}
                 >
                   <ShoppingCart className="w-3 h-3 mr-1" />
-                  Export to Market
+                  Export
                 </Button>
                 <Button 
                   size="sm" 
                   variant="outline" 
-                  className="flex-1"
+                  className="text-xs py-1 px-2 h-8"
                   onClick={() => handlePOSAction('update_analytics', {
                     metrics: card.data.metrics,
                     insights: card.data.insights
                   })}
                 >
                   <Monitor className="w-3 h-3 mr-1" />
-                  Update POS Data
+                  Update
                 </Button>
               </div>
             </CardContent>
