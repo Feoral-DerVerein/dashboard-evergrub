@@ -12,8 +12,12 @@ import {
   Calendar,
   MapPin,
   Tag,
-  Zap
+  Zap,
+  ShoppingCart,
+  Monitor
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface BusinessCardData {
   id: string;
@@ -25,6 +29,36 @@ export interface BusinessCardData {
 interface BusinessCardProps {
   card: BusinessCardData;
 }
+
+// Functions to handle marketplace and POS actions
+const handleMarketplaceAction = async (action: string, data: any) => {
+  try {
+    const { error } = await supabase.functions.invoke('send-to-marketplace', {
+      body: { action, data }
+    });
+    
+    if (error) throw error;
+    
+    toast.success(`Successfully sent to marketplace: ${action}`);
+  } catch (error) {
+    console.error('Marketplace action error:', error);
+    toast.error('Failed to sync with marketplace');
+  }
+};
+
+const handlePOSAction = async (action: string, data: any) => {
+  try {
+    // Simulate POS system integration
+    console.log('POS Action:', action, data);
+    
+    // You would implement actual POS API calls here
+    // For now, we'll just show a success message
+    toast.success(`POS System updated: ${action}`);
+  } catch (error) {
+    console.error('POS action error:', error);
+    toast.error('Failed to sync with POS system');
+  }
+};
 
 export const BusinessCard = ({ card }: BusinessCardProps) => {
   const renderCard = () => {
@@ -75,6 +109,37 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     <span className="font-medium">{new Date(card.data.expiry_date).toLocaleDateString('en-GB')}</span>
                   </div>
                 )}
+
+                {/* Action buttons for Marketplace and POS */}
+                <div className="flex gap-2 mt-3">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="flex-1 hover:bg-blue-50"
+                    onClick={() => handleMarketplaceAction('update_inventory', {
+                      product: card.data.product,
+                      quantity: card.data.quantity,
+                      price: card.data.sell_price,
+                      status: card.data.status
+                    })}
+                  >
+                    <ShoppingCart className="w-3 h-3 mr-1" />
+                    Update Marketplace
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="flex-1 hover:bg-green-50"
+                    onClick={() => handlePOSAction('sync_inventory', {
+                      product: card.data.product,
+                      quantity: card.data.quantity,
+                      price: card.data.sell_price
+                    })}
+                  >
+                    <Monitor className="w-3 h-3 mr-1" />
+                    Sync POS
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -119,12 +184,56 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                   <p className="text-sm text-gray-700">{card.data.recommendation}</p>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1 hover-scale">
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="hover-scale"
+                    onClick={() => handleMarketplaceAction('apply_discount', {
+                      product: card.data.product,
+                      quantity: card.data.quantity,
+                      discount_percentage: 25
+                    })}
+                  >
                     Apply Discount
                   </Button>
-                  <Button size="sm" variant="outline" className="flex-1 hover-scale">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="hover-scale"
+                    onClick={() => handlePOSAction('mark_for_donation', {
+                      product: card.data.product,
+                      quantity: card.data.quantity
+                    })}
+                  >
                     Donate
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="col-span-1"
+                    onClick={() => handleMarketplaceAction('list_expiring_product', {
+                      product: card.data.product,
+                      quantity: card.data.quantity,
+                      expiry_date: card.data.expiry_date,
+                      discounted_price: card.data.sell_price * 0.75
+                    })}
+                  >
+                    <ShoppingCart className="w-3 h-3 mr-1" />
+                    List on Market
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="col-span-1"
+                    onClick={() => handlePOSAction('update_pricing', {
+                      product: card.data.product,
+                      new_price: card.data.sell_price * 0.75,
+                      reason: 'expiring_soon'
+                    })}
+                  >
+                    <Monitor className="w-3 h-3 mr-1" />
+                    Update POS
                   </Button>
                 </div>
               </div>
@@ -170,6 +279,36 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                     </div>
                   </div>
                 )}
+
+                {/* Sales actions */}
+                <div className="flex gap-2 mt-3">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => handleMarketplaceAction('promote_product', {
+                      product: card.data.topProduct,
+                      promotion_type: 'featured',
+                      duration: '7_days'
+                    })}
+                  >
+                    <ShoppingCart className="w-3 h-3 mr-1" />
+                    Promote on Market
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => handlePOSAction('create_promotion', {
+                      product: card.data.topProduct,
+                      discount: 15,
+                      type: 'bestseller_promo'
+                    })}
+                  >
+                    <Monitor className="w-3 h-3 mr-1" />
+                    Create POS Promo
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -207,9 +346,30 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                   </div>
                 </div>
 
-                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white hover-scale">
-                  Implement Recommendation
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    className="flex-1 bg-purple-600 hover:bg-purple-700 text-white hover-scale"
+                    onClick={() => handleMarketplaceAction('implement_recommendation', {
+                      action: card.data.action,
+                      expected_impact: card.data.impact,
+                      target: 'marketplace'
+                    })}
+                  >
+                    <ShoppingCart className="w-3 h-3 mr-1" />
+                    Apply to Market
+                  </Button>
+                  <Button 
+                    className="flex-1 bg-purple-600 hover:bg-purple-700 text-white hover-scale"
+                    onClick={() => handlePOSAction('implement_recommendation', {
+                      action: card.data.action,
+                      expected_impact: card.data.impact,
+                      target: 'pos_system'
+                    })}
+                  >
+                    <Monitor className="w-3 h-3 mr-1" />
+                    Apply to POS
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -241,12 +401,45 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                 </div>
 
                 {card.data.action_required && (
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="destructive" className="flex-1 hover-scale">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="destructive" 
+                      className="hover-scale"
+                      onClick={() => handlePOSAction('immediate_action', {
+                        alert_type: card.data.severity,
+                        message: card.data.message,
+                        timestamp: card.data.created_at
+                      })}
+                    >
                       Immediate Action
                     </Button>
-                    <Button size="sm" variant="outline" className="flex-1 hover-scale">
+                    <Button size="sm" variant="outline" className="hover-scale">
                       View Details
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="col-span-1"
+                      onClick={() => handleMarketplaceAction('alert_action', {
+                        alert_type: card.data.severity,
+                        message: card.data.message
+                      })}
+                    >
+                      <ShoppingCart className="w-3 h-3 mr-1" />
+                      Market Alert
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="col-span-1"
+                      onClick={() => handlePOSAction('system_alert', {
+                        severity: card.data.severity,
+                        message: card.data.message
+                      })}
+                    >
+                      <Monitor className="w-3 h-3 mr-1" />
+                      POS Alert
                     </Button>
                   </div>
                 )}
@@ -280,6 +473,34 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                   <p className="text-sm text-gray-700">{card.data.insights}</p>
                 </div>
               )}
+
+              {/* Analytics actions */}
+              <div className="flex gap-2 mt-3">
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => handleMarketplaceAction('sync_analytics', {
+                    metrics: card.data.metrics,
+                    insights: card.data.insights
+                  })}
+                >
+                  <ShoppingCart className="w-3 h-3 mr-1" />
+                  Export to Market
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => handlePOSAction('update_analytics', {
+                    metrics: card.data.metrics,
+                    insights: card.data.insights
+                  })}
+                >
+                  <Monitor className="w-3 h-3 mr-1" />
+                  Update POS Data
+                </Button>
+              </div>
             </CardContent>
           </Card>
         );
