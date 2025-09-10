@@ -136,7 +136,7 @@ const ChatBot = ({ variant = 'floating' }: ChatBotProps) => {
               <Bot className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-primary">Business Intelligence AI</h3>
+              <h3 className="font-semibold text-primary">Hello, I'm Negen. How can I help you today?</h3>
               <p className="text-sm text-muted-foreground">What information do you need today?</p>
             </div>
           </div>
