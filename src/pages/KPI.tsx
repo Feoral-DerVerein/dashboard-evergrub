@@ -250,6 +250,9 @@ const KPI = () => {
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [aiInsights, setAiInsights] = useState<any | null>(null);
   const [showExpiringSoon, setShowExpiringSoon] = useState(true);
+  
+  // Debug log
+  console.log('showExpiringSoon state:', showExpiringSoon);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentActionDetails, setCurrentActionDetails] = useState<any>(null);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -601,7 +604,10 @@ const KPI = () => {
           <div className="px-6 mb-4">
             <div className="flex justify-end">
               <Button 
-                onClick={() => setShowExpiringSoon(false)}
+                onClick={() => {
+                  console.log('Marketplace button clicked, hiding expiring soon card');
+                  setShowExpiringSoon(false);
+                }}
                 className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
               >
                 <ShoppingCart className="w-4 h-4" />
@@ -917,7 +923,10 @@ const KPI = () => {
           <section className="px-6">
             <div className="grid md:grid-cols-3 gap-6 mt-6">
               <StockAlertsCard products={products} />
-              {showExpiringSoon && <ExpiringSoonCard products={products} />}
+              {(() => {
+                console.log('Rendering expiring soon card, showExpiringSoon:', showExpiringSoon);
+                return showExpiringSoon && <ExpiringSoonCard products={products} />;
+              })()}
               <SuppliersCard suppliers={suppliers} />
             </div>
 
