@@ -250,13 +250,12 @@ const KPI = () => {
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [aiInsights, setAiInsights] = useState<any | null>(null);
   const [showExpiringSoon, setShowExpiringSoon] = useState(true);
-  
+
   // Debug log
   console.log('showExpiringSoon state:', showExpiringSoon);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentActionDetails, setCurrentActionDetails] = useState<any>(null);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-
 
   // Real business data state
   const [realData, setRealData] = useState({
@@ -302,49 +301,37 @@ const KPI = () => {
   const loadRealData = async () => {
     try {
       // Fetch orders, products, and sales data
-      const [ordersResponse, productsResponse, salesResponse] = await Promise.all([
-        supabase.from('orders').select('*'),
-        supabase.from('products').select('*'),
-        supabase.from('sales').select('*')
-      ]);
-      
+      const [ordersResponse, productsResponse, salesResponse] = await Promise.all([supabase.from('orders').select('*'), supabase.from('products').select('*'), supabase.from('sales').select('*')]);
       if (ordersResponse.error) throw ordersResponse.error;
       if (productsResponse.error) throw productsResponse.error;
       if (salesResponse.error) throw salesResponse.error;
-      
       const orders = ordersResponse.data || [];
       const products = productsResponse.data || [];
       const sales = salesResponse.data || [];
-      
+
       // Separate regular products from surprise bags
       const regularProducts = products.filter(p => !p.is_surprise_bag);
       const surpriseBags = products.filter(p => p.is_surprise_bag);
-      
+
       // Calculate sales metrics
       const totalSalesAmount = sales.reduce((sum, sale) => sum + (sale.amount || 0), 0);
       const totalOrdersAmount = orders.reduce((sum, order) => sum + (order.total || 0), 0);
-      
+
       // Use sales data if available, otherwise fall back to orders
       const finalSalesAmount = sales.length > 0 ? totalSalesAmount : totalOrdersAmount;
       const transactionCount = sales.length > 0 ? sales.length : orders.length;
-      
+
       // Calculate surprise bag specific metrics
       const surpriseBagSales = sales.filter(sale => {
         if (!sale.products || !Array.isArray(sale.products)) return false;
-        return sale.products.some((product: any) => 
-          product.category === 'Surprise Bag' || 
-          product.name?.toLowerCase().includes('surprise') || 
-          product.name?.toLowerCase().includes('bag')
-        );
+        return sale.products.some((product: any) => product.category === 'Surprise Bag' || product.name?.toLowerCase().includes('surprise') || product.name?.toLowerCase().includes('bag'));
       });
-      
       const surpriseBagRevenue = surpriseBagSales.reduce((sum, sale) => sum + (sale.amount || 0), 0);
       const surpriseBagCount = surpriseBags.length;
       const activeSurpriseBags = surpriseBags.filter(bag => bag.quantity > 0).length;
-      
       if (finalSalesAmount > 0 || transactionCount > 0) {
         const avgOrderValue = finalSalesAmount / Math.max(transactionCount, 1);
-        
+
         // Enhanced calculations with surprise bag data
         const estimatedItems = transactionCount * 3 + surpriseBagCount * 2; // Include surprise bag items
         const co2SavedKg = Math.round(estimatedItems * 0.5 + surpriseBagCount * 1.2); // Surprise bags save more CO2
@@ -353,12 +340,11 @@ const KPI = () => {
         const returnRate = Math.max(3, Math.round(transactionCount * 0.05));
         const costSavings = Math.round(finalSalesAmount * 0.15 + surpriseBagRevenue * 0.25); // Higher savings from surprise bags
         const foodWasteKg = Math.round(estimatedItems * 0.3 + surpriseBagCount * 0.8); // Surprise bags reduce more waste
-        
+
         // Calculate additional metrics
         const profit = Math.round(finalSalesAmount * 0.25 + surpriseBagRevenue * 0.35); // Higher profit margin on surprise bags
         const revenue = Math.round(finalSalesAmount * 1.15);
         const operationalSavings = Math.round(finalSalesAmount * 0.18 + surpriseBagRevenue * 0.22);
-        
         setRealData({
           co2Saved: `${co2SavedKg} kg`,
           co2Change: "+18% vs last week",
@@ -386,7 +372,6 @@ const KPI = () => {
           avgOrderTrend: "4.5%"
         });
       }
-      
       if (products.length > 0) {
         // Enhanced AI Predictive Insights with surprise bag data
         const categoryCount = products.reduce((acc, product) => {
@@ -394,22 +379,19 @@ const KPI = () => {
           acc[category] = (acc[category] || 0) + product.quantity;
           return acc;
         }, {} as Record<string, number>);
-        
+
         // Find top selling category and overstocked items
         const topCategory = Object.entries(categoryCount).sort(([, a], [, b]) => b - a)[0];
         const overstockedItems = products.filter(p => p.quantity > 50);
         const overstockedItem = overstockedItems.length > 0 ? overstockedItems[0] : products[0];
-        
+
         // Calculate demand forecast based on current stock levels and surprise bag performance
         const avgStock = products.reduce((sum, p) => sum + p.quantity, 0) / products.length;
         const surpriseBagImpact = activeSurpriseBags > 0 ? 5 : 0; // Boost forecast if surprise bags are active
         const demandIncrease = Math.min(25, Math.max(5, Math.round(avgStock / 10) + surpriseBagImpact));
-        
+
         // Determine best performing product type
-        const bestPerformer = surpriseBagRevenue > (finalSalesAmount - surpriseBagRevenue) / 2 
-          ? 'Surprise Bags' 
-          : topCategory ? topCategory[0] : "Products";
-        
+        const bestPerformer = surpriseBagRevenue > (finalSalesAmount - surpriseBagRevenue) / 2 ? 'Surprise Bags' : topCategory ? topCategory[0] : "Products";
         setPredictiveData({
           topSellingProduct: bestPerformer,
           topSellingRate: topCategory ? `${Math.min(95, Math.round(topCategory[1] / products.length * 10))}%` : "0%",
@@ -470,7 +452,6 @@ const KPI = () => {
       setIsGeneratingReport(false);
     }
   };
-
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
@@ -482,13 +463,11 @@ const KPI = () => {
         return "bg-gray-100 text-gray-800";
     }
   };
-
   const showActionDetails = (actionDetails: any, action: () => void) => {
     setCurrentActionDetails(actionDetails);
     setPendingAction(() => action);
     setDialogOpen(true);
   };
-  
   const handleConfirmAction = () => {
     if (pendingAction) {
       pendingAction();
@@ -497,14 +476,11 @@ const KPI = () => {
       setCurrentActionDetails(null);
     }
   };
-  
   const handleCancelAction = () => {
     setDialogOpen(false);
     setPendingAction(null);
     setCurrentActionDetails(null);
   };
-
-
   const handleGenerateInsightsWithDetails = () => {
     const details = {
       title: "Generate AI Business Insights",
@@ -521,7 +497,6 @@ const KPI = () => {
     };
     showActionDetails(details, handleGenerateInsights);
   };
-
   const handleDownloadReportWithDetails = () => {
     const details = {
       title: "Generate NSW EPA Compliance Report",
@@ -603,16 +578,7 @@ const KPI = () => {
           {/* Marketplace Button */}
           <div className="px-6 mb-4">
             <div className="flex justify-end">
-              <Button 
-                onClick={() => {
-                  console.log('Marketplace button clicked, hiding expiring soon card');
-                  setShowExpiringSoon(false);
-                }}
-                className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
-              >
-                <ShoppingCart className="w-4 h-4" />
-                Marketplace
-              </Button>
+              
             </div>
           </div>
 
@@ -880,26 +846,10 @@ const KPI = () => {
             <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
               <h3 className="text-lg font-semibold mb-4">Surprise Bags Performance</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
-                <SustainabilityCard 
-                  label="Active Surprise Bags" 
-                  value={products.filter(p => p.isSurpriseBag && p.quantity > 0).length.toString()} 
-                  subtext={`Total created: ${products.filter(p => p.isSurpriseBag).length}`} 
-                />
-                <SustainabilityCard 
-                  label="Surprise Bag Revenue" 
-                  value={`$${Math.round(parseFloat(realData.totalSales.replace(/[$,]/g, '')) * 0.15).toLocaleString()}`}
-                  subtext="15% of total sales" 
-                />
-                <SustainabilityCard 
-                  label="Food Waste Prevented" 
-                  value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 2.5)} kg`}
-                  subtext="Through surprise bags" 
-                />
-                <SustainabilityCard 
-                  label="Environmental Impact" 
-                  value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 1.8)} kg CO₂`}
-                  subtext="Emissions saved" 
-                />
+                <SustainabilityCard label="Active Surprise Bags" value={products.filter(p => p.isSurpriseBag && p.quantity > 0).length.toString()} subtext={`Total created: ${products.filter(p => p.isSurpriseBag).length}`} />
+                <SustainabilityCard label="Surprise Bag Revenue" value={`$${Math.round(parseFloat(realData.totalSales.replace(/[$,]/g, '')) * 0.15).toLocaleString()}`} subtext="15% of total sales" />
+                <SustainabilityCard label="Food Waste Prevented" value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 2.5)} kg`} subtext="Through surprise bags" />
+                <SustainabilityCard label="Environmental Impact" value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 1.8)} kg CO₂`} subtext="Emissions saved" />
               </div>
             </section>
 
@@ -924,9 +874,9 @@ const KPI = () => {
             <div className="grid md:grid-cols-3 gap-6 mt-6">
               <StockAlertsCard products={products} />
               {(() => {
-                console.log('Rendering expiring soon card, showExpiringSoon:', showExpiringSoon);
-                return showExpiringSoon && <ExpiringSoonCard products={products} />;
-              })()}
+            console.log('Rendering expiring soon card, showExpiringSoon:', showExpiringSoon);
+            return showExpiringSoon && <ExpiringSoonCard products={products} />;
+          })()}
               <SuppliersCard suppliers={suppliers} />
             </div>
 
@@ -1001,13 +951,7 @@ const KPI = () => {
         </div>
 
         {/* Action Details Dialog */}
-        <ActionDetailsDialog 
-          open={dialogOpen} 
-          onOpenChange={setDialogOpen} 
-          actionDetails={currentActionDetails} 
-          onConfirm={handleConfirmAction} 
-          onCancel={handleCancelAction} 
-        />
+        <ActionDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} actionDetails={currentActionDetails} onConfirm={handleConfirmAction} onCancel={handleCancelAction} />
 
       <BottomNav />
     </div>;
