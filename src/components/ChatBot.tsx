@@ -127,7 +127,13 @@ const ChatBot = ({
                   disabled={isLoading || !inputValue.trim()} 
                   className="bg-primary hover:bg-primary/90 px-6"
                 >
-                  {isLoading ? <LoadingCard /> : <Send className="w-4 h-4" />}
+                  {isLoading ? (
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                    </div>
+                  ) : <Send className="w-4 h-4" />}
                 </Button>
               </div>
 
@@ -221,10 +227,14 @@ const ChatBot = ({
                   </div>}
               </div>)}
             {isLoading && <div className="mb-4">
-                <div className="inline-block bg-gray-100 p-2 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                    <span className="text-sm text-gray-600">Thinking...</span>
+                <div className="inline-block bg-gray-100 p-3 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                    </div>
+                    <span className="text-sm text-gray-600">Negentropy Assistant está pensando...</span>
                   </div>
                 </div>
               </div>}
