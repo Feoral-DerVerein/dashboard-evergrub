@@ -1,11 +1,11 @@
-import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Users, TrendingUp, Clock } from "lucide-react";
+import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { generateKpiReport, TimeFilterPeriod } from "@/utils/reportGenerator";
+import { generateKpiReport, generateAIReportWithEPACompliance, TimeFilterPeriod } from "@/utils/reportGenerator";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -19,6 +19,12 @@ import RatingInsightCard from "@/components/kpi/RatingInsightCard";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AustralianComplianceDialog } from "@/components/AustralianComplianceDialog";
 import { supabase } from "@/integrations/supabase/client";
+import { DynamicGreeting } from '@/components/DynamicGreeting';
+import ChatBot from "@/components/ChatBot";
+import { ActionDetailsDialog } from "@/components/ActionDetailsDialog";
+import { aiInsightsService } from "@/services/aiInsightsService";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 const chartDataSamples: Record<TimeFilterPeriod, {
   label: string;
   value: number;
@@ -243,6 +249,70 @@ const KPI = () => {
   // AI insights state
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [aiInsights, setAiInsights] = useState<any | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentActionDetails, setCurrentActionDetails] = useState<any>(null);
+  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+
+  // AI Business Intelligence Data
+  const [inventoryRecommendations] = useState([{
+    id: 1,
+    type: "reduce",
+    product: "Decaf Coffee Beans",
+    current: "12 kg",
+    recommended: "8 kg (-33%)",
+    reason: "Low demand, slow rotation in Melbourne market",
+    priority: "high",
+    savings: "$180"
+  }, {
+    id: 2,
+    type: "increase",
+    product: "Oat Milk",
+    current: "15 L",
+    recommended: "25 L (+67%)",
+    reason: "High demand from Melbourne vegans, excellent margins",
+    priority: "medium",
+    opportunity: "$125"
+  }]);
+  const [expirationAlerts] = useState([{
+    id: 1,
+    product: "Almond Croissants",
+    quantity: "18 units",
+    daysLeft: 2,
+    value: "$72",
+    priority: "urgent",
+    recommendation: "50% discount after 3pm or donate to shelter"
+  }, {
+    id: 2,
+    product: "Fresh Milk",
+    quantity: "8 L",
+    daysLeft: 3,
+    value: "$24",
+    priority: "medium",
+    recommendation: "Use for coffee drinks first"
+  }, {
+    id: 3,
+    product: "Banana Bread",
+    quantity: "6 loaves",
+    daysLeft: 1,
+    value: "$48",
+    priority: "urgent",
+    recommendation: "Staff meal or customer free samples"
+  }]);
+  const [pricingSuggestions] = useState([{
+    id: 1,
+    product: "Specialty Latte",
+    currentPrice: "$6.50",
+    suggestedPrice: "$7.20 (+11%)",
+    reason: "High demand during Melbourne winter, premium beans justify price",
+    impact: "+$280 weekly revenue"
+  }, {
+    id: 2,
+    product: "Vegan Muffins",
+    currentPrice: "$5.00",
+    suggestedPrice: "$4.50 (-10%)",
+    reason: "Clear stock before weekend batch, attract price-sensitive customers",
+    impact: "+45% estimated sales"
+  }]);
 
   // Real business data state
   const [realData, setRealData] = useState({
@@ -446,15 +516,139 @@ const KPI = () => {
   const handleDownloadReport = async () => {
     try {
       setIsGeneratingReport(true);
-      toast.info("Generating report...");
-      await generateKpiReport(activeTimeFilter);
-      toast.success("Report generated successfully!");
+      toast.info("Generating EPA compliance report...");
+      await generateAIReportWithEPACompliance(activeTimeFilter);
+      toast.success("EPA compliance report generated successfully!");
     } catch (error) {
       console.error("Error generating report:", error);
-      toast.error("Failed to generate report. Please try again.");
+      toast.error("Failed to generate EPA compliance report. Please try again.");
     } finally {
       setIsGeneratingReport(false);
     }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+      case "urgent":
+        return "bg-red-100 text-red-800";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const showActionDetails = (actionDetails: any, action: () => void) => {
+    setCurrentActionDetails(actionDetails);
+    setPendingAction(() => action);
+    setDialogOpen(true);
+  };
+  
+  const handleConfirmAction = () => {
+    if (pendingAction) {
+      pendingAction();
+      setDialogOpen(false);
+      setPendingAction(null);
+      setCurrentActionDetails(null);
+    }
+  };
+  
+  const handleCancelAction = () => {
+    setDialogOpen(false);
+    setPendingAction(null);
+    setCurrentActionDetails(null);
+  };
+
+  const handleAcceptRecommendation = (id: number, type: string, product?: string) => {
+    const details = {
+      title: `Accept ${type === 'reduce' ? 'Reduction' : 'Increase'} Inventory Recommendation`,
+      description: `This action will automatically implement the AI recommendation to optimize your coffee inventory.`,
+      impact: {
+        financial: type === 'reduce' ? '+$180 weekly savings' : '+$125 weekly opportunity',
+        inventory: `${product}: ${type === 'reduce' ? '-33%' : '+67%'} adjustment`,
+        environmental: type === 'reduce' ? '15% waste reduction' : 'Higher customer satisfaction',
+        timeframe: 'Effective immediately, results in 3-5 days'
+      },
+      changes: [`Automatic order adjustment for ${product}`, 'Update minimum stock levels', 'Notify suppliers about changes', 'Recalibrate inventory alerts'],
+      benefits: ['Automatic cash flow optimization', 'Reduction in expired products', 'Better inventory turnover', 'Increased profit margins'],
+      risks: ['Possible temporary stockout if demand unexpectedly increases', 'Need for monitoring during first week']
+    };
+    showActionDetails(details, () => {
+      toast.success(`${type} recommendation applied automatically for ${product}`);
+    });
+  };
+
+  const handleApplyPromotion = (product: string, days: number) => {
+    const details = {
+      title: `Apply Promotion to ${product}`,
+      description: `This action will automatically apply an intelligent promotion for ${product} expiring in ${days} days.`,
+      impact: {
+        financial: `Estimated recovery: 70-85% of value vs total loss`,
+        inventory: 'Accelerated rotation of soon-to-expire stock',
+        environmental: 'Prevention of food waste',
+        timeframe: 'Promotion active immediately for 24-48 hours'
+      },
+      changes: [`Automatic ${days <= 1 ? '50%' : '30%'} discount applied`, 'Push notification to regular customers', 'Update on cafe digital displays', 'Automatic social media promotion'],
+      benefits: ['Significant investment recovery', 'Increased customer traffic', 'Improved sustainability perception', 'Cross-selling opportunity'],
+      risks: ['Temporarily reduced margin', 'Possible customer conditioning to discounts']
+    };
+    showActionDetails(details, () => {
+      toast.success(`Promotion automatically applied to ${product}`);
+    });
+  };
+
+  const handleApplyDynamicPricing = (product: string, currentPrice: string, newPrice: string) => {
+    const details = {
+      title: `Apply Dynamic Pricing to ${product}`,
+      description: `This action will update the price of ${product} from ${currentPrice} to ${newPrice} based on demand and competition analysis.`,
+      impact: {
+        financial: `Estimated revenue increase: $280 weekly`,
+        inventory: 'Price-based rotation optimization',
+        environmental: 'Better valuation of premium products',
+        timeframe: 'Change effective immediately'
+      },
+      changes: [`Update price from ${currentPrice} to ${newPrice}`, 'Automatically modify POS system', 'Update digital and physical menus', 'Notify barista team of changes'],
+      benefits: ['Direct increase in margins', 'Better premium brand positioning', 'Price-based demand optimization', 'Improved data for future decisions'],
+      risks: ['Possible initial resistance from some customers', 'Need to clearly communicate added value']
+    };
+    showActionDetails(details, () => {
+      toast.success(`Dynamic pricing applied: ${product} now ${newPrice}`);
+    });
+  };
+
+  const handleGenerateInsightsWithDetails = () => {
+    const details = {
+      title: "Generate AI Business Insights",
+      description: "This action will analyze your current business data using advanced AI to provide personalized recommendations and predictions.",
+      impact: {
+        financial: 'Complete financial KPIs and cost savings analysis',
+        inventory: 'Detailed waste reduction and optimization metrics',
+        environmental: 'Sustainability impact measurement and improvement suggestions',
+        timeframe: 'Analysis based on last 30 days of data'
+      },
+      changes: ['Analyze sales patterns and customer behavior', 'Generate inventory optimization recommendations', 'Create sustainability impact reports', 'Predict demand and market trends'],
+      benefits: ['Data-driven decision making', 'Optimized inventory management', 'Improved sustainability practices', 'Competitive advantage through AI insights'],
+      risks: ['Recommendations based on historical data patterns', 'Market conditions may vary from predictions']
+    };
+    showActionDetails(details, handleGenerateInsights);
+  };
+
+  const handleDownloadReportWithDetails = () => {
+    const details = {
+      title: "Generate NSW EPA Compliance Report",
+      description: "This action will create a comprehensive NSW Environmental Protection Authority compliance report with your food waste reduction data and Negentropy platform impact.",
+      impact: {
+        financial: 'Detailed cost savings from waste reduction',
+        inventory: 'Complete waste management and reduction metrics',
+        environmental: 'Full environmental impact assessment and compliance verification',
+        timeframe: 'Report covers all historical data and current compliance status'
+      },
+      changes: ['Compile all food waste data', 'Calculate environmental impact metrics', 'Generate official EPA compliance documentation', 'Include Negentropy platform contribution analysis'],
+      benefits: ['Official EPA compliance verification', 'Regulatory requirement fulfillment', 'Environmental impact documentation', 'Potential tax benefits and incentives'],
+      risks: ['Compliance requirements may change', 'Data accuracy dependent on input quality']
+    };
+    showActionDetails(details, handleDownloadReport);
   };
   const handleGenerateInsights = async () => {
     try {
@@ -517,6 +711,195 @@ const KPI = () => {
               </DropdownMenu>
             </div>
           </header>
+
+          {/* AI ChatBot - Inline */}
+          <div className="px-6 mb-6">
+            <ChatBot variant="inline" />
+          </div>
+
+          {/* AI Business Intelligence Cards */}
+          <div className="px-6 mb-6">
+            <h3 className="text-lg font-semibold mb-4">AI Business Intelligence</h3>
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {/* Inventory Recommendations */}
+              <Card className="h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Package className="w-5 h-5 text-blue-600" />
+                    Inventory Recommendations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {inventoryRecommendations.slice(0, 3).map(rec => (
+                      <div key={rec.id} className="border rounded-lg p-3 bg-gray-50">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-medium text-sm text-gray-900">{rec.product}</h4>
+                              <Badge className={getPriorityColor(rec.priority)}>
+                                {rec.priority === "high" ? "High" : "Medium"}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-gray-600 mb-1">{rec.reason}</p>
+                            <div className="flex gap-2 text-xs">
+                              <span className="text-gray-600">Current: <strong>{rec.current}</strong></span>
+                              <span className="text-blue-600">Rec: <strong>{rec.recommended}</strong></span>
+                            </div>
+                          </div>
+                          {rec.type === "reduce" ? <ArrowDown className="w-4 h-4 text-red-500" /> : <ArrowUp className="w-4 h-4 text-green-500" />}
+                        </div>
+                        <div className="flex gap-1">
+                          <Button size="sm" onClick={() => handleAcceptRecommendation(rec.id, rec.type, rec.product)} className="flex-1 text-xs h-7">
+                            Accept
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => {}} className="flex-1 text-xs h-7">
+                            Decline
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Expiration Alerts */}
+              <Card className="h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                    Priority Expiration Alerts
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {expirationAlerts.slice(0, 3).map(alert => (
+                      <div key={alert.id} className="border rounded-lg p-3 bg-red-50">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-medium text-sm text-gray-900">{alert.product}</h4>
+                              <Badge className={getPriorityColor(alert.priority)}>
+                                {alert.daysLeft} days
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-gray-600 mb-1">
+                              <Clock className="w-3 h-3 inline mr-1" />
+                              {alert.quantity} • {alert.recommendation}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button size="sm" onClick={() => handleApplyPromotion(alert.product, alert.daysLeft)} className="flex-1 text-xs h-7">
+                            Marketplace
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => {}} className="flex-1 text-xs h-7">
+                            Decline
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Dynamic Pricing Suggestions */}
+              <Card className="h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-green-600" />
+                    Dynamic Pricing
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {pricingSuggestions.slice(0, 2).map(pricing => (
+                      <div key={pricing.id} className="border rounded-lg p-3 bg-green-50">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-medium text-sm text-gray-900">{pricing.product}</h4>
+                              <Badge className="bg-green-100 text-green-800">
+                                {pricing.currentPrice} → {pricing.suggestedPrice}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-gray-600 mb-1">{pricing.reason}</p>
+                            <p className="text-xs text-green-600 font-medium">{pricing.impact}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button size="sm" onClick={() => handleApplyDynamicPricing(pricing.product, pricing.currentPrice, pricing.suggestedPrice)} className="flex-1 text-xs h-7">
+                            Apply
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => {}} className="flex-1 text-xs h-7">
+                            Decline
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* AI Control Panel */}
+          <div className="px-6 mb-6">
+            <h3 className="text-lg font-semibold mb-4">AI Control Panel</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Upload Training Data */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-600" />
+                    Upload Training Data
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Upload additional data to improve AI recommendations and predictions.
+                  </p>
+                  <UploadTrainingDataDialog />
+                </CardContent>
+              </Card>
+
+              {/* Generate Insights */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-blue-600" />
+                    AI Insights
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Generate intelligent insights based on your current data and market trends.
+                  </p>
+                  <Button className="w-full" onClick={handleGenerateInsightsWithDetails} disabled={isGeneratingInsights}>
+                    {isGeneratingInsights ? "Generating..." : "Generate AI Insights"}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Download Report */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-green-600" />
+                    NSW EPA Compliance Report
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Generate comprehensive NSW EPA food waste compliance reports with Negentropy platform impact data.
+                  </p>
+                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white flex justify-center items-center" onClick={handleDownloadReportWithDetails} disabled={isGeneratingReport}>
+                    {isGeneratingReport ? "Generating EPA Report..." : "Download EPA Compliance Report"}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
 
           {/* Main dashboard content and chart - Moved to top */}
           <section className="px-6 mt-8 mb-8 space-y-6">
@@ -880,6 +1263,15 @@ const KPI = () => {
             </div>
           </section>
         </div>
+
+        {/* Action Details Dialog */}
+        <ActionDetailsDialog 
+          open={dialogOpen} 
+          onOpenChange={setDialogOpen} 
+          actionDetails={currentActionDetails} 
+          onConfirm={handleConfirmAction} 
+          onCancel={handleCancelAction} 
+        />
 
       <BottomNav />
     </div>;
