@@ -139,12 +139,12 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                       if (onAddToTaskList) {
                         const taskInfo = getTaskInfo(card.type, card.data);
                         onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                        toast.success('Tarea agregada a la lista');
+                        toast.success('Task added to list');
                       }
                     }}
                   >
                     <Plus className="w-3 h-3 mr-1" />
-                    Agregar a lista de tareas
+                    Add to task list
                   </Button>
                 </div>
               </div>
@@ -200,12 +200,12 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                       if (onAddToTaskList) {
                         const taskInfo = getTaskInfo(card.type, card.data);
                         onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                        toast.success('Tarea agregada a la lista');
+                        toast.success('Task added to list');
                       }
                     }}
                   >
                     <Plus className="w-3 h-3 mr-1" />
-                    Agregar a lista de tareas
+                    Add to task list
                   </Button>
                 </div>
               </div>
@@ -262,12 +262,12 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                       if (onAddToTaskList) {
                         const taskInfo = getTaskInfo(card.type, card.data);
                         onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                        toast.success('Tarea agregada a la lista');
+                        toast.success('Task added to list');
                       }
                     }}
                   >
                     <Plus className="w-3 h-3 mr-1" />
-                    Agregar a lista de tareas
+                    Add to task list
                   </Button>
                 </div>
               </div>
@@ -316,12 +316,12 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                       if (onAddToTaskList) {
                         const taskInfo = getTaskInfo(card.type, card.data);
                         onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                        toast.success('Tarea agregada a la lista');
+                        toast.success('Task added to list');
                       }
                     }}
                   >
                     <Plus className="w-3 h-3 mr-1" />
-                    Agregar a lista de tareas
+                    Add to task list
                   </Button>
                 </div>
               </div>
@@ -370,12 +370,12 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                       if (onAddToTaskList) {
                         const taskInfo = getTaskInfo(card.type, card.data);
                         onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                        toast.success('Tarea agregada a la lista');
+                        toast.success('Task added to list');
                       }
                     }}
                   >
                     <Plus className="w-3 h-3 mr-1" />
-                    Agregar a lista de tareas
+                    Add to task list
                   </Button>
                 </div>
               </div>
@@ -418,12 +418,12 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                     if (onAddToTaskList) {
                       const taskInfo = getTaskInfo(card.type, card.data);
                       onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                      toast.success('Tarea agregada a la lista');
+                      toast.success('Task added to list');
                     }
                   }}
                 >
                   <Plus className="w-3 h-3 mr-1" />
-                  Agregar a lista de tareas
+                  Add to task list
                 </Button>
               </div>
             </CardContent>

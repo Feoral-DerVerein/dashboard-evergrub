@@ -44,14 +44,14 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted }: Tas
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Clock className="w-5 h-5" />
-            Lista de Tareas
+            Task List
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-gray-500">
             <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No hay tareas pendientes</p>
-            <p className="text-sm mt-1">Las tarjetas del chatbot aparecerán aquí cuando agregues tareas</p>
+            <p>No pending tasks</p>
+            <p className="text-sm mt-1">Chatbot cards will appear here when you add tasks</p>
           </div>
         </CardContent>
       </Card>
@@ -64,7 +64,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted }: Tas
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <Clock className="w-5 h-5" />
-            Lista de Tareas ({pendingTasks.length} pendientes)
+            Task List ({pendingTasks.length} pending)
           </CardTitle>
           {completedCount > 0 && (
             <Button 
@@ -73,7 +73,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted }: Tas
               size="sm"
               className="text-xs"
             >
-              Limpiar completadas ({completedCount})
+              Clear completed ({completedCount})
             </Button>
           )}
         </div>
@@ -99,7 +99,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted }: Tas
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{task.description}</p>
                     <div className="text-xs text-gray-400">
-                      Agregado: {task.createdAt.toLocaleString('es-ES')}
+                      Added: {task.createdAt.toLocaleString('en-US')}
                     </div>
                   </div>
                 </div>
@@ -128,7 +128,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted }: Tas
           {completedTasks.length > 0 && (
             <>
               <div className="border-t pt-4 mt-4">
-                <h5 className="text-sm font-medium text-gray-500 mb-3">Completadas ({completedCount})</h5>
+                <h5 className="text-sm font-medium text-gray-500 mb-3">Completed ({completedCount})</h5>
                 {completedTasks.map((task) => (
                   <div 
                     key={task.id} 
@@ -140,7 +140,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted }: Tas
                         <div>
                           <h5 className="text-sm font-medium text-gray-700 line-through">{task.title}</h5>
                           <p className="text-xs text-gray-500">
-                            Completada: {task.createdAt.toLocaleString('es-ES')}
+                            Completed: {task.createdAt.toLocaleString('en-US')}
                           </p>
                         </div>
                       </div>
