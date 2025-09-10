@@ -9,8 +9,6 @@ import { generateKpiReport, generateAIReportWithEPACompliance, TimeFilterPeriod 
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AIRecommendations } from "@/components/AIRecommendations";
 import { supabase } from "@/integrations/supabase/client";
-import WeatherWidget from "@/components/widgets/WeatherWidget";
-import VisitorPredictionWidget from "@/components/widgets/VisitorPredictionWidget";
 import { ActionDetailsDialog } from "@/components/ActionDetailsDialog";
 import { aiInsightsService } from "@/services/aiInsightsService";
 import ChatBot from "@/components/ChatBot";
@@ -418,11 +416,6 @@ const AI = () => {
         {/* AI ChatBot - Inline */}
         <ChatBot variant="inline" />
 
-        {/* Widgets */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <WeatherWidget />
-          <VisitorPredictionWidget />
-        </div>
 
         {/* Main Content Grid - 2 columns */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">

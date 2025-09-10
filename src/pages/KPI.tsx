@@ -1,4 +1,4 @@
-import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle } from "lucide-react";
+import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Users, TrendingUp, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Link } from "react-router-dom";
@@ -537,6 +537,120 @@ const KPI = () => {
               <MetricCard icon={AlertTriangle} value={realData.savings} label="Operational Savings" trend={realData.savingsTrend} />
               <MetricCard icon={Plus} value={realData.revenue} label="Revenue" trend={realData.revenueTrend} />
               <MetricCard icon={User} value={realData.avgOrderValue} label="Avg Order Value" trend={realData.avgOrderTrend} />
+            </div>
+
+            {/* Weather and Visitor Prediction Cards */}
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <div className="glass-card rounded-xl p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-blue-500 rounded-full">
+                    <Sun className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-blue-900">Melbourne Weather Live</h3>
+                  <div className="ml-auto">
+                    <button className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors">
+                      <Settings className="w-4 h-4 text-blue-700" />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-3xl font-light text-blue-900 mb-1">16°C</div>
+                    <p className="text-blue-700 text-sm">Demo Weather Data - Add API Key For Real Data</p>
+                    <p className="text-blue-600 text-sm">Feels like 18°C</p>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-blue-400 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">💧</span>
+                      </div>
+                      <span className="text-blue-700">66%</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Wind className="w-4 h-4 text-blue-600" />
+                      <span className="text-blue-700">19 km/h</span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/50 rounded-lg p-3">
+                    <p className="text-sm text-blue-800 font-medium mb-2">Today's Forecast</p>
+                    <div className="grid grid-cols-4 gap-2 text-xs">
+                      <div className="text-center">
+                        <div className="text-blue-600">12:00</div>
+                        <Sun className="w-4 h-4 text-yellow-500 mx-auto my-1" />
+                        <div className="text-blue-900">18°</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-blue-600">15:00</div>
+                        <Cloud className="w-4 h-4 text-gray-500 mx-auto my-1" />
+                        <div className="text-blue-900">22°</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-blue-600">18:00</div>
+                        <Cloud className="w-4 h-4 text-gray-500 mx-auto my-1" />
+                        <div className="text-blue-900">19°</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-blue-600">21:00</div>
+                        <Cloud className="w-4 h-4 text-gray-500 mx-auto my-1" />
+                        <div className="text-blue-900">16°</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-green-100 rounded-lg p-2">
+                    <p className="text-green-800 text-sm">☕ Perfect for warm drinks</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass-card rounded-xl p-6 bg-gradient-to-br from-purple-50 to-indigo-100 border border-purple-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-purple-500 rounded-full">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-purple-900">Visitor Prediction</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-3xl font-bold text-purple-900">94</div>
+                      <p className="text-purple-700 text-sm">Expected visitors today</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-green-600">
+                      <TrendingUp className="w-4 h-4" />
+                      <span className="text-sm font-medium">Up</span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-purple-500" />
+                      <span className="text-purple-700">Peak: 1:00 PM</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-green-500" />
+                      <span className="text-purple-700">Confidence: 92%</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-purple-800">Key Factors:</p>
+                    <div className="flex flex-wrap gap-1">
+                      <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Weekday</span>
+                      <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Historical patterns</span>
+                      <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Regular hours</span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-purple-100 rounded-lg p-3">
+                    <p className="text-purple-800 text-sm">AI recommendation: Normal staffing sufficient</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Sales Performance Chart */}
