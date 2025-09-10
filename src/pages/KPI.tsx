@@ -602,63 +602,6 @@ const KPI = () => {
           </div>
 
 
-          {/* AI Control Panel */}
-          <div className="px-6 mb-6">
-            <h3 className="text-lg font-semibold mb-4">AI Control Panel</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Upload Training Data */}
-              <Card className="bg-white/80">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-purple-600" />
-                    Upload Training Data
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Upload additional data to improve AI recommendations and predictions.
-                  </p>
-                  <UploadTrainingDataDialog />
-                </CardContent>
-              </Card>
-
-              {/* Generate Insights */}
-              <Card className="bg-white/80">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-blue-600" />
-                    AI Insights
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Generate intelligent insights based on your current data and market trends.
-                  </p>
-                  <Button className="w-full" onClick={handleGenerateInsightsWithDetails} disabled={isGeneratingInsights}>
-                    {isGeneratingInsights ? "Generating..." : "Generate AI Insights"}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Download Report */}
-              <Card className="bg-white/80">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-green-600" />
-                    NSW EPA Compliance Report
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Generate comprehensive NSW EPA food waste compliance reports with Negentropy platform impact data.
-                  </p>
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white flex justify-center items-center" onClick={handleDownloadReportWithDetails} disabled={isGeneratingReport}>
-                    {isGeneratingReport ? "Generating EPA Report..." : "Download EPA Compliance Report"}
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
 
           {/* Main dashboard content and chart - Moved to top */}
           <section className="px-6 mt-8 mb-8 space-y-6">
@@ -1011,8 +954,66 @@ const KPI = () => {
               <SuppliersCard suppliers={suppliers} />
             </div>
 
-            <div className="text-center text-sm text-gray-500 space-y-2 mb-6">
-              <div className="flex flex-col gap-4 mt-8">
+            {/* AI Control Panel - Moved to bottom */}
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold mb-4">AI Control Panel</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Upload Training Data */}
+                <Card className="bg-white/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-purple-600" />
+                      Upload Training Data
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Upload additional data to improve AI recommendations and predictions.
+                    </p>
+                    <UploadTrainingDataDialog />
+                  </CardContent>
+                </Card>
+
+                {/* Generate Insights */}
+                <Card className="bg-white/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Brain className="w-5 h-5 text-blue-600" />
+                      AI Insights
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Generate intelligent insights based on your current data and market trends.
+                    </p>
+                    <Button className="w-full" onClick={handleGenerateInsightsWithDetails} disabled={isGeneratingInsights}>
+                      {isGeneratingInsights ? "Generating..." : "Generate AI Insights"}
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Download Report */}
+                <Card className="bg-white/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-green-600" />
+                      NSW EPA Compliance Report
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Generate comprehensive NSW EPA food waste compliance reports with Negentropy platform impact data.
+                    </p>
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white flex justify-center items-center" onClick={handleDownloadReportWithDetails} disabled={isGeneratingReport}>
+                      {isGeneratingReport ? "Generating EPA Report..." : "Download EPA Compliance Report"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            <div className="text-center text-sm text-gray-500 space-y-2 mb-6 mt-8">
+              <div className="flex flex-col gap-4">
                 <AustralianComplianceDialog />
                 <p className="text-xs text-muted-foreground px-4 leading-relaxed">
                   Generate Australian legal compliance reports aligned with DCCEEW Food Waste Baseline & Reporting Framework 
