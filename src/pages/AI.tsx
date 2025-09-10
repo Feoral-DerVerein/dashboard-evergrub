@@ -755,8 +755,7 @@ const AI = () => {
               <p className="text-sm text-gray-600 mb-4">
                 Generate comprehensive NSW EPA food waste compliance reports with Negentropy platform impact data.
               </p>
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDownloadReportWithDetails} disabled={isGeneratingReport}>
-                <Download className="w-4 h-4 mr-2" />
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white flex justify-center items-center" onClick={handleDownloadReportWithDetails} disabled={isGeneratingReport}>
                 {isGeneratingReport ? "Generating EPA Report..." : "Download EPA Compliance Report"}
               </Button>
             </CardContent>
