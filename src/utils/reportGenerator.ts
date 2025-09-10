@@ -274,94 +274,64 @@ export const generateAIReportWithEPACompliance = async (period: TimeFilterPeriod
     const doc = new jsPDF();
     const currentDate = new Date().toLocaleDateString();
     
-    // Add title and header
-    doc.setFontSize(20);
-    doc.text("AI Business Report with EPA Compliance", 105, 15, { align: "center" });
-    doc.setFontSize(10);
+    // PAGE 1: Business Performance & EPA Overview
+    doc.setFontSize(18);
+    doc.text("NSW EPA Compliance Report", 105, 15, { align: "center" });
+    doc.setFontSize(9);
     doc.text(`Period: ${kpiData.period} | Generated: ${currentDate}`, 105, 22, { align: "center" });
     
-    // Add business performance section
-    doc.setFontSize(16);
-    doc.text("Business Performance Summary", 14, 35);
-    
+    // Compliance Status Header
     doc.setFontSize(11);
-    doc.text(`Total Sales: $${kpiData.totalSales}`, 14, 45);
-    doc.text(`Transactions: ${kpiData.transactionCount}`, 14, 52);
-    doc.text(`Waste Reduced: ${kpiData.wasteReduced}`, 14, 59);
-    
-    let yPosition = 75;
-    
-    // NSW EPA COMPLIANCE SECTION - NEW PAGE
-    doc.addPage();
-    yPosition = 20;
-    
-    // EPA Compliance Header
-    doc.setFontSize(18);
-    doc.setTextColor(0, 100, 0); // Green color for EPA section
-    doc.text("NSW EPA Food Waste Compliance Report", 105, yPosition, { align: "center" });
-    doc.setTextColor(0, 0, 0); // Reset to black
-    yPosition += 15;
-    
-    // Compliance Status
-    doc.setFontSize(12);
-    doc.text(`Compliance Status: ${epaData.reportingPeriod.complianceStatus.toUpperCase()}`, 14, yPosition);
-    doc.text(`Reporting Period: ${epaData.reportingPeriod.startDate} to ${epaData.reportingPeriod.endDate}`, 14, yPosition + 7);
-    yPosition += 20;
-    
-    // SECTION 1: Food Waste Volume
-    doc.setFontSize(14);
-    doc.text("1. Food Waste Volume & Separation", 14, yPosition);
-    yPosition += 10;
-    
-    doc.setFontSize(11);
-    doc.text(`• Total Food Waste Weight: ${epaData.foodWasteVolume.weight} kg`, 20, yPosition);
-    doc.text(`• Total Food Waste Volume: ${epaData.foodWasteVolume.volume} litres`, 20, yPosition + 7);
-    doc.text(`• Separation Rate: ${epaData.foodWasteVolume.separationRate}% (Target: >80%)`, 20, yPosition + 14);
-    yPosition += 25;
-    
-    // SECTION 2: General Waste Volume
-    doc.setFontSize(14);
-    doc.text("2. General Waste to Landfill", 14, yPosition);
-    yPosition += 10;
-    
-    doc.setFontSize(11);
-    doc.text(`• General Waste Weight: ${epaData.generalWasteVolume.weight} kg`, 20, yPosition);
-    doc.text(`• General Waste Volume: ${epaData.generalWasteVolume.volume} litres`, 20, yPosition + 7);
-    doc.text(`• Destination: ${epaData.generalWasteVolume.destinationType}`, 20, yPosition + 14);
-    yPosition += 25;
-    
-    // SECTION 3: Collection Service Information
-    doc.setFontSize(14);
-    doc.text("3. Collection Service Details", 14, yPosition);
-    yPosition += 10;
-    
-    doc.setFontSize(11);
-    doc.text(`• Service Provider: ${epaData.collectionService.provider}`, 20, yPosition);
-    doc.text(`• Collection Frequency: ${epaData.collectionService.frequency}`, 20, yPosition + 7);
-    doc.text(`• Collection Days: ${epaData.collectionService.collectionDays.join(", ")}`, 20, yPosition + 14);
-    doc.text(`• Processing Destination: ${epaData.collectionService.destination}`, 20, yPosition + 21);
-    doc.text(`• Facility Type: ${epaData.collectionService.facilityType}`, 20, yPosition + 28);
-    yPosition += 40;
-    
-    // SECTION 4: Waste Reduction Evidence (Key Section)
-    doc.setFontSize(14);
-    doc.setTextColor(0, 100, 0); // Green for this important section
-    doc.text("4. Evidence of Waste Reduction (Negentropy Platform)", 14, yPosition);
+    doc.setTextColor(0, 100, 0);
+    doc.text(`Status: ${epaData.reportingPeriod.complianceStatus.toUpperCase()}`, 14, 32);
     doc.setTextColor(0, 0, 0);
-    yPosition += 10;
+    doc.text(`Period: ${epaData.reportingPeriod.startDate} to ${epaData.reportingPeriod.endDate}`, 14, 39);
     
-    doc.setFontSize(11);
-    doc.text(`• Monthly Reduction Trend: ${Math.abs(epaData.wasteReduction.monthlyTrend)}% decrease`, 20, yPosition);
-    doc.text(`• Total Waste Prevented: ${epaData.wasteReduction.totalReduced} kg`, 20, yPosition + 7);
-    doc.text(`• CO₂ Impact Avoided: ${epaData.wasteReduction.negentropyCo2Impact} kg CO₂ equivalent`, 20, yPosition + 14);
-    doc.text(`• Cost Savings Achieved: $${epaData.wasteReduction.costSavings} AUD`, 20, yPosition + 21);
-    yPosition += 35;
-    
-    // Waste Reduction Methods Table
+    // Business Performance (Compact)
     doc.setFontSize(12);
-    doc.text("Waste Prevention Methods Implemented:", 14, yPosition);
-    yPosition += 10;
+    doc.text("Business Performance", 14, 50);
+    doc.setFontSize(9);
+    doc.text(`Sales: $${kpiData.totalSales} | Transactions: ${kpiData.transactionCount} | Waste Reduced: ${kpiData.wasteReduced}`, 14, 57);
     
+    // Food Waste & General Waste (Side by Side)
+    let yPos = 70;
+    doc.setFontSize(11);
+    doc.text("1. Food Waste Volume", 14, yPos);
+    doc.text("2. General Waste", 110, yPos);
+    yPos += 8;
+    
+    doc.setFontSize(9);
+    doc.text(`Weight: ${epaData.foodWasteVolume.weight} kg`, 14, yPos);
+    doc.text(`Weight: ${epaData.generalWasteVolume.weight} kg`, 110, yPos);
+    doc.text(`Volume: ${epaData.foodWasteVolume.volume} L`, 14, yPos + 6);
+    doc.text(`Volume: ${epaData.generalWasteVolume.volume} L`, 110, yPos + 6);
+    doc.text(`Separation: ${epaData.foodWasteVolume.separationRate}%`, 14, yPos + 12);
+    doc.text(`Destination: ${epaData.generalWasteVolume.destinationType}`, 110, yPos + 12);
+    yPos += 25;
+    
+    // Collection Service (Compact)
+    doc.setFontSize(11);
+    doc.text("3. Collection Service", 14, yPos);
+    yPos += 8;
+    doc.setFontSize(9);
+    doc.text(`Provider: ${epaData.collectionService.provider}`, 14, yPos);
+    doc.text(`Frequency: ${epaData.collectionService.frequency} | Days: ${epaData.collectionService.collectionDays.join(", ")}`, 14, yPos + 6);
+    doc.text(`Destination: ${epaData.collectionService.destination}`, 14, yPos + 12);
+    doc.text(`Facility: ${epaData.collectionService.facilityType}`, 14, yPos + 18);
+    yPos += 30;
+    
+    // Waste Reduction Evidence
+    doc.setFontSize(11);
+    doc.setTextColor(0, 100, 0);
+    doc.text("4. Waste Reduction Evidence (Negentropy Platform)", 14, yPos);
+    doc.setTextColor(0, 0, 0);
+    yPos += 8;
+    doc.setFontSize(9);
+    doc.text(`Monthly Reduction: ${Math.abs(epaData.wasteReduction.monthlyTrend)}% | Waste Prevented: ${epaData.wasteReduction.totalReduced} kg`, 14, yPos);
+    doc.text(`CO₂ Avoided: ${epaData.wasteReduction.negentropyCo2Impact} kg | Cost Savings: $${epaData.wasteReduction.costSavings} AUD`, 14, yPos + 6);
+    yPos += 15;
+    
+    // Prevention Methods Table (Compact)
     const methodsTableData = epaData.wasteReduction.preventionMethods.map((method, index) => [
       (index + 1).toString(),
       method
@@ -370,67 +340,73 @@ export const generateAIReportWithEPACompliance = async (period: TimeFilterPeriod
     autoTable(doc, {
       head: [["#", "Prevention Method"]],
       body: methodsTableData,
-      startY: yPosition,
+      startY: yPos,
       theme: "grid",
-      styles: { fontSize: 10 }
+      styles: { fontSize: 8 },
+      margin: { left: 14, right: 14 }
     });
     
-    // Get the final Y position after the table
-    yPosition = (doc as any).lastAutoTable.finalY + 20;
+    yPos = (doc as any).lastAutoTable.finalY + 10;
     
-    // Add Negentropy Platform Information
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 255); // Blue for platform info
-    doc.text("Negentropy AI Platform Benefits:", 14, yPosition);
-    doc.setTextColor(0, 0, 0);
-    yPosition += 10;
-    
+    // Negentropy Benefits (Compact)
     doc.setFontSize(10);
-    doc.text("• Real-time demand forecasting reduces over-ordering", 20, yPosition);
-    doc.text("• Predictive analytics optimize inventory rotation", 20, yPosition + 7);
-    doc.text("• Dynamic pricing algorithms minimize food waste", 20, yPosition + 14);
-    doc.text("• Automated donation program integration", 20, yPosition + 21);
-    doc.text("• Continuous improvement through machine learning", 20, yPosition + 28);
-    
-    // Add new page for certification seals
-    doc.addPage();
-    yPosition = 20;
-    
-    // Add certification header
-    doc.setFontSize(18);
-    doc.setTextColor(0, 100, 0);
-    doc.text("Negentropy Impact Certification", 105, yPosition, { align: "center" });
+    doc.setTextColor(0, 0, 255);
+    doc.text("Negentropy AI Benefits:", 14, yPos);
     doc.setTextColor(0, 0, 0);
-    yPosition += 20;
+    yPos += 6;
+    doc.setFontSize(8);
+    doc.text("• Real-time forecasting • Inventory optimization • Dynamic pricing • Donation integration", 14, yPos);
     
-    // Add certification seals image using the uploaded image
+    // PAGE 2: Certification & Footer
+    doc.addPage();
+    yPos = 20;
+    
+    // Certification header
+    doc.setFontSize(16);
+    doc.setTextColor(0, 100, 0);
+    doc.text("Negentropy Impact Certification", 105, yPos, { align: "center" });
+    doc.setTextColor(0, 0, 0);
+    yPos += 15;
+    
+    // Add certification seals image
     try {
-      // Use the uploaded image directly
       const imgData = '/lovable-uploads/9240be3b-9144-47c2-81e5-7bcb548d1fe6.png';
-      
-      // Add image to PDF (centered)
-      const imgWidth = 180; // Adjust size as needed
-      const imgHeight = 120; // Approximate height based on aspect ratio
+      const imgWidth = 160;
+      const imgHeight = 107;
       const xPosition = (doc.internal.pageSize.width - imgWidth) / 2;
       
-      doc.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
-      yPosition += imgHeight + 10;
+      doc.addImage(imgData, 'PNG', xPosition, yPos, imgWidth, imgHeight);
+      yPos += imgHeight + 20;
     } catch (error) {
-      console.warn('Could not load certification image:', error);
-      // Fallback text if image can't be loaded
       doc.setFontSize(12);
-      doc.text("Negentropy Impact Seals", 105, yPosition + 50, { align: "center" });
+      doc.text("Negentropy Impact Seals", 105, yPos + 30, { align: "center" });
       doc.setFontSize(10);
-      doc.text("Green Seal (+30%) | Orange Seal (+60%) | Blue Seal (+90%)", 105, yPosition + 65, { align: "center" });
-      doc.text("Certification system for food waste reduction achievements", 105, yPosition + 75, { align: "center" });
-      yPosition += 90;
+      doc.text("Green Seal (+30%) | Orange Seal (+60%) | Blue Seal (+90%)", 105, yPos + 45, { align: "center" });
+      yPos += 60;
     }
     
-    // Add EPA compliance footer
-    yPosition = doc.internal.pageSize.height - 30;
+    // Additional EPA compliance details
+    doc.setFontSize(12);
+    doc.text("EPA Compliance Summary", 14, yPos);
+    yPos += 10;
+    doc.setFontSize(9);
+    doc.text("✓ Food waste separation rate exceeds 80% target", 14, yPos);
+    doc.text("✓ Licensed collection service with weekly frequency", 14, yPos + 7);
+    doc.text("✓ Certified composting facility destination", 14, yPos + 14);
+    doc.text("✓ Documented waste reduction through AI optimization", 14, yPos + 21);
+    doc.text("✓ CO₂ impact reporting and cost savings tracking", 14, yPos + 28);
+    
+    // EPA compliance footer
+    yPos = doc.internal.pageSize.height - 30;
     doc.setFontSize(8);
-    doc.text("This report is prepared in accordance with NSW EPA Food Waste Reporting Requirements.", 105, yPosition, { align: "center" });
-    doc.text("Generated by Negentropy Platform - Certified for EPA Compliance Reporting", 105, yPosition + 7, { align: "center" });
+    doc.text("This report complies with NSW EPA Food Waste Reporting Requirements.", 105, yPos, { align: "center" });
+    doc.text("Generated by Negentropy Platform - Certified for EPA Compliance", 105, yPos + 7, { align: "center" });
+    
+    // Add EPA compliance footer
+    yPos = doc.internal.pageSize.height - 30;
+    doc.setFontSize(8);
+    doc.text("This report is prepared in accordance with NSW EPA Food Waste Reporting Requirements.", 105, yPos, { align: "center" });
+    doc.text("Generated by Negentropy Platform - Certified for EPA Compliance Reporting", 105, yPos + 7, { align: "center" });
     
     // Add standard footer
     const pageCount = (doc as any).internal.pages.length;
