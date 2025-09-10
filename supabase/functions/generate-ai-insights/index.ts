@@ -21,73 +21,73 @@ serve(async (req) => {
 
     // Create a comprehensive prompt based on real data
     const prompt = `
-    Eres un consultor experto en negocios de cafeterías. Analiza los siguientes datos reales de una cafetería y proporciona insights accionables:
+    You are an expert business consultant specialising in café operations. Analyse the following real data from a café and provide actionable insights:
 
-    DATOS ACTUALES:
-    - Total de productos: ${realTimeData.totalProducts}
-    - Órdenes recientes: ${realTimeData.totalOrders}
-    - Ventas totales: $${realTimeData.totalSales}
-    - Productos con stock bajo: ${realTimeData.lowStockItems}
-    - Productos próximos a vencer: ${realTimeData.expiringItems.length}
+    CURRENT DATA:
+    - Total products: ${realTimeData.totalProducts}
+    - Recent orders: ${realTimeData.totalOrders}
+    - Total sales: £${realTimeData.totalSales}
+    - Low stock items: ${realTimeData.lowStockItems}
+    - Products expiring soon: ${realTimeData.expiringItems.length}
 
-    PRODUCTOS MÁS VENDIDOS:
+    TOP SELLING PRODUCTS:
     ${realTimeData.topSellingProducts.map((p: any, i: number) => 
-      `${i + 1}. ${p.name}: ${p.total_sold} unidades vendidas, $${p.revenue} en ingresos`
+      `${i + 1}. ${p.name}: ${p.total_sold} units sold, £${p.revenue} in revenue`
     ).join('\n')}
 
-    PRODUCTOS PRÓXIMOS A VENCER:
+    PRODUCTS EXPIRING SOON:
     ${realTimeData.expiringItems.map((item: any) => 
-      `- ${item.name}: ${item.quantity} unidades, vence: ${item.expiration_date}, valor: $${item.price * item.quantity}`
+      `- ${item.name}: ${item.quantity} units, expires: ${item.expiration_date}, value: £${item.price * item.quantity}`
     ).join('\n')}
 
-    Proporciona un análisis completo incluyendo:
-    1. Resumen ejecutivo en español
-    2. Métricas de rendimiento (eficiencia, reducción de desperdicios, rentabilidad)
-    3. Recomendaciones específicas y accionables
-    4. Alertas críticas
-    5. Impacto en sostenibilidad
-    6. Pronósticos y tendencias
+    Provide a comprehensive analysis including:
+    1. Executive summary in British English
+    2. Performance metrics (efficiency, waste reduction, profitability)
+    3. Specific and actionable recommendations
+    4. Critical alerts
+    5. Sustainability impact
+    6. Forecasts and trends
 
-    Responde en formato JSON con la estructura exacta que especificaré en el siguiente prompt.
+    Respond in JSON format with the exact structure I will specify in the following prompt.
     `;
 
     const structurePrompt = `
-    Devuelve ÚNICAMENTE un objeto JSON válido con esta estructura exacta (sin texto adicional):
+    Return ONLY a valid JSON object with this exact structure (no additional text):
     {
-      "executiveSummary": "Resumen de 1-2 oraciones sobre el estado actual",
+      "executiveSummary": "1-2 sentence summary about current state",
       "metrics": {
-        "efficiency": número entre 0-100,
-        "wasteReduction": número entre 0-100,
-        "profitability": número entre 0-100,
-        "customerSatisfaction": número entre 0-100
+        "efficiency": number between 0-100,
+        "wasteReduction": number between 0-100,
+        "profitability": number between 0-100,
+        "customerSatisfaction": number between 0-100
       },
       "recommendations": [
         {
           "type": "inventory|pricing|operations|marketing",
-          "title": "Título de la recomendación",
-          "description": "Descripción detallada",
+          "title": "Recommendation title",
+          "description": "Detailed description",
           "priority": "high|medium|low",
-          "impact": "Impacto esperado",
-          "action": "Acción específica a tomar"
+          "impact": "Expected impact",
+          "action": "Specific action to take"
         }
       ],
       "alerts": [
         {
           "type": "warning|critical|info",
-          "title": "Título de la alerta",
-          "description": "Descripción de la alerta",
-          "value": "Valor numérico o texto relevante"
+          "title": "Alert title",
+          "description": "Alert description",
+          "value": "Numerical value or relevant text"
         }
       ],
       "sustainability": {
         "co2Saved": "X kg",
         "wasteReduced": "X%",
-        "sustainabilityScore": número entre 0-100
+        "sustainabilityScore": number between 0-100
       },
       "forecast": {
-        "salesTrend": "porcentaje de crecimiento esperado",
-        "demandForecast": "descripción de tendencias",
-        "recommendedActions": ["acción 1", "acción 2", "acción 3"]
+        "salesTrend": "expected growth percentage",
+        "demandForecast": "trend description",
+        "recommendedActions": ["action 1", "action 2", "action 3"]
       }
     }
     `;
@@ -101,7 +101,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4.1-2025-04-14',
         messages: [
-          { role: 'system', content: 'Eres un experto consultor de negocios especializado en cafeterías. Analiza datos y proporciona insights precisos y accionables.' },
+          { role: 'system', content: 'You are an expert business consultant specialising in café operations. Analyse data and provide precise, actionable insights.' },
           { role: 'user', content: prompt },
           { role: 'user', content: structurePrompt }
         ],
@@ -131,7 +131,7 @@ serve(async (req) => {
       
       // Return fallback insights if parsing fails
       const fallbackInsights = {
-        executiveSummary: `Análisis de ${realTimeData.totalProducts} productos activos con ${realTimeData.totalOrders} órdenes recientes generado con IA.`,
+        executiveSummary: `Analysis of ${realTimeData.totalProducts} active products with ${realTimeData.totalOrders} recent orders generated by AI.`,
         metrics: {
           efficiency: Math.min(95, 70 + realTimeData.totalOrders),
           wasteReduction: Math.max(70, 95 - (realTimeData.expiringItems.length * 5)),
@@ -141,19 +141,19 @@ serve(async (req) => {
         recommendations: [
           {
             type: "inventory",
-            title: "Gestión de inventario",
-            description: "Optimizar stock basado en datos de ventas",
+            title: "Inventory Management",
+            description: "Optimise stock based on sales data",
             priority: "high",
-            impact: "Reducir desperdicios en 20%",
-            action: "Revisar productos próximos a vencer"
+            impact: "Reduce waste by 20%",
+            action: "Review products expiring soon"
           }
         ],
         alerts: realTimeData.expiringItems.length > 0 ? [
           {
             type: "warning",
-            title: "Productos próximos a vencer",
-            description: `${realTimeData.expiringItems.length} productos requieren atención`,
-            value: `${realTimeData.expiringItems.length} productos`
+            title: "Products expiring soon",
+            description: `${realTimeData.expiringItems.length} products require attention`,
+            value: `${realTimeData.expiringItems.length} products`
           }
         ] : [],
         sustainability: {
@@ -163,11 +163,11 @@ serve(async (req) => {
         },
         forecast: {
           salesTrend: "+10%",
-          demandForecast: "Crecimiento estable esperado",
+          demandForecast: "Stable growth expected",
           recommendedActions: [
-            "Optimizar inventario",
-            "Promocionar productos populares",
-            "Reducir desperdicios"
+            "Optimise inventory",
+            "Promote popular products",
+            "Reduce waste"
           ]
         }
       };
