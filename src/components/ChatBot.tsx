@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { BusinessCard, LoadingCard, type BusinessCardData } from '@/components/chat/BusinessCards';
 import { BusinessIntelligenceService } from '@/services/businessIntelligenceService';
+import { useTaskList } from '@/hooks/useTaskList';
+import TaskList from '@/components/chat/TaskList';
 interface ChatMessage {
   id: string;
   type: 'user' | 'bot';
@@ -32,6 +34,9 @@ const ChatBot = ({
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Task list hook
+  const { tasks, addTask, completeTask, removeTask, clearCompletedTasks } = useTaskList();
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: 'smooth'
@@ -94,7 +99,7 @@ const ChatBot = ({
     }
   };
   const renderInfoCard = (card: BusinessCardData) => {
-    return <BusinessCard key={card.id} card={card} />;
+    return <BusinessCard key={card.id} card={card} onAddToTaskList={addTask} />;
   };
   if (!isOpen && variant === 'floating') {
     return <Button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg z-50">
@@ -102,45 +107,80 @@ const ChatBot = ({
       </Button>;
   }
   if (variant === 'inline') {
-    return <Card className="w-full mb-6 shadow-lg border-primary/20">
-        {/* Header */}
-        
+    return (
+      <div className="space-y-6">
+        <Card className="w-full shadow-lg border-primary/20">
+          {!isMinimized && (
+            <CardContent className="p-4">
+              {/* Input Section */}
+              <div className="flex gap-3 mb-4">
+                <Input 
+                  value={inputValue} 
+                  onChange={e => setInputValue(e.target.value)} 
+                  placeholder="Ask me about inventory, sales, products nearing expiry, profitability analysis..." 
+                  onKeyPress={e => e.key === 'Enter' && handleSendMessage()} 
+                  disabled={isLoading} 
+                  className="flex-1" 
+                />
+                <Button 
+                  onClick={handleSendMessage} 
+                  disabled={isLoading || !inputValue.trim()} 
+                  className="bg-primary hover:bg-primary/90 px-6"
+                >
+                  {isLoading ? <LoadingCard /> : <Send className="w-4 h-4" />}
+                </Button>
+              </div>
 
-        {!isMinimized && <CardContent className="p-4">
-            {/* Input Section */}
-            <div className="flex gap-3 mb-4">
-              <Input value={inputValue} onChange={e => setInputValue(e.target.value)} placeholder="Ask me about inventory, sales, products nearing expiry, profitability analysis..." onKeyPress={e => e.key === 'Enter' && handleSendMessage()} disabled={isLoading} className="flex-1" />
-              <Button onClick={handleSendMessage} disabled={isLoading || !inputValue.trim()} className="bg-primary hover:bg-primary/90 px-6">
-                {isLoading ? <LoadingCard /> : <Send className="w-4 h-4" />}
-              </Button>
-            </div>
-
-            {/* Recent Messages - Show last 2 messages only in inline mode */}
-            {messages.length > 1 && <div className="space-y-3">
-                {messages.slice(-2).map(message => <div key={message.id} className={`${message.type === 'user' ? 'text-right' : ''}`}>
-                    <div className={`inline-block max-w-[80%] p-4 rounded-lg shadow-sm animate-fade-in ${message.type === 'user' ? 'bg-primary text-primary-foreground ml-auto' : 'bg-card text-card-foreground border border-border'}`}>
-                      <div className="flex items-center gap-2">
-                        {message.type === 'bot' && <Bot className="w-4 h-4" />}
-                        {message.type === 'user' && <User className="w-4 h-4" />}
-                        <span className="text-sm font-medium">
-                          {message.type === 'bot' ? 'AI Assistant' : 'You'}
-                        </span>
+              {/* Recent Messages - Show last 2 messages only in inline mode */}
+              {messages.length > 1 && (
+                <div className="space-y-3">
+                  {messages.slice(-2).map(message => (
+                    <div key={message.id} className={`${message.type === 'user' ? 'text-right' : ''}`}>
+                      <div className={`inline-block max-w-[80%] p-4 rounded-lg shadow-sm animate-fade-in ${
+                        message.type === 'user' 
+                          ? 'bg-primary text-primary-foreground ml-auto' 
+                          : 'bg-card text-card-foreground border border-border'
+                      }`}>
+                        <div className="flex items-center gap-2">
+                          {message.type === 'bot' && <Bot className="w-4 h-4" />}
+                          {message.type === 'user' && <User className="w-4 h-4" />}
+                          <span className="text-sm font-medium">
+                            {message.type === 'bot' ? 'AI Assistant' : 'You'}
+                          </span>
+                        </div>
+                        <div className="mt-2">{message.content}</div>
+                        {message.type === 'bot' && (
+                          <div className="text-xs opacity-70 mt-2">
+                            {message.timestamp.toLocaleTimeString('en-GB')}
+                          </div>
+                        )}
                       </div>
-                      <div className="mt-2">{message.content}</div>
-                      {message.type === 'bot' && <div className="text-xs opacity-70 mt-2">
-                          {message.timestamp.toLocaleTimeString('en-GB')}
-                        </div>}
+                      {/* Render info cards with staggered animation */}
+                      {message.type === 'bot' && message.cards && message.cards.length > 0 && (
+                        <div 
+                          className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 text-left" 
+                          style={{ animationDelay: '0.2s' }}
+                        >
+                          {message.cards.map(renderInfoCard)}
+                        </div>
+                      )}
                     </div>
-                    {/* Render info cards with staggered animation */}
-                    {message.type === 'bot' && message.cards && message.cards.length > 0 && <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 text-left" style={{
-              animationDelay: '0.2s'
-            }}>
-                        {message.cards.map(renderInfoCard)}
-                      </div>}
-                  </div>)}
-              </div>}
-          </CardContent>}
-      </Card>;
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          )}
+        </Card>
+        
+        {/* Task List */}
+        <TaskList 
+          tasks={tasks}
+          onCompleteTask={completeTask}
+          onRemoveTask={removeTask}
+          onClearCompleted={clearCompletedTasks}
+        />
+      </div>
+    );
   }
 
   // Floating version (original design)

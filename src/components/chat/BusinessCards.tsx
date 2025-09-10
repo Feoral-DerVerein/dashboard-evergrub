@@ -13,11 +13,9 @@ import {
   MapPin,
   Tag,
   Zap,
-  ShoppingCart,
-  Monitor
+  Plus
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 
 export interface BusinessCardData {
   id: string;
@@ -28,39 +26,60 @@ export interface BusinessCardData {
 
 interface BusinessCardProps {
   card: BusinessCardData;
+  onAddToTaskList?: (card: BusinessCardData, title: string, description: string, priority: 'low' | 'medium' | 'high' | 'critical') => void;
 }
 
-// Functions to handle marketplace and POS actions
-const handleMarketplaceAction = async (action: string, data: any) => {
-  try {
-    const { error } = await supabase.functions.invoke('send-to-marketplace', {
-      body: { action, data }
-    });
-    
-    if (error) throw error;
-    
-    toast.success(`Successfully sent to marketplace: ${action}`);
-  } catch (error) {
-    console.error('Marketplace action error:', error);
-    toast.error('Failed to sync with marketplace');
-  }
-};
-
-const handlePOSAction = async (action: string, data: any) => {
-  try {
-    // Simulate POS system integration
-    console.log('POS Action:', action, data);
-    
-    // You would implement actual POS API calls here
-    // For now, we'll just show a success message
-    toast.success(`POS System updated: ${action}`);
-  } catch (error) {
-    console.error('POS action error:', error);
-    toast.error('Failed to sync with POS system');
-  }
-};
-
-export const BusinessCard = ({ card }: BusinessCardProps) => {
+export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
+  
+  const getTaskInfo = (cardType: string, cardData: any) => {
+    switch (cardType) {
+      case 'inventory':
+        return {
+          title: `Gestionar inventario: ${cardData.product}`,
+          description: `${cardData.quantity} unidades en ${cardData.location}. Estado: ${cardData.status}`,
+          priority: (cardData.status === 'out_of_stock' ? 'critical' : 
+                   cardData.status === 'low_stock' ? 'high' : 'medium') as 'low' | 'medium' | 'high' | 'critical'
+        };
+      case 'expiry':
+        const daysLeft = Math.ceil((new Date(cardData.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+        return {
+          title: `Producto por vencer: ${cardData.product}`,
+          description: `${cardData.quantity} unidades vencen en ${daysLeft} días`,
+          priority: (daysLeft <= 2 ? 'critical' : daysLeft <= 7 ? 'high' : 'medium') as 'low' | 'medium' | 'high' | 'critical'
+        };
+      case 'sales':
+        return {
+          title: `Revisar rendimiento de ventas`,
+          description: `Producto destacado: ${cardData.topProduct}. Ingresos: $${cardData.revenue}`,
+          priority: 'medium' as const
+        };
+      case 'recommendation':
+        return {
+          title: `Implementar recomendación: ${cardData.action}`,
+          description: cardData.description,
+          priority: 'medium' as const
+        };
+      case 'alert':
+        return {
+          title: `Atender alerta: ${cardData.message}`,
+          description: `Severidad: ${cardData.severity}`,
+          priority: (cardData.severity === 'critical' ? 'critical' : 
+                   cardData.severity === 'high' ? 'high' : 'medium') as 'low' | 'medium' | 'high' | 'critical'
+        };
+      case 'analytics':
+        return {
+          title: `Revisar análisis: ${cardData.metric}`,
+          description: `Valor: ${cardData.value}`,
+          priority: 'low' as const
+        };
+      default:
+        return {
+          title: 'Revisar información',
+          description: 'Nueva información disponible',
+          priority: 'medium' as const
+        };
+    }
+  };
   const renderCard = () => {
     switch (card.type) {
       case 'inventory':
@@ -110,34 +129,22 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                   </div>
                 )}
 
-                {/* Action buttons for Marketplace and POS */}
-                <div className="grid grid-cols-2 gap-2 mt-3">
+                {/* Add to task list button */}
+                <div className="mt-3">
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="text-xs py-1 px-2 h-8 hover:bg-blue-50"
-                    onClick={() => handleMarketplaceAction('update_inventory', {
-                      product: card.data.product,
-                      quantity: card.data.quantity,
-                      price: card.data.sell_price,
-                      status: card.data.status
-                    })}
+                    className="text-xs py-1 px-2 h-8 w-full hover:bg-blue-50"
+                    onClick={() => {
+                      if (onAddToTaskList) {
+                        const taskInfo = getTaskInfo(card.type, card.data);
+                        onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
+                        toast.success('Tarea agregada a la lista');
+                      }
+                    }}
                   >
-                    <ShoppingCart className="w-3 h-3 mr-1" />
-                    Marketplace
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs py-1 px-2 h-8 hover:bg-green-50"
-                    onClick={() => handlePOSAction('sync_inventory', {
-                      product: card.data.product,
-                      quantity: card.data.quantity,
-                      price: card.data.sell_price
-                    })}
-                  >
-                    <Monitor className="w-3 h-3 mr-1" />
-                    POS
+                    <Plus className="w-3 h-3 mr-1" />
+                    Agregar a lista de tareas
                   </Button>
                 </div>
               </div>
@@ -184,56 +191,21 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                   <p className="text-sm text-gray-700">{card.data.recommendation}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 mt-3">
+                <div className="mt-3">
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="text-xs py-1 px-2 h-8 hover-scale"
-                    onClick={() => handleMarketplaceAction('apply_discount', {
-                      product: card.data.product,
-                      quantity: card.data.quantity,
-                      discount_percentage: 25
-                    })}
+                    className="text-xs py-1 px-2 h-8 w-full hover:bg-orange-50"
+                    onClick={() => {
+                      if (onAddToTaskList) {
+                        const taskInfo = getTaskInfo(card.type, card.data);
+                        onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
+                        toast.success('Tarea agregada a la lista');
+                      }
+                    }}
                   >
-                    Discount
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs py-1 px-2 h-8 hover-scale"
-                    onClick={() => handlePOSAction('mark_for_donation', {
-                      product: card.data.product,
-                      quantity: card.data.quantity
-                    })}
-                  >
-                    Donate
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs py-1 px-2 h-8"
-                    onClick={() => handleMarketplaceAction('list_expiring_product', {
-                      product: card.data.product,
-                      quantity: card.data.quantity,
-                      expiry_date: card.data.expiry_date,
-                      discounted_price: card.data.sell_price * 0.75
-                    })}
-                  >
-                    <ShoppingCart className="w-3 h-3 mr-1" />
-                    Market
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs py-1 px-2 h-8"
-                    onClick={() => handlePOSAction('update_pricing', {
-                      product: card.data.product,
-                      new_price: card.data.sell_price * 0.75,
-                      reason: 'expiring_soon'
-                    })}
-                  >
-                    <Monitor className="w-3 h-3 mr-1" />
-                    POS
+                    <Plus className="w-3 h-3 mr-1" />
+                    Agregar a lista de tareas
                   </Button>
                 </div>
               </div>
@@ -280,33 +252,22 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                   </div>
                 )}
 
-                {/* Sales actions */}
-                <div className="grid grid-cols-2 gap-2 mt-3">
+                {/* Add to task list button */}
+                <div className="mt-3">
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="text-xs py-1 px-2 h-8"
-                    onClick={() => handleMarketplaceAction('promote_product', {
-                      product: card.data.topProduct,
-                      promotion_type: 'featured',
-                      duration: '7_days'
-                    })}
+                    className="text-xs py-1 px-2 h-8 w-full hover:bg-green-50"
+                    onClick={() => {
+                      if (onAddToTaskList) {
+                        const taskInfo = getTaskInfo(card.type, card.data);
+                        onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
+                        toast.success('Tarea agregada a la lista');
+                      }
+                    }}
                   >
-                    <ShoppingCart className="w-3 h-3 mr-1" />
-                    Promote
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs py-1 px-2 h-8"
-                    onClick={() => handlePOSAction('create_promotion', {
-                      product: card.data.topProduct,
-                      discount: 15,
-                      type: 'bestseller_promo'
-                    })}
-                  >
-                    <Monitor className="w-3 h-3 mr-1" />
-                    POS Promo
+                    <Plus className="w-3 h-3 mr-1" />
+                    Agregar a lista de tareas
                   </Button>
                 </div>
               </div>
@@ -346,30 +307,21 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 mt-3">
+                <div className="mt-3">
                   <Button 
-                    size="sm"
-                    className="text-xs py-1 px-2 h-8 bg-purple-600 hover:bg-purple-700 text-white hover-scale"
-                    onClick={() => handleMarketplaceAction('implement_recommendation', {
-                      action: card.data.action,
-                      expected_impact: card.data.impact,
-                      target: 'marketplace'
-                    })}
+                    size="sm" 
+                    variant="outline" 
+                    className="text-xs py-1 px-2 h-8 w-full hover:bg-purple-50"
+                    onClick={() => {
+                      if (onAddToTaskList) {
+                        const taskInfo = getTaskInfo(card.type, card.data);
+                        onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
+                        toast.success('Tarea agregada a la lista');
+                      }
+                    }}
                   >
-                    <ShoppingCart className="w-3 h-3 mr-1" />
-                    Market
-                  </Button>
-                  <Button 
-                    size="sm"
-                    className="text-xs py-1 px-2 h-8 bg-purple-600 hover:bg-purple-700 text-white hover-scale"
-                    onClick={() => handlePOSAction('implement_recommendation', {
-                      action: card.data.action,
-                      expected_impact: card.data.impact,
-                      target: 'pos_system'
-                    })}
-                  >
-                    <Monitor className="w-3 h-3 mr-1" />
-                    POS
+                    <Plus className="w-3 h-3 mr-1" />
+                    Agregar a lista de tareas
                   </Button>
                 </div>
               </div>
@@ -403,45 +355,29 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                 </div>
 
                 {card.data.action_required && (
-                  <div className="grid grid-cols-2 gap-2 mt-3">
-                    <Button 
-                      size="sm" 
-                      variant="destructive" 
-                      className="text-xs py-1 px-2 h-8 hover-scale col-span-2"
-                      onClick={() => handlePOSAction('immediate_action', {
-                        alert_type: card.data.severity,
-                        message: card.data.message,
-                        timestamp: card.data.created_at
-                      })}
-                    >
-                      Immediate Action
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="text-xs py-1 px-2 h-8"
-                      onClick={() => handleMarketplaceAction('alert_action', {
-                        alert_type: card.data.severity,
-                        message: card.data.message
-                      })}
-                    >
-                      <ShoppingCart className="w-3 h-3 mr-1" />
-                      Market
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="text-xs py-1 px-2 h-8"
-                      onClick={() => handlePOSAction('system_alert', {
-                        severity: card.data.severity,
-                        message: card.data.message
-                      })}
-                    >
-                      <Monitor className="w-3 h-3 mr-1" />
-                      POS
-                    </Button>
+                  <div className="bg-white bg-opacity-60 p-3 rounded-lg border border-white border-opacity-50">
+                    <p className="text-sm font-medium text-red-800 mb-1">⚠️ Action Required:</p>
+                    <p className="text-sm text-red-700">{card.data.action_required}</p>
                   </div>
                 )}
+
+                <div className="mt-3">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="text-xs py-1 px-2 h-8 w-full hover:bg-red-50"
+                    onClick={() => {
+                      if (onAddToTaskList) {
+                        const taskInfo = getTaskInfo(card.type, card.data);
+                        onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
+                        toast.success('Tarea agregada a la lista');
+                      }
+                    }}
+                  >
+                    <Plus className="w-3 h-3 mr-1" />
+                    Agregar a lista de tareas
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -473,31 +409,21 @@ export const BusinessCard = ({ card }: BusinessCardProps) => {
                 </div>
               )}
 
-              {/* Analytics actions */}
-              <div className="grid grid-cols-2 gap-2 mt-3">
+              <div className="mt-3">
                 <Button 
                   size="sm" 
                   variant="outline" 
-                  className="text-xs py-1 px-2 h-8"
-                  onClick={() => handleMarketplaceAction('sync_analytics', {
-                    metrics: card.data.metrics,
-                    insights: card.data.insights
-                  })}
+                  className="text-xs py-1 px-2 h-8 w-full hover:bg-indigo-50"
+                  onClick={() => {
+                    if (onAddToTaskList) {
+                      const taskInfo = getTaskInfo(card.type, card.data);
+                      onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
+                      toast.success('Tarea agregada a la lista');
+                    }
+                  }}
                 >
-                  <ShoppingCart className="w-3 h-3 mr-1" />
-                  Export
-                </Button>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="text-xs py-1 px-2 h-8"
-                  onClick={() => handlePOSAction('update_analytics', {
-                    metrics: card.data.metrics,
-                    insights: card.data.insights
-                  })}
-                >
-                  <Monitor className="w-3 h-3 mr-1" />
-                  Update
+                  <Plus className="w-3 h-3 mr-1" />
+                  Agregar a lista de tareas
                 </Button>
               </div>
             </CardContent>
