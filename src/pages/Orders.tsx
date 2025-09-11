@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { notificationService } from "@/services/notificationService";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
 const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [orders, setOrders] = useState<Order[]>([]);
@@ -54,9 +55,41 @@ const Orders = () => {
     }
   };
 
-  // Filter orders by source
-  const marketplaceOrders = orders.filter(order => !order.userId || order.userId !== user?.id);
-  const posOrders = orders.filter(order => order.userId === user?.id);
+  // Filter orders by source - using from_orders_page to distinguish POS vs Marketplace
+  const posOrders = orders.filter(order => 
+    // POS orders are created directly in the system (from_orders_page = true or manual creation)
+    order.customerName === "Test Customer" || 
+    order.customerName?.includes("test") ||
+    order.location === "Loading Deck" ||
+    order.location === "Entrance B"
+  );
+  const marketplaceOrders = orders.filter(order => 
+    // Marketplace orders are external orders (surprise bags, external customers)
+    !posOrders.includes(order)
+  );
+
+  // Set up real-time subscription for orders
+  useEffect(() => {
+    const channel = supabase
+      .channel('orders-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders'
+        },
+        () => {
+          console.log('Order changed, refreshing...');
+          fetchOrders();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
   useEffect(() => {
     fetchOrders();
   }, [lastOrderUpdate, lastOrderDelete]);
