@@ -13,10 +13,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
-  businessName: z.string().min(1, "Nombre del negocio es requerido"),
-  businessType: z.string().min(1, "Tipo de negocio es requerido"),
-  posType: z.string().min(1, "Tipo de POS es requerido"),
-  apiKey: z.string().min(1, "API Key es requerida"),
+  businessName: z.string().min(1, "Business name is required"),
+  businessType: z.string().min(1, "Business type is required"),
+  posType: z.string().min(1, "POS type is required"),
+  apiKey: z.string().min(1, "API Key is required"),
   apiUrl: z.string().optional(),
 });
 
@@ -43,10 +43,10 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
   });
 
   const businessTypes = [
-    { value: "cafeteria", label: "Cafetería" },
-    { value: "restaurante", label: "Restaurante" },
+    { value: "cafe", label: "Café" },
+    { value: "restaurant", label: "Restaurant" },
     { value: "hotel", label: "Hotel" },
-    { value: "supermercado", label: "Supermercado" },
+    { value: "supermarket", label: "Supermarket" },
     { value: "hospital", label: "Hospital" },
   ];
 
@@ -55,7 +55,7 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
     { value: "shopify", label: "Shopify POS" },
     { value: "lightspeed", label: "Lightspeed" },
     { value: "toast", label: "Toast" },
-    { value: "custom", label: "Custom/Otro" },
+    { value: "custom", label: "Custom/Other" },
   ];
 
   const handleSubmit = async (data: FormData) => {
@@ -101,13 +101,13 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
 
   if (status === "success") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-        <Card className="w-full max-w-md mx-auto shadow-xl">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4">
+        <Card className="w-full max-w-md mx-auto backdrop-blur-xl bg-background/80 border border-white/20 shadow-2xl">
           <CardContent className="p-8 text-center">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-green-600 mb-2">¡Conexión exitosa!</h2>
+            <h2 className="text-2xl font-bold text-green-600 mb-2">Connection Successful!</h2>
             <p className="text-muted-foreground">
-              Ahora estamos analizando tus datos. Tu dashboard estará listo en unos minutos.
+              We're now analyzing your data. Your dashboard will be ready in a few minutes.
             </p>
           </CardContent>
         </Card>
@@ -116,12 +116,13 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-      <Card className="w-full max-w-2xl mx-auto shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4 relative">
+      <div className="absolute inset-0 bg-grid-small-slate-300/20 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
+      <Card className="w-full max-w-2xl mx-auto backdrop-blur-xl bg-background/80 border border-white/20 shadow-2xl relative z-10">
         <CardHeader className="text-center pb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Conecta tu sistema POS</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Connect Your POS System</h1>
           <p className="text-lg text-muted-foreground mt-2">
-            Para empezar a optimizar tu inventario y reducir el desperdicio, conecta tu sistema de ventas.
+            To start optimizing your inventory and reducing waste, connect your point of sale system.
           </p>
         </CardHeader>
 
@@ -129,13 +130,13 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
           {/* Step 1 */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold shadow-lg">
                 1
               </div>
-              <h3 className="text-lg font-semibold">Obtén tu API Key</h3>
+              <h3 className="text-lg font-semibold">Get Your API Key</h3>
             </div>
             <p className="text-muted-foreground ml-11">
-              En la configuración de tu sistema POS, busca las opciones para desarrolladores o integraciones y copia tu clave de API.
+              In your POS system settings, look for developer options or integrations and copy your API key.
             </p>
           </div>
 
@@ -144,10 +145,10 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
           {/* Step 2 */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold shadow-lg">
                 2
               </div>
-              <h3 className="text-lg font-semibold">Ingresa tus datos</h3>
+              <h3 className="text-lg font-semibold">Enter Your Details</h3>
             </div>
 
             <Form {...form}>
@@ -164,9 +165,9 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                   name="businessName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nombre del Negocio</FormLabel>
+                      <FormLabel>Business Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ej: Café del Centro" {...field} />
+                        <Input placeholder="e.g. Central Café" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -178,11 +179,11 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                   name="businessType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tipo de Negocio</FormLabel>
+                      <FormLabel>Business Type</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecciona el tipo de negocio" />
+                            <SelectValue placeholder="Select your business type" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -203,11 +204,11 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                   name="posType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tipo de POS</FormLabel>
+                      <FormLabel>POS System Type</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecciona tu sistema POS" />
+                            <SelectValue placeholder="Select your POS system" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -232,7 +233,7 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                       <FormControl>
                         <Input 
                           type="password" 
-                          placeholder="Ingresa tu clave de API" 
+                          placeholder="Enter your API key" 
                           {...field} 
                         />
                       </FormControl>
@@ -246,10 +247,10 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                   name="apiUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>URL de la API (opcional)</FormLabel>
+                      <FormLabel>API URL (optional)</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="https://api.tupos.com/v1" 
+                          placeholder="https://api.yourpos.com/v1" 
                           {...field} 
                         />
                       </FormControl>
@@ -261,16 +262,16 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                 <Button 
                   type="submit" 
                   size="lg" 
-                  className="w-full h-12 text-lg font-semibold"
+                  className="w-full h-12 text-lg font-semibold shadow-lg"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Conectando...
+                      Connecting...
                     </>
                   ) : (
-                    "Conectar y empezar a optimizar"
+                    "Connect and Start Optimizing"
                   )}
                 </Button>
               </form>
