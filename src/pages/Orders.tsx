@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2, ShoppingBag, Clock, User } from "lucide-react";
+import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2, ShoppingBag, Clock, User, Store, CreditCard } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
 import { Order } from "@/types/order.types";
@@ -14,12 +14,14 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { notificationService } from "@/services/notificationService";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("marketplace");
   const {
     user
   } = useAuth();
@@ -51,6 +53,10 @@ const Orders = () => {
       setIsLoading(false);
     }
   };
+
+  // Filter orders by source
+  const marketplaceOrders = orders.filter(order => !order.userId || order.userId !== user?.id);
+  const posOrders = orders.filter(order => order.userId === user?.id);
   useEffect(() => {
     fetchOrders();
   }, [lastOrderUpdate, lastOrderDelete]);
@@ -289,16 +295,41 @@ const Orders = () => {
         </CardFooter>
       </Card>;
   };
+  const renderOrdersList = (ordersList: Order[], emptyMessage: string) => {
+    if (ordersList.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Package className="h-16 w-16 text-gray-300 mb-4" />
+          <p className="text-gray-500 font-medium mb-2">No orders found</p>
+          <p className="text-gray-400 text-sm max-w-xs">{emptyMessage}</p>
+        </div>
+      );
+    }
+
+    return viewMode === "cards" ? (
+      <div className="space-y-4">
+        {ordersList.map(order => (
+          <OrderCard key={order.id} order={order} />
+        ))}
+      </div>
+    ) : (
+      <OrdersTable
+        orders={ordersList}
+        onViewDetails={handleViewDetails}
+        onStatusChange={handleStatusChange}
+      />
+    );
+  };
+
   return (
     <>
       <header className="px-6 pt-8 pb-6 sticky top-0 glass-card z-10 border-b">
         <div className="flex items-center justify-between gap-3 mb-6">
           <h1 className="text-2xl font-bold">Orders</h1>
-          
         </div>
         <div className="flex justify-between items-center">
           <p className="text-gray-500">
-            {isLoading ? "Loading orders..." : `${orders.length} Orders`}
+            {isLoading ? "Loading orders..." : `${orders.length} Total Orders`}
           </p>
         </div>
       </header>
@@ -308,28 +339,33 @@ const Orders = () => {
           <div className="flex justify-center py-10">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
           </div>
-        ) : orders.length > 0 ? (
-          viewMode === "cards" ? (
-            <div className="space-y-4">
-              {orders.map(order => (
-                <OrderCard key={order.id} order={order} />
-              ))}
-            </div>
-          ) : (
-            <OrdersTable
-              orders={orders}
-              onViewDetails={handleViewDetails}
-              onStatusChange={handleStatusChange}
-            />
-          )
         ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Package className="h-16 w-16 text-gray-300 mb-4" />
-            <p className="text-gray-500 font-medium mb-2">No orders found</p>
-            <p className="text-gray-400 text-sm max-w-xs">
-              New orders will appear here when customers make purchases.
-            </p>
-          </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="marketplace" className="flex items-center gap-2">
+                <Store className="h-4 w-4" />
+                Marketplace ({marketplaceOrders.length})
+              </TabsTrigger>
+              <TabsTrigger value="pos" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                POS System ({posOrders.length})
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="marketplace">
+              {renderOrdersList(
+                marketplaceOrders,
+                "No marketplace orders yet. Orders from external customers will appear here."
+              )}
+            </TabsContent>
+            
+            <TabsContent value="pos">
+              {renderOrdersList(
+                posOrders,
+                "No POS orders yet. Orders created directly in your system will appear here."
+              )}
+            </TabsContent>
+          </Tabs>
         )}
       </main>
 
