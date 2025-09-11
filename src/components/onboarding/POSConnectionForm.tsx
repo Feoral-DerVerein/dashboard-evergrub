@@ -101,8 +101,13 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
 
   if (status === "success") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4">
-        <Card className="w-full max-w-md mx-auto backdrop-blur-xl bg-background/80 border border-white/20 shadow-2xl">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-400 via-teal-300 to-blue-400 p-4 relative overflow-hidden">
+        {/* Background blur elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-200/30 via-teal-200/20 to-blue-200/30" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-300/20 rounded-full blur-3xl" />
+        
+        <Card className="w-full max-w-md mx-auto backdrop-blur-md bg-white/10 border border-white/20 shadow-2xl relative z-10 rounded-3xl">
           <CardContent className="p-8 text-center">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-green-600 mb-2">Connection Successful!</h2>
@@ -116,9 +121,13 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4 relative">
-      <div className="absolute inset-0 bg-grid-small-slate-300/20 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
-      <Card className="w-full max-w-2xl mx-auto backdrop-blur-xl bg-background/80 border border-white/20 shadow-2xl relative z-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-400 via-teal-300 to-blue-400 p-4 relative overflow-hidden">
+      {/* Background blur elements */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-200/30 via-teal-200/20 to-blue-200/30" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-300/20 rounded-full blur-3xl" />
+      
+      <Card className="w-full max-w-2xl mx-auto backdrop-blur-md bg-white/10 border border-white/20 shadow-2xl relative z-10 rounded-3xl">
         <CardHeader className="text-center pb-6">
           <h1 className="text-3xl font-bold tracking-tight">Connect Your POS System</h1>
           <p className="text-lg text-muted-foreground mt-2">
