@@ -225,16 +225,16 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
             <CardContent className="pt-0">
               <div className="space-y-3">
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="text-center bg-green-50 p-3 rounded-lg">
-                    <div className="text-xl font-bold text-green-900">${card.data.revenue}</div>
+                  <div className="text-center bg-green-50 p-3 rounded-lg min-h-[80px] flex flex-col justify-center">
+                    <div className="text-sm sm:text-lg lg:text-xl font-bold text-green-900 break-words">${card.data.revenue}</div>
                     <div className="text-xs text-green-600">Revenue</div>
                   </div>
-                  <div className="text-center bg-blue-50 p-3 rounded-lg">
-                    <div className="text-xl font-bold text-blue-900">{card.data.units}</div>
+                  <div className="text-center bg-blue-50 p-3 rounded-lg min-h-[80px] flex flex-col justify-center">
+                    <div className="text-sm sm:text-lg lg:text-xl font-bold text-blue-900 break-words">{card.data.units}</div>
                     <div className="text-xs text-blue-600">Units</div>
                   </div>
-                  <div className="text-center bg-purple-50 p-3 rounded-lg">
-                    <div className="text-xl font-bold text-purple-900">{(card.data.margin * 100).toFixed(1)}%</div>
+                  <div className="text-center bg-purple-50 p-3 rounded-lg min-h-[80px] flex flex-col justify-center">
+                    <div className="text-sm sm:text-lg lg:text-xl font-bold text-purple-900 break-words">{(card.data.margin * 100).toFixed(1)}%</div>
                     <div className="text-xs text-purple-600">Margin</div>
                   </div>
                 </div>
