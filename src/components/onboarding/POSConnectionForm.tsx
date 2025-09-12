@@ -116,8 +116,16 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4 relative">
-      <div className="absolute inset-0 bg-grid-small-slate-300/20 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{
+        backgroundImage: 'url(/lovable-uploads/2815a3c7-0a13-4331-970c-f038c450f5c7.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-background/20" />
       <Card className="w-full max-w-2xl mx-auto backdrop-blur-xl bg-background/80 border border-white/20 shadow-2xl relative z-10">
         <CardHeader className="text-center pb-6">
           <h1 className="text-3xl font-bold tracking-tight">Connect Your POS System</h1>
