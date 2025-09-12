@@ -31,6 +31,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
 import Market from "@/pages/Market";
+import ApiConfig from "@/pages/ApiConfig";
 
 const MainRoutes = () => {
   const { user } = useAuth();
@@ -70,6 +71,7 @@ const MainRoutes = () => {
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
         <Route path="/market" element={<Market />} />
+        <Route path="/api-config" element={<ApiConfig />} />
       </Route>
       
       {/* Default redirects */}

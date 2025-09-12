@@ -562,7 +562,7 @@ const KPI = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem asChild>
-                    <Link to="/onboarding" className="flex items-center gap-2 w-full">
+                    <Link to="/api-config" className="flex items-center gap-2 w-full">
                       <Settings2 className="h-4 w-4" />
                       API
                     </Link>
