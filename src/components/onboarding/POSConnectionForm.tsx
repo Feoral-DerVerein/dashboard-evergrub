@@ -113,8 +113,8 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
       >
         <div className="absolute inset-0 bg-black/20" />
         
-        <Card className="w-full max-w-md mx-auto backdrop-blur-lg bg-white/10 border border-white/20 shadow-2xl relative z-10 rounded-3xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-white/10 to-white/5" />
+        <Card className="w-full max-w-md mx-auto backdrop-blur-2xl bg-white/5 border border-white/30 shadow-2xl relative z-10 rounded-3xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-white/10" />
           <CardContent className="p-8 text-center relative z-10">
             <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">Connection Successful!</h2>
@@ -139,8 +139,8 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
     >
       <div className="absolute inset-0 bg-black/30" />
       
-      <Card className="w-full max-w-lg mx-auto backdrop-blur-lg bg-white/10 border border-white/20 shadow-2xl relative z-10 rounded-3xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-white/10 to-white/5" />
+      <Card className="w-full max-w-lg mx-auto backdrop-blur-2xl bg-white/5 border border-white/30 shadow-2xl relative z-10 rounded-3xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-white/10" />
         <CardHeader className="text-center pb-6 relative z-10">
           <h1 className="text-3xl font-bold tracking-tight text-white">Connect Your POS System</h1>
           <p className="text-lg text-white/80 mt-2">
@@ -191,7 +191,7 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                       <FormControl>
                         <Input 
                           placeholder="e.g. Central Café" 
-                          className="backdrop-blur-sm bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:bg-white/20 focus:border-white/40 rounded-2xl"
+                          className="backdrop-blur-md bg-white/5 border-white/40 text-white placeholder:text-white/70 focus:bg-white/10 focus:border-white/60 rounded-2xl shadow-lg"
                           {...field} 
                         />
                       </FormControl>
@@ -208,11 +208,11 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                       <FormLabel className="text-white">Business Type</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="backdrop-blur-sm bg-white/10 border-white/30 text-white focus:bg-white/20 focus:border-white/40 rounded-2xl">
-                            <SelectValue placeholder="Select your business type" className="text-white/60" />
+                          <SelectTrigger className="backdrop-blur-md bg-white/5 border-white/40 text-white focus:bg-white/10 focus:border-white/60 rounded-2xl shadow-lg">
+                            <SelectValue placeholder="Select your business type" className="text-white/70" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="backdrop-blur-xl bg-white/10 border-white/20 rounded-2xl">
+                        <SelectContent className="backdrop-blur-2xl bg-white/10 border-white/30 rounded-2xl shadow-2xl">
                           {businessTypes.map((type) => (
                             <SelectItem key={type.value} value={type.value} className="text-white hover:bg-white/10">
                               {type.label}
@@ -233,11 +233,11 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                       <FormLabel className="text-white">POS System Type</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="backdrop-blur-sm bg-white/10 border-white/30 text-white focus:bg-white/20 focus:border-white/40 rounded-2xl">
-                            <SelectValue placeholder="Select your POS system" className="text-white/60" />
+                          <SelectTrigger className="backdrop-blur-md bg-white/5 border-white/40 text-white focus:bg-white/10 focus:border-white/60 rounded-2xl shadow-lg">
+                            <SelectValue placeholder="Select your POS system" className="text-white/70" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="backdrop-blur-xl bg-white/10 border-white/20 rounded-2xl">
+                        <SelectContent className="backdrop-blur-2xl bg-white/10 border-white/30 rounded-2xl shadow-2xl">
                           {posTypes.map((pos) => (
                             <SelectItem key={pos.value} value={pos.value} className="text-white hover:bg-white/10">
                               {pos.label}
@@ -260,7 +260,7 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                         <Input 
                           type="password" 
                           placeholder="Enter your API key" 
-                          className="backdrop-blur-sm bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:bg-white/20 focus:border-white/40 rounded-2xl"
+                          className="backdrop-blur-md bg-white/5 border-white/40 text-white placeholder:text-white/70 focus:bg-white/10 focus:border-white/60 rounded-2xl shadow-lg"
                           {...field} 
                         />
                       </FormControl>
@@ -278,7 +278,7 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                       <FormControl>
                         <Input 
                           placeholder="https://api.yourpos.com/v1" 
-                          className="backdrop-blur-sm bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:bg-white/20 focus:border-white/40 rounded-2xl"
+                          className="backdrop-blur-md bg-white/5 border-white/40 text-white placeholder:text-white/70 focus:bg-white/10 focus:border-white/60 rounded-2xl shadow-lg"
                           {...field} 
                         />
                       </FormControl>
@@ -290,7 +290,7 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                 <Button 
                   type="submit" 
                   size="lg" 
-                  className="w-full h-12 text-lg font-semibold shadow-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0 rounded-2xl mt-6"
+                  className="w-full h-12 text-lg font-semibold shadow-2xl backdrop-blur-md bg-gradient-to-r from-green-500/80 to-green-600/80 hover:from-green-600/90 hover:to-green-700/90 text-white border border-white/20 rounded-2xl mt-6"
                   disabled={isLoading}
                 >
                   {isLoading ? (
