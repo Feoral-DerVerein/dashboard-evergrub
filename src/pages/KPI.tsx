@@ -1,4 +1,4 @@
-import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink } from "lucide-react";
+import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Link } from "react-router-dom";
@@ -562,9 +562,9 @@ const KPI = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem asChild>
-                    <Link to="/profile" className="flex items-center gap-2 w-full">
-                      <User className="h-4 w-4" />
-                      Profile
+                    <Link to="/onboarding" className="flex items-center gap-2 w-full">
+                      <Settings2 className="h-4 w-4" />
+                      API
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
