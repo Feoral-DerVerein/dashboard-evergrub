@@ -126,7 +126,12 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
       }}
     >
       <div className="absolute inset-0 bg-background/20" />
-      <Card className="w-full max-w-2xl mx-auto backdrop-blur-2xl bg-white/10 border border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] relative z-10 animate-fade-in">
+      {/* Decorative glass circles */}
+      <div className="absolute top-20 left-20 w-32 h-32 rounded-full bg-white/5 blur-xl"></div>
+      <div className="absolute top-40 right-32 w-20 h-20 rounded-full bg-white/10 blur-lg"></div>
+      <div className="absolute bottom-32 left-40 w-24 h-24 rounded-full bg-white/5 blur-xl"></div>
+      <div className="absolute bottom-20 right-20 w-16 h-16 rounded-full bg-white/10 blur-lg"></div>
+      <Card className="w-full max-w-2xl mx-auto backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] relative z-10 animate-fade-in overflow-hidden">
         <CardHeader className="text-center pb-6">
           <h1 className="text-3xl font-bold tracking-tight">Connect Your POS System</h1>
           <p className="text-lg text-muted-foreground mt-2">
