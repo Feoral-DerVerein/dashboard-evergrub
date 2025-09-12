@@ -126,7 +126,7 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
       }}
     >
       <div className="absolute inset-0 bg-background/20" />
-      <Card className="w-full max-w-2xl mx-auto backdrop-blur-xl bg-background/80 border border-white/20 shadow-2xl relative z-10">
+      <Card className="w-full max-w-2xl mx-auto backdrop-blur-2xl bg-white/10 border border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] relative z-10 animate-fade-in">
         <CardHeader className="text-center pb-6">
           <h1 className="text-3xl font-bold tracking-tight">Connect Your POS System</h1>
           <p className="text-lg text-muted-foreground mt-2">
