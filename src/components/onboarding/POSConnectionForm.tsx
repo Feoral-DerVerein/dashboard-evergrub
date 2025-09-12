@@ -101,17 +101,17 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
 
   if (status === "success") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-400 via-teal-300 to-blue-400 p-4 relative overflow-hidden">
-        {/* Background blur elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-200/30 via-teal-200/20 to-blue-200/30" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-300/20 rounded-full blur-3xl" />
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        {/* Background landscape effect */}
+        <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
+        <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-blue-500/5 to-purple-500/10" />
         
-        <Card className="w-full max-w-md mx-auto backdrop-blur-md bg-white/10 border border-white/20 shadow-2xl relative z-10 rounded-3xl">
-          <CardContent className="p-8 text-center">
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-green-600 mb-2">Connection Successful!</h2>
-            <p className="text-muted-foreground">
+        <Card className="w-full max-w-md mx-auto backdrop-blur-xl bg-white/5 border border-white/10 shadow-2xl relative z-10 rounded-3xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-transparent" />
+          <CardContent className="p-8 text-center relative z-10">
+            <CheckCircle className="h-16 w-16 text-emerald-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">Connection Successful!</h2>
+            <p className="text-white/70">
               We're now analyzing your data. Your dashboard will be ready in a few minutes.
             </p>
           </CardContent>
@@ -121,43 +121,45 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-400 via-teal-300 to-blue-400 p-4 relative overflow-hidden">
-      {/* Background blur elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-200/30 via-teal-200/20 to-blue-200/30" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-300/20 rounded-full blur-3xl" />
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+      {/* Background landscape effect */}
+      <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
+      <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-blue-500/5 to-purple-500/10" />
+      <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-green-400/20 to-blue-400/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-purple-400/15 to-pink-400/15 rounded-full blur-3xl" />
       
-      <Card className="w-full max-w-2xl mx-auto backdrop-blur-md bg-white/10 border border-white/20 shadow-2xl relative z-10 rounded-3xl">
-        <CardHeader className="text-center pb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Connect Your POS System</h1>
-          <p className="text-lg text-muted-foreground mt-2">
+      <Card className="w-full max-w-2xl mx-auto backdrop-blur-xl bg-white/5 border border-white/10 shadow-2xl relative z-10 rounded-3xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-transparent" />
+        <CardHeader className="text-center pb-6 relative z-10">
+          <h1 className="text-3xl font-bold tracking-tight text-white">Connect Your POS System</h1>
+          <p className="text-lg text-white/70 mt-2">
             To start optimizing your inventory and reducing waste, connect your point of sale system.
           </p>
         </CardHeader>
 
-        <CardContent className="space-y-8">
+        <CardContent className="space-y-8 relative z-10">
           {/* Step 1 */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold shadow-lg">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-400 to-blue-400 text-white flex items-center justify-center font-semibold shadow-lg">
                 1
               </div>
-              <h3 className="text-lg font-semibold">Get Your API Key</h3>
+              <h3 className="text-lg font-semibold text-white">Get Your API Key</h3>
             </div>
-            <p className="text-muted-foreground ml-11">
+            <p className="text-white/70 ml-11">
               In your POS system settings, look for developer options or integrations and copy your API key.
             </p>
           </div>
 
-          <Separator />
+          <Separator className="bg-white/10" />
 
           {/* Step 2 */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold shadow-lg">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-400 to-blue-400 text-white flex items-center justify-center font-semibold shadow-lg">
                 2
               </div>
-              <h3 className="text-lg font-semibold">Enter Your Details</h3>
+              <h3 className="text-lg font-semibold text-white">Enter Your Details</h3>
             </div>
 
             <Form {...form}>
@@ -174,9 +176,13 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                   name="businessName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Business Name</FormLabel>
+                      <FormLabel className="text-white">Business Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Central Café" {...field} />
+                        <Input 
+                          placeholder="e.g. Central Café" 
+                          className="backdrop-blur-sm bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:bg-white/15 focus:border-white/30"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -188,16 +194,16 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                   name="businessType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Business Type</FormLabel>
+                      <FormLabel className="text-white">Business Type</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select your business type" />
+                          <SelectTrigger className="backdrop-blur-sm bg-white/10 border-white/20 text-white focus:bg-white/15 focus:border-white/30">
+                            <SelectValue placeholder="Select your business type" className="text-white/50" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="backdrop-blur-xl bg-slate-900/90 border-white/20">
                           {businessTypes.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
+                            <SelectItem key={type.value} value={type.value} className="text-white hover:bg-white/10">
                               {type.label}
                             </SelectItem>
                           ))}
@@ -213,16 +219,16 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                   name="posType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>POS System Type</FormLabel>
+                      <FormLabel className="text-white">POS System Type</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select your POS system" />
+                          <SelectTrigger className="backdrop-blur-sm bg-white/10 border-white/20 text-white focus:bg-white/15 focus:border-white/30">
+                            <SelectValue placeholder="Select your POS system" className="text-white/50" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="backdrop-blur-xl bg-slate-900/90 border-white/20">
                           {posTypes.map((pos) => (
-                            <SelectItem key={pos.value} value={pos.value}>
+                            <SelectItem key={pos.value} value={pos.value} className="text-white hover:bg-white/10">
                               {pos.label}
                             </SelectItem>
                           ))}
@@ -238,11 +244,12 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                   name="apiKey"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>API Key</FormLabel>
+                      <FormLabel className="text-white">API Key</FormLabel>
                       <FormControl>
                         <Input 
                           type="password" 
                           placeholder="Enter your API key" 
+                          className="backdrop-blur-sm bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:bg-white/15 focus:border-white/30"
                           {...field} 
                         />
                       </FormControl>
@@ -256,10 +263,11 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                   name="apiUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>API URL (optional)</FormLabel>
+                      <FormLabel className="text-white">API URL (optional)</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="https://api.yourpos.com/v1" 
+                          className="backdrop-blur-sm bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:bg-white/15 focus:border-white/30"
                           {...field} 
                         />
                       </FormControl>
@@ -271,7 +279,7 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                 <Button 
                   type="submit" 
                   size="lg" 
-                  className="w-full h-12 text-lg font-semibold shadow-lg"
+                  className="w-full h-12 text-lg font-semibold shadow-lg bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white border-0"
                   disabled={isLoading}
                 >
                   {isLoading ? (
