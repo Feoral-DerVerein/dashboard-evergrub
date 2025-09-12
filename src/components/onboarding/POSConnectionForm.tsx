@@ -11,7 +11,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import landscapeBackground from "@/assets/landscape-background.jpg";
 
 const formSchema = z.object({
   businessName: z.string().min(1, "Business name is required"),
@@ -105,16 +104,16 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
       <div 
         className="min-h-screen flex items-center justify-center relative overflow-hidden"
         style={{
-          backgroundImage: `url(${landscapeBackground})`,
+          backgroundImage: `url(/lovable-uploads/6ffe34ff-b995-4799-99a5-d8979392cdf9.png)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-black/10" />
         
-      <Card className="w-full max-w-md mx-auto backdrop-blur-3xl bg-white/10 border border-white/20 shadow-2xl relative z-10 rounded-2xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
+      <Card className="w-full max-w-md mx-auto backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] relative z-10 rounded-3xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/2 backdrop-blur-sm" />
         <CardContent className="p-8 text-center relative z-10">
             <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">Connection Successful!</h2>
@@ -131,16 +130,16 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
     <div 
       className="min-h-screen flex items-center justify-center relative overflow-hidden p-4"
       style={{
-        backgroundImage: `url(${landscapeBackground})`,
+        backgroundImage: `url(/lovable-uploads/6ffe34ff-b995-4799-99a5-d8979392cdf9.png)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-black/10" />
       
-      <Card className="w-full max-w-lg mx-auto backdrop-blur-3xl bg-white/10 border border-white/20 shadow-2xl relative z-10 rounded-2xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
+      <Card className="w-full max-w-lg mx-auto backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] relative z-10 rounded-3xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/2 backdrop-blur-sm" />
         <CardHeader className="text-center pb-6 relative z-10">
           <h1 className="text-3xl font-bold tracking-tight text-white">Connect Your POS System</h1>
           <p className="text-lg text-white/80 mt-2">
