@@ -287,6 +287,27 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                     "Connect and Start Optimizing"
                   )}
                 </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <Separator className="w-full" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background/80 px-2 text-muted-foreground">
+                      or
+                    </span>
+                  </div>
+                </div>
+
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full h-12 text-lg font-semibold bg-white/5 border-white/20 text-foreground hover:bg-white/10"
+                  onClick={onComplete}
+                >
+                  Continue without API
+                </Button>
               </form>
             </Form>
           </div>
