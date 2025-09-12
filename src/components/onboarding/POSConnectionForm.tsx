@@ -131,41 +131,41 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
       <div className="absolute top-40 right-32 w-20 h-20 rounded-full bg-white/10 blur-lg"></div>
       <div className="absolute bottom-32 left-40 w-24 h-24 rounded-full bg-white/5 blur-xl"></div>
       <div className="absolute bottom-20 right-20 w-16 h-16 rounded-full bg-white/10 blur-lg"></div>
-      <Card className="w-full max-w-2xl mx-auto backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] relative z-10 animate-fade-in overflow-hidden">
-        <CardHeader className="text-center pb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Connect Your POS System</h1>
-          <p className="text-lg text-muted-foreground mt-2">
-            To start optimizing your inventory and reducing waste, connect your point of sale system.
+      <Card className="w-full max-w-lg mx-auto backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] relative z-10 animate-fade-in overflow-hidden">
+        <CardHeader className="text-center pb-4">
+          <h1 className="text-2xl font-bold tracking-tight">Connect Your POS System</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Connect your point of sale system to start optimizing.
           </p>
         </CardHeader>
 
-        <CardContent className="space-y-8">
+        <CardContent className="space-y-6 px-6 pb-6">
           {/* Step 1 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold shadow-lg">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
                 1
               </div>
-              <h3 className="text-lg font-semibold">Get Your API Key</h3>
+              <h3 className="text-base font-semibold">Get Your API Key</h3>
             </div>
-            <p className="text-muted-foreground ml-11">
-              In your POS system settings, look for developer options or integrations and copy your API key.
+            <p className="text-sm text-muted-foreground ml-8">
+              Find your API key in your POS system's developer settings.
             </p>
           </div>
 
           <Separator />
 
           {/* Step 2 */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold shadow-lg">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
                 2
               </div>
-              <h3 className="text-lg font-semibold">Enter Your Details</h3>
+              <h3 className="text-base font-semibold">Enter Your Details</h3>
             </div>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 ml-11">
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 ml-8">
                 {status === "error" && (
                   <Alert variant="destructive">
                     <XCircle className="h-4 w-4" />
@@ -274,13 +274,12 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
 
                 <Button 
                   type="submit" 
-                  size="lg" 
-                  className="w-full h-12 text-lg font-semibold shadow-lg"
+                  className="w-full h-10 text-sm font-semibold shadow-lg"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Connecting...
                     </>
                   ) : (
@@ -302,8 +301,7 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                 <Button 
                   type="button" 
                   variant="outline" 
-                  size="lg" 
-                  className="w-full h-12 text-lg font-semibold bg-white/5 border-white/20 text-foreground hover:bg-white/10"
+                  className="w-full h-10 text-sm font-semibold bg-white/5 border-white/20 text-foreground hover:bg-white/10"
                   onClick={() => {
                     localStorage.setItem("posOnboardingCompleted", "true");
                     window.location.href = "/kpi";
