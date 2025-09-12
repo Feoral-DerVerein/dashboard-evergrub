@@ -327,9 +327,9 @@ const Dashboard = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center gap-2 w-full">
-                        <User className="h-4 w-4" />
-                        Profile
+                      <Link to="/onboarding" className="flex items-center gap-2 w-full">
+                        <Settings2 className="h-4 w-4" />
+                        API
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
