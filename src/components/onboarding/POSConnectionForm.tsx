@@ -113,9 +113,9 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
       >
         <div className="absolute inset-0 bg-black/20" />
         
-        <Card className="w-full max-w-md mx-auto backdrop-blur-2xl bg-white/5 border border-white/30 shadow-2xl relative z-10 rounded-3xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-white/10" />
-          <CardContent className="p-8 text-center relative z-10">
+      <Card className="w-full max-w-md mx-auto backdrop-blur-3xl bg-white/10 border border-white/20 shadow-2xl relative z-10 rounded-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
+        <CardContent className="p-8 text-center relative z-10">
             <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">Connection Successful!</h2>
             <p className="text-white/80">
@@ -139,8 +139,8 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
     >
       <div className="absolute inset-0 bg-black/30" />
       
-      <Card className="w-full max-w-lg mx-auto backdrop-blur-2xl bg-white/5 border border-white/30 shadow-2xl relative z-10 rounded-3xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-white/10" />
+      <Card className="w-full max-w-lg mx-auto backdrop-blur-3xl bg-white/10 border border-white/20 shadow-2xl relative z-10 rounded-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
         <CardHeader className="text-center pb-6 relative z-10">
           <h1 className="text-3xl font-bold tracking-tight text-white">Connect Your POS System</h1>
           <p className="text-lg text-white/80 mt-2">
