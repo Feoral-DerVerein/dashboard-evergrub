@@ -304,7 +304,10 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
                   variant="outline" 
                   size="lg" 
                   className="w-full h-12 text-lg font-semibold bg-white/5 border-white/20 text-foreground hover:bg-white/10"
-                  onClick={onComplete}
+                  onClick={() => {
+                    localStorage.setItem("posOnboardingCompleted", "true");
+                    window.location.href = "/kpi";
+                  }}
                 >
                   Continue without API
                 </Button>
