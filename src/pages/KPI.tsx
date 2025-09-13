@@ -563,7 +563,7 @@ const KPI = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem asChild>
-                    <Link to="/api-config" className="flex items-center gap-2 w-full">
+                    <Link to="/onboarding" className="flex items-center gap-2 w-full">
                       <Settings2 className="h-4 w-4" />
                       API
                     </Link>
@@ -593,13 +593,7 @@ const KPI = () => {
           {/* Main dashboard content and chart - Moved to top */}
           <section className="px-6 mt-8 mb-8 space-y-6">
             {/* Time Filters */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              <TimeFilterButton label="Today" isActive={activeTimeFilter === "Today"} onClick={() => handleTimeFilterClick("Today")} />
-              <TimeFilterButton label="Week" isActive={activeTimeFilter === "Week"} onClick={() => handleTimeFilterClick("Week")} />
-              <TimeFilterButton label="Month" isActive={activeTimeFilter === "Month"} onClick={() => handleTimeFilterClick("Month")} />
-              <TimeFilterButton label="Quarter" isActive={activeTimeFilter === "Quarter"} onClick={() => handleTimeFilterClick("Quarter")} />
-              <TimeFilterButton label="Year" isActive={activeTimeFilter === "Year"} onClick={() => handleTimeFilterClick("Year")} />
-            </div>
+            
 
             {/* KPI Metrics - Expanded with Profit, Savings, Revenue */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
