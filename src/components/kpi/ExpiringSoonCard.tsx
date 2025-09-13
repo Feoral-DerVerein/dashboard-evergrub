@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Product } from "@/services/productService";
 import { DonationForm } from "@/components/DonationForm";
 import { Store, Heart, X } from "lucide-react";
@@ -28,6 +29,49 @@ export default function ExpiringSoonCard({
   const [donationFormOpen, setDonationFormOpen] = useState(false);
   const [publishingToMarketplace, setPublishingToMarketplace] = useState<number | null>(null);
   const [hiddenItems, setHiddenItems] = useState<Set<number>>(new Set());
+  const [selectedState, setSelectedState] = useState("All States");
+
+  // Food banks by state
+  const foodBanksByState = {
+    "All States": [
+      { name: "OzHarvest", description: "Rescues quality surplus food and delivers it to charities" },
+      { name: "Foodbank Australia", description: "Australia's largest food relief organization" },
+      { name: "SecondBite", description: "Rescues surplus fresh food and redistributes it" },
+      { name: "Food Bank", description: "Community-based food bank helping distribute food" }
+    ],
+    "New South Wales": [
+      { name: "OzHarvest Sydney", description: "Rescues food and delivers to charities in NSW" },
+      { name: "Foodbank NSW & ACT", description: "Provides food relief across NSW and ACT" },
+      { name: "Food Bank NSW", description: "Local food bank serving NSW communities" }
+    ],
+    "Victoria": [
+      { name: "FareShare", description: "Cooks rescued food into free, nutritious meals" },
+      { name: "Foodbank Victoria", description: "Provides food relief to Victorian communities" },
+      { name: "SecondBite Melbourne", description: "Rescues food in Victoria" }
+    ],
+    "Queensland": [
+      { name: "Foodbank Queensland", description: "Provides food relief across Queensland" },
+      { name: "OzHarvest Brisbane", description: "Rescues food in Queensland" },
+      { name: "Food Bank QLD", description: "Local food bank serving Queensland" }
+    ],
+    "Western Australia": [
+      { name: "Foodbank Western Australia", description: "WA's largest food relief organization" },
+      { name: "OzHarvest Perth", description: "Rescues food in Western Australia" }
+    ],
+    "South Australia": [
+      { name: "Foodbank South Australia", description: "Provides food relief in SA" },
+      { name: "Food Bank SA", description: "Local food bank serving South Australia" }
+    ],
+    "Tasmania": [
+      { name: "Foodbank Tasmania", description: "Provides food relief across Tasmania" }
+    ],
+    "Northern Territory": [
+      { name: "Foodbank Northern Territory", description: "Provides food relief in NT" }
+    ]
+  };
+
+  const australianStates = Object.keys(foodBanksByState);
+  const availableFoodBanks = foodBanksByState[selectedState as keyof typeof foodBanksByState];
   
   const items = products
     .filter(p => daysUntil(p.expirationDate) <= 14 && !hiddenItems.has(p.id))
@@ -152,19 +196,40 @@ export default function ExpiringSoonCard({
           <DialogHeader>
             <DialogTitle>Select Food Bank for Donation</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            <Button variant="outline" className="w-full justify-start" onClick={handleDonationSubmit}>
-              <Heart className="w-4 h-4 mr-2" />
-              Local Food Bank - Central District
-            </Button>
-            <Button variant="outline" className="w-full justify-start" onClick={handleDonationSubmit}>
-              <Heart className="w-4 h-4 mr-2" />
-              Community Kitchen - North Area
-            </Button>
-            <Button variant="outline" className="w-full justify-start" onClick={handleDonationSubmit}>
-              <Heart className="w-4 h-4 mr-2" />
-              Salvation Army - Downtown
-            </Button>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Select your state:</label>
+              <Select value={selectedState} onValueChange={setSelectedState}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Choose your state" />
+                </SelectTrigger>
+                <SelectContent>
+                  {australianStates.map((state) => (
+                    <SelectItem key={state} value={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              {availableFoodBanks.map((foodBank) => (
+                <Button 
+                  key={foodBank.name}
+                  variant="outline" 
+                  className="w-full justify-start text-left h-auto p-3" 
+                  onClick={handleDonationSubmit}
+                >
+                  <div>
+                    <div className="flex items-center">
+                      <Heart className="w-4 h-4 mr-2" />
+                      <span className="font-medium">{foodBank.name}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">{foodBank.description}</p>
+                  </div>
+                </Button>
+              ))}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
