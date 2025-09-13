@@ -68,28 +68,27 @@ export default function ExpiringSoonCard({
   };
   return <>
       <Card className="bg-white overflow-hidden border border-gray-200">
-        <CardHeader className="pb-4 bg-gradient-to-r from-background to-muted/30">
-          <CardTitle className="text-lg font-bold text-foreground">Expiring Soon</CardTitle>
+        <CardHeader className="pb-3 bg-gradient-to-r from-background to-muted/30">
+          <CardTitle className="text-base font-bold text-foreground">Expiring Soon</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
-          {items.length === 0 ? <div className="text-center py-8">
-              <p className="text-muted-foreground">No items expiring soon</p>
-            </div> : <div className="space-y-4">
+        <CardContent className="p-4">
+          {items.length === 0 ? <div className="text-center py-4">
+              <p className="text-muted-foreground text-sm">No items expiring soon</p>
+            </div> : <div className="space-y-2">
               {items.map(item => {
             const d = daysUntil(item.expirationDate);
             const sev = severityFor(d);
-            const bgGradient = sev === "high" ? "bg-gradient-to-r from-red-50 to-red-100 border-red-200 dark:from-red-950/30 dark:to-red-900/20 dark:border-red-800" : sev === "medium" ? "bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 dark:from-yellow-950/30 dark:to-yellow-900/20 dark:border-yellow-800" : "bg-gradient-to-r from-muted/30 to-muted/50 border-border";
-            const urgencyColor = sev === "high" ? "text-red-700 dark:text-red-400" : sev === "medium" ? "text-yellow-700 dark:text-yellow-400" : "text-muted-foreground";
-            const urgencyBg = sev === "high" ? "bg-red-100 border-red-200 dark:bg-red-900/20 dark:border-red-800" : sev === "medium" ? "bg-yellow-100 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800" : "bg-muted border-border";
+            const urgencyColor = sev === "high" ? "text-red-600" : sev === "medium" ? "text-yellow-600" : "text-gray-600";
+            const urgencyBg = sev === "high" ? "bg-red-50 border-red-200" : sev === "medium" ? "bg-yellow-50 border-yellow-200" : "bg-gray-50 border-gray-200";
             return <div 
                 key={item.id} 
-                className={`${bgGradient} border rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.01] group relative`}
+                className="bg-white border rounded-lg p-3 transition-all duration-200 hover:shadow-sm group relative"
               >
                 {/* X button to remove item */}
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  className="absolute top-1 right-1 h-5 w-5 p-0 hover:bg-red-100 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleHideItem(item.id);
@@ -97,53 +96,51 @@ export default function ExpiringSoonCard({
                 >
                   <X className="w-3 h-3" />
                 </Button>
-                    <div className="flex items-start justify-between gap-4">
-                      {/* Product Info - Takes more space */}
-                      <div className="flex-1 min-w-0 space-y-2 pr-8">
-                        <h4 className="font-bold text-base text-foreground group-hover:text-primary transition-colors truncate">{item.name}</h4>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${urgencyBg}`}>
-                            
-                            <span className={urgencyColor}>
-                              {Math.max(0, isFinite(d) ? d : 0)} days left
-                            </span>
-                          </div>
-                          <span className="text-muted-foreground text-xs bg-background/60 px-2.5 py-1 rounded-full border">
-                            {item.quantity} units
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {/* Action Buttons - Stacked vertically and smaller */}
-                      <div className="flex flex-col gap-2 flex-shrink-0">
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="h-8 px-3 text-xs font-medium bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 hover:shadow-sm hover:scale-105 transition-all duration-200 group/btn" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handlePublishToMarketplace(item);
-                          }} 
-                          disabled={publishingToMarketplace === item.id}
-                        >
-                          <Store className="w-3 h-3 mr-1.5 group-hover/btn:scale-110 transition-transform" />
-                          {publishingToMarketplace === item.id ? "Publishing..." : "Marketplace"}
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="h-8 px-3 text-xs font-medium bg-gradient-to-r from-green-50 to-green-100 border-green-200 text-green-700 hover:from-green-100 hover:to-green-200 hover:border-green-300 hover:shadow-sm hover:scale-105 transition-all duration-200 group/btn" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDonateProduct(item);
-                          }}
-                        >
-                          <Heart className="w-3 h-3 mr-1.5 group-hover/btn:scale-110 transition-transform" />
-                          Donation
-                        </Button>
-                      </div>
+                
+                <div className="space-y-2">
+                  {/* Product Name and Info */}
+                  <div className="pr-6">
+                    <h4 className="font-medium text-sm text-foreground truncate">{item.name}</h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium ${urgencyBg} ${urgencyColor}`}>
+                        {Math.max(0, isFinite(d) ? d : 0)} days
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {item.quantity} units
+                      </span>
                     </div>
-                  </div>;
+                  </div>
+                  
+                  {/* Action Buttons - Horizontal layout, smaller */}
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="h-7 px-2 text-xs font-medium bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 flex-1" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePublishToMarketplace(item);
+                      }} 
+                      disabled={publishingToMarketplace === item.id}
+                    >
+                      <Store className="w-3 h-3 mr-1" />
+                      {publishingToMarketplace === item.id ? "..." : "Market"}
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="h-7 px-2 text-xs font-medium bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 flex-1" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDonateProduct(item);
+                      }}
+                    >
+                      <Heart className="w-3 h-3 mr-1" />
+                      Donate
+                    </Button>
+                  </div>
+                </div>
+              </div>;
           })}
             </div>}
         </CardContent>
