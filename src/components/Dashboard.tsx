@@ -313,11 +313,10 @@ const Dashboard = () => {
           <div>
             <header className="px-6 pt-8 pb-6">
               <div className="flex justify-between items-center mb-1">
-                <div>
-                  <img src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" alt="Main Logo" className="h-12 w-auto mb-0" />
-                  <p className="text-gray-500">Welcome, Felipe</p>
-                  <p className="text-gray-400 text-sm">Ortega's account</p>
-                </div>
+              <div>
+                <p className="text-gray-500">Welcome, Felipe</p>
+                <p className="text-gray-400 text-sm">Ortega's account</p>
+              </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Avatar className="h-12 w-12 cursor-pointer">
@@ -380,7 +379,7 @@ const Dashboard = () => {
               </div>
 
               {/* Recent Activity */}
-              <div className="apple-card-hover p-6 bg-gradient-to-br from-slate-50/80 to-blue-50/80 backdrop-blur-sm border border-slate-200/50 shadow-sm">
+              <div className="apple-card-hover p-6 bg-white backdrop-blur-sm border border-slate-200/50 shadow-sm">
                 <h3 className="text-lg font-semibold mb-4 text-slate-900">Recent Activity</h3>
                 <div className="space-y-4">
                   {isLoading ? (
