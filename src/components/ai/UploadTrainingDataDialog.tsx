@@ -40,15 +40,15 @@ const UploadTrainingDataDialog: React.FC = () => {
 
   const handleUpload = async () => {
     if (!user) {
-      toast.error("Debes iniciar sesión para subir datos.");
+      toast.error("You must log in to upload data.");
       return;
     }
     if (!files || files.length === 0) {
-      toast.error("Selecciona al menos un archivo.");
+      toast.error("Select at least one file.");
       return;
     }
     if (files.length > MAX_FILES) {
-      toast.error(`Máximo ${MAX_FILES} archivos por subida.`);
+      toast.error(`Maximum ${MAX_FILES} files per upload.`);
       return;
     }
     setIsUploading(true);
@@ -70,13 +70,13 @@ const UploadTrainingDataDialog: React.FC = () => {
       const paths = await Promise.all(uploads);
 
       toast.success(
-        `Se cargaron ${paths.length} archivo(s). El entrenamiento se habilitará cuando esté configurada la API key.`
+        `Uploaded ${paths.length} file(s). Training will be enabled when API key is configured.`
       );
       setOpen(false);
       setFiles(null);
     } catch (err: any) {
       console.error("Upload error", err);
-      toast.error(err?.message || "No se pudieron subir los archivos.");
+      toast.error(err?.message || "Could not upload files.");
     } finally {
       setIsUploading(false);
     }
@@ -91,11 +91,11 @@ const UploadTrainingDataDialog: React.FC = () => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Subir datos para entrenamiento</DialogTitle>
+          <DialogTitle>Upload Training Data</DialogTitle>
           <DialogDescription>
-            Acepta múltiples formatos (CSV, XLSX, PDF, imágenes, texto). Los
-            archivos se guardarán de forma privada por empresa para entrenar las
-            recomendaciones, forecasting y resúmenes del dashboard.
+            Accepts multiple formats (CSV, XLSX, PDF, images, text). Files
+            will be stored privately by company to train recommendations,
+            forecasting and dashboard summaries.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -104,21 +104,21 @@ const UploadTrainingDataDialog: React.FC = () => {
             multiple
             accept={ACCEPTED_TYPES.join(",")}
             onChange={handleFileChange}
-            aria-label="Selecciona archivos para entrenamiento de IA"
+            aria-label="Select files for AI training"
             className="block w-full text-sm"
           />
           <p className="text-xs text-muted-foreground">
-            Formatos soportados: {ACCEPTED_TYPES.join(", ")}. Máx. {MAX_FILES}
-            archivos por subida.
+            Supported formats: {ACCEPTED_TYPES.join(", ")}. Max. {MAX_FILES}
+            files per upload.
           </p>
           <div className="rounded-md bg-muted p-3 text-xs">
-            Consejo: para mejores resultados, sube extractos de ventas, inventario,
-            lista de productos, historial de pedidos y notas operativas.
+            Tip: for best results, upload sales extracts, inventory,
+            product lists, order history and operational notes.
           </div>
         </div>
         <DialogFooter>
           <Button onClick={handleUpload} disabled={isUploading}>
-            {isUploading ? "Subiendo..." : "Subir"}
+            {isUploading ? "Uploading..." : "Upload"}
           </Button>
         </DialogFooter>
       </DialogContent>
