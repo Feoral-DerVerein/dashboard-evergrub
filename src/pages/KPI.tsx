@@ -543,14 +543,8 @@ const KPI = () => {
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
               <div>
-                <img src="/lovable-uploads/negentropy-logo.png" alt="Negentropy Logo" className="h-8 w-auto mb-2 mx-auto" />
-                <img src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" alt="Ortega's Logo" className="h-10 w-auto mb-4 mx-auto" />
-                <div className="flex justify-center mb-4">
-                  <Avatar className="h-16 w-16 cursor-pointer">
-                    <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
-                    <AvatarFallback>O</AvatarFallback>
-                  </Avatar>
-                </div>
+                <img src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" alt="Main Logo" className="h-12 w-auto mb-4 mx-auto" />
+                
                 <p className="text-gray-500">                          The dashboard displays your business's performance, sustainability, and predictions using our Negentropy AI.</p>
                 
               </div>
