@@ -14,7 +14,7 @@ export default function SuppliersCard({
   suppliers
 }: SuppliersCardProps) {
   return (
-    <Card className="bg-gradient-to-br from-cyan-50/80 to-blue-100/80 backdrop-blur-sm border border-cyan-200/50">
+    <Card className="bg-white backdrop-blur-sm border border-gray-200">
       <CardHeader>
         <CardTitle className="text-cyan-900">Suppliers</CardTitle>
       </CardHeader>

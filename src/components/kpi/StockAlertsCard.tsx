@@ -10,7 +10,7 @@ export default function StockAlertsCard({ products }: StockAlertsCardProps) {
   const alerts = products.filter((p) => p.quantity > 0 && p.quantity <= 5).slice(0, 5);
 
   return (
-    <Card className="bg-gradient-to-br from-amber-50/80 to-orange-100/80 backdrop-blur-sm border border-amber-200/50">
+    <Card className="bg-white backdrop-blur-sm border border-gray-200">
       <CardHeader>
         <CardTitle className="text-lg text-amber-900">Stock Alerts</CardTitle>
       </CardHeader>

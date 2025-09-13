@@ -188,7 +188,7 @@ const MetricCard = ({
   value: string;
   label: string;
   trend?: string;
-}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-gradient-to-br from-blue-50/80 to-indigo-100/80 backdrop-blur-sm border border-blue-200/50">
+}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
     <div className="flex items-center gap-2 mb-1">
       <Icon className="w-4 h-4 text-blue-600" />
       <span className="text-blue-700/80 text-sm font-medium">{label}</span>
@@ -206,7 +206,7 @@ const SustainabilityCard = ({
   label: string;
   value: string;
   subtext: string;
-}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-gradient-to-br from-emerald-50/80 to-green-100/80 backdrop-blur-sm border border-emerald-200/50">
+}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
     <div className="flex items-center gap-2 mb-3">
       <span className="text-emerald-700/80 font-medium">{label}</span>
     </div>
@@ -223,7 +223,7 @@ const InsightCard = ({
   label: string;
   value: string;
   trend: string;
-}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-gradient-to-br from-purple-50/80 to-indigo-100/80 backdrop-blur-sm border border-purple-200/50">
+}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
     <div className="text-purple-700/80 mb-2 font-medium">{label}</div>
     <div className="flex items-baseline gap-2">
       <span className="text-2xl font-semibold text-purple-900">{value}</span>
@@ -612,7 +612,7 @@ const KPI = () => {
 
             {/* Weather and Visitor Prediction Cards */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <div className="bg-white/80 rounded-xl p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200">
+              <div className="bg-white rounded-xl p-6 border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-blue-500 rounded-full">
                     <Sun className="w-5 h-5 text-white" />
@@ -677,7 +677,7 @@ const KPI = () => {
                 </div>
               </div>
 
-              <div className="bg-white/80 rounded-xl p-6 bg-gradient-to-br from-purple-50 to-indigo-100 border border-purple-200">
+              <div className="bg-white rounded-xl p-6 border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-purple-500 rounded-full">
                     <Users className="w-5 h-5 text-white" />
@@ -727,7 +727,7 @@ const KPI = () => {
 
       {aiInsights && <div className="space-y-4">
       {/* Main AI Summary */}
-      <div className="apple-card-hover p-6 bg-gradient-to-br from-indigo-50/80 to-blue-100/80 backdrop-blur-sm border border-indigo-200/50">
+      <div className="apple-card-hover p-6 bg-white backdrop-blur-sm border border-gray-200">
         <h4 className="font-semibold mb-2 text-indigo-900">AI Summary</h4>
         <p className="text-sm text-indigo-700/80 mb-3">{aiInsights.executive_summary}</p>
         {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && <div>
@@ -740,7 +740,7 @@ const KPI = () => {
 
       {/* Sustainability Impact Cards */}
       {aiInsights.sustainability_impact && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="apple-card-hover p-4 bg-gradient-to-br from-emerald-50/80 to-green-100/80 backdrop-blur-sm border border-emerald-200/50">
+          <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
             <h4 className="font-semibold text-emerald-800 mb-2">Sustainability Impact</h4>
             <div className="space-y-3">
               <div>
@@ -756,7 +756,7 @@ const KPI = () => {
             </div>
           </div>
 
-          <div className="apple-card-hover p-4 bg-gradient-to-br from-blue-50/80 to-indigo-100/80 backdrop-blur-sm border border-blue-200/50">
+          <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
             <h4 className="font-semibold text-blue-800 mb-2">Customer Insights</h4>
             <div className="space-y-3">
               <div>
@@ -772,7 +772,7 @@ const KPI = () => {
             </div>
           </div>
 
-          <div className="apple-card-hover p-4 bg-gradient-to-br from-purple-50/80 to-indigo-100/80 backdrop-blur-sm border border-purple-200/50">
+          <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
             <h4 className="font-semibold text-purple-800 mb-2">Savings & Food Waste</h4>
             <div className="space-y-3">
               <div>
@@ -885,7 +885,7 @@ const KPI = () => {
               <h3 className="text-lg font-semibold mb-4">AI Control Panel</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Upload Training Data */}
-                <Card className="bg-white/80">
+                <Card className="bg-white border border-gray-200">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-purple-600" />
@@ -901,7 +901,7 @@ const KPI = () => {
                 </Card>
 
                 {/* Generate Insights */}
-                <Card className="bg-white/80">
+                <Card className="bg-white border border-gray-200">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Brain className="w-5 h-5 text-blue-600" />
@@ -919,7 +919,7 @@ const KPI = () => {
                 </Card>
 
                 {/* Download Report */}
-                <Card className="bg-white/80">
+                <Card className="bg-white border border-gray-200">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <BarChart3 className="w-5 h-5 text-green-600" />

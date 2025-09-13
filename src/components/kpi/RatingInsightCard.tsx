@@ -12,7 +12,7 @@ const RatingInsightCard = ({ label, rating, percentage, status }: RatingInsightC
   const showStar = rating !== undefined;
   
   return (
-    <div className="apple-card-hover p-6 h-full min-h-32 flex flex-col justify-between bg-gradient-to-br from-violet-50/80 to-purple-100/80 backdrop-blur-sm border border-violet-200/50">
+    <div className="apple-card-hover p-6 h-full min-h-32 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
       <div className="text-violet-700/80 text-sm font-medium mb-3">{label}</div>
       <div className="flex flex-col">
         <div className="flex items-center gap-2 mb-3">
