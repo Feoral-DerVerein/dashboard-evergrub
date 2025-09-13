@@ -48,26 +48,15 @@
 }
 
 .stat-card {
-  @apply p-6 rounded-xl transition-all duration-200 hover:scale-105;
-  background: rgba(var(--glass-bg));
-  backdrop-filter: var(--glass-backdrop);
-  border: 1px solid rgba(var(--glass-border));
-  box-shadow: var(--glass-shadow);
+  @apply p-6 rounded-xl transition-all duration-200 hover:scale-105 bg-white backdrop-blur-sm border border-gray-200;
 }
 
 .quick-access-item {
-  @apply flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-200 hover:scale-105;
-  background: rgba(var(--glass-bg));
-  backdrop-filter: var(--glass-backdrop);
-  border: 1px solid rgba(var(--glass-border));
-  box-shadow: var(--glass-shadow);
+  @apply flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-200 hover:scale-105 bg-white backdrop-blur-sm border border-gray-200;
 }
 
 .recent-activity-item {
-  @apply flex items-center justify-between p-4 rounded-lg transition-all duration-200;
-  background: rgba(var(--glass-bg));
-  backdrop-filter: var(--glass-backdrop);
-  border: 1px solid rgba(var(--glass-border));
+  @apply flex items-center justify-between p-4 rounded-lg transition-all duration-200 bg-white backdrop-blur-sm border border-gray-200;
 }
 
 .bottom-nav-item {
