@@ -551,7 +551,7 @@ const KPI = () => {
                   </Avatar>
                 </div>
                 <p className="text-gray-500">                          The dashboard displays your business's performance, sustainability, and predictions using our Negentropy AI.</p>
-                <p className="text-gray-400 text-sm">Ortega's Coffe account</p>
+                
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
