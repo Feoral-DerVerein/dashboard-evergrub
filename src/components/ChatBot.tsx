@@ -45,8 +45,8 @@ const ChatBot = ({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-  const generateInfoCards = (question: string): BusinessCardData[] => {
-    return BusinessIntelligenceService.processQuery(question);
+  const generateInfoCards = async (question: string): Promise<BusinessCardData[]> => {
+    return await BusinessIntelligenceService.processQuery(question);
   };
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -71,7 +71,7 @@ const ChatBot = ({
       });
       if (error) throw error;
       const botResponse = data?.response || BusinessIntelligenceService.getResponseText(inputValue);
-      const cards = generateInfoCards(inputValue);
+      const cards = await generateInfoCards(inputValue);
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
@@ -85,7 +85,7 @@ const ChatBot = ({
 
       // Fallback response
       const fallbackResponse = 'Add any potential changes to your to-do list so that you can make the best decisions for your business.';
-      const cards = generateInfoCards(inputValue);
+      const cards = await generateInfoCards(inputValue);
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',

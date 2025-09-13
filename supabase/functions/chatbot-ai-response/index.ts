@@ -383,7 +383,7 @@ function generateDataBasedResponse(question: string, businessData: any): string 
     return 'Add any potential changes to your to-do list so that you can make the best decisions for your business.';
   }
 
-  if (lowerQuestion.includes('inventory') || lowerQuestion.includes('stock') || lowerQuestion.includes('products')) {
+  if (lowerQuestion.includes('inventory') || lowerQuestion.includes('stock') || lowerQuestion.includes('products') || lowerQuestion.includes('producto') || lowerQuestion.includes('inventario')) {
     if (businessData.products && businessData.products.length > 0) {
       const totalProducts = businessData.products.length;
       const lowStockProducts = businessData.products.filter((p: any) => p.quantity < 10);
@@ -393,6 +393,12 @@ function generateDataBasedResponse(question: string, businessData: any): string 
       
       if (lowStockProducts.length > 0) {
         response += `⚠️ ${lowStockProducts.length} products have low stock (under 10 units): ${lowStockProducts.slice(0, 3).map((p: any) => p.name).join(', ')}. `;
+      }
+      
+      // Add marketplace info if relevant
+      const marketplaceProducts = businessData.products.filter((p: any) => p.is_marketplace_visible);
+      if (marketplaceProducts.length > 0) {
+        response += `🛒 ${marketplaceProducts.length} products are visible in the marketplace. `;
       }
       
       return response + 'I recommend reviewing stock levels and reordering popular items.';
