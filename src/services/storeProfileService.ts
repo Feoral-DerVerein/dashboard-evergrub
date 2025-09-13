@@ -4,14 +4,14 @@ import { StoreProfile } from "@/types/store.types";
 import { toast } from "@/components/ui/use-toast";
 
 export const storeProfileService = {
-  // Get the user's store profile
+  // Get the user's store profile with masked payment details for security
   async getStoreProfile(userId: string): Promise<StoreProfile | null> {
     try {
       console.log("Fetching store profile for userId:", userId);
       
-      // Using a type assertion since the table is not in the generated types yet
+      // Use the secure view instead of direct table access for better security
       const { data, error } = await supabase
-        .from('store_profiles' as any)
+        .from('store_profiles_safe' as any)
         .select('*')
         .eq('userId', userId)
         .maybeSingle();
@@ -27,12 +27,12 @@ export const storeProfileService = {
 
       console.log("Fetched store profile:", data);
 
-      // Convert payment_details to paymentDetails if it exists
+      // Convert payment_details_masked to paymentDetails if it exists (from secure view)
       const profile = data as any;
-      if (profile.payment_details) {
-        profile.paymentDetails = profile.payment_details;
-        delete profile.payment_details;
-        console.log("Converted payment_details to paymentDetails:", profile.paymentDetails);
+      if (profile.payment_details_masked) {
+        profile.paymentDetails = profile.payment_details_masked;
+        delete profile.payment_details_masked;
+        console.log("Converted payment_details_masked to paymentDetails:", profile.paymentDetails);
       }
       
       // Safely convert to StoreProfile

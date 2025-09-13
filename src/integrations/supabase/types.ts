@@ -433,6 +433,36 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_access_log: {
+        Row: {
+          access_type: string
+          id: string
+          ip_address: string | null
+          store_profile_id: string | null
+          timestamp: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          access_type: string
+          id?: string
+          ip_address?: string | null
+          store_profile_id?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          access_type?: string
+          id?: string
+          ip_address?: string | null
+          store_profile_id?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       pickup_schedules: {
         Row: {
           collections: number
@@ -979,7 +1009,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      store_profiles_safe: {
+        Row: {
+          businessHours: Json | null
+          categories: string[] | null
+          contactEmail: string | null
+          contactPhone: string | null
+          coverUrl: string | null
+          description: string | null
+          id: string | null
+          location: string | null
+          logoUrl: string | null
+          name: string | null
+          payment_details_masked: Json | null
+          socialFacebook: string | null
+          socialInstagram: string | null
+          userId: string | null
+        }
+        Insert: {
+          businessHours?: Json | null
+          categories?: string[] | null
+          contactEmail?: string | null
+          contactPhone?: string | null
+          coverUrl?: string | null
+          description?: string | null
+          id?: string | null
+          location?: string | null
+          logoUrl?: string | null
+          name?: string | null
+          payment_details_masked?: never
+          socialFacebook?: string | null
+          socialInstagram?: string | null
+          userId?: string | null
+        }
+        Update: {
+          businessHours?: Json | null
+          categories?: string[] | null
+          contactEmail?: string | null
+          contactPhone?: string | null
+          coverUrl?: string | null
+          description?: string | null
+          id?: string | null
+          location?: string | null
+          logoUrl?: string | null
+          name?: string | null
+          payment_details_masked?: never
+          socialFacebook?: string | null
+          socialInstagram?: string | null
+          userId?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_wishlist_item: {
@@ -1079,6 +1159,14 @@ export type Database = {
           category_id: string
           count: number
         }[]
+      }
+      log_payment_access: {
+        Args: { access_type: string; profile_id: string }
+        Returns: undefined
+      }
+      mask_payment_details: {
+        Args: { payment_data: Json }
+        Returns: Json
       }
       remove_wishlist_item: {
         Args: { p_product_id: string; p_user_id: string }
