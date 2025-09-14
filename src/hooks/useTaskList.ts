@@ -4,17 +4,66 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  cardType: 'inventory' | 'expiry' | 'sales' | 'recommendation' | 'alert' | 'analytics';
+  cardType: 'inventory' | 'expiry' | 'sales' | 'recommendation' | 'alert' | 'analytics' | 'product-decision';
   cardData: any;
   createdAt: Date;
   completed: boolean;
   priority: 'low' | 'medium' | 'high' | 'critical';
+  // Product decision specific fields
+  product?: {
+    id: number;
+    name: string;
+    quantity: number;
+    expirationDate: string;
+    category: string;
+    price: number;
+    image: string;
+  };
+  suggestedAction?: 'b2c-discount' | 'b2b-offer' | 'donate' | 'transform' | 'compost';
+  actionTaken?: 'b2c-discount' | 'b2b-offer' | 'donate' | 'transform' | 'compost' | null;
 }
+
+const getSuggestedAction = (product: Task['product']): Task['suggestedAction'] => {
+  if (!product) return 'compost';
+  
+  const daysUntilExpiry = Math.ceil((new Date(product.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+  const quantity = product.quantity;
+  const category = product.category.toLowerCase();
+  
+  // Critical urgency (0-2 days)
+  if (daysUntilExpiry <= 2) {
+    if (quantity > 10 && ['fruits', 'vegetables', 'bread'].includes(category)) {
+      return 'donate'; // High quantity, good for donation
+    }
+    if (['fruits', 'vegetables'].includes(category)) {
+      return 'transform'; // Can be made into juices, smoothies
+    }
+    return 'b2c-discount'; // Last resort for immediate sale
+  }
+  
+  // High urgency (3-7 days)
+  if (daysUntilExpiry <= 7) {
+    if (quantity > 20) {
+      return 'b2b-offer'; // High quantity, good for businesses
+    }
+    if (product.price > 20) {
+      return 'b2c-discount'; // High value items
+    }
+    return 'donate';
+  }
+  
+  // Medium urgency (8+ days)
+  if (quantity > 50) {
+    return 'b2b-offer'; // Bulk quantities
+  }
+  
+  return 'b2c-discount'; // Default action
+};
 
 export const useTaskList = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  const addTask = useCallback((cardData: any, cardType: string, title: string, description: string, priority: 'low' | 'medium' | 'high' | 'critical' = 'medium') => {
+  const addTask = useCallback((cardData: any, cardType: string, title: string, description: string, priority: 'low' | 'medium' | 'high' | 'critical' = 'medium', product?: Task['product']) => {
     const newTask: Task = {
       id: Date.now().toString(),
       title,
@@ -23,11 +72,30 @@ export const useTaskList = () => {
       cardData,
       createdAt: new Date(),
       completed: false,
-      priority
+      priority,
+      product,
+      suggestedAction: product ? getSuggestedAction(product) : undefined,
+      actionTaken: null
     };
     
     setTasks(prev => [newTask, ...prev]);
     return newTask.id;
+  }, []);
+
+  const addProductDecisionTask = useCallback((product: Task['product']) => {
+    if (!product) return;
+    
+    const daysUntilExpiry = Math.ceil((new Date(product.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    const title = `Decisión requerida: ${product.name}`;
+    const description = `${product.quantity} unidades expiran en ${daysUntilExpiry} días`;
+    
+    return addTask(product, 'product-decision', title, description, daysUntilExpiry <= 2 ? 'critical' : daysUntilExpiry <= 7 ? 'high' : 'medium', product);
+  }, [addTask]);
+
+  const takeAction = useCallback((taskId: string, action: Task['actionTaken']) => {
+    setTasks(prev => prev.map(task => 
+      task.id === taskId ? { ...task, actionTaken: action, completed: true } : task
+    ));
   }, []);
 
   const completeTask = useCallback((taskId: string) => {
@@ -47,6 +115,8 @@ export const useTaskList = () => {
   return {
     tasks,
     addTask,
+    addProductDecisionTask,
+    takeAction,
     completeTask,
     removeTask,
     clearCompletedTasks

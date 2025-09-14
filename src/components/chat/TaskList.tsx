@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap } from 'lucide-react';
+import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, Utensils, Recycle } from 'lucide-react';
 import { Task } from '@/hooks/useTaskList';
 
 interface TaskListProps {
@@ -9,9 +9,10 @@ interface TaskListProps {
   onCompleteTask: (taskId: string) => void;
   onRemoveTask: (taskId: string) => void;
   onClearCompleted: () => void;
+  onTakeAction?: (taskId: string, action: Task['actionTaken']) => void;
 }
 
-const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted }: TaskListProps) => {
+const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTakeAction }: TaskListProps) => {
   const getCardIcon = (cardType: Task['cardType']) => {
     switch (cardType) {
       case 'inventory': return <Package className="w-4 h-4" />;
@@ -20,7 +21,41 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted }: Tas
       case 'recommendation': return <Zap className="w-4 h-4" />;
       case 'alert': return <AlertTriangle className="w-4 h-4" />;
       case 'analytics': return <TrendingUp className="w-4 h-4" />;
+      case 'product-decision': return <Package className="w-4 h-4" />;
       default: return <Clock className="w-4 h-4" />;
+    }
+  };
+
+  const getActionIcon = (action: Task['actionTaken']) => {
+    switch (action) {
+      case 'b2c-discount': return <ShoppingCart className="w-4 h-4" />;
+      case 'b2b-offer': return <Building2 className="w-4 h-4" />;
+      case 'donate': return <Heart className="w-4 h-4" />;
+      case 'transform': return <Utensils className="w-4 h-4" />;
+      case 'compost': return <Recycle className="w-4 h-4" />;
+      default: return null;
+    }
+  };
+
+  const getActionLabel = (action: Task['actionTaken']) => {
+    switch (action) {
+      case 'b2c-discount': return 'Venta B2C con descuento';
+      case 'b2b-offer': return 'Oferta B2B';
+      case 'donate': return 'Donar';
+      case 'transform': return 'Transformar';
+      case 'compost': return 'Compostaje';
+      default: return '';
+    }
+  };
+
+  const getActionColor = (action: Task['actionTaken']) => {
+    switch (action) {
+      case 'b2c-discount': return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+      case 'b2b-offer': return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
+      case 'donate': return 'bg-green-100 text-green-800 hover:bg-green-200';
+      case 'transform': return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
+      case 'compost': return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -85,43 +120,160 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted }: Tas
               key={task.id} 
               className="border rounded-lg p-4 bg-white hover:shadow-md transition-all duration-200"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 flex-1">
-                  <div className="mt-1">
-                    {getCardIcon(task.cardType)}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h4 className="font-semibold text-gray-900">{task.title}</h4>
-                      <Badge className={`text-xs ${getPriorityColor(task.priority)}`}>
-                        {task.priority}
-                      </Badge>
+              {task.cardType === 'product-decision' && task.product ? (
+                // Product Decision Card
+                <div className="space-y-4">
+                  {/* Product Header */}
+                  <div className="flex items-start gap-3">
+                    <img 
+                      src={task.product.image || '/placeholder.svg'} 
+                      alt={task.product.name}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-semibold text-gray-900">{task.product.name}</h4>
+                        <Badge className={`text-xs ${getPriorityColor(task.priority)}`}>
+                          {task.priority}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p>Cantidad: {task.product.quantity} unidades</p>
+                        <p>Categoría: {task.product.category}</p>
+                        <p>Precio: ${task.product.price}</p>
+                        <p>Expira: {new Date(task.product.expirationDate).toLocaleDateString('es-ES')}</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{task.description}</p>
-                    <div className="text-xs text-gray-400">
-                      Added: {task.createdAt.toLocaleString('en-US')}
+                    <Button
+                      onClick={() => onRemoveTask(task.id)}
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Suggested Action */}
+                  {task.suggestedAction && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Zap className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-800">Acción Sugerida por IA</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getActionIcon(task.suggestedAction)}
+                        <span className="text-sm text-blue-700">{getActionLabel(task.suggestedAction)}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-700">Opciones de acción:</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        onClick={() => onTakeAction?.(task.id, 'b2c-discount')}
+                        variant="outline"
+                        size="sm"
+                        className={`flex items-center gap-2 justify-start h-auto py-2 px-3 ${
+                          task.suggestedAction === 'b2c-discount' ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                        }`}
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        <span className="text-xs">Venta B2C con descuento</span>
+                      </Button>
+                      
+                      <Button
+                        onClick={() => onTakeAction?.(task.id, 'b2b-offer')}
+                        variant="outline"
+                        size="sm"
+                        className={`flex items-center gap-2 justify-start h-auto py-2 px-3 ${
+                          task.suggestedAction === 'b2b-offer' ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                        }`}
+                      >
+                        <Building2 className="w-4 h-4" />
+                        <span className="text-xs">Oferta B2B</span>
+                      </Button>
+                      
+                      <Button
+                        onClick={() => onTakeAction?.(task.id, 'donate')}
+                        variant="outline"
+                        size="sm"
+                        className={`flex items-center gap-2 justify-start h-auto py-2 px-3 ${
+                          task.suggestedAction === 'donate' ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                        }`}
+                      >
+                        <Heart className="w-4 h-4" />
+                        <span className="text-xs">Donar</span>
+                      </Button>
+                      
+                      <Button
+                        onClick={() => onTakeAction?.(task.id, 'transform')}
+                        variant="outline"
+                        size="sm"
+                        className={`flex items-center gap-2 justify-start h-auto py-2 px-3 ${
+                          task.suggestedAction === 'transform' ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                        }`}
+                      >
+                        <Utensils className="w-4 h-4" />
+                        <span className="text-xs">Transformar</span>
+                      </Button>
+                      
+                      <Button
+                        onClick={() => onTakeAction?.(task.id, 'compost')}
+                        variant="outline"
+                        size="sm"
+                        className={`flex items-center gap-2 justify-start h-auto py-2 px-3 col-span-2 ${
+                          task.suggestedAction === 'compost' ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                        }`}
+                      >
+                        <Recycle className="w-4 h-4" />
+                        <span className="text-xs">Compostaje</span>
+                      </Button>
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => onCompleteTask(task.id)}
-                    variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0 hover:bg-green-50 hover:text-green-600"
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    onClick={() => onRemoveTask(task.id)}
-                    variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+              ) : (
+                // Regular Task Card
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 flex-1">
+                    <div className="mt-1">
+                      {getCardIcon(task.cardType)}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h4 className="font-semibold text-gray-900">{task.title}</h4>
+                        <Badge className={`text-xs ${getPriorityColor(task.priority)}`}>
+                          {task.priority}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                      <div className="text-xs text-gray-400">
+                        Added: {task.createdAt.toLocaleString('en-US')}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => onCompleteTask(task.id)}
+                      variant="outline"
+                      size="sm"
+                      className="h-8 w-8 p-0 hover:bg-green-50 hover:text-green-600"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      onClick={() => onRemoveTask(task.id)}
+                      variant="outline"
+                      size="sm"
+                      className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ))}
           
