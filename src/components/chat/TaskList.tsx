@@ -4,6 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, ChevronDown } from 'lucide-react';
 import { Task } from '@/hooks/useTaskList';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DonationForm } from '@/components/DonationForm';
 
 interface TaskListProps {
   tasks: Task[];
@@ -14,6 +18,42 @@ interface TaskListProps {
 }
 
 const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTakeAction }: TaskListProps) => {
+  const navigate = useNavigate();
+  const [showDonationDialog, setShowDonationDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Task['product'] | null>(null);
+
+  const handleActionClick = (taskId: string, action: Task['actionTaken'], product?: Task['product']) => {
+    // Call the original action handler
+    onTakeAction?.(taskId, action);
+    
+    // Handle navigation based on action
+    switch (action) {
+      case 'b2c-discount':
+        // Navigate to market page to list for sale
+        navigate('/market', { 
+          state: { 
+            product: product,
+            action: 'list-for-sale' 
+          } 
+        });
+        break;
+      case 'b2b-offer':
+        // Navigate to market page and create B2B offer card
+        navigate('/market', { 
+          state: { 
+            product: product,
+            action: 'create-b2b-offer' 
+          } 
+        });
+        break;
+      case 'donate':
+        // Open donation questionnaire
+        setSelectedProduct(product || null);
+        setShowDonationDialog(true);
+        break;
+    }
+  };
+
   const getCardIcon = (cardType: Task['cardType']) => {
     switch (cardType) {
       case 'inventory': return <Package className="w-4 h-4" />;
@@ -173,7 +213,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="w-full bg-white border shadow-lg rounded-lg z-50">
                         <DropdownMenuItem 
-                          onClick={() => onTakeAction?.(task.id, 'b2c-discount')}
+                          onClick={() => handleActionClick(task.id, 'b2c-discount', task.product)}
                           className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
                             task.suggestedAction === 'b2c-discount' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
                           }`}
@@ -186,7 +226,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                         </DropdownMenuItem>
                         
                         <DropdownMenuItem 
-                          onClick={() => onTakeAction?.(task.id, 'b2b-offer')}
+                          onClick={() => handleActionClick(task.id, 'b2b-offer', task.product)}
                           className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
                             task.suggestedAction === 'b2b-offer' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
                           }`}
@@ -199,7 +239,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                         </DropdownMenuItem>
                         
                         <DropdownMenuItem 
-                          onClick={() => onTakeAction?.(task.id, 'donate')}
+                          onClick={() => handleActionClick(task.id, 'donate', task.product)}
                           className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
                             task.suggestedAction === 'donate' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
                           }`}
@@ -292,6 +332,22 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
           )}
         </div>
       </CardContent>
+
+      {/* Donation Dialog */}
+      <Dialog open={showDonationDialog} onOpenChange={setShowDonationDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Donate {selectedProduct?.name || 'Product'}</DialogTitle>
+          </DialogHeader>
+          <DonationForm 
+            onClose={() => {
+              setShowDonationDialog(false);
+              setSelectedProduct(null);
+            }} 
+            product={selectedProduct}
+          />
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

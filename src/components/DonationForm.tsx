@@ -21,16 +21,29 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function DonationForm({ onClose }: { onClose: () => void }) {
+interface DonationFormProps {
+  onClose: () => void;
+  product?: {
+    id: number;
+    name: string;
+    quantity: number;
+    expirationDate: string;
+    category: string;
+    price: number;
+    image: string;
+  } | null;
+}
+
+export function DonationForm({ onClose, product }: DonationFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
       phone: "",
-      amount: "",
-      foodType: "",
-      message: "",
+      amount: product ? product.quantity.toString() : "",
+      foodType: product ? product.name : "",
+      message: product ? `Donating ${product.name} (${product.category}) - Expires: ${new Date(product.expirationDate).toLocaleDateString()}` : "",
     },
   });
 

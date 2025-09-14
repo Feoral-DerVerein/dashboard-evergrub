@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Calendar, MapPin, Package } from "lucide-react";
+import { Search, Calendar, MapPin, Package, Plus, ShoppingCart, Building2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,8 +10,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useToast } from "@/hooks/use-toast";
 import PaymentForm from "@/components/PaymentForm";
 import { supabase } from "@/integrations/supabase/client";
+import { useLocation } from "react-router-dom";
 
 const Market = () => {
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Products");
@@ -19,9 +21,12 @@ const Market = () => {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [showProductListingDialog, setShowProductListingDialog] = useState(false);
+  const [showB2BOfferDialog, setShowB2BOfferDialog] = useState(false);
+  const [incomingProduct, setIncomingProduct] = useState<any>(null);
   const { toast } = useToast();
 
-  // Check for payment status on component mount
+  // Check for payment status and incoming product on component mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment');
@@ -43,7 +48,18 @@ const Market = () => {
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [toast]);
+
+    // Handle incoming product from task list navigation
+    if (location.state?.product && location.state?.action) {
+      setIncomingProduct(location.state.product);
+      
+      if (location.state.action === 'list-for-sale') {
+        setShowProductListingDialog(true);
+      } else if (location.state.action === 'create-b2b-offer') {
+        setShowB2BOfferDialog(true);
+      }
+    }
+  }, [toast, location.state]);
 
   // Mock data for market offers
   const marketOffers = [
@@ -524,6 +540,66 @@ const Market = () => {
           onCancel={handlePaymentCancel}
         />
       )}
+
+      {/* Product Listing Dialog for B2C */}
+      <Dialog open={showProductListingDialog} onOpenChange={setShowProductListingDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5" />
+              List Product for Sale
+            </DialogTitle>
+          </DialogHeader>
+          
+          {incomingProduct && (
+            <div className="space-y-4">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <h3 className="font-semibold text-blue-900">{incomingProduct.name}</h3>
+                <p className="text-sm text-blue-700">Quantity: {incomingProduct.quantity}</p>
+                <p className="text-sm text-blue-700">Price: ${incomingProduct.price}</p>
+              </div>
+              
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setShowProductListingDialog(false)}>Cancel</Button>
+                <Button onClick={() => {
+                  toast({ title: "Product Listed!", description: `${incomingProduct.name} listed for sale.` });
+                  setShowProductListingDialog(false);
+                }}>List for Sale</Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* B2B Offer Dialog */}
+      <Dialog open={showB2BOfferDialog} onOpenChange={setShowB2BOfferDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Create B2B Offer
+            </DialogTitle>
+          </DialogHeader>
+          
+          {incomingProduct && (
+            <div className="space-y-4">
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <h3 className="font-semibold text-purple-900">{incomingProduct.name}</h3>
+                <p className="text-sm text-purple-700">Quantity: {incomingProduct.quantity}</p>
+                <p className="text-sm text-purple-700">Price: ${incomingProduct.price}</p>
+              </div>
+              
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setShowB2BOfferDialog(false)}>Cancel</Button>
+                <Button onClick={() => {
+                  toast({ title: "B2B Offer Created!", description: `${incomingProduct.name} sent to marketplace.` });
+                  setShowB2BOfferDialog(false);
+                }}>Create Offer</Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
