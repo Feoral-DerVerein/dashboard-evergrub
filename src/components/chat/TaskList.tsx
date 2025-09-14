@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, ChevronDown, Archive, Eye, EyeOff } from 'lucide-react';
+import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, Archive, Eye, EyeOff } from 'lucide-react';
 import { Task } from '@/hooks/useTaskList';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -220,60 +220,52 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                     </div>
                   )}
 
-                  {/* Action Dropdown */}
+                  {/* Action Buttons */}
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-700">Action Options:</p>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          className="w-full flex items-center justify-between"
-                        >
-                          <span>Choose Action</span>
-                          <ChevronDown className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-full bg-white border shadow-lg rounded-lg z-50">
-                        <DropdownMenuItem 
-                          onClick={() => handleActionClick(task.id, 'b2c-discount', task.product)}
-                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
-                            task.suggestedAction === 'b2c-discount' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
-                          }`}
-                        >
+                    <div className="flex flex-col gap-2">
+                      <Button 
+                        onClick={() => handleActionClick(task.id, 'b2c-discount', task.product)}
+                        variant={task.suggestedAction === 'b2c-discount' ? 'default' : 'outline'}
+                        className="w-full flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
                           <ShoppingCart className="w-4 h-4" />
                           <span>Create Surprise Bag</span>
-                          {task.suggestedAction === 'b2c-discount' && (
-                            <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
-                          )}
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuItem 
-                          onClick={() => handleActionClick(task.id, 'b2b-offer', task.product)}
-                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
-                            task.suggestedAction === 'b2b-offer' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
-                          }`}
-                        >
+                        </div>
+                        {task.suggestedAction === 'b2c-discount' && (
+                          <Badge variant="secondary" className="text-xs">Suggested</Badge>
+                        )}
+                      </Button>
+                      
+                      <Button 
+                        onClick={() => handleActionClick(task.id, 'b2b-offer', task.product)}
+                        variant={task.suggestedAction === 'b2b-offer' ? 'default' : 'outline'}
+                        className="w-full flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
                           <Building2 className="w-4 h-4" />
                           <span>B2B Market Sale</span>
-                          {task.suggestedAction === 'b2b-offer' && (
-                            <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
-                          )}
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuItem 
-                          onClick={() => handleActionClick(task.id, 'donate', task.product)}
-                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
-                            task.suggestedAction === 'donate' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
-                          }`}
-                        >
+                        </div>
+                        {task.suggestedAction === 'b2b-offer' && (
+                          <Badge variant="secondary" className="text-xs">Suggested</Badge>
+                        )}
+                      </Button>
+                      
+                      <Button 
+                        onClick={() => handleActionClick(task.id, 'donate', task.product)}
+                        variant={task.suggestedAction === 'donate' ? 'default' : 'outline'}
+                        className="w-full flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
                           <Heart className="w-4 h-4" />
                           <span>Donate</span>
-                          {task.suggestedAction === 'donate' && (
-                            <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
-                          )}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </div>
+                        {task.suggestedAction === 'donate' && (
+                          <Badge variant="secondary" className="text-xs">Suggested</Badge>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -306,69 +298,61 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                     </Button>
                   </div>
 
-                  {/* Action Options for Regular Tasks */}
+                  {/* Action Buttons for Regular Tasks */}
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-700">Action Options:</p>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          className="w-full flex items-center justify-between"
-                        >
-                          <span>Choose Action</span>
-                          <ChevronDown className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-full bg-background border shadow-lg rounded-lg z-50">
-                        <DropdownMenuItem 
-                          onClick={() => handleActionClick(task.id, 'b2c-discount', task.product || { 
-                            id: parseInt(task.id), 
-                            name: task.title, 
-                            quantity: 1, 
-                            expirationDate: new Date().toISOString().split('T')[0], 
-                            category: 'General', 
-                            price: 0, 
-                            image: '/placeholder.svg' 
-                          })}
-                          className="flex items-center gap-2 px-4 py-2 hover:bg-accent cursor-pointer"
-                        >
-                          <ShoppingCart className="w-4 h-4" />
-                          <span>Create Surprise Bag</span>
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuItem 
-                          onClick={() => handleActionClick(task.id, 'b2b-offer', task.product || { 
-                            id: parseInt(task.id), 
-                            name: task.title, 
-                            quantity: 1, 
-                            expirationDate: new Date().toISOString().split('T')[0], 
-                            category: 'General', 
-                            price: 0, 
-                            image: '/placeholder.svg' 
-                          })}
-                          className="flex items-center gap-2 px-4 py-2 hover:bg-accent cursor-pointer"
-                        >
-                          <Building2 className="w-4 h-4" />
-                          <span>B2B Market Sale</span>
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuItem 
-                          onClick={() => handleActionClick(task.id, 'donate', task.product || { 
-                            id: parseInt(task.id), 
-                            name: task.title, 
-                            quantity: 1, 
-                            expirationDate: new Date().toISOString().split('T')[0], 
-                            category: 'General', 
-                            price: 0, 
-                            image: '/placeholder.svg' 
-                          })}
-                          className="flex items-center gap-2 px-4 py-2 hover:bg-accent cursor-pointer"
-                        >
-                          <Heart className="w-4 h-4" />
-                          <span>Donate</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex flex-col gap-2">
+                      <Button 
+                        onClick={() => handleActionClick(task.id, 'b2c-discount', task.product || { 
+                          id: parseInt(task.id), 
+                          name: task.title, 
+                          quantity: 1, 
+                          expirationDate: new Date().toISOString().split('T')[0], 
+                          category: 'General', 
+                          price: 0, 
+                          image: '/placeholder.svg' 
+                        })}
+                        variant="outline"
+                        className="w-full flex items-center gap-2"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        <span>Create Surprise Bag</span>
+                      </Button>
+                      
+                      <Button 
+                        onClick={() => handleActionClick(task.id, 'b2b-offer', task.product || { 
+                          id: parseInt(task.id), 
+                          name: task.title, 
+                          quantity: 1, 
+                          expirationDate: new Date().toISOString().split('T')[0], 
+                          category: 'General', 
+                          price: 0, 
+                          image: '/placeholder.svg' 
+                        })}
+                        variant="outline"
+                        className="w-full flex items-center gap-2"
+                      >
+                        <Building2 className="w-4 h-4" />
+                        <span>B2B Market Sale</span>
+                      </Button>
+                      
+                      <Button 
+                        onClick={() => handleActionClick(task.id, 'donate', task.product || { 
+                          id: parseInt(task.id), 
+                          name: task.title, 
+                          quantity: 1, 
+                          expirationDate: new Date().toISOString().split('T')[0], 
+                          category: 'General', 
+                          price: 0, 
+                          image: '/placeholder.svg' 
+                        })}
+                        variant="outline"
+                        className="w-full flex items-center gap-2"
+                      >
+                        <Heart className="w-4 h-4" />
+                        <span>Donate</span>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
