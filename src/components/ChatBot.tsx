@@ -38,7 +38,7 @@ const ChatBot = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Task list hook
-  const { tasks, addTask, completeTask, removeTask, clearCompletedTasks } = useTaskList();
+  const { tasks, addTask, addProductDecisionTask, completeTask, removeTask, clearCompletedTasks, takeAction } = useTaskList();
   
   // Auto-generate tasks from current inventory
   const [products, setProducts] = useState([]);
@@ -114,6 +114,22 @@ const ChatBot = ({
     };
     loadProducts();
   }, []);
+
+  // Add a test product decision task on component mount
+  useEffect(() => {
+    if (tasks.length === 0) {
+      const testProduct = {
+        id: 1,
+        name: 'Manzanas Rojas',
+        quantity: 15,
+        expirationDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        category: 'Frutas',
+        price: 3.50,
+        image: '/placeholder.svg'
+      };
+      addProductDecisionTask(testProduct);
+    }
+  }, [tasks.length, addProductDecisionTask]);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: 'smooth'
@@ -261,6 +277,7 @@ const ChatBot = ({
           onCompleteTask={completeTask}
           onRemoveTask={removeTask}
           onClearCompleted={clearCompletedTasks}
+          onTakeAction={takeAction}
         />
       </div>
     );
