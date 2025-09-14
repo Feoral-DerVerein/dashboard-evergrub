@@ -1009,57 +1009,7 @@ export type Database = {
       }
     }
     Views: {
-      store_profiles_safe: {
-        Row: {
-          businessHours: Json | null
-          categories: string[] | null
-          contactEmail: string | null
-          contactPhone: string | null
-          coverUrl: string | null
-          description: string | null
-          id: string | null
-          location: string | null
-          logoUrl: string | null
-          name: string | null
-          payment_details_masked: Json | null
-          socialFacebook: string | null
-          socialInstagram: string | null
-          userId: string | null
-        }
-        Insert: {
-          businessHours?: Json | null
-          categories?: string[] | null
-          contactEmail?: string | null
-          contactPhone?: string | null
-          coverUrl?: string | null
-          description?: string | null
-          id?: string | null
-          location?: string | null
-          logoUrl?: string | null
-          name?: string | null
-          payment_details_masked?: never
-          socialFacebook?: string | null
-          socialInstagram?: string | null
-          userId?: string | null
-        }
-        Update: {
-          businessHours?: Json | null
-          categories?: string[] | null
-          contactEmail?: string | null
-          contactPhone?: string | null
-          coverUrl?: string | null
-          description?: string | null
-          id?: string | null
-          location?: string | null
-          logoUrl?: string | null
-          name?: string | null
-          payment_details_masked?: never
-          socialFacebook?: string | null
-          socialInstagram?: string | null
-          userId?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       add_wishlist_item: {
