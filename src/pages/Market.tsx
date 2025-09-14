@@ -286,9 +286,6 @@ const Market = () => {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">Negentropy Trade</h1>
-          <p className="text-muted-foreground">
-            Marketplace for farm surplus products - Connect WiseFarm with WiseBite & Negentropy
-          </p>
         </div>
 
         {/* Category Navigation */}
