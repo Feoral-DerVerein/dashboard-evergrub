@@ -223,46 +223,43 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                   {/* Action Buttons */}
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-700">Action Options:</p>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
                       <Button 
                         onClick={() => handleActionClick(task.id, 'b2c-discount', task.product)}
                         variant={task.suggestedAction === 'b2c-discount' ? 'default' : 'outline'}
-                        className="w-full flex items-center justify-between"
+                        size="sm"
+                        className="flex-1 flex items-center gap-1"
                       >
-                        <div className="flex items-center gap-2">
-                          <ShoppingCart className="w-4 h-4" />
-                          <span>Create Surprise Bag</span>
-                        </div>
+                        <ShoppingCart className="w-3 h-3" />
+                        <span className="text-xs">Surprise Bag</span>
                         {task.suggestedAction === 'b2c-discount' && (
-                          <Badge variant="secondary" className="text-xs">Suggested</Badge>
+                          <Badge variant="secondary" className="text-xs ml-1">★</Badge>
                         )}
                       </Button>
                       
                       <Button 
                         onClick={() => handleActionClick(task.id, 'b2b-offer', task.product)}
                         variant={task.suggestedAction === 'b2b-offer' ? 'default' : 'outline'}
-                        className="w-full flex items-center justify-between"
+                        size="sm"
+                        className="flex-1 flex items-center gap-1"
                       >
-                        <div className="flex items-center gap-2">
-                          <Building2 className="w-4 h-4" />
-                          <span>B2B Market Sale</span>
-                        </div>
+                        <Building2 className="w-3 h-3" />
+                        <span className="text-xs">B2B Sale</span>
                         {task.suggestedAction === 'b2b-offer' && (
-                          <Badge variant="secondary" className="text-xs">Suggested</Badge>
+                          <Badge variant="secondary" className="text-xs ml-1">★</Badge>
                         )}
                       </Button>
                       
                       <Button 
                         onClick={() => handleActionClick(task.id, 'donate', task.product)}
                         variant={task.suggestedAction === 'donate' ? 'default' : 'outline'}
-                        className="w-full flex items-center justify-between"
+                        size="sm"
+                        className="flex-1 flex items-center gap-1"
                       >
-                        <div className="flex items-center gap-2">
-                          <Heart className="w-4 h-4" />
-                          <span>Donate</span>
-                        </div>
+                        <Heart className="w-3 h-3" />
+                        <span className="text-xs">Donate</span>
                         {task.suggestedAction === 'donate' && (
-                          <Badge variant="secondary" className="text-xs">Suggested</Badge>
+                          <Badge variant="secondary" className="text-xs ml-1">★</Badge>
                         )}
                       </Button>
                     </div>
@@ -301,7 +298,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                   {/* Action Buttons for Regular Tasks */}
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-700">Action Options:</p>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
                       <Button 
                         onClick={() => handleActionClick(task.id, 'b2c-discount', task.product || { 
                           id: parseInt(task.id), 
@@ -313,10 +310,11 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                           image: '/placeholder.svg' 
                         })}
                         variant="outline"
-                        className="w-full flex items-center gap-2"
+                        size="sm"
+                        className="flex-1 flex items-center gap-1"
                       >
-                        <ShoppingCart className="w-4 h-4" />
-                        <span>Create Surprise Bag</span>
+                        <ShoppingCart className="w-3 h-3" />
+                        <span className="text-xs">Surprise Bag</span>
                       </Button>
                       
                       <Button 
@@ -330,10 +328,11 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                           image: '/placeholder.svg' 
                         })}
                         variant="outline"
-                        className="w-full flex items-center gap-2"
+                        size="sm"
+                        className="flex-1 flex items-center gap-1"
                       >
-                        <Building2 className="w-4 h-4" />
-                        <span>B2B Market Sale</span>
+                        <Building2 className="w-3 h-3" />
+                        <span className="text-xs">B2B Sale</span>
                       </Button>
                       
                       <Button 
@@ -347,10 +346,11 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                           image: '/placeholder.svg' 
                         })}
                         variant="outline"
-                        className="w-full flex items-center gap-2"
+                        size="sm"
+                        className="flex-1 flex items-center gap-1"
                       >
-                        <Heart className="w-4 h-4" />
-                        <span>Donate</span>
+                        <Heart className="w-3 h-3" />
+                        <span className="text-xs">Donate</span>
                       </Button>
                     </div>
                   </div>
