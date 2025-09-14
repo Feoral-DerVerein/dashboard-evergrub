@@ -10,8 +10,5 @@ interface SuppliersCardProps {
 export default function SuppliersCard({
   suppliers
 }: SuppliersCardProps) {
-  return <Card className="bg-white backdrop-blur-sm border border-gray-200">
-      
-      
-    </Card>;
+  return;
 }
