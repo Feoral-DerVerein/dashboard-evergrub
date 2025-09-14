@@ -249,10 +249,11 @@ const KPI = () => {
   // AI insights state
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [aiInsights, setAiInsights] = useState<any | null>(null);
-  
-  // Auto-generate tasks for inventory management
-  useAutoTaskGeneration({ products });
 
+  // Auto-generate tasks for inventory management
+  useAutoTaskGeneration({
+    products
+  });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentActionDetails, setCurrentActionDetails] = useState<any>(null);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -826,15 +827,7 @@ const KPI = () => {
             </section>
 
             {/* AI Predictive Insights */}
-            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
-              <h3 className="text-lg font-semibold mb-4">AI Predictive Insights</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
-                <SustainabilityCard label="Top Selling Product" value={predictiveData.topSellingProduct} subtext={`${predictiveData.topSellingRate} sell-through rate`} />
-                <SustainabilityCard label="Overstocked Item" value={predictiveData.overstockedItem} subtext={predictiveData.overstockAmount} />
-                <SustainabilityCard label="Demand Forecast" value={predictiveData.demandForecast} subtext={predictiveData.forecastPeriod} />
-                <SustainabilityCard label="Optimal Reorder" value={`${predictiveData.optimalReorder} days`} subtext={`For ${predictiveData.reorderCategory}`} />
-              </div>
-            </section>
+            
 
             {/* Surprise Bags Performance */}
             <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
