@@ -19,24 +19,20 @@ export interface Task {
     price: number;
     image: string;
   };
-  suggestedAction?: 'b2c-discount' | 'b2b-offer' | 'donate' | 'transform' | 'compost';
-  actionTaken?: 'b2c-discount' | 'b2b-offer' | 'donate' | 'transform' | 'compost' | null;
+  suggestedAction?: 'b2c-discount' | 'b2b-offer' | 'donate';
+  actionTaken?: 'b2c-discount' | 'b2b-offer' | 'donate' | null;
 }
 
 const getSuggestedAction = (product: Task['product']): Task['suggestedAction'] => {
-  if (!product) return 'compost';
+  if (!product) return 'donate';
   
   const daysUntilExpiry = Math.ceil((new Date(product.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   const quantity = product.quantity;
-  const category = product.category.toLowerCase();
   
   // Critical urgency (0-2 days)
   if (daysUntilExpiry <= 2) {
-    if (quantity > 10 && ['fruits', 'vegetables', 'bread'].includes(category)) {
+    if (quantity > 10) {
       return 'donate'; // High quantity, good for donation
-    }
-    if (['fruits', 'vegetables'].includes(category)) {
-      return 'transform'; // Can be made into juices, smoothies
     }
     return 'b2c-discount'; // Last resort for immediate sale
   }

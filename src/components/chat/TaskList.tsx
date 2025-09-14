@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, Utensils, Recycle, ChevronDown } from 'lucide-react';
+import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, ChevronDown } from 'lucide-react';
 import { Task } from '@/hooks/useTaskList';
 
 interface TaskListProps {
@@ -32,8 +32,6 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
       case 'b2c-discount': return <ShoppingCart className="w-4 h-4" />;
       case 'b2b-offer': return <Building2 className="w-4 h-4" />;
       case 'donate': return <Heart className="w-4 h-4" />;
-      case 'transform': return <Utensils className="w-4 h-4" />;
-      case 'compost': return <Recycle className="w-4 h-4" />;
       default: return null;
     }
   };
@@ -43,8 +41,6 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
       case 'b2c-discount': return 'B2C Discount Sale';
       case 'b2b-offer': return 'B2B Offer';
       case 'donate': return 'Donate';
-      case 'transform': return 'Transform';
-      case 'compost': return 'Compost';
       default: return '';
     }
   };
@@ -54,8 +50,6 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
       case 'b2c-discount': return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
       case 'b2b-offer': return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
       case 'donate': return 'bg-green-100 text-green-800 hover:bg-green-200';
-      case 'transform': return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
-      case 'compost': return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -218,32 +212,6 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                           <Heart className="w-4 h-4" />
                           <span>Donate</span>
                           {task.suggestedAction === 'donate' && (
-                            <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
-                          )}
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuItem 
-                          onClick={() => onTakeAction?.(task.id, 'transform')}
-                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
-                            task.suggestedAction === 'transform' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
-                          }`}
-                        >
-                          <Utensils className="w-4 h-4" />
-                          <span>Transform</span>
-                          {task.suggestedAction === 'transform' && (
-                            <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
-                          )}
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuItem 
-                          onClick={() => onTakeAction?.(task.id, 'compost')}
-                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
-                            task.suggestedAction === 'compost' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
-                          }`}
-                        >
-                          <Recycle className="w-4 h-4" />
-                          <span>Compost</span>
-                          {task.suggestedAction === 'compost' && (
                             <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
                           )}
                         </DropdownMenuItem>
