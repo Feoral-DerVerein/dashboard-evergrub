@@ -745,10 +745,6 @@ const KPI = () => {
 
           {/* Auto Tasks and Suppliers Row */}
           <section className="px-6">
-            <div className="grid md:grid-cols-2 gap-6 mt-6">
-              <AutoTaskSummary />
-              <SuppliersCard suppliers={suppliers} />
-            </div>
 
             {/* Weather and Visitor Prediction Cards - Moved below Task List */}
             <div className="grid md:grid-cols-2 gap-6 mt-6">
