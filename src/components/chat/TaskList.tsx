@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, ChevronDown, Archive } from 'lucide-react';
+import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, ChevronDown, Archive, Eye, EyeOff } from 'lucide-react';
 import { Task } from '@/hooks/useTaskList';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -23,6 +23,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
   const navigate = useNavigate();
   const [showDonationDialog, setShowDonationDialog] = useState(false);
   const [showDoneeListDialog, setShowDoneeListDialog] = useState(false);
+  const [showArchivedTasks, setShowArchivedTasks] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Task['product'] | null>(null);
 
   const handleActionClick = (taskId: string, action: Task['actionTaken'], product?: Task['product']) => {
@@ -110,7 +111,9 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
 
   const pendingTasks = tasks.filter(task => !task.completed && !task.archived);
   const completedTasks = tasks.filter(task => task.completed && !task.archived);
+  const archivedTasks = tasks.filter(task => task.archived);
   const completedCount = completedTasks.length;
+  const archivedCount = archivedTasks.length;
 
   if (tasks.length === 0) {
     return (
@@ -136,10 +139,24 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
     <Card className="w-full">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            Task List ({pendingTasks.length} pending)
-          </CardTitle>
+          <div className="flex items-center gap-4">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              Task List ({pendingTasks.length} pending)
+            </CardTitle>
+            {archivedCount > 0 && (
+              <Button
+                onClick={() => setShowArchivedTasks(!showArchivedTasks)}
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                title={showArchivedTasks ? "Hide archived tasks" : "Show archived tasks"}
+              >
+                {showArchivedTasks ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                Archived ({archivedCount})
+              </Button>
+            )}
+          </div>
           {completedCount > 0 && (
             <Button 
               onClick={onClearCompleted}
@@ -332,6 +349,47 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                     </div>
                   </div>
                 ))}
+              </div>
+            </>
+          )}
+          
+          {/* Archived Tasks */}
+          {showArchivedTasks && archivedCount > 0 && (
+            <>
+              <div className="border-t pt-4 mt-4">
+                <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                  <Archive className="w-4 h-4" />
+                  Archived Tasks ({archivedCount})
+                </h4>
+                <div className="space-y-2">
+                  {archivedTasks.map((task) => (
+                    <div
+                      key={task.id}
+                      className="p-3 bg-muted/30 rounded-lg border border-muted"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Archive className="w-4 h-4 text-muted-foreground" />
+                          <div>
+                            <h5 className="text-sm font-medium text-muted-foreground">{task.title}</h5>
+                            <p className="text-xs text-muted-foreground">
+                              Archived: {task.createdAt.toLocaleString('en-US')}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => onRemoveTask(task.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-600"
+                          title="Delete permanently"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </>
           )}
