@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, ChevronDown } from 'lucide-react';
+import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, ChevronDown, Archive } from 'lucide-react';
 import { Task } from '@/hooks/useTaskList';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -14,11 +14,12 @@ interface TaskListProps {
   tasks: Task[];
   onCompleteTask: (taskId: string) => void;
   onRemoveTask: (taskId: string) => void;
+  onArchiveTask: (taskId: string) => void;
   onClearCompleted: () => void;
   onTakeAction?: (taskId: string, action: Task['actionTaken']) => void;
 }
 
-const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTakeAction }: TaskListProps) => {
+const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearCompleted, onTakeAction }: TaskListProps) => {
   const navigate = useNavigate();
   const [showDonationDialog, setShowDonationDialog] = useState(false);
   const [showDoneeListDialog, setShowDoneeListDialog] = useState(false);
@@ -107,8 +108,8 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
     }
   };
 
-  const pendingTasks = tasks.filter(task => !task.completed);
-  const completedTasks = tasks.filter(task => task.completed);
+  const pendingTasks = tasks.filter(task => !task.completed && !task.archived);
+  const completedTasks = tasks.filter(task => task.completed && !task.archived);
   const completedCount = completedTasks.length;
 
   if (tasks.length === 0) {
@@ -320,12 +321,13 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                         </div>
                       </div>
                       <Button
-                        onClick={() => onRemoveTask(task.id)}
+                        onClick={() => onArchiveTask(task.id)}
                         variant="ghost"
                         size="sm"
-                        className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-600"
+                        className="h-6 w-6 p-0 hover:bg-yellow-50 hover:text-yellow-600"
+                        title="Archive task"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Archive className="w-3 h-3" />
                       </Button>
                     </div>
                   </div>

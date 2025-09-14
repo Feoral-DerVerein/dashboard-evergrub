@@ -276,6 +276,7 @@ const ChatBot = ({
           tasks={tasks}
           onCompleteTask={completeTask}
           onRemoveTask={removeTask}
+          onArchiveTask={archiveTask}
           onClearCompleted={clearCompletedTasks}
           onTakeAction={takeAction}
         />

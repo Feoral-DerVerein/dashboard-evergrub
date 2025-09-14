@@ -8,6 +8,7 @@ export interface Task {
   cardData: any;
   createdAt: Date;
   completed: boolean;
+  archived: boolean;
   priority: 'low' | 'medium' | 'high' | 'critical';
   // Product decision specific fields
   product?: {
@@ -68,6 +69,7 @@ export const useTaskList = () => {
       cardData,
       createdAt: new Date(),
       completed: false,
+      archived: false,
       priority,
       product,
       suggestedAction: product ? getSuggestedAction(product) : undefined,
@@ -104,8 +106,14 @@ export const useTaskList = () => {
     setTasks(prev => prev.filter(task => task.id !== taskId));
   }, []);
 
+  const archiveTask = useCallback((taskId: string) => {
+    setTasks(prev => prev.map(task => 
+      task.id === taskId ? { ...task, archived: true } : task
+    ));
+  }, []);
+
   const clearCompletedTasks = useCallback(() => {
-    setTasks(prev => prev.filter(task => !task.completed));
+    setTasks(prev => prev.filter(task => !task.completed || task.archived));
   }, []);
 
   return {
@@ -115,6 +123,7 @@ export const useTaskList = () => {
     takeAction,
     completeTask,
     removeTask,
+    archiveTask,
     clearCompletedTasks
   };
 };
