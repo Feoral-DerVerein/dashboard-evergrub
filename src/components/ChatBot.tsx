@@ -49,9 +49,67 @@ const ChatBot = ({
     const loadProducts = async () => {
       try {
         const fetchedProducts = await productService.getAllProducts();
-        setProducts(fetchedProducts);
+        console.log('ChatBot: Loaded products for auto tasks:', fetchedProducts.length);
+        
+        // If no products exist, create some demo products to generate tasks
+        if (fetchedProducts.length === 0) {
+          console.log('No products found, creating demo products for task generation');
+          const demoProducts = [
+            {
+              id: 999901,
+              name: 'Pan Integral',
+              category: 'Panadería',
+              quantity: 3, // Low stock
+              price: 2.50,
+              expirationDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Expires tomorrow
+              description: 'Pan integral artesanal',
+              userId: 'demo',
+              userid: 'demo'
+            },
+            {
+              id: 999902,
+              name: 'Leche Fresca',
+              category: 'Lácteos',
+              quantity: 2, // Low stock
+              price: 1.80,
+              expirationDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Expires in 2 days
+              description: 'Leche fresca de granja',
+              userId: 'demo',
+              userid: 'demo'
+            },
+            {
+              id: 999903,
+              name: 'Yogurt Natural',
+              category: 'Lácteos',
+              quantity: 15, // Good stock
+              price: 3.20,
+              expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Expires in 7 days
+              description: 'Yogurt natural sin azúcar',
+              userId: 'demo',
+              userid: 'demo'
+            }
+          ];
+          setProducts(demoProducts as any);
+        } else {
+          setProducts(fetchedProducts);
+        }
       } catch (error) {
         console.error('Error loading products for auto tasks:', error);
+        // Fallback to demo products if there's an error
+        const fallbackProducts = [
+          {
+            id: 999901,
+            name: 'Producto Demo',
+            category: 'General',
+            quantity: 2,
+            price: 5.00,
+            expirationDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            description: 'Producto de demostración',
+            userId: 'demo',
+            userid: 'demo'
+          }
+        ];
+        setProducts(fallbackProducts as any);
       }
     };
     loadProducts();

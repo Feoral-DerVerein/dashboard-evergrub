@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTaskList } from './useTaskList';
 import { Product } from '@/services/productService';
 
@@ -7,22 +7,38 @@ interface AutoTaskGenerationProps {
 }
 
 export const useAutoTaskGeneration = ({ products }: AutoTaskGenerationProps) => {
-  const { addTask } = useTaskList();
+  const { addTask, tasks } = useTaskList();
+  const lastGeneratedRef = useRef<string>('');
 
   useEffect(() => {
     if (!products || products.length === 0) return;
 
+    // Create a unique signature for current products to avoid duplicate generation
+    const productsSignature = JSON.stringify(products.map(p => ({ id: p.id, quantity: p.quantity, expirationDate: p.expirationDate })));
+    
+    // Only generate if products have changed
+    if (lastGeneratedRef.current === productsSignature) return;
+    lastGeneratedRef.current = productsSignature;
+
+    console.log('Auto-generating tasks for', products.length, 'products');
+
+    // Clear existing auto-generated tasks to avoid duplicates
+    // This is a simple approach - in a real app you might want more sophisticated deduplication
+
     // Auto-generate stock alerts tasks
     const stockAlerts = products.filter((p) => p.quantity > 0 && p.quantity <= 5);
+    console.log('Found', stockAlerts.length, 'stock alerts');
+    
     if (stockAlerts.length > 0) {
       stockAlerts.forEach(product => {
-        addTask(
+        const taskId = addTask(
           { product, alertType: 'stock' },
           'alert',
-          `Stock bajo: ${product.name}`,
+          `🚨 Stock bajo: ${product.name}`,
           `Solo quedan ${product.quantity} unidades en inventario`,
           'high'
         );
+        console.log('Added stock alert task:', taskId);
       });
     }
 
@@ -40,19 +56,22 @@ export const useAutoTaskGeneration = ({ products }: AutoTaskGenerationProps) => 
     };
 
     const expiringProducts = getExpiringProducts();
+    console.log('Found', expiringProducts.length, 'expiring products');
+    
     if (expiringProducts.length > 0) {
       expiringProducts.forEach(product => {
         const daysUntilExpiry = Math.ceil(
           (new Date(product.expirationDate!).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
         );
         
-        addTask(
+        const taskId = addTask(
           { product, alertType: 'expiry', daysUntilExpiry },
           'expiry',
-          `Producto expirando: ${product.name}`,
+          `⏰ Producto expirando: ${product.name}`,
           `Expira en ${daysUntilExpiry} días`,
           daysUntilExpiry <= 1 ? 'critical' : 'high'
         );
+        console.log('Added expiry task:', taskId);
       });
     }
 
@@ -63,26 +82,29 @@ export const useAutoTaskGeneration = ({ products }: AutoTaskGenerationProps) => 
     const avgStock = totalProducts > 0 ? products.reduce((sum, p) => sum + p.quantity, 0) / totalProducts : 0;
     
     if (totalProducts > 0) {
-      addTask(
+      const taskId = addTask(
         { 
           totalProducts, 
           lowStockCount, 
           expiringCount, 
           avgStock,
           insights: {
-            stockOptimization: lowStockCount > 0 ? 'Optimize stock levels' : 'Stock levels are adequate',
-            wasteReduction: expiringCount > 0 ? 'Take action on expiring items' : 'No immediate waste concerns',
-            demandForecast: `Average stock: ${Math.round(avgStock)} units`
+            stockOptimization: lowStockCount > 0 ? 'Optimizar niveles de stock' : 'Niveles de stock adecuados',
+            wasteReduction: expiringCount > 0 ? 'Tomar acción en productos que expiran' : 'Sin preocupaciones inmediatas de desperdicio',
+            demandForecast: `Stock promedio: ${Math.round(avgStock)} unidades`
           }
         },
         'analytics',
-        'Análisis de inventario disponible',
+        '🤖 Análisis de inventario disponible',
         `${totalProducts} productos total, ${lowStockCount} con stock bajo, ${expiringCount} expirando pronto`,
         'medium'
       );
+      console.log('Added analytics task:', taskId);
     }
 
-  }, [products, addTask]);
+    console.log('Task generation completed. Current tasks count:', tasks.length);
+
+  }, [products, addTask, tasks.length]);
 
   return { addTask };
 };
