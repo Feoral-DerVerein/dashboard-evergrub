@@ -179,16 +179,17 @@ const AddProduct = () => {
         brand: incomingProduct.brand || '',
         description: `Surprise bag containing ${incomingProduct.name} and similar products`,
         category: incomingProduct.category,
-        price: incomingProduct.price * 0.7, // 30% discount for surprise bag
-        originalPrice: incomingProduct.price,
-        discount: 30,
-        quantity: Math.min(incomingProduct.quantity, 5), // Max 5 for surprise bags
+        price: String(incomingProduct.price * 0.7), // 30% discount for surprise bag
+        originalPrice: String(incomingProduct.price),
+        discount: "30",
+        quantity: String(Math.min(incomingProduct.quantity, 5)), // Max 5 for surprise bags
         expirationDate: incomingProduct.expirationDate,
         image: incomingProduct.image || '',
         pickupTimeStart: "09:00",
         pickupTimeEnd: "18:00",
         isSurpriseBag: true,
-        isMarketplaceVisible: true
+        customBrand: '',
+        surpriseBagContents: `Contains ${incomingProduct.name} and similar products`
       });
     }
   }, [incomingProduct, actionMode]);
