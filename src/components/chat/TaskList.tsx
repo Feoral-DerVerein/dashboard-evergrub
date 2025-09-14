@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DonationForm } from '@/components/DonationForm';
+import { DoneeListDialog } from '@/components/DoneeListDialog';
 
 interface TaskListProps {
   tasks: Task[];
@@ -20,6 +21,7 @@ interface TaskListProps {
 const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTakeAction }: TaskListProps) => {
   const navigate = useNavigate();
   const [showDonationDialog, setShowDonationDialog] = useState(false);
+  const [showDoneeListDialog, setShowDoneeListDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Task['product'] | null>(null);
 
   const handleActionClick = (taskId: string, action: Task['actionTaken'], product?: Task['product']) => {
@@ -48,9 +50,9 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
         });
         break;
       case 'donate':
-        // Open donation questionnaire
+        // Show donee list first, then donation form
         setSelectedProduct(product || null);
-        setShowDonationDialog(true);
+        setShowDoneeListDialog(true);
         break;
     }
   };
@@ -333,6 +335,18 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
           )}
         </div>
       </CardContent>
+
+      
+      {/* Donee Selection Dialog */}
+      <DoneeListDialog
+        open={showDoneeListDialog}
+        onOpenChange={setShowDoneeListDialog}
+        product={selectedProduct}
+        onSelectDonee={(donee) => {
+          setShowDoneeListDialog(false);
+          setShowDonationDialog(true);
+        }}
+      />
 
       {/* Donation Dialog */}
       <Dialog open={showDonationDialog} onOpenChange={setShowDonationDialog}>
