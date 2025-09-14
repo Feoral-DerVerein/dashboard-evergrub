@@ -38,7 +38,7 @@ const ChatBot = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Task list hook
-  const { tasks, addTask, addProductDecisionTask, completeTask, removeTask, clearCompletedTasks, takeAction } = useTaskList();
+  const { tasks, addTask, addProductDecisionTask, completeTask, removeTask, archiveTask, clearCompletedTasks, takeAction } = useTaskList();
   
   // Auto-generate tasks from current inventory
   const [products, setProducts] = useState([]);
