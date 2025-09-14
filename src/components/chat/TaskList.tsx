@@ -29,20 +29,21 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
     // Handle navigation based on action
     switch (action) {
       case 'b2c-discount':
-        // Navigate to market page to list for sale
-        navigate('/market', { 
+        // Navigate to create surprise bag for marketplace
+        navigate('/products/add', { 
           state: { 
             product: product,
-            action: 'list-for-sale' 
+            action: 'create-surprise-bag',
+            mode: 'surprise-bag'
           } 
         });
         break;
       case 'b2b-offer':
-        // Navigate to market page and create B2B offer card
+        // Navigate to market page to list for B2B sale
         navigate('/market', { 
           state: { 
             product: product,
-            action: 'create-b2b-offer' 
+            action: 'list-for-sale' 
           } 
         });
         break;
@@ -78,8 +79,8 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
 
   const getActionLabel = (action: Task['actionTaken']) => {
     switch (action) {
-      case 'b2c-discount': return 'B2C Discount Sale';
-      case 'b2b-offer': return 'B2B Offer';
+      case 'b2c-discount': return 'Create Surprise Bag';
+      case 'b2b-offer': return 'B2B Market Sale';
       case 'donate': return 'Donate';
       default: return '';
     }
@@ -219,7 +220,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                           }`}
                         >
                           <ShoppingCart className="w-4 h-4" />
-                          <span>B2C Discount Sale</span>
+                          <span>Create Surprise Bag</span>
                           {task.suggestedAction === 'b2c-discount' && (
                             <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
                           )}
@@ -232,7 +233,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                           }`}
                         >
                           <Building2 className="w-4 h-4" />
-                          <span>B2B Offer</span>
+                          <span>B2B Market Sale</span>
                           {task.suggestedAction === 'b2b-offer' && (
                             <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
                           )}

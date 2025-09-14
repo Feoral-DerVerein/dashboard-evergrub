@@ -1,5 +1,5 @@
 import { ArrowLeft, Calendar, Camera, Barcode, Zap, Search } from "lucide-react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
@@ -28,12 +28,16 @@ type ProductFormData = {
   surpriseBagContents: string;
 };
 const AddProduct = () => {
+  const location = useLocation();
   const {
     id
   } = useParams<{
     id: string;
   }>();
   const isEditMode = !!id;
+  const incomingProduct = location.state?.product;
+  const actionMode = location.state?.action;
+  const mode = location.state?.mode || 'normal';
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
     price: "",
@@ -166,6 +170,30 @@ const AddProduct = () => {
       description: `"${randomProduct.name}" has been auto-filled for demonstration`
     });
   };
+  // Check for incoming product from task list and mode
+  useEffect(() => {
+    if (incomingProduct && actionMode === 'create-surprise-bag') {
+      // Pre-fill form with incoming product data for surprise bag
+      setFormData({
+        name: `${incomingProduct.name} - Surprise Bag`,
+        brand: incomingProduct.brand || '',
+        description: `Surprise bag containing ${incomingProduct.name} and similar products`,
+        category: incomingProduct.category,
+        price: incomingProduct.price * 0.7, // 30% discount for surprise bag
+        originalPrice: incomingProduct.price,
+        discount: 30,
+        quantity: Math.min(incomingProduct.quantity, 5), // Max 5 for surprise bags
+        expirationDate: incomingProduct.expirationDate,
+        image: incomingProduct.image || '',
+        pickupTimeStart: "09:00",
+        pickupTimeEnd: "18:00",
+        isSurpriseBag: true,
+        isMarketplaceVisible: true
+      });
+    }
+  }, [incomingProduct, actionMode]);
+
+  // Load existing product for editing
   useEffect(() => {
     const fetchProduct = async () => {
       if (isEditMode && id) {
