@@ -196,12 +196,13 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                       </div>
                     </div>
                     <Button
-                      onClick={() => onRemoveTask(task.id)}
+                      onClick={() => onArchiveTask(task.id)}
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+                      className="h-8 w-8 p-0 hover:bg-yellow-50 hover:text-yellow-600"
+                      title="Archive task"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Archive className="w-4 h-4" />
                     </Button>
                   </div>
 
@@ -277,13 +278,13 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                 </div>
               ) : (
                 // Regular Task Card
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 flex-1">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
                     <div className="mt-1">
                       {getCardIcon(task.cardType)}
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-gray-900">{task.title}</h4>
                         <Badge className={`text-xs ${getPriorityColor(task.priority)}`}>
                           {task.priority}
@@ -294,24 +295,80 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                         Added: {task.createdAt.toLocaleString('en-US')}
                       </div>
                     </div>
+                    <Button
+                      onClick={() => onArchiveTask(task.id)}
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-yellow-50 hover:text-yellow-600"
+                      title="Archive task"
+                    >
+                      <Archive className="w-3 h-3" />
+                    </Button>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => onCompleteTask(task.id)}
-                      variant="outline"
-                      size="sm"
-                      className="h-8 w-8 p-0 hover:bg-green-50 hover:text-green-600"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      onClick={() => onRemoveTask(task.id)}
-                      variant="outline"
-                      size="sm"
-                      className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+
+                  {/* Action Options for Regular Tasks */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-700">Action Options:</p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          className="w-full flex items-center justify-between"
+                        >
+                          <span>Choose Action</span>
+                          <ChevronDown className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-full bg-background border shadow-lg rounded-lg z-50">
+                        <DropdownMenuItem 
+                          onClick={() => handleActionClick(task.id, 'b2c-discount', task.product || { 
+                            id: parseInt(task.id), 
+                            name: task.title, 
+                            quantity: 1, 
+                            expirationDate: new Date().toISOString().split('T')[0], 
+                            category: 'General', 
+                            price: 0, 
+                            image: '/placeholder.svg' 
+                          })}
+                          className="flex items-center gap-2 px-4 py-2 hover:bg-accent cursor-pointer"
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                          <span>Create Surprise Bag</span>
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem 
+                          onClick={() => handleActionClick(task.id, 'b2b-offer', task.product || { 
+                            id: parseInt(task.id), 
+                            name: task.title, 
+                            quantity: 1, 
+                            expirationDate: new Date().toISOString().split('T')[0], 
+                            category: 'General', 
+                            price: 0, 
+                            image: '/placeholder.svg' 
+                          })}
+                          className="flex items-center gap-2 px-4 py-2 hover:bg-accent cursor-pointer"
+                        >
+                          <Building2 className="w-4 h-4" />
+                          <span>B2B Market Sale</span>
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem 
+                          onClick={() => handleActionClick(task.id, 'donate', task.product || { 
+                            id: parseInt(task.id), 
+                            name: task.title, 
+                            quantity: 1, 
+                            expirationDate: new Date().toISOString().split('T')[0], 
+                            category: 'General', 
+                            price: 0, 
+                            image: '/placeholder.svg' 
+                          })}
+                          className="flex items-center gap-2 px-4 py-2 hover:bg-accent cursor-pointer"
+                        >
+                          <Heart className="w-4 h-4" />
+                          <span>Donate</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               )}
