@@ -10,6 +10,8 @@ import { BusinessCard, LoadingCard, type BusinessCardData } from '@/components/c
 import { BusinessIntelligenceService } from '@/services/businessIntelligenceService';
 import { useTaskList } from '@/hooks/useTaskList';
 import TaskList from '@/components/chat/TaskList';
+import { useAutoTaskGeneration } from '@/hooks/useAutoTaskGeneration';
+import { productService } from '@/services/productService';
 interface ChatMessage {
   id: string;
   type: 'user' | 'bot';
@@ -37,6 +39,23 @@ const ChatBot = ({
   
   // Task list hook
   const { tasks, addTask, completeTask, removeTask, clearCompletedTasks } = useTaskList();
+  
+  // Auto-generate tasks from current inventory
+  const [products, setProducts] = useState([]);
+  useAutoTaskGeneration({ products });
+  
+  // Load products for auto task generation
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const fetchedProducts = await productService.getAllProducts();
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error('Error loading products for auto tasks:', error);
+      }
+    };
+    loadProducts();
+  }, []);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: 'smooth'

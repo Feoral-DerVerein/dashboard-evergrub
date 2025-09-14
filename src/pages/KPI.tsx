@@ -12,8 +12,6 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { productService, Product } from "@/services/productService";
 import { useAuth } from "@/context/AuthContext";
 import { AIRecommendations } from "@/components/AIRecommendations";
-import StockAlertsCard from "@/components/kpi/StockAlertsCard";
-import ExpiringSoonCard from "@/components/kpi/ExpiringSoonCard";
 import SuppliersCard from "@/components/kpi/SuppliersCard";
 import RatingInsightCard from "@/components/kpi/RatingInsightCard";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
@@ -25,6 +23,8 @@ import { ActionDetailsDialog } from "@/components/ActionDetailsDialog";
 import { aiInsightsService } from "@/services/aiInsightsService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAutoTaskGeneration } from "@/hooks/useAutoTaskGeneration";
+import AutoTaskSummary from "@/components/kpi/AutoTaskSummary";
 const chartDataSamples: Record<TimeFilterPeriod, {
   label: string;
   value: number;
@@ -249,10 +249,10 @@ const KPI = () => {
   // AI insights state
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [aiInsights, setAiInsights] = useState<any | null>(null);
-  const [showExpiringSoon, setShowExpiringSoon] = useState(true);
+  
+  // Auto-generate tasks for inventory management
+  useAutoTaskGeneration({ products });
 
-  // Debug log
-  console.log('showExpiringSoon state:', showExpiringSoon);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentActionDetails, setCurrentActionDetails] = useState<any>(null);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -863,14 +863,10 @@ const KPI = () => {
           {/* Main dashboard content and chart - Moved to bottom */}
           
 
-          {/* Stock Alerts, Expiring Soon, and Suppliers Row */}
+          {/* Auto Tasks and Suppliers Row */}
           <section className="px-6">
-            <div className="grid md:grid-cols-3 gap-6 mt-6">
-              <StockAlertsCard products={products} />
-              {(() => {
-            console.log('Rendering expiring soon card, showExpiringSoon:', showExpiringSoon);
-            return showExpiringSoon && <ExpiringSoonCard products={products} />;
-          })()}
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
+              <AutoTaskSummary />
               <SuppliersCard suppliers={suppliers} />
             </div>
 
