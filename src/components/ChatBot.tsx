@@ -120,10 +120,10 @@ const ChatBot = ({
     if (tasks.length === 0) {
       const testProduct = {
         id: 1,
-        name: 'Manzanas Rojas',
+        name: 'Red Apples',
         quantity: 15,
         expirationDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        category: 'Frutas',
+        category: 'Fruits',
         price: 3.50,
         image: '/placeholder.svg'
       };

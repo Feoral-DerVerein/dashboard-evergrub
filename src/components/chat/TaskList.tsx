@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, Utensils, Recycle } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { CheckCircle2, Clock, Trash2, Package, AlertTriangle, TrendingUp, Zap, ShoppingCart, Building2, Heart, Utensils, Recycle, ChevronDown } from 'lucide-react';
 import { Task } from '@/hooks/useTaskList';
 
 interface TaskListProps {
@@ -39,11 +40,11 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
 
   const getActionLabel = (action: Task['actionTaken']) => {
     switch (action) {
-      case 'b2c-discount': return 'Venta B2C con descuento';
-      case 'b2b-offer': return 'Oferta B2B';
-      case 'donate': return 'Donar';
-      case 'transform': return 'Transformar';
-      case 'compost': return 'Compostaje';
+      case 'b2c-discount': return 'B2C Discount Sale';
+      case 'b2b-offer': return 'B2B Offer';
+      case 'donate': return 'Donate';
+      case 'transform': return 'Transform';
+      case 'compost': return 'Compost';
       default: return '';
     }
   };
@@ -138,10 +139,10 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                         </Badge>
                       </div>
                       <div className="text-sm text-gray-600 space-y-1">
-                        <p>Cantidad: {task.product.quantity} unidades</p>
-                        <p>Categoría: {task.product.category}</p>
-                        <p>Precio: ${task.product.price}</p>
-                        <p>Expira: {new Date(task.product.expirationDate).toLocaleDateString('es-ES')}</p>
+                        <p>Quantity: {task.product.quantity} units</p>
+                        <p>Category: {task.product.category}</p>
+                        <p>Price: ${task.product.price}</p>
+                        <p>Expires: {new Date(task.product.expirationDate).toLocaleDateString('en-US')}</p>
                       </div>
                     </div>
                     <Button
@@ -159,7 +160,7 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <Zap className="w-4 h-4 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-800">Acción Sugerida por IA</span>
+                        <span className="text-sm font-medium text-blue-800">AI Suggested Action</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {getActionIcon(task.suggestedAction)}
@@ -168,70 +169,86 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                     </div>
                   )}
 
-                  {/* Action Buttons */}
+                  {/* Action Dropdown */}
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-700">Opciones de acción:</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button
-                        onClick={() => onTakeAction?.(task.id, 'b2c-discount')}
-                        variant="outline"
-                        size="sm"
-                        className={`flex items-center gap-2 justify-start h-auto py-2 px-3 ${
-                          task.suggestedAction === 'b2c-discount' ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                        }`}
-                      >
-                        <ShoppingCart className="w-4 h-4" />
-                        <span className="text-xs">Venta B2C con descuento</span>
-                      </Button>
-                      
-                      <Button
-                        onClick={() => onTakeAction?.(task.id, 'b2b-offer')}
-                        variant="outline"
-                        size="sm"
-                        className={`flex items-center gap-2 justify-start h-auto py-2 px-3 ${
-                          task.suggestedAction === 'b2b-offer' ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                        }`}
-                      >
-                        <Building2 className="w-4 h-4" />
-                        <span className="text-xs">Oferta B2B</span>
-                      </Button>
-                      
-                      <Button
-                        onClick={() => onTakeAction?.(task.id, 'donate')}
-                        variant="outline"
-                        size="sm"
-                        className={`flex items-center gap-2 justify-start h-auto py-2 px-3 ${
-                          task.suggestedAction === 'donate' ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                        }`}
-                      >
-                        <Heart className="w-4 h-4" />
-                        <span className="text-xs">Donar</span>
-                      </Button>
-                      
-                      <Button
-                        onClick={() => onTakeAction?.(task.id, 'transform')}
-                        variant="outline"
-                        size="sm"
-                        className={`flex items-center gap-2 justify-start h-auto py-2 px-3 ${
-                          task.suggestedAction === 'transform' ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                        }`}
-                      >
-                        <Utensils className="w-4 h-4" />
-                        <span className="text-xs">Transformar</span>
-                      </Button>
-                      
-                      <Button
-                        onClick={() => onTakeAction?.(task.id, 'compost')}
-                        variant="outline"
-                        size="sm"
-                        className={`flex items-center gap-2 justify-start h-auto py-2 px-3 col-span-2 ${
-                          task.suggestedAction === 'compost' ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                        }`}
-                      >
-                        <Recycle className="w-4 h-4" />
-                        <span className="text-xs">Compostaje</span>
-                      </Button>
-                    </div>
+                    <p className="text-sm font-medium text-gray-700">Action Options:</p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          className="w-full flex items-center justify-between"
+                        >
+                          <span>Choose Action</span>
+                          <ChevronDown className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-full bg-white border shadow-lg rounded-lg z-50">
+                        <DropdownMenuItem 
+                          onClick={() => onTakeAction?.(task.id, 'b2c-discount')}
+                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
+                            task.suggestedAction === 'b2c-discount' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                          }`}
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                          <span>B2C Discount Sale</span>
+                          {task.suggestedAction === 'b2c-discount' && (
+                            <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
+                          )}
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem 
+                          onClick={() => onTakeAction?.(task.id, 'b2b-offer')}
+                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
+                            task.suggestedAction === 'b2b-offer' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                          }`}
+                        >
+                          <Building2 className="w-4 h-4" />
+                          <span>B2B Offer</span>
+                          {task.suggestedAction === 'b2b-offer' && (
+                            <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
+                          )}
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem 
+                          onClick={() => onTakeAction?.(task.id, 'donate')}
+                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
+                            task.suggestedAction === 'donate' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                          }`}
+                        >
+                          <Heart className="w-4 h-4" />
+                          <span>Donate</span>
+                          {task.suggestedAction === 'donate' && (
+                            <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
+                          )}
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem 
+                          onClick={() => onTakeAction?.(task.id, 'transform')}
+                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
+                            task.suggestedAction === 'transform' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                          }`}
+                        >
+                          <Utensils className="w-4 h-4" />
+                          <span>Transform</span>
+                          {task.suggestedAction === 'transform' && (
+                            <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
+                          )}
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem 
+                          onClick={() => onTakeAction?.(task.id, 'compost')}
+                          className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer ${
+                            task.suggestedAction === 'compost' ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                          }`}
+                        >
+                          <Recycle className="w-4 h-4" />
+                          <span>Compost</span>
+                          {task.suggestedAction === 'compost' && (
+                            <Badge variant="secondary" className="ml-auto text-xs">Suggested</Badge>
+                          )}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               ) : (

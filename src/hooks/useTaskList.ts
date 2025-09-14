@@ -86,8 +86,8 @@ export const useTaskList = () => {
     if (!product) return;
     
     const daysUntilExpiry = Math.ceil((new Date(product.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-    const title = `Decisión requerida: ${product.name}`;
-    const description = `${product.quantity} unidades expiran en ${daysUntilExpiry} días`;
+    const title = `Decision required: ${product.name}`;
+    const description = `${product.quantity} units expire in ${daysUntilExpiry} days`;
     
     return addTask(product, 'product-decision', title, description, daysUntilExpiry <= 2 ? 'critical' : daysUntilExpiry <= 7 ? 'high' : 'medium', product);
   }, [addTask]);
