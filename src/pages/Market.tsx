@@ -24,6 +24,7 @@ const Market = () => {
   const [showProductListingDialog, setShowProductListingDialog] = useState(false);
   const [showB2BOfferDialog, setShowB2BOfferDialog] = useState(false);
   const [incomingProduct, setIncomingProduct] = useState<any>(null);
+  const [listedProducts, setListedProducts] = useState<any[]>([]);
   const { toast } = useToast();
 
   // Check for payment status and incoming product on component mount
@@ -313,7 +314,7 @@ const Market = () => {
             <TabsTrigger value="finalise-orders">Finalise Orders</TabsTrigger>
             <TabsTrigger value="pending-delivery">Pending Delivery</TabsTrigger>
             <TabsTrigger value="delivered">Delivered</TabsTrigger>
-            <TabsTrigger value="missed-offers">Missed Out Offers</TabsTrigger>
+            <TabsTrigger value="products-listed">Products Listed</TabsTrigger>
           </TabsList>
 
           <TabsContent value="live-offers" className="mt-6">
@@ -430,12 +431,35 @@ const Market = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="missed-offers" className="mt-6">
-            <div className="text-center py-12">
-              <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-lg font-medium mb-2">No missed offers</p>
-              <p className="text-muted-foreground">Expired or missed offers will appear here</p>
-            </div>
+          <TabsContent value="products-listed" className="mt-6">
+            {listedProducts.length === 0 ? (
+              <div className="text-center py-12">
+                <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-lg font-medium mb-2">No products listed yet</p>
+                <p className="text-muted-foreground">Products listed from task actions will appear here</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {listedProducts.map((product) => (
+                  <Card key={product.id} className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-lg">{product.name}</h3>
+                        <p className="text-sm text-muted-foreground">Category: {product.category}</p>
+                        <p className="text-sm text-muted-foreground">Quantity: {product.quantity}</p>
+                        <p className="text-sm text-muted-foreground">Price: ${product.price}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Expires: {new Date(product.expirationDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="bg-green-100 text-green-800">
+                        Listed for Sale
+                      </Badge>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
@@ -562,8 +586,11 @@ const Market = () => {
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={() => setShowProductListingDialog(false)}>Cancel</Button>
                 <Button onClick={() => {
+                  // Add product to listed products
+                  setListedProducts(prev => [...prev, { ...incomingProduct, listedAt: new Date() }]);
                   toast({ title: "Product Listed!", description: `${incomingProduct.name} listed for sale.` });
                   setShowProductListingDialog(false);
+                  setIncomingProduct(null);
                 }}>List for Sale</Button>
               </div>
             </div>
