@@ -435,7 +435,11 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onArchiveTask, onClearC
                           </div>
                         </div>
                         <Button
-                          onClick={() => onRemoveTask(task.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onRemoveTask(task.id);
+                          }}
                           variant="ghost"
                           size="sm"
                           className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-600"
