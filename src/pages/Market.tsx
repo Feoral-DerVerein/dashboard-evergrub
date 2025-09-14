@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Calendar, MapPin, Package, Plus, ShoppingCart, Building2 } from "lucide-react";
+import { Search, Calendar, MapPin, Package, Plus, ShoppingCart, Building2, Edit, Save, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import PaymentForm from "@/components/PaymentForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation } from "react-router-dom";
+import { Label } from "@/components/ui/label";
 
 const Market = () => {
   const location = useLocation();
@@ -25,6 +26,8 @@ const Market = () => {
   const [showB2BOfferDialog, setShowB2BOfferDialog] = useState(false);
   const [incomingProduct, setIncomingProduct] = useState<any>(null);
   const [listedProducts, setListedProducts] = useState<any[]>([]);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const { toast } = useToast();
 
   // Check for payment status and incoming product on component mount
@@ -443,7 +446,7 @@ const Market = () => {
                 {listedProducts.map((product) => (
                   <Card key={product.id} className="p-4">
                     <div className="flex justify-between items-start">
-                      <div>
+                      <div className="flex-1">
                         <h3 className="font-semibold text-lg">{product.name}</h3>
                         <p className="text-sm text-muted-foreground">Category: {product.category}</p>
                         <p className="text-sm text-muted-foreground">Quantity: {product.quantity}</p>
@@ -452,9 +455,22 @@ const Market = () => {
                           Expires: {new Date(product.expirationDate).toLocaleDateString()}
                         </p>
                       </div>
-                      <Badge variant="secondary" className="bg-green-100 text-green-800">
-                        Listed for Sale
-                      </Badge>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setEditingProduct(product);
+                            setShowEditDialog(true);
+                          }}
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                          Listed for Sale
+                        </Badge>
+                      </div>
                     </div>
                   </Card>
                 ))}
@@ -622,6 +638,95 @@ const Market = () => {
                   toast({ title: "B2B Offer Created!", description: `${incomingProduct.name} sent to marketplace.` });
                   setShowB2BOfferDialog(false);
                 }}>Create Offer</Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Product Edit Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="w-5 h-5" />
+              Edit Product Details
+            </DialogTitle>
+          </DialogHeader>
+          
+          {editingProduct && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <Input
+                  id="category"
+                  value={editingProduct.category}
+                  onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
+                  placeholder="Enter category"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="quantity">Quantity</Label>
+                <Input
+                  id="quantity"
+                  type="number"
+                  value={editingProduct.quantity}
+                  onChange={(e) => setEditingProduct({...editingProduct, quantity: parseInt(e.target.value) || 0})}
+                  placeholder="Enter quantity"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="price">Price ($)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  value={editingProduct.price}
+                  onChange={(e) => setEditingProduct({...editingProduct, price: parseFloat(e.target.value) || 0})}
+                  placeholder="Enter price"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="expirationDate">Expires</Label>
+                <Input
+                  id="expirationDate"
+                  type="date"
+                  value={editingProduct.expirationDate}
+                  onChange={(e) => setEditingProduct({...editingProduct, expirationDate: e.target.value})}
+                />
+              </div>
+              
+              <div className="flex gap-2 justify-end pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowEditDialog(false);
+                    setEditingProduct(null);
+                  }}
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => {
+                    // Update the product in the listed products array
+                    setListedProducts(prev => 
+                      prev.map(p => p.id === editingProduct.id ? editingProduct : p)
+                    );
+                    toast({
+                      title: "Product Updated!",
+                      description: `${editingProduct.name} details have been updated.`,
+                    });
+                    setShowEditDialog(false);
+                    setEditingProduct(null);
+                  }}
+                >
+                  <Save className="w-4 h-4 mr-1" />
+                  Save Changes
+                </Button>
               </div>
             </div>
           )}
