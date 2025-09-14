@@ -120,11 +120,6 @@ const TaskList = ({ tasks, onCompleteTask, onRemoveTask, onClearCompleted, onTak
                 <div className="space-y-4">
                   {/* Product Header */}
                   <div className="flex items-start gap-3">
-                    <img 
-                      src={task.product.image || '/placeholder.svg'} 
-                      alt={task.product.name}
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-gray-900">{task.product.name}</h4>
