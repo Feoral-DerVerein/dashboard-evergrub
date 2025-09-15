@@ -267,22 +267,6 @@ const Dashboard = () => {
                 <ShoppingCart className="w-4 h-4" />
                 <span>Products</span>
               </Link>
-              <Link to="/orders" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                <ShoppingBasket className="w-4 h-4" />
-                <span>Orders</span>
-              </Link>
-              <Link to="/sales" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                <BarChart3 className="w-4 h-4" />
-                <span>Sales</span>
-              </Link>
-              <Link to="/notifications" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                <Bell className="w-4 h-4" />
-                <span>Notifications</span>
-              </Link>
-              <Link to="/ads" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                <Megaphone className="w-4 h-4" />
-                <span>Ads</span>
-              </Link>
               <Link to="/donate" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                 <Heart className="w-4 h-4" />
                 <span>Donate</span>
