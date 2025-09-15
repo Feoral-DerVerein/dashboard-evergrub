@@ -427,33 +427,43 @@ const Market = () => {
               <div className="space-y-4">
                 {listedProducts.map((product) => (
                   <Card key={product.id} className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{product.name}</h3>
-                        <p className="text-sm text-muted-foreground">Category: {product.category}</p>
-                        <p className="text-sm text-muted-foreground">Quantity: {product.quantity}</p>
-                        <p className="text-sm text-muted-foreground">Price: ${product.price}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Expires: {new Date(product.expirationDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setEditingProduct(product);
-                            setShowEditDialog(true);
-                          }}
-                        >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Edit
-                        </Button>
-                        <Badge variant="secondary" className="bg-green-100 text-green-800">
-                          Listed for Sale
-                        </Badge>
-                      </div>
-                    </div>
+                     <div className="flex justify-between items-start">
+                       <div className="flex-1">
+                         <h3 className="font-semibold text-lg">{product.name}</h3>
+                         <p className="text-sm text-muted-foreground">Category: {product.category}</p>
+                         <p className="text-sm text-muted-foreground">Quantity: {product.quantity}</p>
+                         <p className="text-sm text-muted-foreground">Price: ${product.price}</p>
+                         <p className="text-sm text-muted-foreground">
+                           Expires: {new Date(product.expirationDate).toLocaleDateString()}
+                         </p>
+                         <p className="text-xs text-muted-foreground">
+                           Listed: {new Date(product.listedAt).toLocaleDateString()}
+                         </p>
+                       </div>
+                       <div className="flex gap-2">
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           onClick={() => {
+                             setEditingProduct(product);
+                             setShowEditDialog(true);
+                           }}
+                         >
+                           <Edit className="w-4 h-4 mr-1" />
+                           Edit
+                         </Button>
+                         <Badge 
+                           variant="secondary" 
+                           className={
+                             product.listingType === 'B2B Offer' 
+                               ? "bg-purple-100 text-purple-800" 
+                               : "bg-green-100 text-green-800"
+                           }
+                         >
+                           {product.listingType || 'Listed for Sale'}
+                         </Badge>
+                       </div>
+                     </div>
                   </Card>
                 ))}
               </div>
@@ -617,8 +627,18 @@ const Market = () => {
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={() => setShowB2BOfferDialog(false)}>Cancel</Button>
                 <Button onClick={() => {
-                  toast({ title: "B2B Offer Created!", description: `${incomingProduct.name} sent to marketplace.` });
+                  // Add product to listed products for B2B marketplace visibility
+                  setListedProducts(prev => [...prev, { 
+                    ...incomingProduct, 
+                    listedAt: new Date(),
+                    listingType: 'B2B Offer' 
+                  }]);
+                  toast({ 
+                    title: "B2B Offer Created!", 
+                    description: `${incomingProduct.name} sent to marketplace and added to your listings.` 
+                  });
                   setShowB2BOfferDialog(false);
+                  setIncomingProduct(null);
                 }}>Create Offer</Button>
               </div>
             </div>
