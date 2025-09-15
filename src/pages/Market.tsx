@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Calendar, MapPin, Package, Plus, ShoppingCart, Building2, Edit, Save, X } from "lucide-react";
+import { Search, Calendar, MapPin, Package, Plus, ShoppingCart, Building2, Edit, Save, X, Fish, Beef, Apple, Cookie, Milk, Wheat, Coffee, UtensilsCrossed, Grape, Grid3X3 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -142,8 +142,16 @@ const Market = () => {
   ];
 
   const categories = [
-    "All Products", "Meat", "Poultry", "Seafood", "Dairy", 
-    "Dry Goods", "Beverages", "Prepared Meals", "Fruit & Veg", "Snacks & Confectionary"
+    { name: "All Products", icon: Grid3X3 },
+    { name: "Meat", icon: Beef },
+    { name: "Poultry", icon: UtensilsCrossed },
+    { name: "Seafood", icon: Fish },
+    { name: "Dairy", icon: Milk },
+    { name: "Dry Goods", icon: Wheat },
+    { name: "Beverages", icon: Coffee },
+    { name: "Prepared Meals", icon: UtensilsCrossed },
+    { name: "Fruit & Veg", icon: Apple },
+    { name: "Snacks & Confectionary", icon: Cookie }
   ];
 
   const filteredOffers = marketOffers.filter(offer => 
@@ -289,21 +297,27 @@ const Market = () => {
         </div>
 
         {/* Category Navigation */}
-        <div className="bg-primary/10 p-4 rounded-lg mb-6">
-          <div className="flex flex-wrap gap-4 text-sm">
-            {categories.map((category) => (
-              <span
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`cursor-pointer transition-colors ${
-                  selectedCategory === category
-                    ? "font-medium text-primary"
-                    : "text-muted-foreground hover:text-primary"
-                }`}
-              >
-                {category}
-              </span>
-            ))}
+        <div className="mb-6">
+          <div className="grid grid-cols-5 md:grid-cols-10 gap-3">
+            {categories.map((category) => {
+              const IconComponent = category.icon;
+              return (
+                <button
+                  key={category.name}
+                  onClick={() => setSelectedCategory(category.name)}
+                  className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all hover:scale-105 ${
+                    selectedCategory === category.name
+                      ? "bg-primary text-primary-foreground border-primary shadow-md"
+                      : "bg-background hover:bg-accent border-border"
+                  }`}
+                >
+                  <IconComponent className="w-6 h-6 mb-2" />
+                  <span className="text-xs font-medium text-center leading-tight">
+                    {category.name}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
