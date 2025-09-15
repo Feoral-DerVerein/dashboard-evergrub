@@ -58,6 +58,20 @@ const Market = () => {
       setIncomingProduct(location.state.product);
       
       if (location.state.action === 'list-for-sale') {
+        // Automatically add product to listed products
+        const newProduct = {
+          ...location.state.product,
+          listingType: 'B2B Sale',
+          listedAt: new Date().toISOString(),
+          status: 'Active'
+        };
+        setListedProducts(prev => [newProduct, ...prev]);
+        
+        toast({
+          title: "Product Listed!",
+          description: `${location.state.product.name} has been added to B2B marketplace`,
+        });
+        
         setShowProductListingDialog(true);
       } else if (location.state.action === 'create-b2b-offer') {
         setShowB2BOfferDialog(true);
