@@ -114,7 +114,7 @@ const Products = () => {
     loadProducts();
   }, [user, toast]);
   const handleDeleteProduct = async (id: number) => {
-    if (!confirm("¿Estás seguro de que deseas eliminar este producto?")) return;
+    if (!confirm("Are you sure you want to delete this product?")) return;
     try {
       await productService.deleteProduct(id);
       setProducts(products.filter(product => product.id !== id));
