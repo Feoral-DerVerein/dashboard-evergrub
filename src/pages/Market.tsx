@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import { Search, Calendar, MapPin, Package, Plus, ShoppingCart, Building2, Edit, Save, X, Fish, Beef, Apple, Cookie, Milk, Wheat, Coffee, UtensilsCrossed, Grape, Grid3X3, Trash2 } from "lucide-react";
+import porkMinceImage from "@/assets/pork-mince-5kg.png";
+import pitangoChickenSoupImage from "@/assets/pitango-chicken-soup.png";
+import pitangoTomatoSoupImage from "@/assets/pitango-tomato-soup.png";
+import buttermilkChickenImage from "@/assets/buttermilk-chicken.png";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -122,7 +126,7 @@ const Market = () => {
           name: "Pork Mince 5kg",
           ean: "11111111160",
           sku: "1111",
-          image: "/lovable-uploads/57d5a65f-f4d4-44de-bc3f-090ee9d3e6c8.png",
+          image: porkMinceImage,
           bbdRange: "1 Feb 2024",
           quantity: 300,
           pricePerUnit: 4.00,
@@ -144,7 +148,7 @@ const Market = () => {
           name: "Pitango Free Range Chicken Sweet Corn & Noodle Soup 600g",
           ean: "9421008321835",
           sku: "455014",
-          image: "/lovable-uploads/c060febe-1a4f-4e7b-aa9f-04e5b1d7ebbc.png",
+          image: pitangoChickenSoupImage,
           bbdRange: "3 Aug 2023 - 23 Aug 2023",
           quantity: 120,
           pricePerUnit: 10.00,
@@ -158,7 +162,7 @@ const Market = () => {
           name: "Pitango Soup Tomato Basil 600g",
           ean: "9421008321804",
           sku: "455101",
-          image: "/lovable-uploads/eb1f48af-1886-47c2-a56a-96d580f7e040.png",
+          image: pitangoTomatoSoupImage,
           bbdRange: "19 Aug 2023",
           quantity: 225,
           pricePerUnit: 2.00,
@@ -172,7 +176,7 @@ const Market = () => {
           name: "Buttermilk Southern Style Chicken Portions 1.3kg",
           ean: "9340128004530",
           sku: "8314483",
-          image: "/lovable-uploads/a68c025a-979f-446d-a9be-8bd55b21893c.png",
+          image: buttermilkChickenImage,
           bbdRange: "",
           quantity: 1611,
           pricePerUnit: 0,
