@@ -25,7 +25,7 @@ const AppLayout = () => {
                 </Link>
                 <Link to="/products" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <ShoppingCart className="w-4 h-4" />
-                  <span>Stock</span>
+                  <span>Market B2C</span>
                 </Link>
                 <Link to="/orders" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <ShoppingBasket className="w-4 h-4" />
