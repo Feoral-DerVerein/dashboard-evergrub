@@ -251,18 +251,15 @@ const Products = () => {
   };
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     // Special handling for Surprise Bag category - show future surprise bags
     if (selectedCategory === "Surprise Bag") {
       console.log(`Checking product ${product.name}: isSurpriseBag=${product.isSurpriseBag}, category=${product.category}`);
-      
       const isSurpriseBag = product.isSurpriseBag || product.category === "Surprise Bag";
-      
       if (!isSurpriseBag) {
         console.log(`Product ${product.name} is not a surprise bag`);
         return false;
       }
-      
       const isFutureBag = (() => {
         // Check if pickup time is in the future
         if (product.pickupTimeEnd) {
@@ -273,7 +270,7 @@ const Products = () => {
           console.log(`Product ${product.name} pickup time check: ${product.pickupTimeEnd} > now = ${isFuture}`);
           return isFuture;
         }
-        
+
         // Check if expiration date is in the future
         if (product.expirationDate) {
           const expirationDate = new Date(product.expirationDate);
@@ -281,25 +278,22 @@ const Products = () => {
           console.log(`Product ${product.name} expiration check: ${product.expirationDate} > now = ${isFuture}`);
           return isFuture;
         }
-        
         console.log(`Product ${product.name} has no time constraints, showing by default`);
         return true; // Show all surprise bags if no time constraints
       })();
-      
       const result = isFutureBag && matchesSearch;
       console.log(`Product ${product.name} final result: ${result} (isFutureBag=${isFutureBag}, matchesSearch=${matchesSearch})`);
       return result;
     }
-    
+
     // For General Stock, exclude surprise bags
     if (selectedCategory === "General Stock") {
       return !product.isSurpriseBag && product.category !== "Surprise Bag" && matchesSearch;
     }
-    
+
     // For other specific categories, exclude surprise bags and match category
     const matchesCategory = product.category === selectedCategory;
     const isNotSurpriseBag = !product.isSurpriseBag && product.category !== "Surprise Bag";
-    
     return matchesCategory && isNotSurpriseBag && matchesSearch;
   });
 
@@ -353,18 +347,12 @@ const Products = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-              <p className="text-muted-foreground text-sm mt-1">
-                This is your summary for today - manage your inventory efficiently
-              </p>
-              <p className="text-sm text-gray-600 mt-1">WiseBite Marketplace by Negentropy</p>
-              <p className="text-xs text-gray-500 mt-1">Manage your inventory and marketplace visibility</p>
+              <h1 className="text-2xl font-bold text-gray-900">Marketplace B2C</h1>
+              
+              
+              
             </div>
-            <button 
-              onClick={() => setTutorialOpen(true)}
-              className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-2"
-              title="Ver tutorial"
-            >
+            <button onClick={() => setTutorialOpen(true)} className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-2" title="Ver tutorial">
               <Info className="w-5 h-5" />
             </button>
           </div>
@@ -388,18 +376,12 @@ const Products = () => {
               </DropdownMenuContent>
             </DropdownMenu>
             
-            <button 
-              onClick={() => setSmartBagCreatorOpen(true)}
-              className="bg-purple-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-purple-700 transition-colors text-sm"
-            >
+            <button onClick={() => setSmartBagCreatorOpen(true)} className="bg-purple-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-purple-700 transition-colors text-sm">
               <ShoppingBag className="w-4 h-4" />
               Create Smart Bag
             </button>
             
-            <button 
-              onClick={() => setScheduleOpen(true)}
-              className="bg-blue-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-blue-700 transition-colors text-sm"
-            >
+            <button onClick={() => setScheduleOpen(true)} className="bg-blue-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-blue-700 transition-colors text-sm">
               <Calendar className="w-4 h-4" />
               Schedule
             </button>
@@ -415,17 +397,14 @@ const Products = () => {
           <DialogHeader>
             <DialogTitle>Create Smart Bag</DialogTitle>
           </DialogHeader>
-          <SmartBagCreator 
-            editingProduct={editingProduct}
-            onSuccess={() => {
-              setSmartBagCreatorOpen(false);
-              setEditingProduct(null);
-              toast({
-                title: "Smart Bag Updated",
-                description: "Your smart bag has been successfully updated"
-              });
-            }} 
-          />
+          <SmartBagCreator editingProduct={editingProduct} onSuccess={() => {
+          setSmartBagCreatorOpen(false);
+          setEditingProduct(null);
+          toast({
+            title: "Smart Bag Updated",
+            description: "Your smart bag has been successfully updated"
+          });
+        }} />
         </DialogContent>
       </Dialog>
 
@@ -472,32 +451,18 @@ const Products = () => {
             </Link>
           </div> : <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredProducts.map(product => {
-              // Use special component for surprise bags
-              if (product.isSurpriseBag || product.category === "Surprise Bag") {
-                return (
-                  <SurpriseBagCard
-                    key={product.id}
-                    product={product}
-                    onEdit={(product) => {
-                      setEditingProduct(product);
-                      setSmartBagCreatorOpen(true);
-                    }}
-                    onDelete={() => product.id && handleDeleteProduct(product.id)}
-                    onToggleVisibility={() => handleToggleMarketplaceVisibility(product)}
-                    isTogglingVisibility={togglingMarketplaceId === product.id}
-                  />
-                );
-              }
-              
-              // Regular product card
-              return (
-                <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+          // Use special component for surprise bags
+          if (product.isSurpriseBag || product.category === "Surprise Bag") {
+            return <SurpriseBagCard key={product.id} product={product} onEdit={product => {
+              setEditingProduct(product);
+              setSmartBagCreatorOpen(true);
+            }} onDelete={() => product.id && handleDeleteProduct(product.id)} onToggleVisibility={() => handleToggleMarketplaceVisibility(product)} isTogglingVisibility={togglingMarketplaceId === product.id} />;
+          }
+
+          // Regular product card
+          return <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
                   <div className="relative">
-                    <button onClick={() => handleToggleMarketplaceVisibility(product)} disabled={togglingMarketplaceId === product.id} className={`absolute top-2 left-2 z-1 backdrop-blur px-2 py-1 rounded-md shadow-sm border disabled:opacity-60 ${
-                      (product as any).isMarketplaceVisible 
-                        ? "bg-white/90 border-gray-200 text-gray-700 hover:bg-white" 
-                        : "bg-red-100/90 border-red-200 text-red-700 hover:bg-red-100"
-                    }`} aria-label={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"} title={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"}>
+                    <button onClick={() => handleToggleMarketplaceVisibility(product)} disabled={togglingMarketplaceId === product.id} className={`absolute top-2 left-2 z-1 backdrop-blur px-2 py-1 rounded-md shadow-sm border disabled:opacity-60 ${(product as any).isMarketplaceVisible ? "bg-white/90 border-gray-200 text-gray-700 hover:bg-white" : "bg-red-100/90 border-red-200 text-red-700 hover:bg-red-100"}`} aria-label={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"} title={(product as any).isMarketplaceVisible ? "Ocultar del marketplace" : "Mostrar en marketplace"}>
                       {(product as any).isMarketplaceVisible ? <Store className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </button>
                     <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-20 object-cover" onError={e => {
@@ -527,11 +492,7 @@ const Products = () => {
                     
                     {/* Pickup Schedule Information */}
                     <div className="mb-2">
-                      <PickupScheduleDisplay 
-                        storeUserId={product.userId} 
-                        compact={true} 
-                        className="text-xs"
-                      />
+                      <PickupScheduleDisplay storeUserId={product.userId} compact={true} className="text-xs" />
                     </div>
                     
                     <div className="space-y-1">
@@ -546,14 +507,11 @@ const Products = () => {
                         </button>
                       </div>
                       
-                      <button 
-                        onClick={() => {
-                          // Pass the product data to SmartBagCreator
-                          setSelectedProductForBag(product);
-                          setSmartBagCreatorOpen(true);
-                        }} 
-                        className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-primary bg-primary/10 rounded hover:bg-primary/20 transition-colors"
-                      >
+                      <button onClick={() => {
+                  // Pass the product data to SmartBagCreator
+                  setSelectedProductForBag(product);
+                  setSmartBagCreatorOpen(true);
+                }} className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-primary bg-primary/10 rounded hover:bg-primary/20 transition-colors">
                         <Package className="w-3 h-3" />
                         Surprise Bag
                       </button>
@@ -565,9 +523,8 @@ const Products = () => {
                       
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                </div>;
+        })}
           </div>}
       </main>
 
@@ -659,32 +616,29 @@ const Products = () => {
         <DialogContent className="sm:max-w-7xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
           </DialogHeader>
-          <SmartBagCreator 
-            selectedProduct={selectedProductForBag}
-            onSuccess={() => {
-              setSmartBagCreatorOpen(false);
-              setSelectedProductForBag(null);
-              // Reload products to show new smart bags
-              if (user) {
-                const loadProducts = async () => {
-                  try {
-                    const userProducts = await productService.getProductsByUser(user.id);
-                    const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
-                    const combinedProducts = [...userProducts];
-                    storeProducts.forEach(storeProduct => {
-                      if (!combinedProducts.some(p => p.id === storeProduct.id)) {
-                        combinedProducts.push(storeProduct);
-                      }
-                    });
-                    setProducts(combinedProducts);
-                  } catch (error) {
-                    console.error("Error reloading products:", error);
+          <SmartBagCreator selectedProduct={selectedProductForBag} onSuccess={() => {
+          setSmartBagCreatorOpen(false);
+          setSelectedProductForBag(null);
+          // Reload products to show new smart bags
+          if (user) {
+            const loadProducts = async () => {
+              try {
+                const userProducts = await productService.getProductsByUser(user.id);
+                const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
+                const combinedProducts = [...userProducts];
+                storeProducts.forEach(storeProduct => {
+                  if (!combinedProducts.some(p => p.id === storeProduct.id)) {
+                    combinedProducts.push(storeProduct);
                   }
-                };
-                loadProducts();
+                });
+                setProducts(combinedProducts);
+              } catch (error) {
+                console.error("Error reloading products:", error);
               }
-            }} 
-          />
+            };
+            loadProducts();
+          }
+        }} />
         </DialogContent>
       </Dialog>
 
@@ -695,27 +649,27 @@ const Products = () => {
             <DialogTitle>Crear Bolsa Sorpresa</DialogTitle>
           </DialogHeader>
           <SurpriseBagForm onSuccess={() => {
-            setSurpriseBagFormOpen(false);
-            // Reload products to show the new surprise bag
-            if (user) {
-              const loadProducts = async () => {
-                try {
-                  const userProducts = await productService.getProductsByUser(user.id);
-                  const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
-                  const combinedProducts = [...userProducts];
-                  storeProducts.forEach(storeProduct => {
-                    if (!combinedProducts.some(p => p.id === storeProduct.id)) {
-                      combinedProducts.push(storeProduct);
-                    }
-                  });
-                  setProducts(combinedProducts);
-                } catch (error) {
-                  console.error("Error reloading products:", error);
-                }
-              };
-              loadProducts();
-            }
-          }} />
+          setSurpriseBagFormOpen(false);
+          // Reload products to show the new surprise bag
+          if (user) {
+            const loadProducts = async () => {
+              try {
+                const userProducts = await productService.getProductsByUser(user.id);
+                const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
+                const combinedProducts = [...userProducts];
+                storeProducts.forEach(storeProduct => {
+                  if (!combinedProducts.some(p => p.id === storeProduct.id)) {
+                    combinedProducts.push(storeProduct);
+                  }
+                });
+                setProducts(combinedProducts);
+              } catch (error) {
+                console.error("Error reloading products:", error);
+              }
+            };
+            loadProducts();
+          }
+        }} />
         </DialogContent>
       </Dialog>
 
