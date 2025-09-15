@@ -17,6 +17,7 @@ import { PickupScheduleDisplay } from "@/components/PickupScheduleDisplay";
 import { SurpriseBagForm } from "@/components/SurpriseBagForm";
 import { SurpriseBagCard } from "@/components/SurpriseBagCard";
 import { SmartBagCreator } from "@/components/SmartBagCreator";
+import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 const categories = ["General Stock", "Coffee", "Tea", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "Surprise Bag"];
 
 // Food banks from Australia
@@ -54,6 +55,11 @@ const Products = () => {
   const {
     toast
   } = useToast();
+  const {
+    notificationCount,
+    orderCount,
+    salesCount
+  } = useNotificationsAndOrders();
   const [importOpen, setImportOpen] = useState(false);
   const [togglingMarketplaceId, setTogglingMarketplaceId] = useState<number | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -362,19 +368,34 @@ const Products = () => {
       {/* Navigation Icons Section */}
       <div className="px-6 py-4 border-b bg-gray-50/60">
         <div className="grid grid-cols-3 md:grid-cols-7 gap-4 max-w-4xl">
-          <Link to="/orders" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
+          <Link to="/orders" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 relative">
             <ShoppingBag className="w-6 h-6 text-gray-600 mb-2" />
             <span className="text-xs text-gray-700 font-medium text-center">Orders</span>
+            {orderCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-medium">
+                {orderCount > 99 ? '99+' : orderCount}
+              </span>
+            )}
           </Link>
           
-          <Link to="/sales" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
+          <Link to="/sales" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 relative">
             <BarChart3 className="w-6 h-6 text-gray-600 mb-2" />
             <span className="text-xs text-gray-700 font-medium text-center">Sales</span>
+            {salesCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-medium">
+                {salesCount > 99 ? '99+' : salesCount}
+              </span>
+            )}
           </Link>
           
-          <Link to="/notifications" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
+          <Link to="/notifications" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 relative">
             <Bell className="w-6 h-6 text-gray-600 mb-2" />
             <span className="text-xs text-gray-700 font-medium text-center">Notifications</span>
+            {notificationCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-medium">
+                {notificationCount > 99 ? '99+' : notificationCount}
+              </span>
+            )}
           </Link>
           
           <Link to="/ads" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
