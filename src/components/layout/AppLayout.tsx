@@ -28,26 +28,6 @@ const AppLayout = () => {
                   <span>Market B2C
               </span>
                 </Link>
-                <Link to="/orders" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  
-                  <span>Orders</span>
-                  {orderCount > 0 && <span className="text-sm text-gray-500">({orderCount})</span>}
-                </Link>
-                <Link to="/sales" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  
-                  <span>Sales</span>
-                  {salesCount > 0 && <span className="text-sm text-gray-500">({salesCount})</span>}
-                </Link>
-                <Link to="/notifications" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 relative">
-                  
-                  <span>Notifications</span>
-                  {notificationCount > 0 && <span className="text-sm text-gray-500">({notificationCount})</span>}
-                  {notificationCount > 0}
-                </Link>
-                <Link to="/ads" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  
-                  <span>Ads</span>
-                </Link>
                 
                 <Link to="/market" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <Store className="w-4 h-4" />
