@@ -349,7 +349,7 @@ const Products = () => {
     }
   };
   return <>
-      <header className="px-6 pt-8 pb-6 sticky top-0 glass-card z-10 border-b">
+      <header className="px-6 pt-8 pb-6 sticky top-0 z-10">
         <div className="flex justify-center items-center">
           <div className="flex items-center gap-2">
             <div>
