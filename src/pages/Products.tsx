@@ -1,4 +1,4 @@
-import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info, Calendar, ShoppingBag, Package } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info, Calendar, ShoppingBag, Package, BarChart3, Megaphone, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -348,9 +348,6 @@ const Products = () => {
           <div className="flex items-center gap-2">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Marketplace B2C</h1>
-              
-              
-              
             </div>
             <button onClick={() => setTutorialOpen(true)} className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-2" title="Ver tutorial">
               <Info className="w-5 h-5" />
@@ -388,6 +385,46 @@ const Products = () => {
           </div>
         </div>
       </header>
+
+      {/* Navigation Icons Section */}
+      <div className="px-6 py-4 border-b bg-gray-50/60">
+        <div className="grid grid-cols-3 md:grid-cols-7 gap-4 max-w-4xl">
+          <Link to="/orders" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
+            <ShoppingBag className="w-6 h-6 text-gray-600 mb-2" />
+            <span className="text-xs text-gray-700 font-medium text-center">Orders</span>
+          </Link>
+          
+          <Link to="/sales" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
+            <BarChart3 className="w-6 h-6 text-gray-600 mb-2" />
+            <span className="text-xs text-gray-700 font-medium text-center">Sales</span>
+          </Link>
+          
+          <Link to="/notifications" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
+            <Bell className="w-6 h-6 text-gray-600 mb-2" />
+            <span className="text-xs text-gray-700 font-medium text-center">Notifications</span>
+          </Link>
+          
+          <Link to="/ads" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
+            <Megaphone className="w-6 h-6 text-gray-600 mb-2" />
+            <span className="text-xs text-gray-700 font-medium text-center">Ads</span>
+          </Link>
+          
+          <Link to="/products/add" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
+            <Plus className="w-6 h-6 text-gray-600 mb-2" />
+            <span className="text-xs text-gray-700 font-medium text-center">Add Products</span>
+          </Link>
+          
+          <button onClick={() => setSmartBagCreatorOpen(true)} className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
+            <Package className="w-6 h-6 text-gray-600 mb-2" />
+            <span className="text-xs text-gray-700 font-medium text-center">Create Smart Bag</span>
+          </button>
+          
+          <button onClick={() => setScheduleOpen(true)} className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
+            <Clock className="w-6 h-6 text-gray-600 mb-2" />
+            <span className="text-xs text-gray-700 font-medium text-center">Schedule</span>
+          </button>
+        </div>
+      </div>
 
       <ApiImportDialog open={importOpen} onOpenChange={setImportOpen} onImported={newProducts => setProducts(prev => [...newProducts, ...prev])} />
       <ScheduleDialog open={scheduleOpen} onOpenChange={setScheduleOpen} />
