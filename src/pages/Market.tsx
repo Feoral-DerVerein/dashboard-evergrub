@@ -372,7 +372,7 @@ const Market = () => {
             <TabsTrigger value="finalise-orders">Finalise Orders</TabsTrigger>
             <TabsTrigger value="pending-delivery">Pending Delivery</TabsTrigger>
             <TabsTrigger value="delivered">Delivered</TabsTrigger>
-            <TabsTrigger value="products-listed">Products Listed</TabsTrigger>
+            <TabsTrigger value="products-listed">Products Listed ({listedProducts.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="live-offers" className="mt-6">
