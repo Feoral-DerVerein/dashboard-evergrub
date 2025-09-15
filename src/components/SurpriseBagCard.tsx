@@ -1,4 +1,4 @@
-import { Clock, Package, DollarSign, Percent, MapPin, Store, EyeOff } from "lucide-react";
+import { Clock, Package, DollarSign, Percent, MapPin, Store, EyeOff, Edit, Trash2 } from "lucide-react";
 import { Product } from "@/types/product.types";
 import { Badge } from "@/components/ui/badge";
 import PointsBadge from "@/components/PointsBadge";
@@ -129,15 +129,17 @@ export const SurpriseBagCard = ({
           <div className="flex gap-1">
             <button 
               onClick={() => onEdit(product)}
-              className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-white/80 rounded hover:bg-white transition-colors border"
+              className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
             >
-              ✏️ Edit
+              <Edit className="w-3 h-3" />
+              Edit
             </button>
             <button 
               onClick={() => product.id && onDelete(product.id)}
-              className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors border border-red-200"
+              className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
             >
-              🗑️ Delete
+              <Trash2 className="w-3 h-3" />
+              Delete
             </button>
           </div>
         </div>
