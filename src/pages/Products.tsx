@@ -367,7 +367,7 @@ const Products = () => {
 
       {/* Navigation Icons Section */}
       <div className="px-6 py-4 border-b bg-gray-50/60">
-        <div className="grid grid-cols-3 md:grid-cols-7 gap-4 max-w-4xl">
+        <div className="grid grid-cols-3 md:grid-cols-7 gap-4 max-w-4xl mx-auto">
           <Link to="/orders" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 relative">
             <ShoppingBag className="w-6 h-6 text-gray-600 mb-2" />
             <span className="text-xs text-gray-700 font-medium text-center">Orders</span>
