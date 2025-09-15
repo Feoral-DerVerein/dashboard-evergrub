@@ -371,27 +371,24 @@ const Market = () => {
 
             {/* Market Offers */}
             <div className="space-y-6">
-              {filteredOffers.map((offer) => (
-                <div key={offer.id}>
-
-                  {/* Status Tabs */}
-                  <div className="mb-4">
-                    <div className="flex gap-4 border-b">
-                      <div className="pb-2 border-b-2 border-primary">
-                        <span className="font-medium">Pending ({offer.products.length})</span>
-                      </div>
-                      <div className="pb-2 text-muted-foreground">
-                        <span>Finalised (0)</span>
-                      </div>
-                    </div>
+              {/* Single Status Tabs */}
+              <div className="mb-4">
+                <div className="flex gap-4 border-b">
+                  <div className="pb-2 border-b-2 border-primary">
+                    <span className="font-medium">Pending ({filteredOffers.reduce((total, offer) => total + offer.products.length, 0)})</span>
                   </div>
-
-                  {/* Products */}
-                  <div>
-                    {offer.products.map((product) => renderProductCard(product, offer))}
+                  <div className="pb-2 text-muted-foreground">
+                    <span>Finalised (0)</span>
                   </div>
                 </div>
-              ))}
+              </div>
+
+              {/* All Products in Single List */}
+              <div>
+                {filteredOffers.map((offer) =>
+                  offer.products.map((product) => renderProductCard(product, offer))
+                )}
+              </div>
             </div>
           </TabsContent>
 
