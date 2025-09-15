@@ -66,26 +66,32 @@ const Market = () => {
       setIncomingProduct(location.state.product);
       
       if (location.state.action === 'list-for-sale') {
-        // Check if product is already listed to prevent duplicates
-        const productId = location.state.product.id;
+        // Create unique listing key to prevent duplicates from multiple navigation events
+        const listingKey = `${location.state.product.id}_${Date.now()}`;
+        
         setListedProducts(prev => {
-          const existingIndex = prev.findIndex(p => p.id === productId);
+          // Check if this exact product is already listed
+          const existingProduct = prev.find(p => p.id === location.state.product.id);
+          
+          if (existingProduct) {
+            // Don't add duplicate, just show message
+            toast({
+              title: "Product Already Listed",
+              description: `${location.state.product.name} is already in the marketplace`,
+            });
+            return prev;
+          }
+          
+          // Add new product with unique listing key
           const newProduct = {
             ...location.state.product,
+            listingKey,
             listingType: 'B2B Sale',
             listedAt: new Date().toISOString(),
             status: 'Active'
           };
           
-          if (existingIndex !== -1) {
-            // Update existing product
-            const updated = [...prev];
-            updated[existingIndex] = newProduct;
-            return updated;
-          } else {
-            // Add new product
-            return [newProduct, ...prev];
-          }
+          return [newProduct, ...prev];
         });
         
         toast({
@@ -97,6 +103,9 @@ const Market = () => {
       } else if (location.state.action === 'create-b2b-offer') {
         setShowB2BOfferDialog(true);
       }
+      
+      // Clear location state to prevent re-execution
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [toast, location.state]);
 
