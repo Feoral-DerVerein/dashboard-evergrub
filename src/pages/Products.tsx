@@ -350,7 +350,7 @@ const Products = () => {
   };
   return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 glass-card z-10 border-b">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-center items-center">
           <div className="flex items-center gap-2">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Marketplace B2C</h1>
@@ -358,9 +358,6 @@ const Products = () => {
             <button onClick={() => setTutorialOpen(true)} className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-2" title="Ver tutorial">
               <Info className="w-5 h-5" />
             </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <QuickInventory products={products} onUpdateQuantities={handleUpdateQuantities} compact />
           </div>
         </div>
       </header>
