@@ -373,32 +373,6 @@ const Market = () => {
             <div className="space-y-6">
               {filteredOffers.map((offer) => (
                 <div key={offer.id}>
-                  {/* Delivery Info Header */}
-                  <Card className="mb-4">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center gap-4">
-                        <Calendar className="h-5 w-5 text-muted-foreground" />
-                        <span className="font-medium">{offer.date}</span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium mb-1">Delivery Address</p>
-                          <div className="flex items-start gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                            <p className="text-sm text-muted-foreground">{offer.deliveryAddress}</p>
-                          </div>
-                        </div>
-                        {offer.deliveryNote && (
-                          <div>
-                            <p className="text-sm font-medium mb-1">Delivery Note</p>
-                            <p className="text-sm text-muted-foreground">{offer.deliveryNote}</p>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
 
                   {/* Status Tabs */}
                   <div className="mb-4">
