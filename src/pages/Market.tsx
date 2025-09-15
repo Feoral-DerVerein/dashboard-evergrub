@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Calendar, MapPin, Package, Plus, ShoppingCart, Building2, Edit, Save, X, Fish, Beef, Apple, Cookie, Milk, Wheat, Coffee, UtensilsCrossed, Grape, Grid3X3 } from "lucide-react";
+import { Search, Calendar, MapPin, Package, Plus, ShoppingCart, Building2, Edit, Save, X, Fish, Beef, Apple, Cookie, Milk, Wheat, Coffee, UtensilsCrossed, Grape, Grid3X3, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,6 +29,14 @@ const Market = () => {
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { toast } = useToast();
+
+  const handleDeleteProduct = (productId: any) => {
+    setListedProducts(prev => prev.filter(product => product.id !== productId));
+    toast({
+      title: "Product Deleted",
+      description: "Product has been removed from the marketplace",
+    });
+  };
 
   // Check for payment status and incoming product on component mount
   useEffect(() => {
@@ -454,29 +462,37 @@ const Market = () => {
                            Listed: {new Date(product.listedAt).toLocaleDateString()}
                          </p>
                        </div>
-                       <div className="flex gap-2">
-                         <Button
-                           size="sm"
-                           variant="outline"
-                           onClick={() => {
-                             setEditingProduct(product);
-                             setShowEditDialog(true);
-                           }}
-                         >
-                           <Edit className="w-4 h-4 mr-1" />
-                           Edit
-                         </Button>
-                         <Badge 
-                           variant="secondary" 
-                           className={
-                             product.listingType === 'B2B Offer' 
-                               ? "bg-purple-100 text-purple-800" 
-                               : "bg-green-100 text-green-800"
-                           }
-                         >
-                           {product.listingType || 'Listed for Sale'}
-                         </Badge>
-                       </div>
+                        <div className="flex gap-2 items-center">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingProduct(product);
+                              setShowEditDialog(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4 mr-1" />
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                            onClick={() => handleDeleteProduct(product.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                          <Badge 
+                            variant="secondary" 
+                            className={
+                              product.listingType === 'B2B Offer' 
+                                ? "bg-purple-100 text-purple-800" 
+                                : "bg-green-100 text-green-800"
+                            }
+                          >
+                            {product.listingType || 'Listed for Sale'}
+                          </Badge>
+                        </div>
                      </div>
                   </Card>
                 ))}
