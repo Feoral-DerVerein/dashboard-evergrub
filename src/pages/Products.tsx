@@ -355,33 +355,6 @@ const Products = () => {
           </div>
           <div className="flex items-center gap-2">
             <QuickInventory products={products} onUpdateQuantities={handleUpdateQuantities} compact />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="bg-green-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-green-700 transition-colors text-sm">
-                  <Plus className="w-4 h-4" />
-                  Add Product
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem asChild>
-                  <Link to="/products/add">Add single product</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setImportOpen(true)}>
-                  Import from API/POS System
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <button onClick={() => setSmartBagCreatorOpen(true)} className="bg-purple-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-purple-700 transition-colors text-sm">
-              <ShoppingBag className="w-4 h-4" />
-              Create Smart Bag
-            </button>
-            
-            <button onClick={() => setScheduleOpen(true)} className="bg-blue-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-blue-700 transition-colors text-sm">
-              <Calendar className="w-4 h-4" />
-              Schedule
-            </button>
           </div>
         </div>
       </header>
