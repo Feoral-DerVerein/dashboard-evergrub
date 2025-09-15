@@ -66,14 +66,27 @@ const Market = () => {
       setIncomingProduct(location.state.product);
       
       if (location.state.action === 'list-for-sale') {
-        // Automatically add product to listed products
-        const newProduct = {
-          ...location.state.product,
-          listingType: 'B2B Sale',
-          listedAt: new Date().toISOString(),
-          status: 'Active'
-        };
-        setListedProducts(prev => [newProduct, ...prev]);
+        // Check if product is already listed to prevent duplicates
+        const productId = location.state.product.id;
+        setListedProducts(prev => {
+          const existingIndex = prev.findIndex(p => p.id === productId);
+          const newProduct = {
+            ...location.state.product,
+            listingType: 'B2B Sale',
+            listedAt: new Date().toISOString(),
+            status: 'Active'
+          };
+          
+          if (existingIndex !== -1) {
+            // Update existing product
+            const updated = [...prev];
+            updated[existingIndex] = newProduct;
+            return updated;
+          } else {
+            // Add new product
+            return [newProduct, ...prev];
+          }
+        });
         
         toast({
           title: "Product Listed!",
