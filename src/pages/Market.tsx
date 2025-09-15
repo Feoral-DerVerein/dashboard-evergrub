@@ -183,7 +183,8 @@ const Market = () => {
               
               <div>
                 <div className="mb-2">
-                  <p className="text-sm font-medium">BBD Range</p>
+                  <p className="text-sm font-medium">
+                </p>
                   <p className="text-sm text-muted-foreground">{product.bbdRange}</p>
                 </div>
                 <div className="mb-2">
