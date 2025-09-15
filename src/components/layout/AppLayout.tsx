@@ -29,23 +29,23 @@ const AppLayout = () => {
               </span>
                 </Link>
                 <Link to="/orders" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <ShoppingBasket className="w-4 h-4" />
+                  
                   <span>Orders</span>
                   {orderCount > 0 && <span className="text-sm text-gray-500">({orderCount})</span>}
                 </Link>
                 <Link to="/sales" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <BarChart3 className="w-4 h-4" />
+                  
                   <span>Sales</span>
                   {salesCount > 0 && <span className="text-sm text-gray-500">({salesCount})</span>}
                 </Link>
                 <Link to="/notifications" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 relative">
-                  <Bell className="w-4 h-4" />
+                  
                   <span>Notifications</span>
                   {notificationCount > 0 && <span className="text-sm text-gray-500">({notificationCount})</span>}
                   {notificationCount > 0}
                 </Link>
                 <Link to="/ads" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <Megaphone className="w-4 h-4" />
+                  
                   <span>Ads</span>
                 </Link>
                 
