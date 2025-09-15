@@ -112,7 +112,6 @@ export const wishlistService = {
         throw error;
       }
       
-      toast.success("Removed from wishlist");
       return true;
     } catch (error) {
       console.error("Error in removeFromWishlist:", error);
