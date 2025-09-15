@@ -2,7 +2,7 @@ import { Clock, Package, DollarSign, Percent, MapPin, Store, EyeOff, Edit, Trash
 import { Product } from "@/types/product.types";
 import { Badge } from "@/components/ui/badge";
 import PointsBadge from "@/components/PointsBadge";
-import mysteryGroceryBag from "@/assets/mystery-grocery-bag.png";
+import surpriseBagBanner from "@/assets/surprise-bag-banner.png";
 
 interface SurpriseBagCardProps {
   product: Product;
@@ -46,7 +46,7 @@ export const SurpriseBagCard = ({
       {/* Image Section */}
       <div className="relative h-24">
         <img 
-          src={product.image || mysteryGroceryBag} 
+          src={product.image || surpriseBagBanner} 
           alt={product.name} 
           className="w-full h-full object-cover"
         />
