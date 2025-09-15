@@ -470,7 +470,7 @@ const Market = () => {
             ) : (
               <div className="space-y-4">
                 {listedProducts.map((product) => (
-                  <Card key={product.id} className="p-4">
+                  <Card key={product.listingKey || `${product.id}_${product.listedAt}`} className="p-4">
                      <div className="flex justify-between items-start">
                        <div className="flex-1">
                          <h3 className="font-semibold text-lg">{product.name}</h3>
@@ -646,12 +646,10 @@ const Market = () => {
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={() => setShowProductListingDialog(false)}>Cancel</Button>
                 <Button onClick={() => {
-                  // Add product to listed products
-                  setListedProducts(prev => [...prev, { ...incomingProduct, listedAt: new Date() }]);
-                  toast({ title: "Product Listed!", description: `${incomingProduct.name} listed for sale.` });
+                  // Product already added in useEffect, just close dialog
                   setShowProductListingDialog(false);
                   setIncomingProduct(null);
-                }}>List for Sale</Button>
+                }}>Confirm Listing</Button>
               </div>
             </div>
           )}
@@ -679,19 +677,10 @@ const Market = () => {
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={() => setShowB2BOfferDialog(false)}>Cancel</Button>
                 <Button onClick={() => {
-                  // Add product to listed products for B2B marketplace visibility
-                  setListedProducts(prev => [...prev, { 
-                    ...incomingProduct, 
-                    listedAt: new Date(),
-                    listingType: 'B2B Offer' 
-                  }]);
-                  toast({ 
-                    title: "B2B Offer Created!", 
-                    description: `${incomingProduct.name} sent to marketplace and added to your listings.` 
-                  });
+                  // Product already added in useEffect, just close dialog
                   setShowB2BOfferDialog(false);
                   setIncomingProduct(null);
-                }}>Create Offer</Button>
+                }}>Confirm Offer</Button>
               </div>
             </div>
           )}
