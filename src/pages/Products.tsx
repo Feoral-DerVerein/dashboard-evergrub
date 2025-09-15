@@ -372,57 +372,49 @@ const Products = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            
-            <button onClick={() => setSmartBagCreatorOpen(true)} className="bg-purple-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-purple-700 transition-colors text-sm">
-              <ShoppingBag className="w-4 h-4" />
-              Create Smart Bag
-            </button>
-            
-            <button onClick={() => setScheduleOpen(true)} className="bg-blue-600 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-blue-700 transition-colors text-sm">
-              <Calendar className="w-4 h-4" />
-              Schedule
-            </button>
           </div>
         </div>
       </header>
 
       {/* Navigation Icons Section */}
-      <div className="px-6 py-4 border-b bg-gray-50/60">
-        <div className="grid grid-cols-3 md:grid-cols-7 gap-4 max-w-4xl">
-          <Link to="/orders" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
-            <ShoppingBag className="w-6 h-6 text-gray-600 mb-2" />
-            <span className="text-xs text-gray-700 font-medium text-center">Orders</span>
-          </Link>
-          
-          <Link to="/sales" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
-            <BarChart3 className="w-6 h-6 text-gray-600 mb-2" />
-            <span className="text-xs text-gray-700 font-medium text-center">Sales</span>
-          </Link>
-          
-          <Link to="/notifications" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
-            <Bell className="w-6 h-6 text-gray-600 mb-2" />
-            <span className="text-xs text-gray-700 font-medium text-center">Notifications</span>
-          </Link>
-          
-          <Link to="/ads" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
-            <Megaphone className="w-6 h-6 text-gray-600 mb-2" />
-            <span className="text-xs text-gray-700 font-medium text-center">Ads</span>
-          </Link>
-          
-          <Link to="/products/add" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
-            <Plus className="w-6 h-6 text-gray-600 mb-2" />
-            <span className="text-xs text-gray-700 font-medium text-center">Add Products</span>
-          </Link>
-          
-          <button onClick={() => setSmartBagCreatorOpen(true)} className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
-            <Package className="w-6 h-6 text-gray-600 mb-2" />
-            <span className="text-xs text-gray-700 font-medium text-center">Create Smart Bag</span>
-          </button>
-          
-          <button onClick={() => setScheduleOpen(true)} className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
-            <Clock className="w-6 h-6 text-gray-600 mb-2" />
-            <span className="text-xs text-gray-700 font-medium text-center">Schedule</span>
-          </button>
+      <div className="px-6 py-6 border-b bg-gray-50/60">
+        <div className="flex justify-center">
+          <div className="grid grid-cols-3 md:grid-cols-7 gap-6 max-w-3xl mx-auto">
+            <Link to="/orders" className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 aspect-square">
+              <ShoppingBag className="w-8 h-8 text-gray-600 mb-3" />
+              <span className="text-sm text-gray-700 font-medium text-center">Orders</span>
+            </Link>
+            
+            <Link to="/sales" className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 aspect-square">
+              <BarChart3 className="w-8 h-8 text-gray-600 mb-3" />
+              <span className="text-sm text-gray-700 font-medium text-center">Sales</span>
+            </Link>
+            
+            <Link to="/notifications" className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 aspect-square">
+              <Bell className="w-8 h-8 text-gray-600 mb-3" />
+              <span className="text-sm text-gray-700 font-medium text-center">Notifications</span>
+            </Link>
+            
+            <Link to="/ads" className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 aspect-square">
+              <Megaphone className="w-8 h-8 text-gray-600 mb-3" />
+              <span className="text-sm text-gray-700 font-medium text-center">Ads</span>
+            </Link>
+            
+            <Link to="/products/add" className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 aspect-square">
+              <Plus className="w-8 h-8 text-gray-600 mb-3" />
+              <span className="text-sm text-gray-700 font-medium text-center">Add Products</span>
+            </Link>
+            
+            <button onClick={() => setSmartBagCreatorOpen(true)} className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 aspect-square">
+              <Package className="w-8 h-8 text-gray-600 mb-3" />
+              <span className="text-sm text-gray-700 font-medium text-center">Create Smart Bag</span>
+            </button>
+            
+            <button onClick={() => setScheduleOpen(true)} className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 aspect-square">
+              <Clock className="w-8 h-8 text-gray-600 mb-3" />
+              <span className="text-sm text-gray-700 font-medium text-center">Schedule</span>
+            </button>
+          </div>
         </div>
       </div>
 
