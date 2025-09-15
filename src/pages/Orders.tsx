@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2, ShoppingBag, Clock, User, Store, CreditCard } from "lucide-react";
+import { LayoutDashboard, Package, Eye, Check, X, CheckCircle2, ShoppingBag, Clock, User, Store, CreditCard, ArrowLeft } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomNav } from "@/components/Dashboard";
 import { Order } from "@/types/order.types";
@@ -357,7 +357,16 @@ const Orders = () => {
   return (
     <>
       <header className="px-6 pt-8 pb-6 sticky top-0 glass-card z-10 border-b">
-        <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/products')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
           <h1 className="text-2xl font-bold">Orders</h1>
         </div>
         <div className="flex justify-between items-center">

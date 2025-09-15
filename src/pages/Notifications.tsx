@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, Eye, Heart, ShoppingCart } from "lucide-react";
+import { Bell, Eye, Heart, ShoppingCart, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/Dashboard";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,9 @@ import NotificationIcon from "@/components/notifications/NotificationIcon";
 import WishlistNotificationCard from "@/components/notifications/WishlistNotificationCard";
 import StandardNotification from "@/components/notifications/StandardNotification";
 import ProductNotificationList from "@/components/notifications/ProductNotificationList";
+import { useNavigate } from "react-router-dom";
 const Notifications = () => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -139,8 +141,19 @@ const Notifications = () => {
   };
   return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3 mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/products')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
           <h1 className="text-2xl font-bold">Notifications</h1>
+        </div>
+        <div className="flex justify-end">
           <div className="flex gap-2">
             <button className={`px-3 py-1 rounded-full text-sm ${viewMode === "all" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`} onClick={() => setViewMode("all")}>
               All

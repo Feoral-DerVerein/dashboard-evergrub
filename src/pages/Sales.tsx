@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BarChart3, Receipt, DollarSign, Package, Calendar, CreditCard, List } from "lucide-react";
+import { BarChart3, Receipt, DollarSign, Package, Calendar, CreditCard, List, ArrowLeft } from "lucide-react";
 import { BottomNav } from "@/components/Dashboard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,7 +8,9 @@ import { salesService, Sale } from "@/services/salesService";
 import { format, parseISO } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 const Sales = () => {
+  const navigate = useNavigate();
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"cards">("cards");
@@ -122,11 +124,17 @@ const Sales = () => {
     </Card>;
   return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 glass-card z-10 border-b">
-        <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/products')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
           <h1 className="text-2xl font-bold">Sales</h1>
-          <div className="flex gap-2 bg-gray-100 p-1 rounded-md">
-            
-          </div>
         </div>
         <div className="flex justify-between items-center">
           <p className="text-gray-500">

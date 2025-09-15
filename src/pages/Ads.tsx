@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Filter, Calendar, Eye, Target, TrendingUp, PiggyBank, BarChart3, Settings, Upload, X } from 'lucide-react';
+import { Search, Plus, Filter, Calendar, Eye, Target, TrendingUp, PiggyBank, BarChart3, Settings, Upload, X, ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/use-toast';
 import AdPerformancePredictor from '@/components/ads/AdPerformancePredictor';
 import { adsService, type Ad, type AdCampaign } from '@/services/adsService';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 const StatusBadge = ({ status }: { status: string }) => {
   const getVariant = (status: string): "default" | "destructive" | "secondary" | "outline" => {
@@ -77,6 +78,7 @@ const Ads = () => {
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Load data on component mount
   useEffect(() => {
@@ -295,8 +297,17 @@ const Ads = () => {
     <div className="min-h-screen bg-gray-50/50">
       <div className="max-w-7xl mx-auto glass-card min-h-screen">
         {/* Header */}
-        <header className="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Advertising</h1>
+        <header className="px-4 py-4 border-b border-gray-100 flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/products')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <h1 className="text-xl font-semibold flex-1">Advertising</h1>
           
           <div className="flex gap-2">
             <Dialog open={showCreateAdDialog} onOpenChange={setShowCreateAdDialog}>
