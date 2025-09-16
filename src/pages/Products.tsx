@@ -352,7 +352,7 @@ const Products = () => {
   return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 z-10">
         <div className="flex justify-center items-center">
-          <div className="flex flex-col items-center gap-3 sticky top-0 bg-background/95 backdrop-blur-sm z-20 py-4">
+          <div className="flex flex-col items-center gap-3 fixed top-4 left-1/2 transform -translate-x-1/2 bg-background/95 backdrop-blur-sm z-20 py-4 px-6 rounded-lg shadow-lg">
             <img src={dailyDayLogo} alt="Daily Day Logo" className="h-16 w-auto" />
             <div className="flex items-center gap-2">
               <div>
