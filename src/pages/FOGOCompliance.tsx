@@ -3,11 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Calculator, FileText, BarChart3, Download, AlertCircle } from 'lucide-react';
+import { ExternalLink, Calculator, FileText, BarChart3, Download, AlertCircle, Zap, TrendingUp, Bell } from 'lucide-react';
 import { FOGOCalculator } from '@/components/fogo/FOGOCalculator';
 import { WasteDashboard } from '@/components/fogo/WasteDashboard';
 import { ReportGenerator } from '@/components/fogo/ReportGenerator';
 import { ExportTools } from '@/components/fogo/ExportTools';
+import POSIntegrationSetup from '@/components/fogo/POSIntegrationSetup';
+import WastePredictor from '@/components/fogo/WastePredictor';
+import SmartAlerts from '@/components/fogo/SmartAlerts';
+import ComplianceTimeline from '@/components/fogo/ComplianceTimeline';
+import WasteAnalytics from '@/components/fogo/WasteAnalytics';
+import DataSourceSettings from '@/components/fogo/DataSourceSettings';
 
 const FOGOCompliance = () => {
   const [activeTab, setActiveTab] = useState('calculator');
@@ -82,9 +88,22 @@ const FOGOCompliance = () => {
           ))}
         </div>
 
+        {/* AI Integration Banner */}
+        <div className="mb-8 p-6 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg border border-purple-200">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-purple-200 rounded-full">
+              <Zap className="w-8 h-8 text-purple-700" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-purple-900">AI-Powered Compliance Assistant</h2>
+              <p className="text-purple-700">Automate waste predictions, generate reports, and ensure compliance with advanced AI integration</p>
+            </div>
+          </div>
+        </div>
+
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="calculator" className="flex items-center gap-2">
               <Calculator className="w-4 h-4" />
               Calculator
@@ -92,6 +111,18 @@ const FOGOCompliance = () => {
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="ai-integration" className="flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              AI Setup
+            </TabsTrigger>
+            <TabsTrigger value="predictions" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Predictions
+            </TabsTrigger>
+            <TabsTrigger value="alerts" className="flex items-center gap-2">
+              <Bell className="w-4 h-4" />
+              Alerts
             </TabsTrigger>
             <TabsTrigger value="reports" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
@@ -109,6 +140,27 @@ const FOGOCompliance = () => {
 
           <TabsContent value="dashboard">
             <WasteDashboard />
+          </TabsContent>
+
+          <TabsContent value="ai-integration">
+            <div className="space-y-6">
+              <POSIntegrationSetup />
+              <DataSourceSettings />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="predictions">
+            <div className="space-y-6">
+              <WastePredictor />
+              <WasteAnalytics />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="alerts">
+            <div className="space-y-6">
+              <SmartAlerts />
+              <ComplianceTimeline />
+            </div>
           </TabsContent>
 
           <TabsContent value="reports">
