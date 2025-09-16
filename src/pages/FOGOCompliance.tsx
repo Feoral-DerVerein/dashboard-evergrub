@@ -14,30 +14,22 @@ import SmartAlerts from '@/components/fogo/SmartAlerts';
 import ComplianceTimeline from '@/components/fogo/ComplianceTimeline';
 import WasteAnalytics from '@/components/fogo/WasteAnalytics';
 import DataSourceSettings from '@/components/fogo/DataSourceSettings';
-
 const FOGOCompliance = () => {
   const [activeTab, setActiveTab] = useState('calculator');
-
-  const officialLinks = [
-    {
-      title: "Official FOGO Calculator",
-      url: "https://bintrim.epa.nsw.gov.au/fogocalculator",
-      description: "Official EPA NSW tool"
-    },
-    {
-      title: "Bin Trim Program",
-      url: "https://www.epa.nsw.gov.au/your-environment/recycling-and-reuse/business-government-recycling/bin-trim",
-      description: "Official program information"
-    },
-    {
-      title: "Apply for Grant",
-      url: "https://www.smartygrants.com.au/",
-      description: "SmartyGrants Portal"
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
+  const officialLinks = [{
+    title: "Official FOGO Calculator",
+    url: "https://bintrim.epa.nsw.gov.au/fogocalculator",
+    description: "Official EPA NSW tool"
+  }, {
+    title: "Bin Trim Program",
+    url: "https://www.epa.nsw.gov.au/your-environment/recycling-and-reuse/business-government-recycling/bin-trim",
+    description: "Official program information"
+  }, {
+    title: "Apply for Grant",
+    url: "https://www.smartygrants.com.au/",
+    description: "SmartyGrants Portal"
+  }];
+  return <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -67,25 +59,19 @@ const FOGOCompliance = () => {
 
         {/* Official Links */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {officialLinks.map((link, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow">
+          {officialLinks.map((link, index) => <Card key={index} className="hover:shadow-md transition-shadow">
               <CardContent className="pt-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-medium text-gray-900">{link.title}</h3>
                     <p className="text-sm text-gray-600">{link.description}</p>
                   </div>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => window.open(link.url, '_blank')}
-                  >
+                  <Button size="sm" variant="outline" onClick={() => window.open(link.url, '_blank')}>
                     <ExternalLink className="w-4 h-4" />
                   </Button>
                 </div>
               </CardContent>
-            </Card>
-          ))}
+            </Card>)}
         </div>
 
         {/* AI Integration Banner */}
@@ -95,7 +81,8 @@ const FOGOCompliance = () => {
               <Zap className="w-8 h-8 text-purple-700" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-purple-900">AI-Powered Compliance Assistant</h2>
+              <h2 className="text-2xl font-bold text-purple-900">Negentropy AI-powered compliance assistant
+            </h2>
               <p className="text-purple-700">Automate waste predictions, generate reports, and ensure compliance with advanced AI integration</p>
             </div>
           </div>
@@ -180,19 +167,13 @@ const FOGOCompliance = () => {
               <p className="text-sm text-blue-800 mb-3">
                 For inquiries about the FOGO program, contact EPA NSW directly
               </p>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => window.location.href = 'mailto:organics.grants@epa.nsw.gov.au'}
-              >
+              <Button variant="outline" size="sm" onClick={() => window.location.href = 'mailto:organics.grants@epa.nsw.gov.au'}>
                 organics.grants@epa.nsw.gov.au
               </Button>
             </div>
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default FOGOCompliance;
