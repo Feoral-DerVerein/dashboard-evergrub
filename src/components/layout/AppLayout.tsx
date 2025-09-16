@@ -2,7 +2,6 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Sparkles, Settings, Store } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
-import dailyDayLogo from "@/assets/daily-day-logo.png";
 const AppLayout = () => {
   const location = useLocation();
   const isDashboard = location.pathname === "/dashboard";
@@ -29,10 +28,6 @@ const AppLayout = () => {
                   <span>Market B2C
               </span>
                 </Link>
-                
-                <div className="flex justify-center py-3">
-                  <img src={dailyDayLogo} alt="Daily Day Logo" className="h-12 w-auto" />
-                </div>
                 
                 <Link to="/market" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <Store className="w-4 h-4" />
