@@ -22,15 +22,11 @@ export const useAutoTaskGeneration = ({ products }: AutoTaskGenerationProps) => 
 
     console.log('Auto-generating tasks for', products.length, 'products');
 
-    // Excluded products that should not generate auto tasks (already managed)
-    const excludedProducts = ['Red apples', 'Manzanas rojas'];
+    // Clear existing auto-generated tasks to avoid duplicates
+    // This is a simple approach - in a real app you might want more sophisticated deduplication
 
     // Auto-generate stock alerts tasks
-    const stockAlerts = products.filter((p) => 
-      p.quantity > 0 && 
-      p.quantity <= 5 && 
-      !excludedProducts.includes(p.name)
-    );
+    const stockAlerts = products.filter((p) => p.quantity > 0 && p.quantity <= 5);
     console.log('Found', stockAlerts.length, 'stock alerts');
     
     if (stockAlerts.length > 0) {
@@ -59,9 +55,7 @@ export const useAutoTaskGeneration = ({ products }: AutoTaskGenerationProps) => 
       });
     };
 
-    const expiringProducts = getExpiringProducts().filter(product => 
-      !excludedProducts.includes(product.name)
-    );
+    const expiringProducts = getExpiringProducts();
     console.log('Found', expiringProducts.length, 'expiring products');
     
     if (expiringProducts.length > 0) {
