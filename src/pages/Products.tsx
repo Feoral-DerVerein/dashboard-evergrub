@@ -19,7 +19,7 @@ import { SurpriseBagForm } from "@/components/SurpriseBagForm";
 import { SurpriseBagCard } from "@/components/SurpriseBagCard";
 import { SmartBagCreator } from "@/components/SmartBagCreator";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
-const categories = ["General Stock", "Coffee", "Tea", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "Surprise Bag"];
+const categories = ["General Stock", "Surprise Bag"];
 
 // Food banks from Australia
 const foodBanks = [{
