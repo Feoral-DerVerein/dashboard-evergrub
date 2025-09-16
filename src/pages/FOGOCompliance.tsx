@@ -15,7 +15,7 @@ const FOGOCompliance = () => {
   const officialLinks = [
     {
       title: "Official FOGO Calculator",
-      url: "https://www.epa.nsw.gov.au/business-food-waste-grants",
+      url: "https://bintrim.epa.nsw.gov.au/fogocalculator",
       description: "Official EPA NSW tool"
     },
     {
