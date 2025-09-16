@@ -1,4 +1,5 @@
 import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info, Calendar, ShoppingBag, Package, BarChart3, Megaphone, Clock } from "lucide-react";
+import dailyDayLogo from "@/assets/daily-day-strawberry-logo.png";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -351,13 +352,16 @@ const Products = () => {
   return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 z-10">
         <div className="flex justify-center items-center">
-          <div className="flex items-center gap-2">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Marketplace B2C</h1>
+          <div className="flex flex-col items-center gap-3">
+            <img src={dailyDayLogo} alt="Daily Day Logo" className="h-16 w-auto" />
+            <div className="flex items-center gap-2">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Marketplace B2C</h1>
+              </div>
+              <button onClick={() => setTutorialOpen(true)} className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-2" title="Ver tutorial">
+                <Info className="w-5 h-5" />
+              </button>
             </div>
-            <button onClick={() => setTutorialOpen(true)} className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-2" title="Ver tutorial">
-              <Info className="w-5 h-5" />
-            </button>
           </div>
         </div>
       </header>
