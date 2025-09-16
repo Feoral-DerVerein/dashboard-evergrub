@@ -91,18 +91,18 @@ export const ReportGenerator = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
-            Generador de Reportes
+            Report Generator
           </CardTitle>
           <CardDescription>
-            Crear reportes automáticos para EPA NSW y programa Bin Trim
+            Create automatic reports for EPA NSW and Bin Trim program
           </CardDescription>
         </CardHeader>
       </Card>
 
       <Tabs value={activeReport} onValueChange={setActiveReport}>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="epa">Reporte EPA</TabsTrigger>
-          <TabsTrigger value="bintrim">Reporte Bin Trim</TabsTrigger>
+          <TabsTrigger value="epa">EPA Report</TabsTrigger>
+          <TabsTrigger value="bintrim">Bin Trim Report</TabsTrigger>
         </TabsList>
 
         {/* EPA Report */}
@@ -111,13 +111,13 @@ export const ReportGenerator = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building className="w-5 h-5" />
-                Datos Requeridos por EPA NSW
+                Data Required by EPA NSW
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="company-count">Número de Empresas con Servicio FOGO</Label>
+                  <Label htmlFor="company-count">Number of Companies with FOGO Service</Label>
                   <Input
                     id="company-count"
                     type="number"
@@ -127,7 +127,7 @@ export const ReportGenerator = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="reporting-date">Fecha de Reporte</Label>
+                  <Label htmlFor="reporting-date">Report Date</Label>
                   <Input
                     id="reporting-date"
                     type="date"
@@ -137,7 +137,7 @@ export const ReportGenerator = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="diversion-rate">Tasa de Desvío (%)</Label>
+                  <Label htmlFor="diversion-rate">Diversion Rate (%)</Label>
                   <Input
                     id="diversion-rate"
                     type="number"

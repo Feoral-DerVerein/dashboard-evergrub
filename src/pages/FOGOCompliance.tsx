@@ -14,19 +14,19 @@ const FOGOCompliance = () => {
 
   const officialLinks = [
     {
-      title: "Calculadora FOGO Oficial",
+      title: "Official FOGO Calculator",
       url: "https://www.epa.nsw.gov.au/business-food-waste-grants",
-      description: "Herramienta oficial de EPA NSW"
+      description: "Official EPA NSW tool"
     },
     {
-      title: "Programa Bin Trim",
+      title: "Bin Trim Program",
       url: "https://www.epa.nsw.gov.au/your-environment/recycling-and-reuse/business-government-recycling/bin-trim",
-      description: "Información del programa oficial"
+      description: "Official program information"
     },
     {
-      title: "Solicitar Subvención",
+      title: "Apply for Grant",
       url: "https://www.smartygrants.com.au/",
-      description: "Portal SmartyGrants"
+      description: "SmartyGrants Portal"
     }
   ];
 
@@ -41,7 +41,7 @@ const FOGOCompliance = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">FOGO & Bin Trim</h1>
-              <p className="text-gray-600">Módulo de Cumplimiento NSW Australia</p>
+              <p className="text-gray-600">NSW Australia Compliance Module</p>
             </div>
           </div>
           
@@ -51,8 +51,8 @@ const FOGOCompliance = () => {
               <div className="flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
                 <div className="text-sm text-yellow-800">
-                  <p className="font-medium mb-1">Aviso Legal</p>
-                  <p>Esta herramienta es de apoyo únicamente. Para información definitiva, consulte siempre las fuentes oficiales de EPA NSW y el programa Bin Trim.</p>
+                  <p className="font-medium mb-1">Legal Notice</p>
+                  <p>This tool is for support only. For definitive information, always consult official EPA NSW sources and the Bin Trim program.</p>
                 </div>
               </div>
             </CardContent>
@@ -87,7 +87,7 @@ const FOGOCompliance = () => {
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="calculator" className="flex items-center gap-2">
               <Calculator className="w-4 h-4" />
-              Calculadora
+              Calculator
             </TabsTrigger>
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
@@ -95,11 +95,11 @@ const FOGOCompliance = () => {
             </TabsTrigger>
             <TabsTrigger value="reports" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              Reportes
+              Reports
             </TabsTrigger>
             <TabsTrigger value="export" className="flex items-center gap-2">
               <Download className="w-4 h-4" />
-              Exportar
+              Export
             </TabsTrigger>
           </TabsList>
 
@@ -124,9 +124,9 @@ const FOGOCompliance = () => {
         <Card className="mt-8 bg-blue-50 border-blue-200">
           <CardContent className="pt-4">
             <div className="text-center">
-              <h3 className="font-medium text-blue-900 mb-2">¿Necesita ayuda?</h3>
+              <h3 className="font-medium text-blue-900 mb-2">Need help?</h3>
               <p className="text-sm text-blue-800 mb-3">
-                Para consultas sobre el programa FOGO, contacte directamente a EPA NSW
+                For inquiries about the FOGO program, contact EPA NSW directly
               </p>
               <Button 
                 variant="outline" 

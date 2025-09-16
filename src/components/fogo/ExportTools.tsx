@@ -134,10 +134,10 @@ Saludos cordiales,
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Download className="w-5 h-5" />
-            Opciones de Exportación
+            Export Options
           </CardTitle>
           <CardDescription>
-            Genere y descargue reportes en diferentes formatos
+            Generate and download reports in different formats
           </CardDescription>
         </CardHeader>
         <CardContent>

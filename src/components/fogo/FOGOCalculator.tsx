@@ -25,14 +25,14 @@ export const FOGOCalculator = () => {
   const [result, setResult] = useState<FOGOResult | null>(null);
 
   const businessTypes = [
-    { value: 'supermarket', label: 'Supermercado' },
+    { value: 'supermarket', label: 'Supermarket' },
     { value: 'hotel', label: 'Hotel' },
     { value: 'hospital', label: 'Hospital' },
-    { value: 'school', label: 'Escuela' },
-    { value: 'restaurant', label: 'Restaurante' },
-    { value: 'cafe', label: 'Café' },
-    { value: 'office', label: 'Oficina' },
-    { value: 'other', label: 'Otro' }
+    { value: 'school', label: 'School' },
+    { value: 'restaurant', label: 'Restaurant' },
+    { value: 'cafe', label: 'Cafe' },
+    { value: 'office', label: 'Office' },
+    { value: 'other', label: 'Other' }
   ];
 
   const calculateMandate = () => {
@@ -99,19 +99,19 @@ export const FOGOCalculator = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calculator className="w-5 h-5" />
-            Calculadora de Mandato FOGO
+            FOGO Mandate Calculator
           </CardTitle>
           <CardDescription>
-            Determine si el mandato FOGO aplica a su negocio y cuándo debe cumplir
+            Determine if the FOGO mandate applies to your business and when you must comply
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Business Type */}
           <div className="space-y-2">
-            <Label htmlFor="business-type">Tipo de Negocio</Label>
+            <Label htmlFor="business-type">Business Type</Label>
             <Select value={businessType} onValueChange={setBusinessType}>
               <SelectTrigger>
-                <SelectValue placeholder="Seleccione el tipo de negocio" />
+                <SelectValue placeholder="Select business type" />
               </SelectTrigger>
               <SelectContent>
                 {businessTypes.map((type) => (
@@ -125,11 +125,11 @@ export const FOGOCalculator = () => {
 
           {/* Sells Food */}
           <div className="space-y-3">
-            <Label>¿Vende comestibles o prepara alimentos/bebidas?</Label>
+            <Label>Do you sell food or prepare food/beverages?</Label>
             <RadioGroup value={sellsFood} onValueChange={setSellsFood}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="yes" id="sells-yes" />
-                <Label htmlFor="sells-yes">Sí</Label>
+                <Label htmlFor="sells-yes">Yes</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="no" id="sells-no" />
@@ -140,11 +140,11 @@ export const FOGOCalculator = () => {
 
           {/* Manages Contract */}
           <div className="space-y-3">
-            <Label>¿Gestiona su propio contrato de residuos?</Label>
+            <Label>Do you manage your own waste contract?</Label>
             <RadioGroup value={managesContract} onValueChange={setManagesContract}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="yes" id="manages-yes" />
-                <Label htmlFor="manages-yes">Sí</Label>
+                <Label htmlFor="manages-yes">Yes</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="no" id="manages-no" />
@@ -155,23 +155,23 @@ export const FOGOCalculator = () => {
 
           {/* Weekly Volume */}
           <div className="space-y-2">
-            <Label htmlFor="weekly-volume">Volumen Semanal de Residuos Generales (litros)</Label>
+            <Label htmlFor="weekly-volume">Weekly General Waste Volume (liters)</Label>
             <Input
               id="weekly-volume"
               type="number"
               value={weeklyVolume}
               onChange={(e) => setWeeklyVolume(e.target.value)}
-              placeholder="Ej: 2500"
+              placeholder="e.g. 2500"
             />
           </div>
 
           {/* Buttons */}
           <div className="flex gap-3">
             <Button onClick={calculateMandate} className="flex-1">
-              Calcular Mandato
+              Calculate Mandate
             </Button>
             <Button variant="outline" onClick={reset}>
-              Reiniciar
+              Reset
             </Button>
           </div>
         </CardContent>
@@ -187,24 +187,24 @@ export const FOGOCalculator = () => {
               ) : (
                 <XCircle className="w-5 h-5 text-gray-600" />
               )}
-              Resultado del Cálculo
+              Calculation Result
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {result.mandateApplies ? (
               <>
-                <Alert className="bg-green-50 border-green-200">
-                  <AlertDescription className="text-green-800">
-                    <strong>El mandato FOGO SÍ aplica a su negocio</strong>
-                  </AlertDescription>
-                </Alert>
+                  <Alert className="bg-green-50 border-green-200">
+                    <AlertDescription className="text-green-800">
+                      <strong>The FOGO mandate DOES apply to your business</strong>
+                    </AlertDescription>
+                  </Alert>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600">
                       {result.volume.toLocaleString()}L
                     </div>
-                    <div className="text-sm text-blue-800">Volumen Semanal</div>
+                    <div className="text-sm text-blue-800">Weekly Volume</div>
                   </div>
 
                   <div className="text-center p-4 bg-orange-50 rounded-lg">
@@ -215,7 +215,7 @@ export const FOGOCalculator = () => {
                         year: 'numeric'
                       })}
                     </div>
-                    <div className="text-sm text-orange-800">Fecha Límite</div>
+                    <div className="text-sm text-orange-800">Deadline</div>
                   </div>
 
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
@@ -225,35 +225,35 @@ export const FOGOCalculator = () => {
                         {result.daysRemaining}
                       </span>
                     </div>
-                    <div className="text-sm text-purple-800">Días Restantes</div>
+                    <div className="text-sm text-purple-800">Days Remaining</div>
                   </div>
                 </div>
 
                 <div className="flex justify-center">
                   <Badge className={getCategoryColor(result.category)}>
-                    {result.category === 'high' && 'Prioridad Alta - Cumplimiento 2026'}
-                    {result.category === 'medium' && 'Prioridad Media - Cumplimiento 2028'}
-                    {result.category === 'low' && 'Prioridad Baja - Cumplimiento 2030'}
+                    {result.category === 'high' && 'High Priority - Compliance 2026'}
+                    {result.category === 'medium' && 'Medium Priority - Compliance 2028'}
+                    {result.category === 'low' && 'Low Priority - Compliance 2030'}
                   </Badge>
                 </div>
 
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-blue-900 mb-2">Próximos Pasos:</h4>
+                  <h4 className="font-medium text-blue-900 mb-2">Next Steps:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Contacte a su proveedor de residuos para implementar recolección FOGO</li>
-                    <li>• Capacite al personal sobre separación de residuos orgánicos</li>
-                    <li>• Considere solicitar subvenciones disponibles</li>
-                    <li>• Establezca sistema de monitoreo para cumplimiento</li>
+                    <li>• Contact your waste provider to implement FOGO collection</li>
+                    <li>• Train staff on organic waste separation</li>
+                    <li>• Consider applying for available grants</li>
+                    <li>• Establish monitoring system for compliance</li>
                   </ul>
                 </div>
               </>
             ) : (
               <Alert className="bg-gray-50 border-gray-200">
                 <AlertDescription className="text-gray-800">
-                  <strong>El mandato FOGO NO aplica a su negocio</strong> basado en los criterios actuales.
-                  {sellsFood === 'no' && " Razón: No vende comestibles ni prepara alimentos."}
-                  {managesContract === 'no' && " Razón: No gestiona su propio contrato de residuos."}
-                  {parseFloat(weeklyVolume) < 660 && " Razón: Volumen semanal menor a 660L."}
+                  <strong>The FOGO mandate does NOT apply to your business</strong> based on current criteria.
+                  {sellsFood === 'no' && " Reason: Does not sell food or prepare food/beverages."}
+                  {managesContract === 'no' && " Reason: Does not manage own waste contract."}
+                  {parseFloat(weeklyVolume) < 660 && " Reason: Weekly volume less than 660L."}
                 </AlertDescription>
               </Alert>
             )}

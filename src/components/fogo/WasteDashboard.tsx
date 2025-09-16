@@ -28,17 +28,17 @@ export const WasteDashboard = () => {
   });
 
   const [savedData, setSavedData] = useState<WasteData[]>([
-    { period: 'Ene 2024', general: 4200, organics: 1800, recyclables: 800, contamination: 15 },
+    { period: 'Jan 2024', general: 4200, organics: 1800, recyclables: 800, contamination: 15 },
     { period: 'Feb 2024', general: 3900, organics: 2100, recyclables: 850, contamination: 12 },
     { period: 'Mar 2024', general: 3600, organics: 2400, recyclables: 900, contamination: 8 },
-    { period: 'Abr 2024', general: 3400, organics: 2600, recyclables: 950, contamination: 6 },
+    { period: 'Apr 2024', general: 3400, organics: 2600, recyclables: 950, contamination: 6 },
   ]);
 
   const saveData = () => {
     if (!currentData.general || !currentData.organics || !currentData.recyclables) return;
     
     const newEntry: WasteData = {
-      period: new Date().toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+      period: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
       general: parseFloat(currentData.general),
       organics: parseFloat(currentData.organics),
       recyclables: parseFloat(currentData.recyclables),
@@ -69,9 +69,9 @@ export const WasteDashboard = () => {
   const complianceStatus = getComplianceStatus();
 
   const pieData = latestData ? [
-    { name: 'Residuos Generales', value: latestData.general, color: '#ef4444' },
-    { name: 'Orgánicos FOGO', value: latestData.organics, color: '#22c55e' },
-    { name: 'Reciclables', value: latestData.recyclables, color: '#3b82f6' }
+    { name: 'General Waste', value: latestData.general, color: '#ef4444' },
+    { name: 'FOGO Organics', value: latestData.organics, color: '#22c55e' },
+    { name: 'Recyclables', value: latestData.recyclables, color: '#3b82f6' }
   ] : [];
 
   return (
@@ -79,73 +79,73 @@ export const WasteDashboard = () => {
       {/* Data Input */}
       <Card>
         <CardHeader>
-          <CardTitle>Ingreso de Datos de Residuos</CardTitle>
-          <CardDescription>Registre los volúmenes semanales/mensuales de sus residuos</CardDescription>
+          <CardTitle>Waste Data Entry</CardTitle>
+          <CardDescription>Record weekly/monthly volumes of your waste</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="general">Residuos Generales (L)</Label>
+              <Label htmlFor="general">General Waste (L)</Label>
               <Input
                 id="general"
                 type="number"
                 value={currentData.general}
                 onChange={(e) => setCurrentData({...currentData, general: e.target.value})}
-                placeholder="Ej: 3500"
+                placeholder="e.g. 3500"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="organics">Residuos Orgánicos FOGO (L)</Label>
+              <Label htmlFor="organics">FOGO Organic Waste (L)</Label>
               <Input
                 id="organics"
                 type="number"
                 value={currentData.organics}
                 onChange={(e) => setCurrentData({...currentData, organics: e.target.value})}
-                placeholder="Ej: 2400"
+                placeholder="e.g. 2400"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="recyclables">Reciclables (L)</Label>
+              <Label htmlFor="recyclables">Recyclables (L)</Label>
               <Input
                 id="recyclables"
                 type="number"
                 value={currentData.recyclables}
                 onChange={(e) => setCurrentData({...currentData, recyclables: e.target.value})}
-                placeholder="Ej: 900"
+                placeholder="e.g. 900"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="frequency">Frecuencia de Recolección</Label>
+              <Label htmlFor="frequency">Collection Frequency</Label>
               <Select value={currentData.frequency} onValueChange={(value) => setCurrentData({...currentData, frequency: value})}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar" />
+                  <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="daily">Diaria</SelectItem>
-                  <SelectItem value="weekly">Semanal</SelectItem>
-                  <SelectItem value="biweekly">Bisemanal</SelectItem>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="biweekly">Bi-weekly</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="contamination">Tasa de Contaminación (%)</Label>
+              <Label htmlFor="contamination">Contamination Rate (%)</Label>
               <Input
                 id="contamination"
                 type="number"
                 max="100"
                 value={currentData.contamination}
                 onChange={(e) => setCurrentData({...currentData, contamination: e.target.value})}
-                placeholder="Ej: 8"
+                placeholder="e.g. 8"
               />
             </div>
             
             <div className="flex items-end">
               <Button onClick={saveData} className="w-full">
-                Guardar Datos
+                Save Data
               </Button>
             </div>
           </div>
@@ -158,7 +158,7 @@ export const WasteDashboard = () => {
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-green-600 font-medium">Tasa de Desvío</p>
+                <p className="text-sm text-green-600 font-medium">Diversion Rate</p>
                 <p className="text-2xl font-bold text-green-700">
                   {diversionRate.toFixed(1)}%
                 </p>
@@ -173,7 +173,7 @@ export const WasteDashboard = () => {
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-600 font-medium">Reducción Mensual</p>
+                <p className="text-sm text-blue-600 font-medium">Monthly Reduction</p>
                 <p className="text-2xl font-bold text-blue-700 flex items-center gap-1">
                   {monthlyReduction > 0 ? (
                     <TrendingDown className="w-5 h-5" />
@@ -192,7 +192,7 @@ export const WasteDashboard = () => {
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-orange-600 font-medium">Contaminación</p>
+                <p className="text-sm text-orange-600 font-medium">Contamination</p>
                 <p className="text-2xl font-bold text-orange-700">
                   {latestData?.contamination || 0}%
                 </p>
@@ -212,17 +212,17 @@ export const WasteDashboard = () => {
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">Estado de Cumplimiento</p>
+                <p className="text-sm font-medium">Compliance Status</p>
                 <Badge className={
                   complianceStatus === 'excellent' ? 'bg-green-100 text-green-800' :
                   complianceStatus === 'good' ? 'bg-blue-100 text-blue-800' :
                   complianceStatus === 'warning' ? 'bg-yellow-100 text-yellow-800' :
                   'bg-red-100 text-red-800'
                 }>
-                  {complianceStatus === 'excellent' && 'Excelente'}
-                  {complianceStatus === 'good' && 'Bueno'}
-                  {complianceStatus === 'warning' && 'Advertencia'}
-                  {complianceStatus === 'danger' && 'Requiere Acción'}
+                  {complianceStatus === 'excellent' && 'Excellent'}
+                  {complianceStatus === 'good' && 'Good'}
+                  {complianceStatus === 'warning' && 'Warning'}
+                  {complianceStatus === 'danger' && 'Requires Action'}
                 </Badge>
               </div>
               <CheckCircle className={`w-8 h-8 ${
@@ -240,7 +240,7 @@ export const WasteDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Tendencia de Residuos</CardTitle>
+            <CardTitle>Waste Trends</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -249,9 +249,9 @@ export const WasteDashboard = () => {
                 <XAxis dataKey="period" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="general" fill="#ef4444" name="Generales" />
-                <Bar dataKey="organics" fill="#22c55e" name="Orgánicos" />
-                <Bar dataKey="recyclables" fill="#3b82f6" name="Reciclables" />
+                <Bar dataKey="general" fill="#ef4444" name="General" />
+                <Bar dataKey="organics" fill="#22c55e" name="Organics" />
+                <Bar dataKey="recyclables" fill="#3b82f6" name="Recyclables" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -259,7 +259,7 @@ export const WasteDashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Composición Actual</CardTitle>
+            <CardTitle>Current Composition</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
