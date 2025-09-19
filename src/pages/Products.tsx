@@ -351,19 +351,7 @@ const Products = () => {
   };
   return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 z-10">
-        <div className="flex justify-center items-center">
-          <div className="flex flex-col items-center gap-3">
-            <img src={dailyDayLogo} alt="Daily Day Logo" className="h-16 w-auto" />
-            <div className="flex items-center gap-2">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Marketplace B2C</h1>
-              </div>
-              <button onClick={() => setTutorialOpen(true)} className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-2" title="Ver tutorial">
-                <Info className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
+        
       </header>
 
       {/* Navigation Icons Section */}
@@ -372,31 +360,25 @@ const Products = () => {
           <Link to="/orders" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 relative">
             <ShoppingBag className="w-6 h-6 text-gray-600 mb-2" />
             <span className="text-xs text-gray-700 font-medium text-center">Orders</span>
-            {orderCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-medium">
+            {orderCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-medium">
                 {orderCount > 99 ? '99+' : orderCount}
-              </span>
-            )}
+              </span>}
           </Link>
           
           <Link to="/sales" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 relative">
             <BarChart3 className="w-6 h-6 text-gray-600 mb-2" />
             <span className="text-xs text-gray-700 font-medium text-center">Sales</span>
-            {salesCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-medium">
+            {salesCount > 0 && <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-medium">
                 {salesCount > 99 ? '99+' : salesCount}
-              </span>
-            )}
+              </span>}
           </Link>
           
           <Link to="/notifications" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200 relative">
             <Bell className="w-6 h-6 text-gray-600 mb-2" />
             <span className="text-xs text-gray-700 font-medium text-center">Notifications</span>
-            {notificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-medium">
+            {notificationCount > 0 && <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-medium">
                 {notificationCount > 99 ? '99+' : notificationCount}
-              </span>
-            )}
+              </span>}
           </Link>
           
           <Link to="/ads" className="flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-gray-200">
