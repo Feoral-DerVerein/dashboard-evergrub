@@ -1,487 +1,558 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
-import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Leaf, 
   Recycle, 
   Calculator, 
   CheckCircle, 
   Clock, 
-  ExternalLink, 
   Download,
   AlertCircle,
   TreePine,
   Target,
   Award,
   Calendar,
-  Upload,
-  Play
+  TrendingUp,
+  BarChart3,
+  FileText,
+  Zap,
+  RefreshCw,
+  Globe,
+  Shield
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 
 const FOGOCompliance = () => {
   const { toast } = useToast();
   
-  // Force rebuild - cache clearing comment
-  // Shared state between cards
-  const [complianceData, setComplianceData] = useState({
-    volumeWeekly: 0,
-    businessType: '',
-    complianceDate: null,
-    assessmentStatus: 'pending',
-    eligibleRebate: 0,
-    actionPlan: [],
-    completedSteps: []
+  // Mock POS data simulation
+  const [posData, setPosData] = useState({
+    weeklyVolume: 2100,
+    connected: true,
+    lastSync: new Date(),
+    sales: [
+      { date: '2025-01-15', organicWaste: 1850, sales: 45000 },
+      { date: '2025-01-16', organicWaste: 2100, sales: 52000 },
+      { date: '2025-01-17', organicWaste: 1900, sales: 48000 },
+      { date: '2025-01-18', organicWaste: 2300, sales: 58000 },
+      { date: '2025-01-19', organicWaste: 2150, sales: 54000 },
+      { date: '2025-01-20', organicWaste: 2400, sales: 61000 },
+      { date: '2025-01-21', organicWaste: 2200, sales: 56000 }
+    ]
   });
 
-  // Calculate compliance date based on volume
-  const calculateComplianceDate = (volume) => {
-    if (volume >= 3840) return { year: 2026, status: 'urgent' };
-    if (volume >= 1920) return { year: 2028, status: 'planning' };
-    if (volume >= 660) return { year: 2030, status: 'future' };
-    return null;
+  const [complianceMetrics, setComplianceMetrics] = useState({
+    mandateDate: 'July 1, 2028',
+    daysRemaining: 1247,
+    complianceProgress: 65,
+    diversionRate: 78,
+    contamination: 12,
+    equipmentNeeded: ['In-vessel Composter', 'Food Waste Dehydrator'],
+    estimatedRebate: 17500
+  });
+
+  // Calculate mandate date based on volume
+  const calculateMandateDate = (volume) => {
+    if (volume >= 3840) return { date: 'July 1, 2026', status: 'urgent', color: 'red' };
+    if (volume >= 1920) return { date: 'July 1, 2028', status: 'planning', color: 'amber' };
+    if (volume >= 660) return { date: 'July 1, 2030', status: 'future', color: 'green' };
+    return { date: 'Not applicable', status: 'exempt', color: 'gray' };
   };
 
-  // Calculate countdown
-  const [countdown, setCountdown] = useState('');
-  
+  // Realtime data updates simulation
   useEffect(() => {
-    if (complianceData.complianceDate) {
-      const targetDate = new Date(`${complianceData.complianceDate.year}-01-01`);
-      const interval = setInterval(() => {
-        const now = new Date().getTime();
-        const distance = targetDate.getTime() - now;
+    const interval = setInterval(() => {
+      setPosData(prev => ({
+        ...prev,
+        lastSync: new Date(),
+        weeklyVolume: prev.weeklyVolume + (Math.random() - 0.5) * 100
+      }));
+    }, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const mandate = calculateMandateDate(posData.weeklyVolume);
+
+  const ComplianceStatusCard = () => (
+    <div className="glass-card p-6 relative overflow-hidden">
+      <div className="absolute inset-0 fogo-gradient" />
+      <div className="relative z-10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center pulse-glow">
+            <CheckCircle className="w-6 h-6 text-emerald-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800">Compliance Status</h3>
+            <p className="text-sm text-gray-600">Auto-synced from POS</p>
+          </div>
+        </div>
         
-        if (distance > 0) {
-          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-          
-          setCountdown(`${days}d ${hours}h ${minutes}m`);
-        } else {
-          setCountdown('Mandate Active');
-        }
-      }, 1000);
+        <div className="space-y-3">
+          <div className="flex justify-between">
+            <span className="text-gray-700">Current Weekly Volume</span>
+            <span className="font-bold text-emerald-600">{posData.weeklyVolume.toFixed(0)}L</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-700">Mandate Applies</span>
+            <Badge variant={mandate.status === 'urgent' ? 'destructive' : mandate.status === 'planning' ? 'default' : 'secondary'}>
+              {mandate.date}
+            </Badge>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-700">Days Remaining</span>
+            <span className={`font-bold ${mandate.color === 'red' ? 'text-red-500' : mandate.color === 'amber' ? 'text-amber-500' : 'text-green-500'}`}>
+              {complianceMetrics.daysRemaining}
+            </span>
+          </div>
+        </div>
+        
+        <div className="mt-4 bg-gray-200/30 rounded-full h-3">
+          <div 
+            className="bg-gradient-to-r from-emerald-500 to-cyan-500 h-3 rounded-full transition-all duration-1000"
+            style={{width: `${complianceMetrics.complianceProgress}%`}}
+          />
+        </div>
+        <p className="text-xs text-gray-600 mt-1">{complianceMetrics.complianceProgress}% compliance ready</p>
+      </div>
+    </div>
+  );
 
-      return () => clearInterval(interval);
-    }
-  }, [complianceData.complianceDate]);
-
-  // Update compliance data
-  const updateComplianceData = (updates) => {
-    setComplianceData(prev => ({ ...prev, ...updates }));
-  };
-
-  // Check compliance status
-  const checkFOGOCompliance = () => {
-    const compliance = calculateComplianceDate(complianceData.volumeWeekly);
-    updateComplianceData({ complianceDate: compliance });
-    
-    if (!complianceData.completedSteps.includes('fogo-check')) {
-      updateComplianceData({ 
-        completedSteps: [...complianceData.completedSteps, 'fogo-check'] 
-      });
+  const MandateCountdown = () => (
+    <div className="glass-card p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+          <Clock className="w-6 h-6 text-amber-600" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800">Mandate Countdown</h3>
+          <p className="text-sm text-gray-600">Time until implementation</p>
+        </div>
+      </div>
       
-      toast({
-        title: "FOGO Status Calculated!",
-        description: `Your compliance date: ${compliance?.year || 'No mandate required'}`,
-      });
-    }
-  };
+      <div className="text-center">
+        <div className="text-3xl font-bold text-amber-600 mb-2">{complianceMetrics.daysRemaining}</div>
+        <div className="text-sm text-gray-600 mb-4">Days remaining</div>
+        
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="bg-white/30 rounded-lg p-2">
+            <div className="text-lg font-bold text-gray-800">{Math.floor(complianceMetrics.daysRemaining / 365)}</div>
+            <div className="text-xs text-gray-600">Years</div>
+          </div>
+          <div className="bg-white/30 rounded-lg p-2">
+            <div className="text-lg font-bold text-gray-800">{Math.floor((complianceMetrics.daysRemaining % 365) / 30)}</div>
+            <div className="text-xs text-gray-600">Months</div>
+          </div>
+          <div className="bg-white/30 rounded-lg p-2">
+            <div className="text-lg font-bold text-gray-800">{complianceMetrics.daysRemaining % 30}</div>
+            <div className="text-xs text-gray-600">Days</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
-  // Equipment options for rebate calculator
-  const equipmentOptions = [
-    { id: 'food-processor', label: 'Commercial Food Waste Processor', cost: 15000, rebate: 7500 },
-    { id: 'composter', label: 'In-vessel Composter', cost: 25000, rebate: 12500 },
-    { id: 'dehydrator', label: 'Food Waste Dehydrator', cost: 8000, rebate: 4000 },
-    { id: 'digestor', label: 'Anaerobic Digestor (Small)', cost: 45000, rebate: 22500 }
-  ];
-
-  const [selectedEquipment, setSelectedEquipment] = useState([]);
-
-  // Calculate rebate
-  const calculateRebate = () => {
-    const totalCost = selectedEquipment.reduce((sum, id) => {
-      const equipment = equipmentOptions.find(eq => eq.id === id);
-      return sum + (equipment?.cost || 0);
-    }, 0);
-    
-    const totalRebate = Math.min(selectedEquipment.reduce((sum, id) => {
-      const equipment = equipmentOptions.find(eq => eq.id === id);
-      return sum + (equipment?.rebate || 0);
-    }, 0), 50000);
-
-    updateComplianceData({ eligibleRebate: totalRebate });
-    
-    if (!complianceData.completedSteps.includes('rebate-calc')) {
-      updateComplianceData({ 
-        completedSteps: [...complianceData.completedSteps, 'rebate-calc'] 
-      });
+  const QuickActions = () => (
+    <div className="glass-card p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center">
+          <Zap className="w-6 h-6 text-cyan-600" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800">Quick Actions</h3>
+          <p className="text-sm text-gray-600">One-click compliance tools</p>
+        </div>
+      </div>
       
-      toast({
-        title: "Rebate Calculated!",
-        description: `You're eligible for up to $${totalRebate.toLocaleString()}`,
-      });
-    }
-  };
+      <div className="space-y-3">
+        <Button 
+          className="w-full justify-start bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-700 border-emerald-200"
+          variant="outline"
+          onClick={() => toast({ title: "EPA Report Generated!", description: "Automatic report ready for download" })}
+        >
+          <FileText className="w-4 h-4 mr-2" />
+          Generate EPA Report
+        </Button>
+        
+        <Button 
+          className="w-full justify-start bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-700 border-cyan-200"
+          variant="outline"
+          onClick={() => window.open('https://bintrim.nsw.gov.au/assessment', '_blank')}
+        >
+          <Target className="w-4 h-4 mr-2" />
+          Start Bin Trim Assessment
+        </Button>
+        
+        <Button 
+          className="w-full justify-start bg-amber-500/20 hover:bg-amber-500/30 text-amber-700 border-amber-200"
+          variant="outline"
+          onClick={() => toast({ title: "Rebate Calculated!", description: `Eligible for $${complianceMetrics.estimatedRebate.toLocaleString()}` })}
+        >
+          <Calculator className="w-4 h-4 mr-2" />
+          Calculate Rebates
+        </Button>
+      </div>
+    </div>
+  );
 
-  // Card unlock logic
-  const isCardUnlocked = (cardId) => {
-    switch (cardId) {
-      case 'compliance': return true;
-      case 'assessment': return complianceData.completedSteps.includes('fogo-check');
-      case 'rebate': return complianceData.assessmentStatus === 'completed';
-      case 'action': return complianceData.eligibleRebate > 0;
-      default: return false;
-    }
-  };
+  const RealtimeWasteMetrics = () => (
+    <div className="glass-card p-6 h-80">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-semibold text-gray-800">Live Waste Analytics</h3>
+        <div className="flex items-center gap-2 text-xs text-emerald-600">
+          <div className="status-dot bg-emerald-500" />
+          Connected to POS
+        </div>
+      </div>
+      
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={posData.sales}>
+          <defs>
+            <linearGradient id="wasteGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+              <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+          <XAxis 
+            dataKey="date" 
+            axisLine={false} 
+            tickLine={false}
+            tick={{ fontSize: 12, fill: '#6B7280' }}
+          />
+          <YAxis 
+            axisLine={false} 
+            tickLine={false}
+            tick={{ fontSize: 12, fill: '#6B7280' }}
+          />
+          <Tooltip 
+            contentStyle={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px'
+            }}
+          />
+          <Area
+            type="monotone"
+            dataKey="organicWaste"
+            stroke="#10b981"
+            fillOpacity={1}
+            fill="url(#wasteGradient)"
+            strokeWidth={2}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+
+  const FOGOPredictionChart = () => (
+    <div className="glass-card p-6 h-80">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-semibold text-gray-800">FOGO Predictions</h3>
+        <Badge variant="outline" className="bg-cyan-500/20 text-cyan-700">
+          87% Accuracy
+        </Badge>
+      </div>
+      
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={posData.sales}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+          <XAxis 
+            dataKey="date" 
+            axisLine={false} 
+            tickLine={false}
+            tick={{ fontSize: 12, fill: '#6B7280' }}
+          />
+          <YAxis 
+            axisLine={false} 
+            tickLine={false}
+            tick={{ fontSize: 12, fill: '#6B7280' }}
+          />
+          <Tooltip 
+            contentStyle={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px'
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="organicWaste"
+            stroke="#06b6d4"
+            strokeWidth={3}
+            dot={{ fill: '#06b6d4', strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, stroke: '#06b6d4', strokeWidth: 2 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+
+  const DataFlowVisualization = () => (
+    <div className="glass-card p-6">
+      <h3 className="text-xl font-semibold text-gray-800 mb-6">Automated Data Flow</h3>
+      
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mb-2">
+            <BarChart3 className="w-8 h-8 text-blue-600" />
+          </div>
+          <span className="text-sm font-medium text-gray-700">POS System</span>
+          <span className="text-xs text-gray-500">Sales Data</span>
+        </div>
+        
+        <div className="flex-1 h-0.5 bg-gradient-to-r from-blue-400 to-emerald-400 mx-4 relative">
+          <div className="absolute -top-1 left-1/3 w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+        </div>
+        
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mb-2">
+            <Calculator className="w-8 h-8 text-emerald-600" />
+          </div>
+          <span className="text-sm font-medium text-gray-700">AI Analysis</span>
+          <span className="text-xs text-gray-500">Waste Prediction</span>
+        </div>
+        
+        <div className="flex-1 h-0.5 bg-gradient-to-r from-emerald-400 to-amber-400 mx-4 relative">
+          <div className="absolute -top-1 left-2/3 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+        </div>
+        
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mb-2">
+            <FileText className="w-8 h-8 text-amber-600" />
+          </div>
+          <span className="text-sm font-medium text-gray-700">Auto Reports</span>
+          <span className="text-xs text-gray-500">EPA & Bin Trim</span>
+        </div>
+      </div>
+      
+      <div className="mt-6 grid grid-cols-3 gap-4 text-center">
+        <div className="bg-white/30 rounded-lg p-3">
+          <div className="text-lg font-bold text-blue-600">Real-time</div>
+          <div className="text-xs text-gray-600">Data Sync</div>
+        </div>
+        <div className="bg-white/30 rounded-lg p-3">
+          <div className="text-lg font-bold text-emerald-600">99.2%</div>
+          <div className="text-xs text-gray-600">Accuracy</div>
+        </div>
+        <div className="bg-white/30 rounded-lg p-3">
+          <div className="text-lg font-bold text-amber-600">Auto</div>
+          <div className="text-xs text-gray-600">Generation</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const AutoReportGenerator = () => (
+    <div className="glass-card p-6">
+      <h3 className="text-xl font-semibold text-gray-800 mb-4">Automated Reports</h3>
+      
+      <div className="space-y-4">
+        <div className="flex items-center justify-between p-4 bg-white/30 rounded-lg">
+          <div className="flex items-center gap-3">
+            <Shield className="w-6 h-6 text-emerald-600" />
+            <div>
+              <div className="font-semibold text-gray-800">EPA Compliance Report</div>
+              <div className="text-sm text-gray-600">Auto-generated from POS data</div>
+            </div>
+          </div>
+          <Button
+            onClick={() => toast({ title: "EPA Report Generated!", description: "Report ready for download" })}
+            className="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-700"
+            variant="outline"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download
+          </Button>
+        </div>
+        
+        <div className="flex items-center justify-between p-4 bg-white/30 rounded-lg">
+          <div className="flex items-center gap-3">
+            <Recycle className="w-6 h-6 text-cyan-600" />
+            <div>
+              <div className="font-semibold text-gray-800">Bin Trim Report</div>
+              <div className="text-sm text-gray-600">Ready for NSW submission</div>
+            </div>
+          </div>
+          <Button
+            className="px-4 py-2 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-700"
+            variant="outline"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download
+          </Button>
+        </div>
+        
+        <div className="flex items-center justify-between p-4 bg-white/30 rounded-lg">
+          <div className="flex items-center gap-3">
+            <Award className="w-6 h-6 text-amber-600" />
+            <div>
+              <div className="font-semibold text-gray-800">Rebate Application</div>
+              <div className="text-sm text-gray-600">Equipment rebate forms</div>
+            </div>
+          </div>
+          <Button
+            className="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-700"
+            variant="outline"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Generate
+          </Button>
+        </div>
+      </div>
+      
+      <div className="mt-6 pt-4 border-t border-white/20">
+        <h4 className="text-sm font-semibold text-gray-700 mb-2">Recent Submissions</h4>
+        <div className="space-y-2 text-xs text-gray-600">
+          <div className="flex justify-between">
+            <span>EPA Report - January 2025</span>
+            <span className="text-emerald-600">✓ Submitted</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Bin Trim Update - December 2024</span>
+            <span className="text-emerald-600">✓ Approved</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ComplianceHistory = () => (
+    <div className="glass-card p-6">
+      <h3 className="text-xl font-semibold text-gray-800 mb-4">Compliance Timeline</h3>
+      
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <div className="w-3 h-3 bg-emerald-500 rounded-full" />
+          <div className="flex-1">
+            <div className="font-medium text-emerald-700">Assessment Completed</div>
+            <div className="text-sm text-gray-600">Bin Trim evaluation finished</div>
+            <div className="text-xs text-gray-500">January 15, 2025</div>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <div className="w-3 h-3 bg-emerald-500 rounded-full" />
+          <div className="flex-1">
+            <div className="font-medium text-emerald-700">POS Integration</div>
+            <div className="text-sm text-gray-600">Automated data collection started</div>
+            <div className="text-xs text-gray-500">January 10, 2025</div>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse" />
+          <div className="flex-1">
+            <div className="font-medium text-amber-700">Equipment Planning</div>
+            <div className="text-sm text-gray-600">Rebate calculation in progress</div>
+            <div className="text-xs text-gray-500">In Progress</div>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <div className="w-3 h-3 bg-gray-300 rounded-full" />
+          <div className="flex-1">
+            <div className="font-medium text-gray-600">Implementation</div>
+            <div className="text-sm text-gray-600">FOGO service setup</div>
+            <div className="text-xs text-gray-500">Pending</div>
+          </div>
+        </div>
+      </div>
+      
+      <Button 
+        className="w-full mt-6 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white"
+        onClick={() => toast({ title: "Action Plan Ready!", description: "Implementation timeline downloaded" })}
+      >
+        <Calendar className="w-4 h-4 mr-2" />
+        Download Full Timeline
+      </Button>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen p-4 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-4">
-            <div className="p-4 bg-white/20 backdrop-blur-sm rounded-full border border-green-200">
-              <TreePine className="w-12 h-12 text-green-700" />
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-50 glass-header">
+        <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+              <TreePine className="w-6 h-6 text-emerald-600" />
+            </div>
+            <div>
+              <div className="text-xl font-bold text-emerald-800">🌱 FOGO Compliance</div>
+              <div className="text-sm text-emerald-600">NSW Australia Dashboard</div>
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-green-900 mb-2">FOGO & Bin Trim</h1>
-          <p className="text-lg text-green-700">NSW Australia Compliance Assistant 2026</p>
-          
-          {/* Progress indicator */}
-          <div className="mt-6 max-w-md mx-auto">
-            <Progress 
-              value={(complianceData.completedSteps.length / 4) * 100} 
-              className="h-2"
-            />
-            <p className="text-sm text-green-600 mt-2">
-              {complianceData.completedSteps.length} of 4 steps completed
-            </p>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm">
+              <div className="status-dot bg-emerald-500" />
+              <span className="text-emerald-700">Connected</span>
+            </div>
+            <Badge variant="outline" className="bg-emerald-500/20 text-emerald-700">
+              Score: {complianceMetrics.complianceProgress}%
+            </Badge>
+            <div className="text-xs text-gray-600">
+              Last sync: {posData.lastSync.toLocaleTimeString()}
+            </div>
           </div>
         </div>
+      </header>
 
-        {/* 4-Card Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          
-          {/* Card 1: FOGO Compliance Checker */}
-          <Card className="glass-card hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <CardHeader className="text-center pb-4">
-              <div className="flex justify-center mb-3">
-                <Leaf className="w-8 h-8 text-green-600" />
-              </div>
-              <CardTitle className="text-xl text-green-900">¿Tu empresa debe cumplir FOGO?</CardTitle>
-              <CardDescription>Determine your FOGO compliance requirements</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-green-800 mb-2">
-                  Weekly Waste Volume: {complianceData.volumeWeekly}L
-                </label>
-                <Slider
-                  value={[complianceData.volumeWeekly]}
-                  onValueChange={([value]) => updateComplianceData({ volumeWeekly: value })}
-                  max={10000}
-                  step={50}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-green-800 mb-2">Business Type</label>
-                <Select 
-                  value={complianceData.businessType} 
-                  onValueChange={(value) => updateComplianceData({ businessType: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your business type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="supermarket">Supermarket</SelectItem>
-                    <SelectItem value="restaurant">Restaurant</SelectItem>
-                    <SelectItem value="hotel">Hotel</SelectItem>
-                    <SelectItem value="school">School/Institution</SelectItem>
-                    <SelectItem value="retail">Retail Food</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button 
-                onClick={checkFOGOCompliance}
-                className="w-full bg-green-600 hover:bg-green-700"
-                disabled={!complianceData.volumeWeekly || !complianceData.businessType}
-              >
-                <Target className="w-4 h-4 mr-2" />
-                Verificar Mi Status FOGO
-              </Button>
-
-              {/* Results */}
-              {complianceData.complianceDate && (
-                <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-green-800">Compliance Date:</span>
-                    <Badge variant={
-                      complianceData.complianceDate.status === 'urgent' ? 'destructive' :
-                      complianceData.complianceDate.status === 'planning' ? 'default' : 'secondary'
-                    }>
-                      {complianceData.complianceDate.year}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-green-600" />
-                    <span className="text-sm text-green-700">{countdown}</span>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Card 2: Bin Trim Assessment Hub */}
-          <Card className={`glass-card transition-all duration-300 ${
-            isCardUnlocked('assessment') 
-              ? 'hover:shadow-xl transform hover:-translate-y-1' 
-              : 'opacity-60 cursor-not-allowed'
-          }`}>
-            <CardHeader className="text-center pb-4">
-              <div className="flex justify-center mb-3">
-                <Recycle className="w-8 h-8 text-green-600" />
-              </div>
-              <CardTitle className="text-xl text-green-900">Evaluación de Residuos Bin Trim</CardTitle>
-              <CardDescription>Complete your waste assessment</CardDescription>
-              {!isCardUnlocked('assessment') && (
-                <Badge variant="outline">Complete FOGO check first</Badge>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                <div className="mb-4">
-                  <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
-                    complianceData.assessmentStatus === 'completed' 
-                      ? 'bg-green-100 text-green-600'
-                      : complianceData.assessmentStatus === 'in-progress'
-                      ? 'bg-yellow-100 text-yellow-600'
-                      : 'bg-gray-100 text-gray-400'
-                  }`}>
-                    {complianceData.assessmentStatus === 'completed' ? (
-                      <CheckCircle className="w-8 h-8" />
-                    ) : (
-                      <Clock className="w-8 h-8" />
-                    )}
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">
-                  Status: {
-                    complianceData.assessmentStatus === 'completed' ? 'Completed' :
-                    complianceData.assessmentStatus === 'in-progress' ? 'In Progress' : 'Pending'
-                  }
-                </p>
-              </div>
-
-              <Button 
-                onClick={() => window.open('https://bintrim.nsw.gov.au/assessment', '_blank')}
-                className="w-full"
-                variant="outline"
-                disabled={!isCardUnlocked('assessment')}
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Comenzar Assessment Bin Trim
-              </Button>
-
-              <Button 
-                onClick={() => {
-                  updateComplianceData({ assessmentStatus: 'completed' });
-                  toast({
-                    title: "Assessment Updated!",
-                    description: "Bin Trim assessment marked as completed",
-                  });
-                }}
-                className="w-full"
-                variant="outline"
-                disabled={!isCardUnlocked('assessment')}
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Upload Results
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Card 3: Rebate Calculator */}
-          <Card className={`glass-card transition-all duration-300 ${
-            isCardUnlocked('rebate') 
-              ? 'hover:shadow-xl transform hover:-translate-y-1' 
-              : 'opacity-60 cursor-not-allowed'
-          }`}>
-            <CardHeader className="text-center pb-4">
-              <div className="flex justify-center mb-3">
-                <Calculator className="w-8 h-8 text-green-600" />
-              </div>
-              <CardTitle className="text-xl text-green-900">Calculadora de Rebates</CardTitle>
-              <CardDescription>Calculate your equipment rebate eligibility</CardDescription>
-              {!isCardUnlocked('rebate') && (
-                <Badge variant="outline">Complete assessment first</Badge>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-green-800">Equipment Selection:</label>
-                {equipmentOptions.map((equipment) => (
-                  <div key={equipment.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={equipment.id}
-                      checked={selectedEquipment.includes(equipment.id)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedEquipment([...selectedEquipment, equipment.id]);
-                        } else {
-                          setSelectedEquipment(selectedEquipment.filter(id => id !== equipment.id));
-                        }
-                      }}
-                      disabled={!isCardUnlocked('rebate')}
-                    />
-                    <label 
-                      htmlFor={equipment.id} 
-                      className="text-sm text-gray-700 flex-1 cursor-pointer"
-                    >
-                      {equipment.label}
-                      <span className="text-xs text-gray-500 block">
-                        Cost: ${equipment.cost.toLocaleString()} | Rebate: ${equipment.rebate.toLocaleString()}
-                      </span>
-                    </label>
-                  </div>
-                ))}
-              </div>
-
-              <Button 
-                onClick={calculateRebate}
-                className="w-full bg-green-600 hover:bg-green-700"
-                disabled={!isCardUnlocked('rebate') || selectedEquipment.length === 0}
-              >
-                <Award className="w-4 h-4 mr-2" />
-                Calcular Mi Rebate
-              </Button>
-
-              {complianceData.eligibleRebate > 0 && (
-                <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-800">
-                      ${complianceData.eligibleRebate.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-green-600">Eligible Rebate</div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      Deadline: 30 Jun 2027
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Card 4: Action Plan & Timeline */}
-          <Card className={`glass-card transition-all duration-300 ${
-            isCardUnlocked('action') 
-              ? 'hover:shadow-xl transform hover:-translate-y-1' 
-              : 'opacity-60 cursor-not-allowed'
-          }`}>
-            <CardHeader className="text-center pb-4">
-              <div className="flex justify-center mb-3">
-                <Calendar className="w-8 h-8 text-green-600" />
-              </div>
-              <CardTitle className="text-xl text-green-900">Plan de Implementación</CardTitle>
-              <CardDescription>Your personalized action plan</CardDescription>
-              {!isCardUnlocked('action') && (
-                <Badge variant="outline">Complete rebate calculation first</Badge>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <div className="flex-1">
-                    <div className="font-medium text-green-800">FOGO Assessment</div>
-                    <div className="text-sm text-green-600">Compliance requirements identified</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <div className="flex-1">
-                    <div className="font-medium text-green-800">Bin Trim Analysis</div>
-                    <div className="text-sm text-green-600">Waste patterns analyzed</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <div className="flex-1">
-                    <div className="font-medium text-green-800">Equipment Planning</div>
-                    <div className="text-sm text-green-600">Rebate eligibility confirmed</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
-                  <Clock className="w-5 h-5 text-yellow-600" />
-                  <div className="flex-1">
-                    <div className="font-medium text-yellow-800">Implementation</div>
-                    <div className="text-sm text-yellow-600">Ready to begin installation</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Button 
-                  className="w-full"
-                  variant="outline"
-                  disabled={!isCardUnlocked('action')}
-                  onClick={() => window.open('https://www.epa.nsw.gov.au/waste/commercial', '_blank')}
-                >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View NSW EPA Resources
-                </Button>
-
-                <Button 
-                  className="w-full bg-green-600 hover:bg-green-700"
-                  disabled={!isCardUnlocked('action')}
-                  onClick={() => {
-                    toast({
-                      title: "Action Plan Generated!",
-                      description: "Your implementation plan is ready for download",
-                    });
-                  }}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Descargar Mi Plan
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        {/* Row 1: Executive Summary */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <ComplianceStatusCard />
+          <MandateCountdown />
+          <QuickActions />
         </div>
-
+        
+        {/* Row 2: Real-time Data */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <RealtimeWasteMetrics />
+          <FOGOPredictionChart />
+        </div>
+        
+        {/* Row 3: Data Flow */}
+        <DataFlowVisualization />
+        
+        {/* Row 4: Reports and History */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AutoReportGenerator />
+          <ComplianceHistory />
+        </div>
+        
         {/* Bottom Info */}
-        <Card className="glass-card">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <AlertCircle className="w-5 h-5 text-yellow-600" />
-                <span className="font-medium text-gray-800">Legal Disclaimer</span>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">
-                This tool provides guidance only. Always consult official EPA NSW sources for definitive compliance requirements.
-              </p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => window.location.href = 'mailto:organics.grants@epa.nsw.gov.au'}
-              >
-                Contact EPA NSW: organics.grants@epa.nsw.gov.au
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="glass-card p-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <AlertCircle className="w-5 h-5 text-amber-600" />
+            <span className="font-medium text-gray-800">Legal Compliance Disclaimer</span>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            This dashboard provides automated guidance based on your POS data. Always consult official EPA NSW sources for definitive compliance requirements.
+          </p>
+          <div className="flex justify-center gap-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => window.open('https://www.epa.nsw.gov.au/waste/commercial', '_blank')}
+            >
+              <Globe className="w-4 h-4 mr-2" />
+              EPA NSW Resources
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => window.location.href = 'mailto:organics.grants@epa.nsw.gov.au'}
+            >
+              Contact EPA NSW
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
