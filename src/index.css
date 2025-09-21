@@ -106,13 +106,29 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* Legacy glass card classes for backward compatibility */
+/* Enhanced glass card classes for FOGO module */
 .glass-card {
-  @apply apple-card;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px 0 rgba(16, 185, 129, 0.15),
+    0 2px 8px 0 rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card-hover {
-  @apply apple-card-hover;
+  @apply glass-card;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 
+    0 12px 40px 0 rgba(16, 185, 129, 0.2),
+    0 4px 16px 0 rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
 }
 
 /* Add scrollbar utilities */
