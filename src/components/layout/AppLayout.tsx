@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Sparkles, Settings, Store, FileText } from "lucide-react";
+import { ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Sparkles, Settings, Store, File } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 const AppLayout = () => {
@@ -34,7 +34,7 @@ const AppLayout = () => {
                   <span>Market B2B</span>
                 </Link>
                 <Link to="/fogo-compliance" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <FileText className="w-4 h-4" />
+                  <File className="w-4 h-4" />
                   <span>FOGO & Bin Trim</span>
                 </Link>
                 <Link to="/configuration" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">

@@ -27,6 +27,7 @@ import { useToast } from '@/hooks/use-toast';
 const FOGOCompliance = () => {
   const { toast } = useToast();
   
+  // Force rebuild - cache clearing comment
   // Shared state between cards
   const [complianceData, setComplianceData] = useState({
     volumeWeekly: 0,
