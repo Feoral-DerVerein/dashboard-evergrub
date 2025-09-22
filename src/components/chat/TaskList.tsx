@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DonationForm } from '@/components/DonationForm';
 import { DoneeListDialog } from '@/components/DoneeListDialog';
+import TaskDetailsModal from './TaskDetailsModal';
 interface TaskListProps {
   tasks: Task[];
   onCompleteTask: (taskId: string) => void;
@@ -30,6 +31,8 @@ const TaskList = ({
   const [showDoneeListDialog, setShowDoneeListDialog] = useState(false);
   const [showArchivedTasks, setShowArchivedTasks] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Task['product'] | null>(null);
+  const [showTaskDetails, setShowTaskDetails] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const handleActionClick = (taskId: string, action: Task['actionTaken'], product?: Task['product']) => {
     // Call the original action handler
     onTakeAction?.(taskId, action);
@@ -301,10 +304,13 @@ const TaskList = ({
                   {/* Simple action for regular tasks */}
                   <div className="flex justify-end">
                     <Button 
-                      onClick={() => onCompleteTask(task.id)} 
+                      onClick={() => {
+                        setSelectedTask(task);
+                        setShowTaskDetails(true);
+                      }} 
                       variant="outline" 
                       size="sm" 
-                      className="flex items-center gap-2"
+                      className="glass-button flex items-center gap-2"
                     >
                       <Eye className="w-4 h-4" />
                       View Details
@@ -369,6 +375,18 @@ const TaskList = ({
       setShowDoneeListDialog(false);
       setShowDonationDialog(true);
     }} />
+
+      {/* Task Details Modal */}
+      <TaskDetailsModal
+        task={selectedTask}
+        open={showTaskDetails}
+        onOpenChange={setShowTaskDetails}
+        onSend={(task) => {
+          // Handle send action - could be completing task or other actions
+          onCompleteTask(task.id);
+          console.log('Task sent:', task);
+        }}
+      />
 
       {/* Donation Dialog */}
       <Dialog open={showDonationDialog} onOpenChange={setShowDonationDialog}>
