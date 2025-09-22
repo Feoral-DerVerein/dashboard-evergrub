@@ -12,6 +12,7 @@ import { useTaskList } from '@/hooks/useTaskList';
 import TaskList from '@/components/chat/TaskList';
 import { useAutoTaskGeneration } from '@/hooks/useAutoTaskGeneration';
 import { productService } from '@/services/productService';
+import { ChatSuggestionCards } from '@/components/chat/ChatSuggestionCards';
 interface ChatMessage {
   id: string;
   type: 'user' | 'bot';
@@ -229,6 +230,9 @@ const ChatBot = ({
                   ) : <Send className="w-4 h-4" />}
                 </Button>
               </div>
+
+              {/* Suggestion Cards */}
+              <ChatSuggestionCards onSuggestionClick={setInputValue} />
 
               {/* Recent Messages - Show last 2 messages only in inline mode */}
               {messages.length > 1 && (

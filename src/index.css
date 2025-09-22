@@ -190,3 +190,14 @@
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), transparent);
 }
+
+/* Glassmorphism for chat suggestion cards */
+.glass-card-suggestion {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
