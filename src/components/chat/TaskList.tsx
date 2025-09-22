@@ -132,6 +132,16 @@ const TaskList = ({
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
+
+  // Check if task is expiry-related (food waste task)
+  const isExpiryRelatedTask = (task: Task) => {
+    return task.cardType === 'product-decision' || 
+           task.title.toLowerCase().includes('expiry') ||
+           task.title.toLowerCase().includes('expiring') ||
+           task.title.toLowerCase().includes('nearing expiry') ||
+           task.description.toLowerCase().includes('expire') ||
+           task.description.toLowerCase().includes('expiring');
+  };
   const pendingTasks = tasks.filter(task => !task.completed && !task.archived);
   const completedTasks = tasks.filter(task => task.completed && !task.archived);
   const archivedTasks = tasks.filter(task => task.archived);
@@ -175,23 +185,29 @@ const TaskList = ({
       <CardContent>
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {pendingTasks.map(task => <div key={task.id} className="border rounded-lg p-4 bg-white hover:shadow-md transition-all duration-200">
-              {task.cardType === 'product-decision' && task.product ?
-          // Product Decision Card
+              {isExpiryRelatedTask(task) ?
+          // Expiry-Related Task (Food Waste) - Show full options
           <div className="space-y-4">
                   {/* Product Header */}
                   <div className="flex items-start gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-semibold text-gray-900">{task.product.name}</h4>
+                        <h4 className="font-semibold text-gray-900">{task.product?.name || task.title}</h4>
                         <Badge className={`text-xs ${getPriorityColor(task.priority)}`}>
                           {task.priority}
                         </Badge>
                       </div>
                       <div className="text-sm text-gray-600 space-y-1">
-                        <p>Quantity: {task.product.quantity} units</p>
-                        <p>Category: {task.product.category}</p>
-                        <p>Price: ${task.product.price}</p>
-                        <p>Expires: {new Date(task.product.expirationDate).toLocaleDateString('en-US')}</p>
+                        {task.product ? (
+                          <>
+                            <p>Quantity: {task.product.quantity} units</p>
+                            <p>Category: {task.product.category}</p>
+                            <p>Price: ${task.product.price}</p>
+                            <p>Expires: {new Date(task.product.expirationDate).toLocaleDateString('en-US')}</p>
+                          </>
+                        ) : (
+                          <p>{task.description}</p>
+                        )}
                       </div>
                     </div>
                     <Button onClick={() => onArchiveTask(task.id)} variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-yellow-50 hover:text-yellow-600" title="Archive task">
@@ -199,7 +215,7 @@ const TaskList = ({
                     </Button>
                   </div>
 
-                  {/* Suggested Action */}
+                  {/* Suggested Action - Only for expiry tasks */}
                   {task.suggestedAction && <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <Zap className="w-4 h-4 text-blue-600" />
@@ -211,23 +227,47 @@ const TaskList = ({
                       </div>
                     </div>}
 
-                  {/* Action Buttons */}
+                  {/* Action Options - Only for expiry tasks */}
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-700">Action Options:</p>
                     <div className="flex gap-2">
-                      <Button onClick={() => handleActionClick(task.id, 'b2c-discount', task.product)} variant={task.suggestedAction === 'b2c-discount' ? 'default' : 'outline'} size="sm" className="flex-1 flex items-center gap-1">
+                      <Button onClick={() => handleActionClick(task.id, 'b2c-discount', task.product || {
+                  id: parseInt(task.id),
+                  name: task.title,
+                  quantity: 1,
+                  expirationDate: new Date().toISOString().split('T')[0],
+                  category: 'General',
+                  price: 0,
+                  image: '/placeholder.svg'
+                })} variant={task.suggestedAction === 'b2c-discount' ? 'default' : 'outline'} size="sm" className="flex-1 flex items-center gap-1">
                         <ShoppingCart className="w-3 h-3" />
                         <span className="text-xs">Surprise Bag</span>
                         {task.suggestedAction === 'b2c-discount' && <Badge variant="secondary" className="text-xs ml-1">★</Badge>}
                       </Button>
                       
-                      <Button onClick={() => handleActionClick(task.id, 'b2b-offer', task.product)} variant={task.suggestedAction === 'b2b-offer' ? 'default' : 'outline'} size="sm" className="flex-1 flex items-center gap-1">
+                      <Button onClick={() => handleActionClick(task.id, 'b2b-offer', task.product || {
+                  id: parseInt(task.id),
+                  name: task.title,
+                  quantity: 1,
+                  expirationDate: new Date().toISOString().split('T')[0],
+                  category: 'General',
+                  price: 0,
+                  image: '/placeholder.svg'
+                })} variant={task.suggestedAction === 'b2b-offer' ? 'default' : 'outline'} size="sm" className="flex-1 flex items-center gap-1">
                         <Building2 className="w-3 h-3" />
                         <span className="text-xs">B2B Sale</span>
                         {task.suggestedAction === 'b2b-offer' && <Badge variant="secondary" className="text-xs ml-1">★</Badge>}
                       </Button>
                       
-                      <Button onClick={() => handleActionClick(task.id, 'donate', task.product)} variant={task.suggestedAction === 'donate' ? 'default' : 'outline'} size="sm" className="flex-1 flex items-center gap-1">
+                      <Button onClick={() => handleActionClick(task.id, 'donate', task.product || {
+                  id: parseInt(task.id),
+                  name: task.title,
+                  quantity: 1,
+                  expirationDate: new Date().toISOString().split('T')[0],
+                  category: 'General',
+                  price: 0,
+                  image: '/placeholder.svg'
+                })} variant={task.suggestedAction === 'donate' ? 'default' : 'outline'} size="sm" className="flex-1 flex items-center gap-1">
                         <Heart className="w-3 h-3" />
                         <span className="text-xs">Donate</span>
                         {task.suggestedAction === 'donate' && <Badge variant="secondary" className="text-xs ml-1">★</Badge>}
@@ -235,7 +275,7 @@ const TaskList = ({
                     </div>
                   </div>
                 </div> :
-          // Regular Task Card
+          // Regular Task - Simple view details option
           <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="mt-1">
@@ -258,49 +298,17 @@ const TaskList = ({
                     </Button>
                   </div>
 
-                  {/* Action Buttons for Regular Tasks */}
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-700">Action Options:</p>
-                    <div className="flex gap-2">
-                      <Button onClick={() => handleActionClick(task.id, 'b2c-discount', task.product || {
-                  id: parseInt(task.id),
-                  name: task.title,
-                  quantity: 1,
-                  expirationDate: new Date().toISOString().split('T')[0],
-                  category: 'General',
-                  price: 0,
-                  image: '/placeholder.svg'
-                })} variant="outline" size="sm" className="flex-1 flex items-center gap-1">
-                        <ShoppingCart className="w-3 h-3" />
-                        <span className="text-xs">Surprise Bag</span>
-                      </Button>
-                      
-                      <Button onClick={() => handleActionClick(task.id, 'b2b-offer', task.product || {
-                  id: parseInt(task.id),
-                  name: task.title,
-                  quantity: 1,
-                  expirationDate: new Date().toISOString().split('T')[0],
-                  category: 'General',
-                  price: 0,
-                  image: '/placeholder.svg'
-                })} variant="outline" size="sm" className="flex-1 flex items-center gap-1">
-                        <Building2 className="w-3 h-3" />
-                        <span className="text-xs">B2B Sale</span>
-                      </Button>
-                      
-                      <Button onClick={() => handleActionClick(task.id, 'donate', task.product || {
-                  id: parseInt(task.id),
-                  name: task.title,
-                  quantity: 1,
-                  expirationDate: new Date().toISOString().split('T')[0],
-                  category: 'General',
-                  price: 0,
-                  image: '/placeholder.svg'
-                })} variant="outline" size="sm" className="flex-1 flex items-center gap-1">
-                        <Heart className="w-3 h-3" />
-                        <span className="text-xs">Donate</span>
-                      </Button>
-                    </div>
+                  {/* Simple action for regular tasks */}
+                  <div className="flex justify-end">
+                    <Button 
+                      onClick={() => onCompleteTask(task.id)} 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      View Details
+                    </Button>
                   </div>
                 </div>}
             </div>)}
