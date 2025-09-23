@@ -514,7 +514,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
           >
             <Card className="glass-card backdrop-blur-xl bg-white/25 border border-white/20 rounded-3xl shadow-[0_25px_45px_rgba(0,0,0,0.1)] overflow-hidden">
               <CardHeader className="text-center pb-6 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm">
-                <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold tracking-tight text-black">
                   Alternative Data Sources
                 </h2>
                 <p className="text-muted-foreground mt-1">
