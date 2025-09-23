@@ -32,7 +32,7 @@ import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
 import Market from "@/pages/Market";
 import ApiConfig from "@/pages/ApiConfig";
-import FOGOCompliance from "@/pages/FOGOCompliance";
+
 
 const MainRoutes = () => {
   const { user } = useAuth();
@@ -73,7 +73,7 @@ const MainRoutes = () => {
         <Route path="/sync" element={<ProductSync />} />
         <Route path="/market" element={<Market />} />
         <Route path="/api-config" element={<ApiConfig />} />
-        <Route path="/fogo-compliance" element={<FOGOCompliance />} />
+        
       </Route>
       
       {/* Default redirects */}

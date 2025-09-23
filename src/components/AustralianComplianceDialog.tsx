@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Download, FileText, CheckCircle } from "lucide-react";
-import { generateAustralianComplianceReport } from "@/utils/australianComplianceReportGenerator";
+
 import { toast } from "sonner";
 
 export const AustralianComplianceDialog = () => {
@@ -14,13 +14,11 @@ export const AustralianComplianceDialog = () => {
   const handleGenerateReport = async () => {
     try {
       setIsGenerating(true);
-      toast.info("Generating Australian compliance report...");
-      await generateAustralianComplianceReport();
-      toast.success("Australian compliance report generated successfully!");
+      toast.info("This feature has been removed.");
       setIsOpen(false);
     } catch (error) {
-      console.error("Error generating Australian compliance report:", error);
-      toast.error("Failed to generate compliance report. Please try again.");
+      console.error("Error:", error);
+      toast.error("This feature is no longer available.");
     } finally {
       setIsGenerating(false);
     }

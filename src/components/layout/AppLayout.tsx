@@ -33,10 +33,7 @@ const AppLayout = () => {
                   <Store className="w-4 h-4" />
                   <span>Market B2B</span>
                 </Link>
-                <Link to="/fogo-compliance" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <File className="w-4 h-4" />
-                  <span>FOGO & Bin Trim</span>
-                </Link>
+                
                 <Link to="/configuration" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                   <Settings className="w-4 h-4" />
                   <span>Settings</span>

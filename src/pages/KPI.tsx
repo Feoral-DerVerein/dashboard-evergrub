@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { generateKpiReport, generateAIReportWithEPACompliance, TimeFilterPeriod } from "@/utils/reportGenerator";
+
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -25,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAutoTaskGeneration } from "@/hooks/useAutoTaskGeneration";
 import AutoTaskSummary from "@/components/kpi/AutoTaskSummary";
+type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
 const chartDataSamples: Record<TimeFilterPeriod, {
   label: string;
   value: number;
@@ -443,12 +444,10 @@ const KPI = () => {
   const handleDownloadReport = async () => {
     try {
       setIsGeneratingReport(true);
-      toast.info("Generating EPA compliance report...");
-      await generateAIReportWithEPACompliance(activeTimeFilter);
-      toast.success("EPA compliance report generated successfully!");
+      toast.info("Report generation feature has been removed.");
     } catch (error) {
-      console.error("Error generating report:", error);
-      toast.error("Failed to generate EPA compliance report. Please try again.");
+      console.error("Error:", error);
+      toast.error("This feature is no longer available.");
     } finally {
       setIsGeneratingReport(false);
     }
