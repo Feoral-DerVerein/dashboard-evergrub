@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import Spline from "@splinetool/react-spline";
 
 const formSchema = z.object({
   businessName: z.string().min(1, "Business name is required"),
@@ -247,37 +248,20 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* 3D Gradient Background with Animated Floating Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-green-100 to-green-200 dark:from-green-900/20 dark:via-green-800/10 dark:to-green-700/5">
-        {/* Animated Floating Fruits & Vegetables */}
-        {[...Array(12)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute opacity-10 pointer-events-none"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              fontSize: `${Math.random() * 40 + 20}px`,
-            }}
-            animate={{
-              y: [0, -20, 0],
-              rotate: [0, 360],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: Math.random() * 8 + 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: Math.random() * 2,
-            }}
-          >
-            {["🍎", "🥕", "🥬", "🍅", "🍊", "🥒"][Math.floor(Math.random() * 6)]}
-          </motion.div>
-        ))}
-        
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-white/20" />
+      {/* Spline 3D Background */}
+      <div className="absolute inset-0 z-0">
+        <Spline
+          scene="https://prod.spline.design/XM3cjMqxA7CFeI62/scene.splinecode"
+          style={{ 
+            width: '100%', 
+            height: '100%',
+            pointerEvents: 'none' // Prevents interaction with 3D scene
+          }}
+        />
       </div>
+
+      {/* Overlay to ensure content visibility */}
+      <div className="absolute inset-0 z-1 bg-black/20" />
 
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-4xl mx-auto space-y-8">
