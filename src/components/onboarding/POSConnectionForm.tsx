@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,7 +17,6 @@ import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import Spline from "@splinetool/react-spline";
 
 const formSchema = z.object({
   businessName: z.string().min(1, "Business name is required"),
@@ -50,6 +49,19 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
     productCategories: "",
     averageOrderValue: "",
   });
+
+  // Load Spline viewer script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = 'https://unpkg.com/@splinetool/viewer@1.10.64/build/spline-viewer.js';
+    document.head.appendChild(script);
+    
+    return () => {
+      // Cleanup: remove script when component unmounts
+      document.head.removeChild(script);
+    };
+  }, []);
 
   // Dropzone configuration for CSV uploads
   const onDrop = (acceptedFiles: File[]) => {
@@ -250,8 +262,8 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
     <div className="min-h-screen relative overflow-hidden">
       {/* Spline 3D Background */}
       <div className="absolute inset-0 z-0">
-        <Spline
-          scene="https://prod.spline.design/XM3cjMqxA7CFeI62/scene.splinecode"
+        <spline-viewer 
+          url="https://prod.spline.design/XM3cjMqxA7CFeI62/scene.splinecode"
           style={{ 
             width: '100%', 
             height: '100%',
