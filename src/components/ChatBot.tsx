@@ -116,21 +116,7 @@ const ChatBot = ({
     loadProducts();
   }, []);
 
-  // Add a test product decision task on component mount
-  useEffect(() => {
-    if (tasks.length === 0) {
-      const testProduct = {
-        id: 1,
-        name: 'Red Apples',
-        quantity: 15,
-        expirationDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        category: 'Fruits',
-        price: 3.50,
-        image: '/placeholder.svg'
-      };
-      addProductDecisionTask(testProduct);
-    }
-  }, [tasks.length, addProductDecisionTask]);
+  // Task generation is now handled by auto task generation logic only
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: 'smooth'
