@@ -291,7 +291,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 >
-                  <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+                  <h1 className="text-3xl font-bold tracking-tight text-black">
                     Connect Your POS System
                   </h1>
                   <p className="text-muted-foreground mt-2 text-lg">
