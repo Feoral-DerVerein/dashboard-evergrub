@@ -224,3 +224,149 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+/* Enhanced Glassmorphism for Onboarding Form */
+.glass-card {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 35px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* Enhanced Glass Input Styling */
+.glass-input {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(34, 197, 94, 0.5) !important;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.2) !important;
+}
+
+/* Enhanced Modal Styling */
+.glass-modal {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Floating Animation for Background Elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Upload Zone Styling */
+.upload-zone {
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.upload-zone.active {
+  border-color: rgba(34, 197, 94, 0.6);
+  background: rgba(34, 197, 94, 0.1);
+  transform: scale(1.02);
+}
+
+/* Enhanced Card Hover Effects */
+.data-source-card {
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.data-source-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Floating Fruit Animation */
+.floating-fruit {
+  position: absolute;
+  opacity: 0.1;
+  pointer-events: none;
+  font-size: clamp(20px, 4vw, 60px);
+  animation: floatFruit 8s ease-in-out infinite;
+}
+
+@keyframes floatFruit {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-10px) rotate(90deg) scale(1.1);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg) scale(1);
+  }
+  75% {
+    transform: translateY(-10px) rotate(270deg) scale(1.1);
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+  }
+  
+  .floating-fruit {
+    font-size: 24px;
+    opacity: 0.05;
+  }
+}
+
+/* Success State Animations */
+.success-checkmark {
+  animation: checkmarkScale 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes checkmarkScale {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
