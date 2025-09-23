@@ -234,7 +234,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4">
         <Card className="w-full max-w-md mx-auto backdrop-blur-xl bg-background/80 border border-white/20 shadow-2xl">
           <CardContent className="p-8 text-center">
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <CheckCircle className="h-16 w-16 text-white mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-green-600 mb-2">Connection Successful!</h2>
             <p className="text-muted-foreground">
               We're now analyzing your data. Your dashboard will be ready in a few minutes.
@@ -313,7 +313,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                   transition={{ delay: 0.3 }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white flex items-center justify-center text-sm font-bold shadow-lg">
+                    <div className="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center text-sm font-bold shadow-lg">
                       1
                     </div>
                     <h3 className="text-lg font-semibold">Get Your API Key</h3>
@@ -333,7 +333,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                   transition={{ delay: 0.4 }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white flex items-center justify-center text-sm font-bold shadow-lg">
+                    <div className="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center text-sm font-bold shadow-lg">
                       2
                     </div>
                     <h3 className="text-lg font-semibold">Enter Your Details</h3>
@@ -500,7 +500,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                           window.location.href = "/kpi";
                         }}
                       >
-                        <Coffee className="mr-2 h-4 w-4" />
+                        <Coffee className="mr-2 h-4 w-4 text-gray-900" />
                         Continue without API
                       </Button>
                     </form>
@@ -536,7 +536,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                     transition={{ type: "spring", stiffness: 300 }}
                   >
                     <div className="flex items-center gap-3 mb-4">
-                      <FileSpreadsheet className="h-6 w-6 text-green-600" />
+                      <FileSpreadsheet className="h-6 w-6 text-white" />
                       <h3 className="font-semibold">Google Sheets</h3>
                     </div>
                     <div className="space-y-3">
@@ -546,14 +546,14 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                         onChange={(e) => setGoogleSheetUrl(e.target.value)}
                         className="glass-input bg-white/50 border-white/30 focus:border-green-400"
                       />
-                      <Button 
-                        onClick={handleGoogleSheetsConnect}
-                        disabled={isLoading}
-                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
-                      >
-                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Link className="mr-2 h-4 w-4" />}
-                        Connect Google Sheet
-                      </Button>
+                       <Button 
+                         onClick={handleGoogleSheetsConnect}
+                         disabled={isLoading}
+                         className="w-full bg-white text-gray-900 hover:bg-white/90"
+                       >
+                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-gray-900" /> : <Link className="mr-2 h-4 w-4 text-gray-900" />}
+                         Connect Google Sheet
+                       </Button>
                       <p className="text-xs text-muted-foreground">
                         Share your sheet with view permissions
                       </p>
@@ -567,7 +567,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                     transition={{ type: "spring", stiffness: 300 }}
                   >
                     <div className="flex items-center gap-3 mb-4">
-                      <Upload className="h-6 w-6 text-purple-600" />
+                      <Upload className="h-6 w-6 text-white" />
                       <h3 className="font-semibold">CSV Upload</h3>
                     </div>
                     <div 
@@ -616,7 +616,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                     transition={{ type: "spring", stiffness: 300 }}
                   >
                     <div className="flex items-center gap-3 mb-4">
-                      <Edit3 className="h-6 w-6 text-orange-600" />
+                      <Edit3 className="h-6 w-6 text-white" />
                       <h3 className="font-semibold">Manual Entry</h3>
                     </div>
                     <p className="text-sm text-muted-foreground mb-4">
@@ -624,10 +624,10 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                     </p>
                     <Dialog open={isManualEntryOpen} onOpenChange={setIsManualEntryOpen}>
                       <DialogTrigger asChild>
-                        <Button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700">
-                          <Edit3 className="mr-2 h-4 w-4" />
-                          Enter Data Manually
-                        </Button>
+                         <Button className="w-full bg-white text-gray-900 hover:bg-white/90">
+                           <Edit3 className="mr-2 h-4 w-4 text-gray-900" />
+                           Enter Data Manually
+                         </Button>
                       </DialogTrigger>
                       <DialogContent className="glass-modal bg-white/90 backdrop-blur-xl border border-white/30 rounded-2xl">
                         <DialogHeader>
@@ -686,12 +686,12 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                           >
                             Cancel
                           </Button>
-                          <Button 
-                            onClick={handleManualDataSubmit}
-                            className="flex-1 bg-gradient-to-r from-green-500 to-green-600"
-                          >
-                            Save Data
-                          </Button>
+                           <Button 
+                             onClick={handleManualDataSubmit}
+                             className="flex-1 bg-white text-gray-900 hover:bg-white/90"
+                           >
+                             Save Data
+                           </Button>
                         </div>
                       </DialogContent>
                     </Dialog>
@@ -704,31 +704,31 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                     transition={{ type: "spring", stiffness: 300 }}
                   >
                     <div className="flex items-center gap-3 mb-4">
-                      <Download className="h-6 w-6 text-indigo-600" />
+                      <Download className="h-6 w-6 text-white" />
                       <h3 className="font-semibold">Template Import</h3>
                     </div>
                     <p className="text-sm text-muted-foreground mb-4">
                       Download our template, fill it out, and upload it back
                     </p>
                     <div className="space-y-3">
-                      <Button 
-                        variant="outline"
-                        onClick={downloadTemplate}
-                        className="w-full glass-button bg-white/40 hover:bg-white/50"
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Download Template
-                      </Button>
-                      <Button 
-                        className="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700"
-                        onClick={() => {
-                          // Trigger file picker for completed template
-                          document.getElementById('template-upload')?.click();
-                        }}
-                      >
-                        <Upload className="mr-2 h-4 w-4" />
-                        Upload Completed Template
-                      </Button>
+                       <Button 
+                         variant="outline"
+                         onClick={downloadTemplate}
+                         className="w-full glass-button bg-white/40 hover:bg-white/50"
+                       >
+                         <Download className="mr-2 h-4 w-4 text-gray-900" />
+                         Download Template
+                       </Button>
+                       <Button 
+                         className="w-full bg-white text-gray-900 hover:bg-white/90"
+                         onClick={() => {
+                           // Trigger file picker for completed template
+                           document.getElementById('template-upload')?.click();
+                         }}
+                       >
+                         <Upload className="mr-2 h-4 w-4 text-gray-900" />
+                         Upload Completed Template
+                       </Button>
                       <input 
                         id="template-upload" 
                         type="file" 
@@ -751,15 +751,15 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
                 >
-                  <Button 
-                    onClick={() => {
-                      localStorage.setItem("posOnboardingCompleted", "true");
-                      onComplete();
-                    }}
-                    className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
-                  >
-                    Continue to Dashboard
-                  </Button>
+                   <Button 
+                     onClick={() => {
+                       localStorage.setItem("posOnboardingCompleted", "true");
+                       onComplete();
+                     }}
+                     className="bg-white text-gray-900 hover:bg-white/90 px-8 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+                   >
+                     Continue to Dashboard
+                   </Button>
                 </motion.div>
               </CardContent>
             </Card>
