@@ -21,6 +21,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
 const MyProductsListed = ({
   onSendToMarket
 }: {
@@ -183,9 +184,34 @@ const Market = () => {
   const [showMakeOfferDialog, setShowMakeOfferDialog] = useState(false);
   const [offerPrice, setOfferPrice] = useState<number>(0);
   const [offerQuantity, setOfferQuantity] = useState<number>(1);
-  const {
-    toast
-  } = useToast();
+  const [salesManagementItems, setSalesManagementItems] = useState<any[]>([
+    {
+      id: 1,
+      product: "Pitango Chicken Soup",
+      buyer: "Melbourne Fresh Market",
+      type: "offer",
+      price: 7.50,
+      quantity: 15,
+      total: 112.50,
+      status: "pending_approval",
+      image: pitangoChickenSoupImage
+    },
+    {
+      id: 2,
+      product: "Pitango Tomato Soup", 
+      buyer: "Restaurant ABC",
+      type: "bulk_order",
+      price: 8.50,
+      quantity: 20,
+      total: 170.00,
+      status: "pending_approval",
+      image: pitangoTomatoSoupImage
+    }
+  ]);
+  const [showContactDialog, setShowContactDialog] = useState(false);
+  const [selectedBuyer, setSelectedBuyer] = useState<any>(null);
+  const [contactMessage, setContactMessage] = useState("");
+  const { toast } = useToast();
   const categories = [{
     name: "All Products",
     icon: Grid3X3
@@ -371,26 +397,56 @@ const Market = () => {
 
   // Sales Management Functions
   const handleAcceptSale = (saleItem: any) => {
+    // Update the status to "send product"
+    setSalesManagementItems(prev => 
+      prev.map(item => 
+        item.id === saleItem.id 
+          ? { ...item, status: "send_product" }
+          : item
+      )
+    );
+    
     toast({
       title: "Sale Accepted!",
-      description: `You've accepted the ${saleItem.type === 'offer' ? 'offer' : 'order'} for ${saleItem.product}.`
+      description: `Order status changed to "send product" for ${saleItem.product}.`
     });
   };
 
   const handleContactBuyer = (saleItem: any) => {
-    toast({
-      title: "Contact Buyer",
-      description: `Opening contact options for ${saleItem.buyer}.`
-    });
-    // In a real app, this would open a messaging system or contact modal
+    setSelectedBuyer(saleItem);
+    setContactMessage("");
+    setShowContactDialog(true);
   };
 
   const handleDeclineSale = (saleItem: any) => {
+    // Remove the item from sales management and return to "my products"
+    setSalesManagementItems(prev => prev.filter(item => item.id !== saleItem.id));
+    
     toast({
       title: "Sale Declined",
-      description: `You've declined the ${saleItem.type === 'offer' ? 'offer' : 'order'} for ${saleItem.product}.`,
+      description: `${saleItem.product} has been returned to your products and removed from sales.`,
       variant: "destructive"
     });
+  };
+
+  const handleSendMessage = () => {
+    if (!contactMessage.trim()) {
+      toast({
+        title: "Message Required",
+        description: "Please enter a message to send to the buyer.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    toast({
+      title: "Message Sent!",
+      description: `Your message has been sent to ${selectedBuyer?.buyer}.`
+    });
+    
+    setShowContactDialog(false);
+    setSelectedBuyer(null);
+    setContactMessage("");
   };
   const filteredOffers = marketOffers.filter(offer => {
     const matchesSearch = offer.products.some(product => product.name.toLowerCase().includes(searchQuery.toLowerCase()) || product.category.toLowerCase().includes(searchQuery.toLowerCase()) || product.supplier.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -1017,6 +1073,56 @@ const Market = () => {
             <Button onClick={confirmSendToMarket}>
               <Send className="w-4 h-4 mr-2" />
               Send to Market
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Contact Buyer Dialog */}
+      <Dialog open={showContactDialog} onOpenChange={setShowContactDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Contact Buyer</DialogTitle>
+          </DialogHeader>
+          
+          {selectedBuyer && (
+            <div className="space-y-4">
+              {/* Buyer Info */}
+              <div className="flex gap-4 p-4 bg-muted/50 rounded-lg">
+                <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                  <img src={selectedBuyer.image} alt={selectedBuyer.product} className="w-full h-full object-cover rounded-lg" />
+                </div>
+                
+                <div className="flex-1">
+                  <h3 className="font-semibold">{selectedBuyer.product}</h3>
+                  <p className="text-sm text-muted-foreground">Buyer: {selectedBuyer.buyer}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedBuyer.type === 'offer' ? 'Offer' : 'Order'}: ${selectedBuyer.price} × {selectedBuyer.quantity}
+                  </p>
+                </div>
+              </div>
+
+              {/* Message Input */}
+              <div className="space-y-2">
+                <Label htmlFor="message">Message</Label>
+                <Textarea 
+                  id="message"
+                  className="min-h-[100px] resize-none"
+                  placeholder="Type your message to the buyer..."
+                  value={contactMessage}
+                  onChange={(e) => setContactMessage(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowContactDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSendMessage}>
+              <Send className="w-4 h-4 mr-2" />
+              Send Message
             </Button>
           </DialogFooter>
         </DialogContent>
