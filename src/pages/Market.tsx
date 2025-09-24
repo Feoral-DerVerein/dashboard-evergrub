@@ -23,10 +23,6 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const [pendingProducts, setPendingProducts] = useState<any[]>([]);
-  const [showSendToMarketDialog, setShowSendToMarketDialog] = useState(false);
-  const [selectedProductForMarket, setSelectedProductForMarket] = useState<any>(null);
-  const [quantityToSend, setQuantityToSend] = useState<number>(1);
 
   useEffect(() => {
     const fetchUserProducts = async () => {
