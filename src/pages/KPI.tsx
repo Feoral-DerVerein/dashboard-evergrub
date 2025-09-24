@@ -25,201 +25,149 @@ import { Badge } from "@/components/ui/badge";
 import { useAutoTaskGeneration } from "@/hooks/useAutoTaskGeneration";
 import AutoTaskSummary from "@/components/kpi/AutoTaskSummary";
 import hiMateBanner from "@/assets/hi-mate-banner.png";
-
 type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
-
 const chartDataSamples: Record<TimeFilterPeriod, {
   label: string;
   value: number;
 }[]> = {
-  Today: [
-    {
-      label: "9AM",
-      value: 200
-    },
-    {
-      label: "10AM",
-      value: 320
-    },
-    {
-      label: "11AM",
-      value: 450
-    },
-    {
-      label: "12PM",
-      value: 600
-    },
-    {
-      label: "1PM",
-      value: 520
-    },
-    {
-      label: "2PM",
-      value: 680
-    },
-    {
-      label: "3PM",
-      value: 740
-    },
-    {
-      label: "4PM",
-      value: 820
-    },
-    {
-      label: "5PM",
-      value: 900
-    }
-  ],
-  Week: [
-    {
-      label: "Mon",
-      value: 2500
-    },
-    {
-      label: "Tue",
-      value: 1500
-    },
-    {
-      label: "Wed",
-      value: 3500
-    },
-    {
-      label: "Thu",
-      value: 4000
-    },
-    {
-      label: "Fri",
-      value: 4500
-    },
-    {
-      label: "Sat",
-      value: 4000
-    },
-    {
-      label: "Sun",
-      value: 4200
-    }
-  ],
-  Month: [
-    {
-      label: "W1",
-      value: 8200
-    },
-    {
-      label: "W2",
-      value: 9100
-    },
-    {
-      label: "W3",
-      value: 8800
-    },
-    {
-      label: "W4",
-      value: 9800
-    }
-  ],
-  Quarter: [
-    {
-      label: "W1",
-      value: 3000
-    },
-    {
-      label: "W2",
-      value: 3600
-    },
-    {
-      label: "W3",
-      value: 4200
-    },
-    {
-      label: "W4",
-      value: 3900
-    },
-    {
-      label: "W5",
-      value: 4400
-    },
-    {
-      label: "W6",
-      value: 4800
-    },
-    {
-      label: "W7",
-      value: 5100
-    },
-    {
-      label: "W8",
-      value: 5300
-    },
-    {
-      label: "W9",
-      value: 5500
-    },
-    {
-      label: "W10",
-      value: 5700
-    },
-    {
-      label: "W11",
-      value: 5900
-    },
-    {
-      label: "W12",
-      value: 6100
-    }
-  ],
-  Year: [
-    {
-      label: "Jan",
-      value: 12000
-    },
-    {
-      label: "Feb",
-      value: 11500
-    },
-    {
-      label: "Mar",
-      value: 14000
-    },
-    {
-      label: "Apr",
-      value: 13500
-    },
-    {
-      label: "May",
-      value: 15000
-    },
-    {
-      label: "Jun",
-      value: 14500
-    },
-    {
-      label: "Jul",
-      value: 16000
-    },
-    {
-      label: "Aug",
-      value: 15800
-    },
-    {
-      label: "Sep",
-      value: 14900
-    },
-    {
-      label: "Oct",
-      value: 15500
-    },
-    {
-      label: "Nov",
-      value: 16200
-    },
-    {
-      label: "Dec",
-      value: 17000
-    }
-  ]
+  Today: [{
+    label: "9AM",
+    value: 200
+  }, {
+    label: "10AM",
+    value: 320
+  }, {
+    label: "11AM",
+    value: 450
+  }, {
+    label: "12PM",
+    value: 600
+  }, {
+    label: "1PM",
+    value: 520
+  }, {
+    label: "2PM",
+    value: 680
+  }, {
+    label: "3PM",
+    value: 740
+  }, {
+    label: "4PM",
+    value: 820
+  }, {
+    label: "5PM",
+    value: 900
+  }],
+  Week: [{
+    label: "Mon",
+    value: 2500
+  }, {
+    label: "Tue",
+    value: 1500
+  }, {
+    label: "Wed",
+    value: 3500
+  }, {
+    label: "Thu",
+    value: 4000
+  }, {
+    label: "Fri",
+    value: 4500
+  }, {
+    label: "Sat",
+    value: 4000
+  }, {
+    label: "Sun",
+    value: 4200
+  }],
+  Month: [{
+    label: "W1",
+    value: 8200
+  }, {
+    label: "W2",
+    value: 9100
+  }, {
+    label: "W3",
+    value: 8800
+  }, {
+    label: "W4",
+    value: 9800
+  }],
+  Quarter: [{
+    label: "W1",
+    value: 3000
+  }, {
+    label: "W2",
+    value: 3600
+  }, {
+    label: "W3",
+    value: 4200
+  }, {
+    label: "W4",
+    value: 3900
+  }, {
+    label: "W5",
+    value: 4400
+  }, {
+    label: "W6",
+    value: 4800
+  }, {
+    label: "W7",
+    value: 5100
+  }, {
+    label: "W8",
+    value: 5300
+  }, {
+    label: "W9",
+    value: 5500
+  }, {
+    label: "W10",
+    value: 5700
+  }, {
+    label: "W11",
+    value: 5900
+  }, {
+    label: "W12",
+    value: 6100
+  }],
+  Year: [{
+    label: "Jan",
+    value: 12000
+  }, {
+    label: "Feb",
+    value: 11500
+  }, {
+    label: "Mar",
+    value: 14000
+  }, {
+    label: "Apr",
+    value: 13500
+  }, {
+    label: "May",
+    value: 15000
+  }, {
+    label: "Jun",
+    value: 14500
+  }, {
+    label: "Jul",
+    value: 16000
+  }, {
+    label: "Aug",
+    value: 15800
+  }, {
+    label: "Sep",
+    value: 14900
+  }, {
+    label: "Oct",
+    value: 15500
+  }, {
+    label: "Nov",
+    value: 16200
+  }, {
+    label: "Dec",
+    value: 17000
+  }]
 };
-
 const TimeFilterButton = ({
   label,
   isActive = false,
@@ -228,19 +176,9 @@ const TimeFilterButton = ({
   label: string;
   isActive?: boolean;
   onClick: () => void;
-}) => (
-  <button
-    className={`px-4 py-1.5 rounded-full text-sm ${
-      isActive
-        ? "bg-blue-500 text-white"
-        : "text-gray-500 hover:bg-gray-100"
-    }`}
-    onClick={onClick}
-  >
+}) => <button className={`px-4 py-1.5 rounded-full text-sm ${isActive ? "bg-blue-500 text-white" : "text-gray-500 hover:bg-gray-100"}`} onClick={onClick}>
     {label}
-  </button>
-);
-
+  </button>;
 const MetricCard = ({
   icon: Icon,
   value,
@@ -251,21 +189,16 @@ const MetricCard = ({
   value: string;
   label: string;
   trend?: string;
-}) => (
-  <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
+}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
     <div className="flex items-center gap-2 mb-1">
       <Icon className="w-4 h-4 text-blue-600" />
       <span className="text-blue-700/80 text-sm font-medium">{label}</span>
     </div>
     <div className="flex items-baseline gap-2">
       <span className="text-2xl font-semibold text-blue-900">{value}</span>
-      {trend && (
-        <span className="text-emerald-600 text-sm font-medium">+{trend}</span>
-      )}
+      {trend && <span className="text-emerald-600 text-sm font-medium">+{trend}</span>}
     </div>
-  </div>
-);
-
+  </div>;
 const SustainabilityCard = ({
   label,
   value,
@@ -274,20 +207,15 @@ const SustainabilityCard = ({
   label: string;
   value: string;
   subtext: string;
-}) => (
-  <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
+}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
     <div className="flex items-center gap-2 mb-3">
       <span className="text-emerald-700/80 font-medium">{label}</span>
     </div>
     <div className="flex flex-col">
-      <span className="text-2xl font-semibold mb-1 text-emerald-900">
-        {value}
-      </span>
+      <span className="text-2xl font-semibold mb-1 text-emerald-900">{value}</span>
       <span className="text-sm text-emerald-600 font-medium">{subtext}</span>
     </div>
-  </div>
-);
-
+  </div>;
 const InsightCard = ({
   label,
   value,
@@ -296,22 +224,21 @@ const InsightCard = ({
   label: string;
   value: string;
   trend: string;
-}) => (
-  <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
+}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
     <div className="text-purple-700/80 mb-2 font-medium">{label}</div>
     <div className="flex items-baseline gap-2">
       <span className="text-2xl font-semibold text-purple-900">{value}</span>
       <span className="text-emerald-600 text-sm font-medium">+{trend}</span>
     </div>
-  </div>
-);
-
+  </div>;
 const KPI = () => {
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeFilterPeriod>("Week");
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
   // Inventory POS state
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [suppliers, setSuppliers] = useState<Array<{
     id: string;
@@ -325,8 +252,9 @@ const KPI = () => {
   const [aiInsights, setAiInsights] = useState<any | null>(null);
 
   // Auto-generate tasks for inventory management
-  useAutoTaskGeneration({ products });
-
+  useAutoTaskGeneration({
+    products
+  });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentActionDetails, setCurrentActionDetails] = useState<any>(null);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -371,19 +299,14 @@ const KPI = () => {
     reorderCategory: "Loading..."
   });
 
+  // Load real business data
   const loadRealData = async () => {
     try {
       // Fetch orders, products, and sales data
-      const [ordersResponse, productsResponse, salesResponse] = await Promise.all([
-        supabase.from('orders').select('*'),
-        supabase.from('products').select('*'),
-        supabase.from('sales').select('*')
-      ]);
-
+      const [ordersResponse, productsResponse, salesResponse] = await Promise.all([supabase.from('orders').select('*'), supabase.from('products').select('*'), supabase.from('sales').select('*')]);
       if (ordersResponse.error) throw ordersResponse.error;
       if (productsResponse.error) throw productsResponse.error;
       if (salesResponse.error) throw salesResponse.error;
-
       const orders = ordersResponse.data || [];
       const products = productsResponse.data || [];
       const sales = salesResponse.data || [];
@@ -403,17 +326,11 @@ const KPI = () => {
       // Calculate surprise bag specific metrics
       const surpriseBagSales = sales.filter(sale => {
         if (!sale.products || !Array.isArray(sale.products)) return false;
-        return sale.products.some((product: any) => 
-          product.category === 'Surprise Bag' || 
-          product.name?.toLowerCase().includes('surprise') || 
-          product.name?.toLowerCase().includes('bag')
-        );
+        return sale.products.some((product: any) => product.category === 'Surprise Bag' || product.name?.toLowerCase().includes('surprise') || product.name?.toLowerCase().includes('bag'));
       });
-
       const surpriseBagRevenue = surpriseBagSales.reduce((sum, sale) => sum + (sale.amount || 0), 0);
       const surpriseBagCount = surpriseBags.length;
       const activeSurpriseBags = surpriseBags.filter(bag => bag.quantity > 0).length;
-
       if (finalSalesAmount > 0 || transactionCount > 0) {
         const avgOrderValue = finalSalesAmount / Math.max(transactionCount, 1);
 
@@ -430,7 +347,6 @@ const KPI = () => {
         const profit = Math.round(finalSalesAmount * 0.25 + surpriseBagRevenue * 0.35); // Higher profit margin on surprise bags
         const revenue = Math.round(finalSalesAmount * 1.15);
         const operationalSavings = Math.round(finalSalesAmount * 0.18 + surpriseBagRevenue * 0.22);
-
         setRealData({
           co2Saved: `${co2SavedKg} kg`,
           co2Change: "+18% vs last week",
@@ -458,7 +374,6 @@ const KPI = () => {
           avgOrderTrend: "4.5%"
         });
       }
-
       if (products.length > 0) {
         // Enhanced AI Predictive Insights with surprise bag data
         const categoryCount = products.reduce((acc, product) => {
@@ -468,7 +383,7 @@ const KPI = () => {
         }, {} as Record<string, number>);
 
         // Find top selling category and overstocked items
-        const topCategory = Object.entries(categoryCount).sort(([,a], [,b]) => b - a)[0];
+        const topCategory = Object.entries(categoryCount).sort(([, a], [, b]) => b - a)[0];
         const overstockedItems = products.filter(p => p.quantity > 50);
         const overstockedItem = overstockedItems.length > 0 ? overstockedItems[0] : products[0];
 
@@ -478,10 +393,7 @@ const KPI = () => {
         const demandIncrease = Math.min(25, Math.max(5, Math.round(avgStock / 10) + surpriseBagImpact));
 
         // Determine best performing product type
-        const bestPerformer = surpriseBagRevenue > (finalSalesAmount - surpriseBagRevenue) / 2 
-          ? 'Surprise Bags' 
-          : topCategory ? topCategory[0] : "Products";
-
+        const bestPerformer = surpriseBagRevenue > (finalSalesAmount - surpriseBagRevenue) / 2 ? 'Surprise Bags' : topCategory ? topCategory[0] : "Products";
         setPredictiveData({
           topSellingProduct: bestPerformer,
           topSellingRate: topCategory ? `${Math.min(95, Math.round(topCategory[1] / products.length * 10))}%` : "0%",
@@ -503,28 +415,32 @@ const KPI = () => {
       setProducts(mappedProducts);
 
       // Mock suppliers data
-      setSuppliers([
-        { id: '1', name: 'Local Farm Co.', type: 'produce' },
-        { id: '2', name: 'Organic Supply', type: 'organic' },
-        { id: '3', name: 'Fresh Distributors', type: 'dairy' }
-      ]);
-
+      setSuppliers([{
+        id: '1',
+        name: 'Local Farm Co.',
+        type: 'produce'
+      }, {
+        id: '2',
+        name: 'Organic Supply',
+        type: 'organic'
+      }, {
+        id: '3',
+        name: 'Fresh Distributors',
+        type: 'dairy'
+      }]);
     } catch (error) {
       console.error('Error loading real data:', error);
     }
   };
-
   useEffect(() => {
     loadRealData();
   }, []);
 
   // Derived chart data from active period
   const chartData = chartDataSamples[activeTimeFilter] ?? chartDataSamples["Week"];
-
   const handleTimeFilterClick = (filter: TimeFilterPeriod) => {
     setActiveTimeFilter(filter);
   };
-
   const handleDownloadReport = async () => {
     try {
       setIsGeneratingReport(true);
@@ -548,138 +464,219 @@ const KPI = () => {
         },
         residualWaste: {
           volumeLitres: Math.max(2000 - parseNumericValue(realData.co2Saved), 500),
-          containers: [
-            { type: "240 L bin", quantity: 8 },
-            { type: "120 L bin", quantity: 4 }
-          ],
+          containers: [{
+            type: "240 L bin",
+            quantity: 8
+          }, {
+            type: "120 L bin",
+            quantity: 4
+          }],
           collectionFrequency: "twice weekly",
           provider: "Metro Waste Services Pty Ltd"
         },
         foodWaste: {
           volumeLitres: Math.max(parseNumericValue(realData.co2Saved) * 10, 1250),
-          containers: [
-            { type: "140 L organics bin", quantity: 6 },
-            { type: "80 L kitchen caddy", quantity: 3 }
-          ],
+          containers: [{
+            type: "140 L organics bin",
+            quantity: 6
+          }, {
+            type: "80 L kitchen caddy",
+            quantity: 3
+          }],
           collectionFrequency: "weekly",
           provider: "GreenCycle Organics Ltd",
           destination: "Sydney Organics Processing Facility"
         },
-        foodDonations: [
-          {
-            category: "Fresh Produce",
-            weightKg: Math.max(parseNumericValue(realData.foodWasteReduced), 85),
-            recipient: "OzHarvest Sydney"
-          },
-          {
-            category: "Bakery Items",
-            weightKg: 25,
-            recipient: "Local Community Kitchen"
-          },
-          {
-            category: "Packaged Goods",
-            weightKg: 40,
-            recipient: "Salvation Army Food Pantry"
+        foodDonations: [{
+          category: "Fresh Produce",
+          weightKg: Math.max(parseNumericValue(realData.foodWasteReduced), 85),
+          recipient: "OzHarvest Sydney"
+        }, {
+          category: "Bakery Items",
+          weightKg: 25,
+          recipient: "Local Community Kitchen"
+        }, {
+          category: "Packaged Goods",
+          weightKg: 40,
+          recipient: "Salvation Army Food Bank"
+        }],
+        reductionActions: [{
+          action: "Implemented smart inventory tracking via Negentropy platform",
+          startDate: "2025-08-01"
+        }, {
+          action: "Regular food donation program establishment",
+          startDate: "2025-08-15"
+        }, {
+          action: "Staff training on food waste reduction",
+          startDate: "2025-09-01"
+        }, {
+          action: "Kitchen waste separation procedures",
+          startDate: "2025-07-15"
+        }],
+        historicalData: {
+          previousPeriod: {
+            residualVolumeLitres: 3200,
+            foodWasteVolumeLitres: 800
           }
-        ],
-        wasteStreams: [
-          {
-            type: "Paper/Cardboard",
-            volume: "300 L",
-            frequency: "weekly",
-            provider: "RecycleSmart NSW"
-          },
-          {
-            type: "Plastic Packaging",
-            volume: "120 L",
-            frequency: "weekly",
-            provider: "RecycleSmart NSW"
-          },
-          {
-            type: "Glass",
-            volume: "80 L",
-            frequency: "fortnightly",
-            provider: "Glass Recovery Partners"
-          }
-        ],
-        improvementActions: [
-          {
-            action: "Implement dynamic pricing on surprise bags",
-            targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            expectedReduction: "15% additional food waste reduction"
-          },
-          {
-            action: "Partner with additional food rescue organizations",
-            targetDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            expectedReduction: "20% increase in food donations"
-          }
-        ],
-        complianceMetrics: {
-          wasteToLandfill: Math.max(500 - parseNumericValue(realData.co2Saved), 50) + " L/month",
-          recyclingRate: Math.min(90, 60 + Math.round(parseNumericValue(realData.co2Saved) / 10)) + "%",
-          organicsRecovery: Math.min(95, 70 + Math.round(parseNumericValue(realData.foodWasteReduced) / 20)) + "%",
-          foodRescueRate: Math.min(80, 45 + Math.round(parseNumericValue(realData.foodWasteReduced) / 15)) + "%"
         }
       };
 
-      // Simulate API call to generate report
-      const response = await supabase.functions.invoke('generate-nsw-epa-report', {
+      // Call the edge function to generate the report
+      const {
+        data: reportData,
+        error
+      } = await supabase.functions.invoke('generate-nsw-epa-report', {
         body: complianceData
       });
-
-      if (response.error) {
-        throw new Error(response.error.message);
+      if (error) {
+        console.error('Edge function error:', error);
+        toast.error("Failed to generate compliance report. Please try again.");
+        return;
       }
+      if (reportData?.success && reportData?.report) {
+        // Import jsPDF dynamically
+        const jsPDF = (await import('jspdf')).default;
 
-      toast.success("NSW EPA compliance report generated successfully!");
+        // Create new PDF document
+        const pdf = new jsPDF();
+
+        // Convert markdown to plain text for PDF
+        const cleanText = reportData.report.replace(/#{1,6}\s/g, '') // Remove markdown headers
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markdown
+        .replace(/\*(.*?)\*/g, '$1') // Remove italic markdown
+        .replace(/✅|❌/g, '') // Remove emoji symbols
+        .split('\n').filter(line => line.trim()) // Remove empty lines
+        .join('\n');
+
+        // Add title
+        pdf.setFontSize(16);
+        pdf.setFont(undefined, 'bold');
+        pdf.text('NSW EPA Food Waste Compliance Report', 20, 30);
+
+        // Add business name
+        pdf.setFontSize(12);
+        pdf.setFont(undefined, 'normal');
+        pdf.text('WiseBite Demo Store', 20, 45);
+
+        // Add date
+        const currentDate = new Date().toLocaleDateString();
+        pdf.text(`Generated: ${currentDate}`, 20, 55);
+
+        // Split text into lines that fit the page width
+        const pageWidth = pdf.internal.pageSize.width;
+        const maxLineWidth = pageWidth - 40; // 20px margin on each side
+        const lines = pdf.splitTextToSize(cleanText, maxLineWidth);
+
+        // Add content starting from y position 70
+        let yPosition = 70;
+        const lineHeight = 6;
+        const pageHeight = pdf.internal.pageSize.height;
+        lines.forEach((line: string) => {
+          // Check if we need a new page
+          if (yPosition > pageHeight - 30) {
+            pdf.addPage();
+            yPosition = 30;
+          }
+          pdf.text(line, 20, yPosition);
+          yPosition += lineHeight;
+        });
+
+        // Generate filename with current date
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = `NSW_EPA_Compliance_Report_${timestamp}.pdf`;
+
+        // Download the PDF
+        pdf.save(filename);
+        toast.success("NSW EPA compliance report downloaded successfully!");
+      } else {
+        toast.error("Failed to generate compliance report. Please check your data.");
+      }
     } catch (error) {
-      console.error("Report generation error:", error);
-      toast.error("Failed to generate NSW EPA compliance report");
+      console.error("Error generating report:", error);
+      toast.error("An error occurred while generating the report.");
     } finally {
       setIsGeneratingReport(false);
     }
   };
-
-  const handleActionWithConfirmation = (action: () => void, details: any) => {
-    setCurrentActionDetails(details);
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+      case "urgent":
+        return "bg-red-100 text-red-800";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+  const showActionDetails = (actionDetails: any, action: () => void) => {
+    setCurrentActionDetails(actionDetails);
     setPendingAction(() => action);
     setDialogOpen(true);
   };
-
   const handleConfirmAction = () => {
     if (pendingAction) {
       pendingAction();
+      setDialogOpen(false);
       setPendingAction(null);
+      setCurrentActionDetails(null);
     }
-    setDialogOpen(false);
-    setCurrentActionDetails(null);
   };
-
   const handleCancelAction = () => {
     setDialogOpen(false);
-    setCurrentActionDetails(null);
     setPendingAction(null);
+    setCurrentActionDetails(null);
   };
-
-  // AI Insights handler
+  const handleGenerateInsightsWithDetails = () => {
+    const details = {
+      title: "Generate AI Business Insights",
+      description: "This action will analyze your current business data using advanced AI to provide personalized recommendations and predictions.",
+      impact: {
+        financial: 'Complete financial KPIs and cost savings analysis',
+        inventory: 'Detailed waste reduction and optimization metrics',
+        environmental: 'Sustainability impact measurement and improvement suggestions',
+        timeframe: 'Analysis based on last 30 days of data'
+      },
+      changes: ['Analyze sales patterns and customer behavior', 'Generate inventory optimization recommendations', 'Create sustainability impact reports', 'Predict demand and market trends'],
+      benefits: ['Data-driven decision making', 'Optimized inventory management', 'Improved sustainability practices', 'Competitive advantage through AI insights'],
+      risks: ['Recommendations based on historical data patterns', 'Market conditions may vary from predictions']
+    };
+    showActionDetails(details, handleGenerateInsights);
+  };
+  const handleDownloadReportWithDetails = () => {
+    const details = {
+      title: "Generate NSW EPA Compliance Report",
+      description: "This action will create a comprehensive NSW Environmental Protection Authority compliance report with your food waste reduction data and Negentropy platform impact.",
+      impact: {
+        financial: 'Detailed cost savings from waste reduction',
+        inventory: 'Complete waste management and reduction metrics',
+        environmental: 'Full environmental impact assessment and compliance verification',
+        timeframe: 'Report covers all historical data and current compliance status'
+      },
+      changes: ['Compile all food waste data', 'Calculate environmental impact metrics', 'Generate official EPA compliance documentation', 'Include Negentropy platform contribution analysis'],
+      benefits: ['Official EPA compliance verification', 'Regulatory requirement fulfillment', 'Environmental impact documentation', 'Potential tax benefits and incentives'],
+      risks: ['Compliance requirements may change', 'Data accuracy dependent on input quality']
+    };
+    showActionDetails(details, handleDownloadReport);
+  };
   const handleGenerateInsights = async () => {
     try {
       setIsGeneratingInsights(true);
-      toast.info("AI is analyzing your business data...");
+      toast.info("Generating AI insights...");
 
-      const businessData = {
-        sales: realData.totalSales,
-        profit: realData.profit,
-        transactions: parseInt(realData.transactions),
-        co2Saved: realData.co2Saved,
-        wasteReduced: realData.wasteReduced,
-        products: products.length,
-        predictive: predictiveData
-      };
-
-      const insights = await aiInsightsService.generateAIInsights(businessData, user?.id);
-      setAiInsights(insights);
-      toast.success("AI insights generated successfully!");
+      // Refresh real data when generating insights
+      await loadRealData();
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('ai-train', {
+        body: {
+          period: activeTimeFilter
+        }
+      });
+      if (error) throw error;
+      setAiInsights(data);
+      toast.success("Insights generated successfully.");
     } catch (err) {
       console.error("AI insights error:", err);
       toast.error("Could not generate insights.");
@@ -687,18 +684,16 @@ const KPI = () => {
       setIsGeneratingInsights(false);
     }
   };
-
-  return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
+  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
       <div className="max-w-md md:max-w-6xl mx-auto glass-card md:rounded-xl md:my-0 min-h-screen md:min-h-0 animate-fade-in">
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
               <div>
                 
                 <div className="flex justify-center mb-4">
-                  
+                  <img src={hiMateBanner} alt="Hi Mate, What are we going to make possible today?" className="h-12 object-contain" />
                 </div>
-                <p className="text-2xl text-center text-slate-950 font-thin">{"Hi Mate, What are we going to make possible today?"}</p>
+                <p className="text-gray-500">                          The dashboard displays your business's performance, sustainability, and predictions using our Negentropy AI.</p>
                 
               </div>
               <DropdownMenu>
@@ -723,232 +718,326 @@ const KPI = () => {
             </div>
           </header>
 
-          <main className="px-6 space-y-6">
-            {/* Chart Section */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-                <h2 className="text-xl font-semibold text-gray-900">Revenue Trends</h2>
-                <div className="flex flex-wrap gap-2">
-                  {(Object.keys(chartDataSamples) as TimeFilterPeriod[]).map(period => (
-                    <TimeFilterButton
-                      key={period}
-                      label={period}
-                      isActive={activeTimeFilter === period}
-                      onClick={() => handleTimeFilterClick(period)}
-                    />
-                  ))}
-                </div>
-              </div>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis
-                      dataKey="label"
-                      axisLine={false}
-                      tickLine={false}
-                      className="text-sm text-gray-500"
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      className="text-sm text-gray-500"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#3b82f6"
-                      fillOpacity={1}
-                      fill="url(#colorRevenue)"
-                      strokeWidth={2}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+          {/* Marketplace Button */}
+          <div className="px-6 mb-4">
+            <div className="flex justify-end">
+              
+            </div>
+          </div>
+
+          {/* AI ChatBot - Inline */}
+          <div className="px-6 mb-6">
+            <ChatBot variant="inline" />
+          </div>
+
+
+
+          {/* Main dashboard content and chart - Moved to top */}
+          <section className="px-6 mt-8 mb-8 space-y-6">
+            {/* Time Filters */}
+            
+
+            {/* KPI Metrics - Expanded with Profit, Savings, Revenue */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <MetricCard icon={AreaChart} value={realData.totalSales} label="Total Sales" trend={realData.salesTrend} />
+              <MetricCard icon={Lock} value={realData.transactions} label="Transactions" trend={realData.transactionsTrend} />
+              <MetricCard icon={Package} value={realData.profit} label="Profit" trend={realData.profitTrend} />
+              <MetricCard icon={AlertTriangle} value={realData.savings} label="Operational Savings" trend={realData.savingsTrend} />
+              <MetricCard icon={Plus} value={realData.revenue} label="Revenue" trend={realData.revenueTrend} />
+              <MetricCard icon={User} value={realData.avgOrderValue} label="Avg Order Value" trend={realData.avgOrderTrend} />
             </div>
 
-            {/* Key Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <MetricCard
-                icon={DollarSign}
-                value={realData.totalSales}
-                label="Total Sales"
-                trend={realData.salesTrend}
-              />
-              <MetricCard
-                icon={ShoppingCart}
-                value={realData.transactions}
-                label="Transactions"
-                trend={realData.transactionsTrend}
-              />
-              <MetricCard
-                icon={TrendingUp}
-                value={realData.profit}
-                label="Profit"
-                trend={realData.profitTrend}
-              />
-              <MetricCard
-                icon={ArrowUp}
-                value={realData.avgOrderValue}
-                label="Avg Order Value"
-                trend={realData.avgOrderTrend}
-              />
-            </div>
 
-            {/* Sustainability Impact */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <SustainabilityCard
-                label="CO₂ Saved"
-                value={realData.co2Saved}
-                subtext={realData.co2Change}
-              />
-              <SustainabilityCard
-                label="Food Waste Reduced"
-                value={realData.foodWasteReduced}
-                subtext={realData.foodWasteChange}
-              />
-              <SustainabilityCard
-                label="Cost Savings"
-                value={realData.costSavings}
-                subtext={realData.costChange}
-              />
+
+      {aiInsights && <div className="space-y-4">
+      {/* Main AI Summary */}
+      <div className="apple-card-hover p-6 bg-white backdrop-blur-sm border border-gray-200">
+        <h4 className="font-semibold mb-2 text-indigo-900">AI Summary</h4>
+        <p className="text-sm text-indigo-700/80 mb-3">{aiInsights.executive_summary}</p>
+        {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && <div>
+            <h5 className="text-sm font-medium mb-1 text-indigo-800">Recommendations</h5>
+            <ul className="list-disc pl-5 text-sm text-indigo-700">
+              {aiInsights.recommendations.slice(0, 3).map((r: any, i: number) => <li key={i}>{typeof r === 'string' ? r : r.title || JSON.stringify(r)}</li>)}
+            </ul>
+          </div>}
+      </div>
+
+      {/* Sustainability Impact Cards */}
+      {aiInsights.sustainability_impact && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
+            <h4 className="font-semibold text-emerald-800 mb-2">Sustainability Impact</h4>
+            <div className="space-y-3">
+              <div>
+                <p className="text-emerald-700/80 text-sm font-medium">CO₂ Saved</p>
+                <p className="text-2xl font-bold text-emerald-900">{aiInsights.sustainability_impact.co2_saved_kg} kg</p>
+                <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.co2_saved_change}</p>
+              </div>
+              <div>
+                <p className="text-emerald-700/80 text-sm font-medium">Waste Reduced</p>
+                <p className="text-2xl font-bold text-emerald-900">{aiInsights.sustainability_impact.waste_reduced_percentage}%</p>
+                <p className="text-emerald-600 text-sm font-medium">Target: {aiInsights.sustainability_impact.waste_target}%</p>
+              </div>
             </div>
+          </div>
+
+          <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
+            <h4 className="font-semibold text-blue-800 mb-2">Customer Insights</h4>
+            <div className="space-y-3">
+              <div>
+                <p className="text-blue-700/80 text-sm font-medium">Conversion Rate</p>
+                <p className="text-2xl font-bold text-blue-900">{aiInsights.customer_insights.conversion_rate}%</p>
+                <p className="text-emerald-600 text-sm font-medium">{aiInsights.customer_insights.conversion_change}</p>
+              </div>
+              <div>
+                <p className="text-blue-700/80 text-sm font-medium">Return Rate</p>
+                <p className="text-2xl font-bold text-blue-900">{aiInsights.customer_insights.return_rate}%</p>
+                <p className="text-orange-600 text-sm font-medium">{aiInsights.customer_insights.return_change}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
+            <h4 className="font-semibold text-purple-800 mb-2">Savings & Food Waste</h4>
+            <div className="space-y-3">
+              <div>
+                <p className="text-purple-700/80 text-sm font-medium">Cost Savings</p>
+                <p className="text-2xl font-bold text-purple-900">${aiInsights.sustainability_impact.cost_savings}</p>
+                <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.cost_savings_change}</p>
+              </div>
+              <div>
+                <p className="text-purple-700/80 text-sm font-medium">Food Waste Reduced</p>
+                <p className="text-2xl font-bold text-purple-900">{aiInsights.sustainability_impact.food_waste_reduced_kg} kg</p>
+                <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.food_waste_change}</p>
+              </div>
+            </div>
+          </div>
+        </div>}
+    </div>}
+          </section>
+
+          <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
+            {/* KPI groups in a single row */}
+            <section className="md:col-span-4 order-1 md:order-0 mt-6">
+              <div className="grid md:grid-cols-3 gap-6 items-stretch">
+                  <div className="h-full flex flex-col">
+                    <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
+                    <div className="flex-1 grid grid-rows-2 gap-4">
+                      <div className="flex-1">
+                        <SustainabilityCard label="CO₂ Saved" value={realData.co2Saved} subtext={realData.co2Change} />
+                      </div>
+                      <div className="flex-1">
+                        <SustainabilityCard label="Waste Reduced" value={realData.wasteReduced} subtext={`Target: ${realData.wasteTarget}`} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="h-full flex flex-col">
+                    <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
+                    <div className="flex-1 grid grid-rows-2 gap-4">
+                      <div className="flex-1">
+                        <InsightCard label="Conversion Rate" value={realData.conversionRate} trend={realData.conversionChange.replace('+', '')} />
+                      </div>
+                      <div className="flex-1">
+                        <InsightCard label="Return Rate" value={realData.returnRate} trend={realData.returnChange.replace('+', '')} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="h-full flex flex-col">
+                    <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
+                    <div className="flex-1 grid grid-rows-2 gap-4">
+                      <div className="flex-1">
+                        <SustainabilityCard label="Cost Savings" value={realData.costSavings} subtext={realData.costChange} />
+                      </div>
+                      <div className="flex-1">
+                        <SustainabilityCard label="Food Waste Reduced" value={realData.foodWasteReduced} subtext={realData.foodWasteChange} />
+                      </div>
+                    </div>
+                  </div>
+              </div>
+            </section>
 
             {/* AI Predictive Insights */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <InsightCard
-                label="Top Selling Product"
-                value={predictiveData.topSellingProduct}
-                trend={predictiveData.topSellingRate}
-              />
-              <InsightCard
-                label="Overstocked Item"
-                value={predictiveData.overstockedItem}
-                trend={predictiveData.overstockAmount}
-              />
-              <InsightCard
-                label="Demand Forecast"
-                value={predictiveData.demandForecast}
-                trend={predictiveData.forecastPeriod}
-              />
-              <InsightCard
-                label="Optimal Reorder Point"
-                value={predictiveData.optimalReorder}
-                trend={predictiveData.reorderCategory}
-              />
+            
+
+            {/* Surprise Bags Performance */}
+            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
+              <h3 className="text-lg font-semibold mb-4">Surprise Bags Performance</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
+                <SustainabilityCard label="Active Surprise Bags" value={products.filter(p => p.isSurpriseBag && p.quantity > 0).length.toString()} subtext={`Total created: ${products.filter(p => p.isSurpriseBag).length}`} />
+                <SustainabilityCard label="Surprise Bag Revenue" value={`$${Math.round(parseFloat(realData.totalSales.replace(/[$,]/g, '')) * 0.15).toLocaleString()}`} subtext="15% of total sales" />
+                <SustainabilityCard label="Food Waste Prevented" value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 2.5)} kg`} subtext="Through surprise bags" />
+                <SustainabilityCard label="Environmental Impact" value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 1.8)} kg CO₂`} subtext="Emissions saved" />
+              </div>
+            </section>
+
+            {/* Customer Satisfaction & Performance */}
+            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
+              <h3 className="text-lg font-semibold mb-4">Customer Satisfaction & Performance</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
+                <RatingInsightCard label="Surprise Bag rating" rating={4.72} status="Looks good" />
+                <RatingInsightCard label="Store experience rating" rating={4.75} status="Looks good" />
+                <RatingInsightCard label="Cancellations" percentage={0} status="Looks good" />
+                <RatingInsightCard label="Refunds" percentage={0} status="Looks good" />
+              </div>
+            </section>
+
+          </main>
+
+          {/* Main dashboard content and chart - Moved to bottom */}
+          
+
+          {/* Auto Tasks and Suppliers Row */}
+          <section className="px-6">
+
+            {/* Weather and Visitor Prediction Cards - Moved below Task List */}
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
+              <div className="bg-white rounded-xl p-6 border border-gray-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-blue-500 rounded-full">
+                    <Sun className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-blue-900">Melbourne Weather Live</h3>
+                  <div className="ml-auto">
+                    <button className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors">
+                      <Settings className="w-4 h-4 text-blue-700" />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-3xl font-light text-blue-900 mb-1">16°C</div>
+                    <p className="text-blue-700 text-sm">Demo Weather Data - Add API Key For Real Data</p>
+                    <p className="text-blue-600 text-sm">Feels like 18°C</p>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-blue-400 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">💧</span>
+                      </div>
+                      <span className="text-blue-700">66%</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Wind className="w-4 h-4 text-blue-600" />
+                      <span className="text-blue-700">19 km/h</span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/50 rounded-lg p-3">
+                    <p className="text-sm text-blue-800 font-medium mb-2">Today's Forecast</p>
+                    <div className="grid grid-cols-4 gap-2 text-xs">
+                      <div className="text-center">
+                        <div className="text-blue-600">12:00</div>
+                        <Sun className="w-4 h-4 text-yellow-500 mx-auto my-1" />
+                        <div className="text-blue-900">18°</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-blue-600">15:00</div>
+                        <Cloud className="w-4 h-4 text-gray-500 mx-auto my-1" />
+                        <div className="text-blue-900">22°</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-blue-600">18:00</div>
+                        <Cloud className="w-4 h-4 text-gray-500 mx-auto my-1" />
+                        <div className="text-blue-900">19°</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-blue-600">21:00</div>
+                        <Cloud className="w-4 h-4 text-gray-500 mx-auto my-1" />
+                        <div className="text-blue-900">16°</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-green-100 rounded-lg p-2">
+                    <p className="text-green-800 text-sm">☕ Perfect for warm drinks</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-6 border border-gray-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-purple-500 rounded-full">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-purple-900">Visitor Prediction</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-3xl font-bold text-purple-900">94</div>
+                      <p className="text-purple-700 text-sm">Expected visitors today</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-green-600">
+                      <TrendingUp className="w-4 h-4" />
+                      <span className="text-sm font-medium">Up</span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-purple-500" />
+                      <span className="text-purple-700">Peak: 1:00 PM</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-green-500" />
+                      <span className="text-purple-700">Confidence: 92%</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-purple-800">Key Factors:</p>
+                    <div className="flex flex-wrap gap-1">
+                      <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Weekday</span>
+                      <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Historical patterns</span>
+                      <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Regular hours</span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-purple-100 rounded-lg p-3">
+                    <p className="text-purple-800 text-sm">AI recommendation: Normal staffing sufficient</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Inventory Management Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <SuppliersCard suppliers={suppliers} />
-              <RatingInsightCard label="Customer Satisfaction" status="excellent" />
-            </div>
-
-            {/* AI Recommendations */}
-            <AIRecommendations />
-
-            {/* Auto Task Summary */}
-            <AutoTaskSummary />
-
-            {/* Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button
-                onClick={() => handleActionWithConfirmation(handleDownloadReport, {
-                  title: "Generate NSW EPA Compliance Report",
-                  description: "This will create a comprehensive waste management report including food waste data, donation records, and compliance metrics required by NSW EPA regulations.",
-                  impact: "Helps maintain regulatory compliance and demonstrates your sustainability efforts.",
-                  estimatedTime: "2-3 minutes"
-                })}
-                disabled={isGeneratingReport}
-                className="w-full"
-              >
-                {isGeneratingReport ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Download className="mr-2 h-4 w-4" />
-                    Download NSW EPA Report
-                  </>
-                )}
-              </Button>
-              <Button
-                onClick={() => handleActionWithConfirmation(handleGenerateInsights, {
-                  title: "Generate AI Business Insights",
-                  description: "AI will analyze your sales data, inventory levels, and customer patterns to provide actionable business recommendations.",
-                  impact: "Discover optimization opportunities and predict future trends for better decision making.",
-                  estimatedTime: "1-2 minutes"
-                })}
-                disabled={isGeneratingInsights}
-                variant="outline"
-                className="w-full"
-              >
-                {isGeneratingInsights ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Brain className="mr-2 h-4 w-4" />
-                    Generate AI Insights
-                  </>
-                )}
-              </Button>
-            </div>
-
-            {/* AI Insights Display */}
-            {aiInsights && (
-              <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
+            {/* NSW EPA Compliance Report */}
+            <div className="mt-8 max-w-md mx-auto">
+              <Card className="bg-white/80">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-purple-900">
-                    <Sparkles className="h-5 w-5" />
-                    AI Business Insights
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-green-600" />
+                    NSW EPA Compliance Report
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {aiInsights.recommendations?.map((rec: any, index: any) => (
-                    <div key={index} className="p-4 bg-white/70 rounded-lg border border-purple-100">
-                      <h4 className="font-semibold text-purple-900 mb-2">{rec.title}</h4>
-                      <p className="text-purple-700 text-sm mb-2">{rec.description}</p>
-                      <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                        {rec.impact}
-                      </Badge>
-                    </div>
-                  ))}
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Generate comprehensive NSW EPA food waste compliance reports with Negentropy platform impact data.
+                  </p>
+                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white flex justify-center items-center" onClick={handleDownloadReportWithDetails} disabled={isGeneratingReport}>
+                    {isGeneratingReport ? "Generating EPA Report..." : "Download EPA Compliance Report"}
+                  </Button>
                 </CardContent>
               </Card>
-            )}
+            </div>
 
-            {/* Australian Compliance Dialog */}
-            <AustralianComplianceDialog />
+            <div className="text-center text-sm text-gray-500 space-y-2 mb-6 mt-8">
+              <div className="flex flex-col gap-4">
+                <AustralianComplianceDialog />
+                <p className="text-xs text-muted-foreground px-4 leading-relaxed">
+                  Generate Australian legal compliance reports aligned with DCCEEW Food Waste Baseline & Reporting Framework 
+                  and NSW Waste Regulation 2026. Essential for businesses to meet national food waste strategy requirements.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
 
-            {/* Upload Training Data Dialog */}
-            <UploadTrainingDataDialog />
+        {/* Action Details Dialog */}
+        <ActionDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} actionDetails={currentActionDetails} onConfirm={handleConfirmAction} onCancel={handleCancelAction} />
 
-            {/* Action Details Dialog */}
-            <ActionDetailsDialog
-              open={dialogOpen}
-              onOpenChange={setDialogOpen}
-              onConfirm={handleConfirmAction}
-              onCancel={handleCancelAction}
-              actionDetails={currentActionDetails}
-            />
-
-            {/* Chat Bot */}
-            <ChatBot />
-          </main>
-      </div>
       <BottomNav />
-    </div>
-  );
+    </div>;
 };
-
 export default KPI;
