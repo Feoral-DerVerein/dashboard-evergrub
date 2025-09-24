@@ -24,6 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAutoTaskGeneration } from "@/hooks/useAutoTaskGeneration";
 import AutoTaskSummary from "@/components/kpi/AutoTaskSummary";
+import hiMateBanner from "@/assets/hi-mate-banner.png";
 type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
 const chartDataSamples: Record<TimeFilterPeriod, {
   label: string;
@@ -690,7 +691,7 @@ const KPI = () => {
               <div>
                 
                 <div className="flex justify-center mb-4">
-                  <img src="/src/assets/welcome-banner.png" alt="Hi Mate, What are we going to make possible today?" className="h-12 object-contain" />
+                  <img src={hiMateBanner} alt="Hi Mate, What are we going to make possible today?" className="h-12 object-contain" />
                 </div>
                 <p className="text-gray-500">                          The dashboard displays your business's performance, sustainability, and predictions using our Negentropy AI.</p>
                 
