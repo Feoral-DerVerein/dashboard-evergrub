@@ -196,23 +196,23 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
                             List on Market
                           </>
                         )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.location.href = `/products/edit/${product.id}`}
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => onSendToMarket(product)}
-                      >
-                        <Send className="w-4 h-4 mr-2" />
-                        Send to Market
-                      </Button>
+                       </Button>
+                       <Button
+                         variant="secondary"
+                         size="sm"
+                         onClick={() => onSendToMarket(product)}
+                       >
+                         <Send className="w-4 h-4 mr-2" />
+                         Send to Market
+                       </Button>
+                       <Button
+                         variant="outline"
+                         size="sm"
+                         onClick={() => window.location.href = `/products/edit/${product.id}`}
+                       >
+                         <Edit className="w-4 h-4 mr-2" />
+                         Edit
+                       </Button>
                     </div>
                   </div>
                 </div>
