@@ -397,18 +397,18 @@ const Market = () => {
 
   // Sales Management Functions
   const handleAcceptSale = (saleItem: any) => {
-    // Update the status to "send product"
+    // Update the status to accepted (green color)
     setSalesManagementItems(prev => 
       prev.map(item => 
         item.id === saleItem.id 
-          ? { ...item, status: "send_product" }
+          ? { ...item, status: "accepted", cardColor: "green" }
           : item
       )
     );
     
     toast({
       title: "Sale Accepted!",
-      description: `Order status changed to "send product" for ${saleItem.product}.`
+      description: `Order accepted for ${saleItem.product}.`
     });
   };
 
@@ -419,12 +419,18 @@ const Market = () => {
   };
 
   const handleDeclineSale = (saleItem: any) => {
-    // Remove the item from sales management and return to "my products"
-    setSalesManagementItems(prev => prev.filter(item => item.id !== saleItem.id));
+    // Update the status to declined (red color)
+    setSalesManagementItems(prev => 
+      prev.map(item => 
+        item.id === saleItem.id 
+          ? { ...item, status: "declined", cardColor: "red" }
+          : item
+      )
+    );
     
     toast({
       title: "Sale Declined",
-      description: `${saleItem.product} has been returned to your products and removed from sales.`,
+      description: `${saleItem.product} has been declined.`,
       variant: "destructive"
     });
   };
@@ -660,145 +666,82 @@ const Market = () => {
               <Badge variant="secondary">Incoming Orders & Offers</Badge>
             </div>
 
-            {/* Mock incoming sales/offers for demonstration */}
+            {/* Dynamic sales management cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="border-green-200 bg-green-50/50">
-                <CardContent className="p-4">
-                  <div className="flex gap-3">
-                    <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                      <img src={porkMinceImage} alt="Pork Mince" className="w-full h-full object-cover rounded-lg" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm mb-1">Pork Mince 5kg</h3>
-                      <div className="space-y-1 text-xs text-muted-foreground">
-                        <p>Buyer: John Smith</p>
-                        <p>Offered: $22.50 (Listed: $25.00)</p>
-                        <p>Quantity: 3 units</p>
-                        <p>Total: $67.50</p>
+              {salesManagementItems.map(item => (
+                <Card 
+                  key={item.id} 
+                  className={cn(
+                    "hover:shadow-md transition-shadow",
+                    item.cardColor === "green" && "border-green-500 bg-green-50 dark:bg-green-950/20",
+                    item.cardColor === "red" && "border-red-500 bg-red-50 dark:bg-red-950/20"
+                  )}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex gap-3">
+                      <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                        <img src={item.image} alt={item.product} className="w-full h-full object-cover rounded-lg" />
                       </div>
-                      <div className="flex gap-1 mt-2">
-                        <Button 
-                          size="sm" 
-                          variant="default" 
-                          className="text-xs px-2 py-1 h-6 flex-1"
-                          onClick={() => handleAcceptSale({product: "Pork Mince 5kg", buyer: "John Smith", type: "offer"})}
-                        >
-                          Accept
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="text-xs px-2 py-1 h-6 flex-1"
-                          onClick={() => handleContactBuyer({product: "Pork Mince 5kg", buyer: "John Smith", type: "offer"})}
-                        >
-                          Contact
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="destructive" 
-                          className="text-xs px-2 py-1 h-6 flex-1"
-                          onClick={() => handleDeclineSale({product: "Pork Mince 5kg", buyer: "John Smith", type: "offer"})}
-                        >
-                          Decline
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-blue-200 bg-blue-50/50">
-                <CardContent className="p-4">
-                  <div className="flex gap-3">
-                    <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                      <img src={buttermilkChickenImage} alt="Buttermilk Chicken" className="w-full h-full object-cover rounded-lg" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm mb-1">Buttermilk Chicken</h3>
-                      <div className="space-y-1 text-xs text-muted-foreground">
-                        <p>Buyer: Maria Garcia</p>
-                        <p>Direct Purchase: $18.00</p>
-                        <p>Quantity: 2 units</p>
-                        <p>Total: $36.00</p>
-                      </div>
-                      <div className="flex gap-1 mt-2">
-                        <Button 
-                          size="sm" 
-                          variant="default" 
-                          className="text-xs px-2 py-1 h-6 flex-1"
-                          onClick={() => handleAcceptSale({product: "Buttermilk Chicken", buyer: "Maria Garcia", type: "order"})}
-                        >
-                          Accept
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="text-xs px-2 py-1 h-6 flex-1"
-                          onClick={() => handleContactBuyer({product: "Buttermilk Chicken", buyer: "Maria Garcia", type: "order"})}
-                        >
-                          Contact
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="destructive" 
-                          className="text-xs px-2 py-1 h-6 flex-1"
-                          onClick={() => handleDeclineSale({product: "Buttermilk Chicken", buyer: "Maria Garcia", type: "order"})}
-                        >
-                          Decline
-                        </Button>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-semibold text-sm truncate">{item.product}</h3>
+                          <Badge 
+                            variant={
+                              item.status === "accepted" ? "default" : 
+                              item.status === "declined" ? "destructive" : 
+                              "secondary"
+                            }
+                          >
+                            {item.status === "accepted" ? "Accepted" : 
+                             item.status === "declined" ? "Declined" : 
+                             "Pending"}
+                          </Badge>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground">Buyer: {item.buyer}</p>
+                          <p className="text-xs text-muted-foreground">Type: {item.type}</p>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">${item.price}</span>
+                            <span className="text-xs">Qty: {item.quantity}</span>
+                          </div>
+                          <p className="text-xs font-medium text-primary">Total: ${item.total}</p>
+                          
+                          {item.status === "pending_approval" && (
+                            <div className="flex gap-1 mt-2">
+                              <Button 
+                                onClick={() => handleAcceptSale(item)} 
+                                size="sm" 
+                                variant="default" 
+                                className="flex-1 h-7 text-xs"
+                              >
+                                Accept
+                              </Button>
+                              <Button 
+                                onClick={() => handleContactBuyer(item)} 
+                                size="sm" 
+                                variant="outline" 
+                                className="flex-1 h-7 text-xs"
+                              >
+                                Contact
+                              </Button>
+                              <Button 
+                                onClick={() => handleDeclineSale(item)} 
+                                size="sm" 
+                                variant="destructive" 
+                                className="flex-1 h-7 text-xs"
+                              >
+                                Decline
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-purple-200 bg-purple-50/50">
-                <CardContent className="p-4">
-                  <div className="flex gap-3">
-                    <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                      <img src={pitangoTomatoSoupImage} alt="Tomato Soup" className="w-full h-full object-cover rounded-lg" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm mb-1">Pitango Tomato Soup</h3>
-                      <div className="space-y-1 text-xs text-muted-foreground">
-                        <p>Buyer: Restaurant ABC</p>
-                        <p>Bulk Order: $8.50 each</p>
-                        <p>Quantity: 20 units</p>
-                        <p>Total: $170.00</p>
-                      </div>
-                      <div className="flex gap-1 mt-2">
-                        <Button 
-                          size="sm" 
-                          variant="default" 
-                          className="text-xs px-2 py-1 h-6 flex-1"
-                          onClick={() => handleAcceptSale({product: "Pitango Tomato Soup", buyer: "Restaurant ABC", type: "bulk_order"})}
-                        >
-                          Accept
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="text-xs px-2 py-1 h-6 flex-1"
-                          onClick={() => handleContactBuyer({product: "Pitango Tomato Soup", buyer: "Restaurant ABC", type: "bulk_order"})}
-                        >
-                          Contact
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="destructive" 
-                          className="text-xs px-2 py-1 h-6 flex-1"
-                          onClick={() => handleDeclineSale({product: "Pitango Tomato Soup", buyer: "Restaurant ABC", type: "bulk_order"})}
-                        >
-                          Decline
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
 
             <div className="text-center py-8 text-muted-foreground">
