@@ -667,7 +667,19 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
               }} transition={{
                 delay: 0.8
               }}>
-                   
+                  <Button 
+                    onClick={form.handleSubmit(handleSubmit)} 
+                    className="w-full h-12 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg transition-all duration-300 transform hover:scale-[1.02]" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Connecting...
+                      </> : <>
+                        <Link className="mr-2 h-4 w-4" />
+                        Connect and Start Optimizing
+                      </>}
+                  </Button>
                 </motion.div>
               </CardContent>
             </Card>
