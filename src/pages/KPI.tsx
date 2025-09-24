@@ -168,6 +168,7 @@ const chartDataSamples: Record<TimeFilterPeriod, {
     value: 17000
   }]
 };
+
 const TimeFilterButton = ({
   label,
   isActive = false,
@@ -231,6 +232,7 @@ const InsightCard = ({
       <span className="text-emerald-600 text-sm font-medium">+{trend}</span>
     </div>
   </div>;
+
 const KPI = () => {
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeFilterPeriod>("Week");
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -693,7 +695,7 @@ const KPI = () => {
                 <div className="flex justify-center mb-4">
                   
                 </div>
-                <p className="text-center text-xl text-gray-950">                                                                          {Hi Mate, What are we going to make possible today?</p>
+                <p className="text-center text-xl text-gray-950">Hi Mate, What are we going to make possible today?</p>
                 
               </div>
               <DropdownMenu>
@@ -735,7 +737,13 @@ const KPI = () => {
           {/* Main dashboard content and chart - Moved to top */}
           <section className="px-6 mt-8 mb-8 space-y-6">
             {/* Time Filters */}
-            
+            <div className="flex justify-center gap-3 mb-6">
+              <TimeFilterButton label="Today" isActive={activeTimeFilter === "Today"} onClick={() => handleTimeFilterClick("Today")} />
+              <TimeFilterButton label="Week" isActive={activeTimeFilter === "Week"} onClick={() => handleTimeFilterClick("Week")} />
+              <TimeFilterButton label="Month" isActive={activeTimeFilter === "Month"} onClick={() => handleTimeFilterClick("Month")} />
+              <TimeFilterButton label="Quarter" isActive={activeTimeFilter === "Quarter"} onClick={() => handleTimeFilterClick("Quarter")} />
+              <TimeFilterButton label="Year" isActive={activeTimeFilter === "Year"} onClick={() => handleTimeFilterClick("Year")} />
+            </div>
 
             {/* KPI Metrics - Expanded with Profit, Savings, Revenue */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -856,7 +864,15 @@ const KPI = () => {
             </section>
 
             {/* AI Predictive Insights */}
-            
+            <section className="md:col-span-4 order-3 md:order-2 mt-6">
+              <h3 className="text-lg font-semibold mb-4">AI Predictive Insights</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
+                <InsightCard label="Top Selling Product" value={predictiveData.topSellingProduct} trend={predictiveData.topSellingRate} />
+                <InsightCard label="Overstocked Item" value={predictiveData.overstockedItem} trend={predictiveData.overstockAmount} />
+                <InsightCard label="Demand Forecast" value={predictiveData.demandForecast} trend={predictiveData.forecastPeriod} />
+                <InsightCard label="Optimal Reorder" value={predictiveData.optimalReorder} trend={predictiveData.reorderCategory} />
+              </div>
+            </section>
 
             {/* Surprise Bags Performance */}
             <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
