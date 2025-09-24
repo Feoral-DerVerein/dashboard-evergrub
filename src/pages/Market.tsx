@@ -56,39 +56,36 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
     fetchUserProducts();
   }, [user?.id, toast]);
 
-  const handleToggleVisibility = async (productId: number, currentVisibility: boolean) => {
+  const handleEditProduct = (product: any) => {
+    console.log('Edit product:', product);
+    // Add edit functionality here
+  };
+
+  const handleDeleteProduct = async (product: any) => {
     try {
       const { error } = await supabase
         .from('products')
-        .update({ is_marketplace_visible: !currentVisibility })
-        .eq('id', productId)
-        .eq('userid', user?.id);
+        .update({ is_marketplace_visible: false })
+        .eq('id', product.id);
 
       if (error) throw error;
 
-      setUserProducts(prev => 
-        prev.map(product => 
-          product.id === productId 
-            ? { ...product, is_marketplace_visible: !currentVisibility }
-            : product
-        )
-      );
-
+      setUserProducts(prev => prev.filter(p => p.id !== product.id));
       toast({
-        title: "Success",
-        description: `Product ${!currentVisibility ? 'listed on' : 'removed from'} marketplace`,
+        title: "Product Removed",
+        description: `${product.name} has been removed from the marketplace`,
       });
     } catch (error) {
-      console.error('Error updating product visibility:', error);
+      console.error('Error removing product:', error);
       toast({
         title: "Error",
-        description: "Failed to update product visibility",
+        description: "Failed to remove product from marketplace",
         variant: "destructive"
       });
     }
   };
 
-  const getStatusBadge = (product: any) => {
+  const getStockBadge = (product: any) => {
     if (product.quantity === 0) {
       return <Badge variant="destructive">Out of Stock</Badge>;
     }
@@ -132,12 +129,12 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
         </Button>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {userProducts.map((product) => (
-          <Card key={product.id}>
-            <CardContent className="p-6">
-              <div className="flex gap-4">
-                <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center">
+          <Card key={product.id} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex gap-3">
+                <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                   {product.image ? (
                     <img 
                       src={product.image} 
@@ -145,79 +142,50 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
                       className="w-full h-full object-cover rounded-lg"
                     />
                   ) : (
-                    <Package className="w-8 h-8 text-muted-foreground" />
+                    <Package className="w-6 h-6 text-muted-foreground" />
                   )}
                 </div>
                 
-                <div className="flex-1">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground">{product.category}</p>
-                      {product.sku && (
-                        <p className="text-sm text-muted-foreground">SKU: {product.sku}</p>
-                      )}
-                    </div>
-                    
-                    <div>
-                      <div className="mb-2">
-                        <p className="text-sm font-medium">Price</p>
-                        <p className="text-lg font-bold">${product.price}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Quantity</p>
-                        <p className="text-sm text-muted-foreground">{product.quantity} units</p>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="mb-2">
-                        <p className="text-sm font-medium">Expiration</p>
-                        <p className="text-sm text-muted-foreground">
-                          {product.expirationdate || 'Not specified'}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Status</p>
-                        {getStatusBadge(product)}
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold text-sm truncate">{product.name}</h3>
+                    <div className="flex gap-1 flex-shrink-0 ml-2">
                       <Button
-                        variant={product.is_marketplace_visible ? "destructive" : "default"}
+                        variant="ghost"
                         size="sm"
-                        onClick={() => handleToggleVisibility(product.id, product.is_marketplace_visible)}
+                        onClick={() => handleEditProduct(product)}
+                        className="h-8 w-8 p-0"
                       >
-                        {product.is_marketplace_visible ? (
-                          <>
-                            <Eye className="w-4 h-4 mr-2" />
-                            Remove from Market
-                          </>
-                        ) : (
-                          <>
-                            <DollarSign className="w-4 h-4 mr-2" />
-                            List on Market
-                          </>
-                        )}
-                       </Button>
-                       <Button
-                         variant="secondary"
-                         size="sm"
-                         onClick={() => onSendToMarket(product)}
-                       >
-                         <Send className="w-4 h-4 mr-2" />
-                         Send to Market
-                       </Button>
-                       <Button
-                         variant="outline"
-                         size="sm"
-                         onClick={() => window.location.href = `/products/edit/${product.id}`}
-                       >
-                         <Edit className="w-4 h-4 mr-2" />
-                         Edit
-                       </Button>
+                        <Edit className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteProduct(product)}
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
                     </div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">{product.category}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">${product.price}</span>
+                      {getStockBadge(product)}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Qty: {product.quantity}</p>
+                    
+                    <Button 
+                      onClick={() => onSendToMarket(product)}
+                      size="sm" 
+                      variant="outline" 
+                      className="w-full mt-2"
+                    >
+                      <Send className="w-3 h-3 mr-2" />
+                      Send to Market
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -249,146 +217,33 @@ const Market = () => {
   const [selectedProductForMarket, setSelectedProductForMarket] = useState<any>(null);
   const [quantityToSend, setQuantityToSend] = useState<number>(1);
   const [marketPrice, setMarketPrice] = useState<number>(0);
-  const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
+  const [expiryDate, setExpiryDate] = useState<Date>();
   const [collectFrom, setCollectFrom] = useState<string>("");
+
   const { toast } = useToast();
 
-  const handleDeleteProduct = (productId: any) => {
-    setListedProducts(prev => prev.filter(product => product.id !== productId));
-    toast({
-      title: "Product Deleted",
-      description: "Product has been removed from the marketplace",
-    });
-  };
+  const categories = [
+    { name: "All Products", icon: Grid3X3 },
+    { name: "Fish", icon: Fish },
+    { name: "Meat", icon: Beef },
+    { name: "Fruit", icon: Apple },
+    { name: "Bakery", icon: Cookie },
+    { name: "Dairy", icon: Milk },
+    { name: "Grains", icon: Wheat },
+    { name: "Beverages", icon: Coffee },
+    { name: "Ready Meals", icon: UtensilsCrossed },
+    { name: "Wine", icon: Grape }
+  ];
 
-  const handleSendToMarket = (product: any) => {
-    setSelectedProductForMarket(product);
-    setQuantityToSend(1);
-    setMarketPrice(product.price || 0);
-    setExpiryDate(product.expirationdate ? new Date(product.expirationdate) : undefined);
-    setCollectFrom("");
-    setShowSendToMarketDialog(true);
-  };
-
-  const confirmSendToMarket = () => {
-    if (!selectedProductForMarket || quantityToSend <= 0 || quantityToSend > selectedProductForMarket.quantity) {
-      toast({
-        title: "Invalid Quantity",
-        description: "Please enter a valid quantity",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (marketPrice <= 0) {
-      toast({
-        title: "Invalid Price",
-        description: "Please enter a valid price",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!collectFrom.trim()) {
-      toast({
-        title: "Collection Location Required",
-        description: "Please specify where buyers can collect this item",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Add product to pending delivery with specified details
-    const pendingProduct = {
-      ...selectedProductForMarket,
-      quantityForSale: quantityToSend,
-      marketPrice: marketPrice,
-      expiryDate: expiryDate,
-      collectFrom: collectFrom.trim(),
-      originalQuantity: selectedProductForMarket.quantity,
-      sentToMarketAt: new Date().toISOString(),
-      marketStatus: 'pending_delivery'
-    };
-    
-    setPendingProducts(prev => [pendingProduct, ...prev]);
-    
-    toast({
-      title: "Product Sent to Market",
-      description: `${quantityToSend} units of ${selectedProductForMarket.name} sent to pending delivery`,
-    });
-
-    // Reset form
-    setShowSendToMarketDialog(false);
-    setSelectedProductForMarket(null);
-    setQuantityToSend(1);
-    setMarketPrice(0);
-    setExpiryDate(undefined);
-    setCollectFrom("");
-  };
-
-  // Check for payment status and incoming product on component mount
+  // Handle incoming product data from other pages
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const paymentStatus = urlParams.get('payment');
-    const sessionId = urlParams.get('session_id');
-
-    if (paymentStatus === 'success' && sessionId) {
-      toast({
-        title: "Payment Successful!",
-        description: "Your order has been confirmed. You will receive updates via email.",
-      });
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (paymentStatus === 'cancelled') {
-      toast({
-        title: "Payment Cancelled",
-        description: "Your payment was cancelled. You can try again anytime.",
-        variant: "destructive",
-      });
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    // Handle incoming product from task list navigation
-    if (location.state?.product && location.state?.action) {
-      setIncomingProduct(location.state.product);
+    if (location.state?.product) {
+      const product = location.state.product;
+      setIncomingProduct(product);
       
-      if (location.state.action === 'list-for-sale') {
-        // Create unique listing key to prevent duplicates from multiple navigation events
-        const listingKey = `${location.state.product.id}_${Date.now()}`;
-        
-        setListedProducts(prev => {
-          // Check if this exact product is already listed
-          const existingProduct = prev.find(p => p.id === location.state.product.id);
-          
-          if (existingProduct) {
-            // Don't add duplicate, just show message
-            toast({
-              title: "Product Already Listed",
-              description: `${location.state.product.name} is already in the marketplace`,
-            });
-            return prev;
-          }
-          
-          // Add new product with unique listing key
-          const newProduct = {
-            ...location.state.product,
-            listingKey,
-            listingType: 'B2B Sale',
-            listedAt: new Date().toISOString(),
-            status: 'Active'
-          };
-          
-          return [newProduct, ...prev];
-        });
-        
-        toast({
-          title: "Product Listed!",
-          description: `${location.state.product.name} has been added to B2B marketplace`,
-        });
-        
+      if (location.state.action === 'list') {
         setShowProductListingDialog(true);
-      } else if (location.state.action === 'create-b2b-offer') {
+      } else if (location.state.action === 'b2b') {
         setShowB2BOfferDialog(true);
       }
       
@@ -408,211 +263,156 @@ const Market = () => {
         {
           id: 1,
           name: "Pork Mince 5kg",
-          ean: "11111111160",
-          sku: "1111",
           image: porkMinceImage,
-          bbdRange: "1 Feb 2024",
-          quantity: 300,
-          pricePerUnit: 4.00,
-          totalPrice: 18000.00,
-          status: "Offer Under Review",
-          configuration: "18.00 kilos x carton, 3 x 5.00kg units per carton",
-          category: "Meat"
-        }
-      ]
-    },
-    {
-      id: 2,
-      date: "31 Jul 2023", 
-      deliveryAddress: "151 Albert St, Windsor VIC 3181, Australia",
-      deliveryNote: "",
-      products: [
-        {
-          id: 2,
-          name: "Pitango Free Range Chicken Sweet Corn & Noodle Soup 600g",
-          ean: "9421008321835",
-          sku: "455014",
-          image: pitangoChickenSoupImage,
-          bbdRange: "3 Aug 2023 - 23 Aug 2023",
-          quantity: 120,
-          pricePerUnit: 10.00,
-          totalPrice: 1200.00,
-          status: "Offer Under Review",
-          configuration: "6 x 0.60kg units per carton",
-          category: "Prepared Meals"
-        },
-        {
-          id: 3,
-          name: "Pitango Soup Tomato Basil 600g",
-          ean: "9421008321804",
-          sku: "455101",
-          image: pitangoTomatoSoupImage,
-          bbdRange: "19 Aug 2023",
-          quantity: 225,
-          pricePerUnit: 2.00,
-          totalPrice: 450.00,
-          status: "Offer Under Review",
-          configuration: "6 x 0.60kg units per carton",
-          category: "Prepared Meals"
-        },
-        {
-          id: 4,
-          name: "Buttermilk Southern Style Chicken Portions 1.3kg",
-          ean: "9340128004530",
-          sku: "8314483",
-          image: buttermilkChickenImage,
-          bbdRange: "",
-          quantity: 1611,
-          pricePerUnit: 0,
-          totalPrice: 8377.20,
-          status: "Offer Under Review",
-          configuration: "5.20 kilos x carton, 4 x 1.00kg units per carton",
-          category: "Poultry"
+          quantity: 5,
+          price: 25.00,
+          originalPrice: 30.00,
+          category: "Meat",
+          expirationDate: "2023-08-15",
+          supplier: "Fresh Meat Co.",
+          distance: "2.5 km",
+          ratings: 4.8,
+          totalRatings: 124,
+          description: "Fresh premium pork mince, perfect for cooking. Must be used within 3 days of collection."
         }
       ]
     }
   ];
 
-  const categories = [
-    { name: "All Products", icon: Grid3X3 },
-    { name: "Meat", icon: Beef },
-    { name: "Poultry", icon: UtensilsCrossed },
-    { name: "Seafood", icon: Fish },
-    { name: "Dairy", icon: Milk },
-    { name: "Dry Goods", icon: Wheat },
-    { name: "Beverages", icon: Coffee },
-    { name: "Prepared Meals", icon: UtensilsCrossed },
-    { name: "Fruit & Veg", icon: Apple },
-    { name: "Snacks & Confectionary", icon: Cookie }
-  ];
+  const handleSendToMarket = (product: any) => {
+    setSelectedProductForMarket(product);
+    setQuantityToSend(1);
+    setMarketPrice(product.price);
+    setExpiryDate(undefined);
+    setCollectFrom("");
+    setShowSendToMarketDialog(true);
+  };
 
-  const filteredOffers = marketOffers.filter(offer => 
-    offer.products.some(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.ean.includes(searchQuery);
-      
-      const matchesCategory = selectedCategory === "All Products" || 
-        product.category === selectedCategory;
-      
-      return matchesSearch && matchesCategory;
-    })
-  ).map(offer => ({
-    ...offer,
-    products: offer.products.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.ean.includes(searchQuery);
-      
-      const matchesCategory = selectedCategory === "All Products" || 
-        product.category === selectedCategory;
-      
-      return matchesSearch && matchesCategory;
-    })
-  })).filter(offer => offer.products.length > 0);
+  const confirmSendToMarket = () => {
+    if (!selectedProductForMarket || !expiryDate || !collectFrom) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
 
-  const handleReviewOffer = (product: any, offer: any) => {
+    // Add to pending products list
+    const newPendingProduct = {
+      ...selectedProductForMarket,
+      quantity: quantityToSend,
+      marketPrice,
+      expiryDate: expiryDate.toISOString(),
+      collectFrom,
+      status: "pending_approval",
+      submittedAt: new Date().toISOString()
+    };
+
+    setPendingProducts(prev => [...prev, newPendingProduct]);
+    
+    toast({
+      title: "Sent to Market!",
+      description: `${selectedProductForMarket.name} has been submitted for marketplace approval.`,
+    });
+    
+    setShowSendToMarketDialog(false);
+    setSelectedProductForMarket(null);
+  };
+
+  const handleProductSelection = (product: any) => {
     setSelectedProduct(product);
-    setSelectedOffer(offer);
     setShowReviewDialog(true);
   };
 
-  const handleAcceptOffer = async () => {
-    if (!selectedOffer || !selectedProduct) return;
-    
-    // Close review dialog and show payment form
+  const handleAddToCart = (product: any) => {
+    toast({
+      title: "Added to Cart!",
+      description: `${product.name} has been added to your cart.`,
+    });
     setShowReviewDialog(false);
-    setShowPaymentForm(true);
   };
 
-  const handlePaymentSuccess = () => {
+  const handleBuyNow = (product: any) => {
+    setSelectedProduct(product);
+    setShowPaymentForm(true);
+    setShowReviewDialog(false);
+  };
+
+  const handlePaymentComplete = () => {
     toast({
       title: "Payment Successful!",
-      description: "Your order has been confirmed. You will receive updates via email.",
+      description: "Your order has been placed successfully.",
     });
+    setShowPaymentForm(false);
+    setSelectedProduct(null);
+  };
+
+  const filteredOffers = marketOffers.filter(offer => {
+    const matchesSearch = offer.products.some(product =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.supplier.toLowerCase().includes(searchQuery.toLowerCase())
+    );
     
-    setShowPaymentForm(false);
-    setSelectedProduct(null);
-    setSelectedOffer(null);
-  };
+    const matchesCategory = selectedCategory === "All Products" || 
+      offer.products.some(product => product.category === selectedCategory);
+    
+    return matchesSearch && matchesCategory;
+  });
 
-  const handlePaymentCancel = () => {
-    setShowPaymentForm(false);
-  };
-
-  const handleRejectOffer = () => {
-    toast({
-      title: "Offer Rejected",
-      description: `Offer for ${selectedProduct?.name} has been rejected`,
-      variant: "destructive",
-    });
-    setShowReviewDialog(false);
-    setSelectedProduct(null);
-    setSelectedOffer(null);
-  };
-
-  const renderProductCard = (product: any, offer: any) => (
-    <Card key={product.id} className="mb-4">
-      <CardContent className="p-6">
+  const ProductReviewCard = ({ product }: { product: any }) => (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader className="pb-4">
         <div className="flex gap-4">
-          <img 
-            src={product.image} 
-            alt={product.name}
-            className="w-20 h-20 object-cover rounded-md"
-          />
+          <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center">
+            <img src={product.image} alt={product.name} className="w-full h-full object-cover rounded-lg" />
+          </div>
           <div className="flex-1">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
-                <p className="text-sm text-muted-foreground">EAN {product.ean}</p>
-                <p className="text-sm text-muted-foreground">SKU {product.sku}</p>
+            <CardTitle className="text-lg mb-2">{product.name}</CardTitle>
+            <div className="flex items-center gap-2 mb-2">
+              <Badge variant="secondary">{product.category}</Badge>
+              <span className="text-sm text-muted-foreground">• {product.distance}</span>
+            </div>
+            <div className="flex items-center gap-1 mb-2">
+              <span className="text-sm">⭐ {product.ratings}</span>
+              <span className="text-xs text-muted-foreground">({product.totalRatings} reviews)</span>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">Description</p>
+            <p className="text-sm">{product.description}</p>
+          </div>
+          
+          <div className="flex justify-between items-center py-2 border-t">
+            <div>
+              <p className="text-sm text-muted-foreground">Quantity Available</p>
+              <p className="font-medium">{product.quantity} units</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Price per unit</p>
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-primary">${product.price}</span>
+                {product.originalPrice > product.price && (
+                  <span className="text-sm line-through text-muted-foreground">${product.originalPrice}</span>
+                )}
               </div>
-              
-              <div>
-                <div className="mb-4">
-                  <p className="text-sm font-medium">Total: ${product.totalPrice.toLocaleString()}</p>
-                  <p className="text-sm text-muted-foreground">Total Quantity: {product.quantity} cartons</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Configuration:</p>
-                  <p className="text-sm text-muted-foreground">{product.configuration}</p>
-                </div>
-              </div>
-              
-              <div>
-                <div className="mb-2">
-                  <p className="text-sm font-medium">BBD Range</p>
-                  <p className="text-sm text-muted-foreground">{product.bbdRange}</p>
-                </div>
-                <div className="mb-2">
-                  <p className="text-sm font-medium">Quantity (carton)</p>
-                  <p className="text-sm text-muted-foreground">{product.quantity}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Price (kilo)</p>
-                  <p className="text-sm text-muted-foreground">${product.pricePerUnit.toFixed(2)}</p>
-                </div>
-              </div>
-              
-              <div className="flex flex-col justify-between">
-                <div className="mb-4">
-                  <p className="text-sm font-medium">Total Price</p>
-                  <p className="text-lg font-bold">${product.totalPrice.toLocaleString()}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium mb-2">Status</p>
-                  <Badge variant="secondary" className="mb-2">
-                    {product.status}
-                  </Badge>
-                  <Button 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => handleReviewOffer(product, offer)}
-                  >
-                    Review Offer
-                  </Button>
-                </div>
-              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-between items-center py-2 border-t">
+            <div>
+              <p className="text-sm text-muted-foreground">Expires</p>
+              <p className="font-medium">{new Date(product.expirationDate).toLocaleDateString()}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Supplier</p>
+              <p className="font-medium">{product.supplier}</p>
             </div>
           </div>
         </div>
@@ -643,241 +443,160 @@ const Market = () => {
                       : "bg-background hover:bg-accent border-border"
                   }`}
                 >
-                  <IconComponent className="w-6 h-6 mb-2" />
-                  <span className="text-xs font-medium text-center leading-tight">
-                    {category.name}
-                  </span>
+                  <IconComponent size={24} className="mb-2" />
+                  <span className="text-xs font-medium text-center">{category.name}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="live-offers" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="live-offers">Live Offers</TabsTrigger>
-            <TabsTrigger value="my-products-listed">My Products Listed</TabsTrigger>
-            <TabsTrigger value="pending-delivery">Pending Delivery</TabsTrigger>
-            <TabsTrigger value="delivered">Delivered</TabsTrigger>
-            <TabsTrigger value="products-listed">Products Listed ({listedProducts.length})</TabsTrigger>
+        {/* Search and Filters */}
+        <div className="mb-6 space-y-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+            <Input
+              type="text"
+              placeholder="Search for products, suppliers, or categories..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          
+          <div className="flex gap-4">
+            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="All Locations" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Locations</SelectItem>
+                <SelectItem value="sydney">Sydney</SelectItem>
+                <SelectItem value="melbourne">Melbourne</SelectItem>
+                <SelectItem value="brisbane">Brisbane</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <Tabs defaultValue="browse" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="browse">Browse Market</TabsTrigger>
+            <TabsTrigger value="my-products">My Products</TabsTrigger>
+            <TabsTrigger value="pending">Pending ({pendingProducts.length})</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="live-offers" className="mt-6">
-            {/* Search and Filters */}
-            <div className="flex gap-4 mb-6">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by Product Name, SKU, EAN, Buyer PO No., Transaction Summary No., Order Item No."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Delivery Location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="nsw">New South Wales (NSW)</SelectItem>
-                  <SelectItem value="vic">Victoria (VIC)</SelectItem>
-                  <SelectItem value="qld">Queensland (QLD)</SelectItem>
-                  <SelectItem value="wa">Western Australia (WA)</SelectItem>
-                  <SelectItem value="sa">South Australia (SA)</SelectItem>
-                  <SelectItem value="tas">Tasmania (TAS)</SelectItem>
-                  <SelectItem value="act">Australian Capital Territory (ACT)</SelectItem>
-                  <SelectItem value="nt">Northern Territory (NT)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Disclaimer */}
-            <div className="bg-muted/50 p-4 rounded-lg mb-6">
-              <p className="text-sm text-muted-foreground">
-                Delivery times for your products may vary depending on each seller's dispatch & shipping process. 
-                Stock may arrive across multiple deliveries. Yume is unable to provide ETA updates.
-              </p>
-            </div>
-
-            {/* Market Offers */}
-            <div className="space-y-6">
-              {/* Single Status Tabs */}
-              <div className="mb-4">
-                <div className="flex gap-4 border-b">
-                  <div className="pb-2 border-b-2 border-primary">
-                    <span className="font-medium">Pending ({filteredOffers.reduce((total, offer) => total + offer.products.length, 0)})</span>
-                  </div>
-                  <div className="pb-2 text-muted-foreground">
-                    <span>Finalised (0)</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* All Products in Single List */}
-              <div>
-                {filteredOffers.map((offer) =>
-                  offer.products.map((product) => renderProductCard(product, offer))
-                )}
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="my-products-listed" className="mt-6">
-            <MyProductsListed onSendToMarket={handleSendToMarket} />
-          </TabsContent>
-
-          <TabsContent value="pending-delivery" className="mt-6">
-            {pendingProducts.length === 0 ? (
-              <div className="text-center py-12">
-                <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-lg font-medium mb-2">No pending deliveries</p>
-                <p className="text-muted-foreground">Products sent to market will appear here</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold">Pending Delivery ({pendingProducts.length})</h2>
-                </div>
-                
-                <div className="grid gap-4">
-                  {pendingProducts.map((product) => (
-                    <Card key={`pending-${product.id}`}>
-                      <CardContent className="p-6">
-                        <div className="flex gap-4">
-                          <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center">
-                            {product.image ? (
-                              <img 
-                                src={product.image} 
-                                alt={product.name}
-                                className="w-full h-full object-cover rounded-lg"
-                              />
-                            ) : (
-                              <Package className="w-8 h-8 text-muted-foreground" />
+          <TabsContent value="browse" className="space-y-6">
+            {/* Market Offers Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredOffers.map((offer) =>
+                offer.products.map((product) => (
+                  <Card 
+                    key={`${offer.id}-${product.id}`}
+                    className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
+                    onClick={() => handleProductSelection(product)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden">
+                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-semibold text-lg leading-tight">{product.name}</h3>
+                          <Badge variant={product.quantity > 0 ? "default" : "destructive"}>
+                            {product.quantity > 0 ? "Available" : "Sold Out"}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <MapPin size={14} />
+                          <span>{product.distance}</span>
+                          <span>•</span>
+                          <span>⭐ {product.ratings} ({product.totalRatings})</span>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl font-bold text-primary">${product.price}</span>
+                            {product.originalPrice > product.price && (
+                              <span className="text-lg line-through text-muted-foreground">${product.originalPrice}</span>
                             )}
                           </div>
-                          
-                          <div className="flex-1">
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                              <div>
-                                <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                                <p className="text-sm text-muted-foreground">{product.category}</p>
-                                {product.sku && (
-                                  <p className="text-sm text-muted-foreground">SKU: {product.sku}</p>
-                                )}
-                              </div>
-                              
-                              <div>
-                                <div className="mb-2">
-                                  <p className="text-sm font-medium">Price</p>
-                                  <p className="text-lg font-bold">${product.price}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium">Market Price</p>
-                                  <p className="text-lg font-bold">${product.marketPrice}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium">Quantity for Sale</p>
-                                  <p className="text-sm text-muted-foreground">{product.quantityForSale} units</p>
-                                </div>
-                              </div>
-                              
-                              <div>
-                                <div className="mb-2">
-                                  <p className="text-sm font-medium">Collection Location</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    {product.collectFrom || 'Not specified'}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium">Expiry Date</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    {product.expiryDate ? format(new Date(product.expiryDate), 'PPP') : 'Not specified'}
-                                  </p>
-                                </div>
-                              </div>
-                              
-                              <div className="flex flex-col justify-center">
-                                <Badge variant="outline" className="w-fit">
-                                  Awaiting Buyer
-                                </Badge>
-                              </div>
-                            </div>
-                          </div>
+                          <Badge variant="secondary">{product.quantity} left</Badge>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-muted-foreground">Expires: {new Date(product.expirationDate).toLocaleDateString()}</span>
+                          <Badge variant="outline">{product.category}</Badge>
+                        </div>
+                        
+                        <p className="text-sm text-muted-foreground">By {product.supplier}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+
+            {filteredOffers.length === 0 && (
+              <div className="text-center py-12">
+                <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-lg font-medium mb-2">No products found</p>
+                <p className="text-muted-foreground">Try adjusting your search or filters</p>
               </div>
             )}
           </TabsContent>
 
-          <TabsContent value="delivered" className="mt-6">
-            <div className="text-center py-12">
-              <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-lg font-medium mb-2">No delivered orders</p>
-              <p className="text-muted-foreground">Completed deliveries will appear here</p>
-            </div>
+          <TabsContent value="my-products">
+            <MyProductsListed onSendToMarket={handleSendToMarket} />
           </TabsContent>
 
-          <TabsContent value="products-listed" className="mt-6">
-            {listedProducts.length === 0 ? (
+          <TabsContent value="pending" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Pending Market Submissions</h2>
+            </div>
+
+            {pendingProducts.length === 0 ? (
               <div className="text-center py-12">
                 <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-lg font-medium mb-2">No products listed yet</p>
-                <p className="text-muted-foreground">Products listed from task actions will appear here</p>
+                <p className="text-lg font-medium mb-2">No pending submissions</p>
+                <p className="text-muted-foreground">Products you send to market will appear here while awaiting approval</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {listedProducts.map((product) => (
-                  <Card key={product.listingKey || `${product.id}_${product.listedAt}`} className="p-4">
-                     <div className="flex justify-between items-start">
-                       <div className="flex-1">
-                         <h3 className="font-semibold text-lg">{product.name}</h3>
-                         <p className="text-sm text-muted-foreground">Category: {product.category}</p>
-                         <p className="text-sm text-muted-foreground">Quantity: {product.quantity}</p>
-                         <p className="text-sm text-muted-foreground">Price: ${product.price}</p>
-                         <p className="text-sm text-muted-foreground">
-                           Expires: {new Date(product.expirationDate).toLocaleDateString()}
-                         </p>
-                         <p className="text-xs text-muted-foreground">
-                           Listed: {new Date(product.listedAt).toLocaleDateString()}
-                         </p>
-                       </div>
-                        <div className="flex gap-2 items-center">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setEditingProduct(product);
-                              setShowEditDialog(true);
-                            }}
-                          >
-                            <Edit className="w-4 h-4 mr-1" />
-                            Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                            onClick={() => handleDeleteProduct(product.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                          <Badge 
-                            variant="secondary" 
-                            className={
-                              product.listingType === 'B2B Offer' 
-                                ? "bg-purple-100 text-purple-800" 
-                                : "bg-green-100 text-green-800"
-                            }
-                          >
-                            {product.listingType || 'Listed for Sale'}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pendingProducts.map((product, index) => (
+                  <Card key={index} className="border-orange-200 bg-orange-50/50">
+                    <CardContent className="p-4">
+                      <div className="flex gap-3">
+                        <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                          {product.image ? (
+                            <img 
+                              src={product.image} 
+                              alt={product.name}
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                          ) : (
+                            <Package className="w-6 h-6 text-muted-foreground" />
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
+                          <div className="space-y-1 text-xs text-muted-foreground">
+                            <p>Quantity: {product.quantity} units</p>
+                            <p>Market Price: ${product.marketPrice}</p>
+                            <p>Expires: {new Date(product.expiryDate).toLocaleDateString()}</p>
+                            <p>Collection: {product.collectFrom}</p>
+                            <p>Total Value: ${(product.quantity * product.marketPrice).toFixed(2)}</p>
+                          </div>
+                          <Badge variant="secondary" className="mt-2 text-xs">
+                            Pending Approval
                           </Badge>
                         </div>
-                     </div>
+                      </div>
+                    </CardContent>
                   </Card>
                 ))}
               </div>
@@ -886,114 +605,49 @@ const Market = () => {
         </Tabs>
       </div>
 
-      {/* Review Offer Dialog */}
+      {/* Product Review Dialog */}
       <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Review Offer</DialogTitle>
-          </DialogHeader>
-          
-          {selectedProduct && selectedOffer && (
-            <div className="space-y-6">
-              {/* Product Info */}
-              <div className="flex gap-4">
-                <img 
-                  src={selectedProduct.image} 
-                  alt={selectedProduct.name}
-                  className="w-24 h-24 object-cover rounded-md"
-                />
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold mb-2">{selectedProduct.name}</h3>
-                  <p className="text-sm text-muted-foreground">EAN: {selectedProduct.ean}</p>
-                  <p className="text-sm text-muted-foreground">SKU: {selectedProduct.sku}</p>
-                </div>
-              </div>
-
-              {/* Offer Details */}
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium mb-3">Product Details</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Total Quantity:</span>
-                      <span>{selectedProduct.quantity} cartons</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Price per unit:</span>
-                      <span>${selectedProduct.pricePerUnit.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">BBD Range:</span>
-                      <span>{selectedProduct.bbdRange || "N/A"}</span>
-                    </div>
-                    <div className="flex justify-between font-medium">
-                      <span>Total Price:</span>
-                      <span>${selectedProduct.totalPrice.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium mb-3">Delivery Information</h4>
-                  <div className="space-y-2 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Date:</span>
-                      <p>{selectedOffer.date}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Address:</span>
-                      <p className="text-xs">{selectedOffer.deliveryAddress}</p>
-                    </div>
-                    {selectedOffer.deliveryNote && (
-                      <div>
-                        <span className="text-muted-foreground">Note:</span>
-                        <p>{selectedOffer.deliveryNote}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Configuration */}
-              <div>
-                <h4 className="font-medium mb-2">Configuration</h4>
-                <p className="text-sm text-muted-foreground">{selectedProduct.configuration}</p>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="gap-2">
-            <Button 
-              variant="outline" 
-              onClick={handleRejectOffer}
-              className="bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-            >
-              Reject Offer
+        <DialogContent className="max-w-md">
+          {selectedProduct && <ProductReviewCard product={selectedProduct} />}
+          <div className="flex gap-2 justify-end pt-4">
+            <Button variant="outline" onClick={() => setShowReviewDialog(false)}>
+              <X className="w-4 h-4 mr-1" />
+              Close
             </Button>
-            <Button onClick={handleAcceptOffer}>
-              Accept Offer
+            <Button variant="outline" onClick={() => handleAddToCart(selectedProduct)}>
+              <ShoppingCart className="w-4 h-4 mr-1" />
+              Add to Cart
             </Button>
-          </DialogFooter>
+            <Button onClick={() => handleBuyNow(selectedProduct)}>
+              <DollarSign className="w-4 h-4 mr-1" />
+              Buy Now
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
-      {/* Payment Form */}
-      {showPaymentForm && selectedOffer && (
-        <PaymentForm
-          offer={selectedOffer}
-          products={selectedOffer.products}
-          onPaymentSuccess={handlePaymentSuccess}
-          onCancel={handlePaymentCancel}
-        />
-      )}
+      {/* Payment Form Dialog */}
+      <Dialog open={showPaymentForm} onOpenChange={setShowPaymentForm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Complete Purchase</DialogTitle>
+          </DialogHeader>
+          {selectedProduct && (
+            <PaymentForm
+              products={[selectedProduct]}
+              onPaymentComplete={handlePaymentComplete}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
-      {/* Product Listing Dialog for B2C */}
+      {/* Product Listing Dialog */}
       <Dialog open={showProductListingDialog} onOpenChange={setShowProductListingDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <ShoppingCart className="w-5 h-5" />
-              List Product for Sale
+              <Package className="w-5 h-5" />
+              List Product on Market
             </DialogTitle>
           </DialogHeader>
           
