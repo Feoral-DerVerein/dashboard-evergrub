@@ -475,10 +475,11 @@ const Market = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="browse" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="browse">Browse Market</TabsTrigger>
-            <TabsTrigger value="my-products">My Products</TabsTrigger>
             <TabsTrigger value="pending">Pending ({pendingProducts.length})</TabsTrigger>
+            <TabsTrigger value="my-products">My Products</TabsTrigger>
+            <TabsTrigger value="my-market">My Market</TabsTrigger>
           </TabsList>
 
           <TabsContent value="browse" className="space-y-6">
@@ -537,13 +538,13 @@ const Market = () => {
 
           <TabsContent value="pending" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Pending Market Submissions</h2>
+              <h2 className="text-xl font-semibold">Pending Orders & Offers</h2>
             </div>
 
             {pendingProducts.length === 0 ? <div className="text-center py-12">
                 <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-lg font-medium mb-2">No pending submissions</p>
-                <p className="text-muted-foreground">Products you send to market will appear here while awaiting approval</p>
+                <p className="text-lg font-medium mb-2">No pending items</p>
+                <p className="text-muted-foreground">Your purchases and offers will appear here</p>
               </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pendingProducts.map((product, index) => <Card key={index} className="border-orange-200 bg-orange-50/50">
                     <CardContent className="p-4">
@@ -556,19 +557,125 @@ const Market = () => {
                           <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
                           <div className="space-y-1 text-xs text-muted-foreground">
                             <p>Quantity: {product.quantity} units</p>
-                            <p>Market Price: ${product.marketPrice}</p>
-                            <p>Expires: {new Date(product.expiryDate).toLocaleDateString()}</p>
-                            <p>Collection: {product.collectFrom}</p>
-                            <p>Total Value: ${(product.quantity * product.marketPrice).toFixed(2)}</p>
+                            <p>Price: ${product.marketPrice || product.price}</p>
+                            {product.orderType === "offer" && <p>Offered: ${product.marketPrice}</p>}
+                            {product.orderType === "purchase" && <p>Purchased: ${product.marketPrice || product.price}</p>}
+                            <p>Pickup: {product.pickupLocation || product.supplier}</p>
+                            <Badge variant={product.status === "pending_delivery" ? "default" : "secondary"} className="mt-1">
+                              {product.status === "pending_delivery" ? "Ready for Pickup" : 
+                               product.status === "offer_accepted" ? "Offer Accepted" : 
+                               "Pending Approval"}
+                            </Badge>
                           </div>
-                          <Badge variant="secondary" className="mt-2 text-xs">
-                            Pending Approval
-                          </Badge>
                         </div>
                       </div>
                     </CardContent>
                   </Card>)}
               </div>}
+          </TabsContent>
+
+          <TabsContent value="my-market" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Sales Management</h2>
+              <Badge variant="secondary">Incoming Orders & Offers</Badge>
+            </div>
+
+            {/* Mock incoming sales/offers for demonstration */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Card className="border-green-200 bg-green-50/50">
+                <CardContent className="p-4">
+                  <div className="flex gap-3">
+                    <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                      <img src={porkMinceImage} alt="Pork Mince" className="w-full h-full object-cover rounded-lg" />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm mb-1">Pork Mince 5kg</h3>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <p>Buyer: John Smith</p>
+                        <p>Offered: $22.50 (Listed: $25.00)</p>
+                        <p>Quantity: 3 units</p>
+                        <p>Total: $67.50</p>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button size="sm" variant="default" className="text-xs px-2 py-1 h-6">
+                          Accept
+                        </Button>
+                        <Button size="sm" variant="outline" className="text-xs px-2 py-1 h-6">
+                          Counter
+                        </Button>
+                        <Button size="sm" variant="destructive" className="text-xs px-2 py-1 h-6">
+                          Decline
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-blue-200 bg-blue-50/50">
+                <CardContent className="p-4">
+                  <div className="flex gap-3">
+                    <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                      <img src={buttermilkChickenImage} alt="Buttermilk Chicken" className="w-full h-full object-cover rounded-lg" />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm mb-1">Buttermilk Chicken</h3>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <p>Buyer: Maria Garcia</p>
+                        <p>Direct Purchase: $18.00</p>
+                        <p>Quantity: 2 units</p>
+                        <p>Total: $36.00</p>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button size="sm" variant="default" className="text-xs px-2 py-1 h-6">
+                          Accept Order
+                        </Button>
+                        <Button size="sm" variant="outline" className="text-xs px-2 py-1 h-6">
+                          Contact Buyer
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-purple-200 bg-purple-50/50">
+                <CardContent className="p-4">
+                  <div className="flex gap-3">
+                    <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                      <img src={pitangoTomatoSoupImage} alt="Tomato Soup" className="w-full h-full object-cover rounded-lg" />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm mb-1">Pitango Tomato Soup</h3>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <p>Buyer: Restaurant ABC</p>
+                        <p>Bulk Order: $8.50 each</p>
+                        <p>Quantity: 20 units</p>
+                        <p>Total: $170.00</p>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button size="sm" variant="default" className="text-xs px-2 py-1 h-6">
+                          Accept B2B
+                        </Button>
+                        <Button size="sm" variant="outline" className="text-xs px-2 py-1 h-6">
+                          Negotiate
+                        </Button>
+                        <Button size="sm" variant="destructive" className="text-xs px-2 py-1 h-6">
+                          Decline
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="text-center py-8 text-muted-foreground">
+              <p className="text-sm">This section shows incoming purchase requests and offers for your products</p>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
