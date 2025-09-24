@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -464,34 +463,55 @@ const KPI = () => {
         },
         residualWaste: {
           volumeLitres: Math.max(2000 - parseNumericValue(realData.co2Saved), 500),
-          containers: [
-            { type: "240 L bin", quantity: 8 },
-            { type: "120 L bin", quantity: 4 }
-          ],
+          containers: [{
+            type: "240 L bin",
+            quantity: 8
+          }, {
+            type: "120 L bin",
+            quantity: 4
+          }],
           collectionFrequency: "twice weekly",
           provider: "Metro Waste Services Pty Ltd"
         },
         foodWaste: {
           volumeLitres: Math.max(parseNumericValue(realData.co2Saved) * 10, 1250),
-          containers: [
-            { type: "140 L organics bin", quantity: 6 },
-            { type: "80 L kitchen caddy", quantity: 3 }
-          ],
+          containers: [{
+            type: "140 L organics bin",
+            quantity: 6
+          }, {
+            type: "80 L kitchen caddy",
+            quantity: 3
+          }],
           collectionFrequency: "weekly",
           provider: "GreenCycle Organics Ltd",
           destination: "Sydney Organics Processing Facility"
         },
-        foodDonations: [
-          { category: "Fresh Produce", weightKg: Math.max(parseNumericValue(realData.foodWasteReduced), 85), recipient: "OzHarvest Sydney" },
-          { category: "Bakery Items", weightKg: 25, recipient: "Local Community Kitchen" },
-          { category: "Packaged Goods", weightKg: 40, recipient: "Salvation Army Food Bank" }
-        ],
-        reductionActions: [
-          { action: "Implemented smart inventory tracking via Negentropy platform", startDate: "2025-08-01" },
-          { action: "Regular food donation program establishment", startDate: "2025-08-15" },
-          { action: "Staff training on food waste reduction", startDate: "2025-09-01" },
-          { action: "Kitchen waste separation procedures", startDate: "2025-07-15" }
-        ],
+        foodDonations: [{
+          category: "Fresh Produce",
+          weightKg: Math.max(parseNumericValue(realData.foodWasteReduced), 85),
+          recipient: "OzHarvest Sydney"
+        }, {
+          category: "Bakery Items",
+          weightKg: 25,
+          recipient: "Local Community Kitchen"
+        }, {
+          category: "Packaged Goods",
+          weightKg: 40,
+          recipient: "Salvation Army Food Bank"
+        }],
+        reductionActions: [{
+          action: "Implemented smart inventory tracking via Negentropy platform",
+          startDate: "2025-08-01"
+        }, {
+          action: "Regular food donation program establishment",
+          startDate: "2025-08-15"
+        }, {
+          action: "Staff training on food waste reduction",
+          startDate: "2025-09-01"
+        }, {
+          action: "Kitchen waste separation procedures",
+          startDate: "2025-07-15"
+        }],
         historicalData: {
           previousPeriod: {
             residualVolumeLitres: 3200,
@@ -501,80 +521,75 @@ const KPI = () => {
       };
 
       // Call the edge function to generate the report
-      const { data: reportData, error } = await supabase.functions.invoke('generate-nsw-epa-report', {
+      const {
+        data: reportData,
+        error
+      } = await supabase.functions.invoke('generate-nsw-epa-report', {
         body: complianceData
       });
-
       if (error) {
         console.error('Edge function error:', error);
         toast.error("Failed to generate compliance report. Please try again.");
         return;
       }
-
       if (reportData?.success && reportData?.report) {
         // Import jsPDF dynamically
         const jsPDF = (await import('jspdf')).default;
-        
+
         // Create new PDF document
         const pdf = new jsPDF();
-        
+
         // Convert markdown to plain text for PDF
-        const cleanText = reportData.report
-          .replace(/#{1,6}\s/g, '') // Remove markdown headers
-          .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markdown
-          .replace(/\*(.*?)\*/g, '$1') // Remove italic markdown
-          .replace(/✅|❌/g, '') // Remove emoji symbols
-          .split('\n')
-          .filter(line => line.trim()) // Remove empty lines
-          .join('\n');
+        const cleanText = reportData.report.replace(/#{1,6}\s/g, '') // Remove markdown headers
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markdown
+        .replace(/\*(.*?)\*/g, '$1') // Remove italic markdown
+        .replace(/✅|❌/g, '') // Remove emoji symbols
+        .split('\n').filter(line => line.trim()) // Remove empty lines
+        .join('\n');
 
         // Add title
         pdf.setFontSize(16);
         pdf.setFont(undefined, 'bold');
         pdf.text('NSW EPA Food Waste Compliance Report', 20, 30);
-        
+
         // Add business name
         pdf.setFontSize(12);
         pdf.setFont(undefined, 'normal');
         pdf.text('WiseBite Demo Store', 20, 45);
-        
+
         // Add date
         const currentDate = new Date().toLocaleDateString();
         pdf.text(`Generated: ${currentDate}`, 20, 55);
-        
+
         // Split text into lines that fit the page width
         const pageWidth = pdf.internal.pageSize.width;
         const maxLineWidth = pageWidth - 40; // 20px margin on each side
         const lines = pdf.splitTextToSize(cleanText, maxLineWidth);
-        
+
         // Add content starting from y position 70
         let yPosition = 70;
         const lineHeight = 6;
         const pageHeight = pdf.internal.pageSize.height;
-        
         lines.forEach((line: string) => {
           // Check if we need a new page
           if (yPosition > pageHeight - 30) {
             pdf.addPage();
             yPosition = 30;
           }
-          
           pdf.text(line, 20, yPosition);
           yPosition += lineHeight;
         });
-        
+
         // Generate filename with current date
         const timestamp = new Date().toISOString().split('T')[0];
         const filename = `NSW_EPA_Compliance_Report_${timestamp}.pdf`;
-        
+
         // Download the PDF
         pdf.save(filename);
-        
         toast.success("NSW EPA compliance report downloaded successfully!");
       } else {
         toast.error("Failed to generate compliance report. Please check your data.");
       }
-
     } catch (error) {
       console.error("Error generating report:", error);
       toast.error("An error occurred while generating the report.");
@@ -673,12 +688,9 @@ const KPI = () => {
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
               <div>
-                <img src="/lovable-uploads/negentropy-logo.png" alt="Negentropy Logo" className="h-8 w-auto mb-2 mx-auto" />
+                
                 <div className="flex justify-center mb-4">
-                  <Avatar className="h-16 w-16 cursor-pointer">
-                    <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
-                    <AvatarFallback>O</AvatarFallback>
-                  </Avatar>
+                  
                 </div>
                 <p className="text-gray-500">                          The dashboard displays your business's performance, sustainability, and predictions using our Negentropy AI.</p>
                 
