@@ -57,8 +57,8 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
   }, [user?.id, toast]);
 
   const handleEditProduct = (product: any) => {
-    console.log('Edit product:', product);
-    // Add edit functionality here
+    // Navigate to product editor with product data
+    window.location.href = `/products/add?edit=${product.id}`;
   };
 
   const handleDeleteProduct = async (product: any) => {
