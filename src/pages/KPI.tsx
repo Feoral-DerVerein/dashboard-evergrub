@@ -168,7 +168,6 @@ const chartDataSamples: Record<TimeFilterPeriod, {
     value: 17000
   }]
 };
-
 const TimeFilterButton = ({
   label,
   isActive = false,
@@ -232,7 +231,6 @@ const InsightCard = ({
       <span className="text-emerald-600 text-sm font-medium">+{trend}</span>
     </div>
   </div>;
-
 const KPI = () => {
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeFilterPeriod>("Week");
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -737,13 +735,7 @@ const KPI = () => {
           {/* Main dashboard content and chart - Moved to top */}
           <section className="px-6 mt-8 mb-8 space-y-6">
             {/* Time Filters */}
-            <div className="flex justify-center gap-3 mb-6">
-              <TimeFilterButton label="Today" isActive={activeTimeFilter === "Today"} onClick={() => handleTimeFilterClick("Today")} />
-              <TimeFilterButton label="Week" isActive={activeTimeFilter === "Week"} onClick={() => handleTimeFilterClick("Week")} />
-              <TimeFilterButton label="Month" isActive={activeTimeFilter === "Month"} onClick={() => handleTimeFilterClick("Month")} />
-              <TimeFilterButton label="Quarter" isActive={activeTimeFilter === "Quarter"} onClick={() => handleTimeFilterClick("Quarter")} />
-              <TimeFilterButton label="Year" isActive={activeTimeFilter === "Year"} onClick={() => handleTimeFilterClick("Year")} />
-            </div>
+            
 
             {/* KPI Metrics - Expanded with Profit, Savings, Revenue */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
