@@ -691,9 +691,9 @@ const KPI = () => {
               <div>
                 
                 <div className="flex justify-center mb-4">
-                  <img src={hiMateBanner} alt="Hi Mate, What are we going to make possible today?" className="h-12 object-contain" />
+                  
                 </div>
-                <p className="text-gray-500">                          The dashboard displays your business's performance, sustainability, and predictions using our Negentropy AI.</p>
+                <p className="text-gray-500 text-center">                                                                          {Hi Mate, What are we going to make possible today?</p>
                 
               </div>
               <DropdownMenu>
