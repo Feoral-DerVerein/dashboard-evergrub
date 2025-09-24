@@ -322,9 +322,21 @@ const Market = () => {
       return;
     }
 
+    // Add to pending products list as an accepted offer
+    const newPendingProduct = {
+      ...selectedProduct,
+      quantity: offerQuantity,
+      marketPrice: offerPrice,
+      offeredAt: new Date().toISOString(),
+      status: "offer_accepted",
+      pickupLocation: selectedProduct.supplier,
+      orderType: "offer"
+    };
+    setPendingProducts(prev => [...prev, newPendingProduct]);
+
     toast({
       title: "Offer Submitted!",
-      description: `Your offer of $${offerPrice} for ${offerQuantity} units has been sent to ${selectedProduct.supplier}.`
+      description: `Your offer of $${offerPrice} for ${offerQuantity} units has been sent to ${selectedProduct.supplier} and added to pending.`
     });
     setShowMakeOfferDialog(false);
     setSelectedProduct(null);
@@ -335,9 +347,23 @@ const Market = () => {
     setShowReviewDialog(false);
   };
   const handlePaymentComplete = () => {
+    if (selectedProduct) {
+      // Add to pending products list
+      const newPendingProduct = {
+        ...selectedProduct,
+        quantity: offerQuantity || 1,
+        marketPrice: offerPrice || selectedProduct.price,
+        purchasedAt: new Date().toISOString(),
+        status: "pending_delivery",
+        pickupLocation: selectedProduct.supplier,
+        orderType: "purchase"
+      };
+      setPendingProducts(prev => [...prev, newPendingProduct]);
+    }
+    
     toast({
       title: "Payment Successful!",
-      description: "Your order has been placed successfully."
+      description: "Your order has been placed successfully and added to pending tab."
     });
     setShowPaymentForm(false);
     setSelectedProduct(null);
