@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
+import welcomeBanner from "@/assets/welcome-banner.png";
 import { useState, useEffect } from "react";
 import { salesService, Sale } from "@/services/salesService";
 import { getUserOrders } from "@/services/orderService";
@@ -297,10 +298,10 @@ const Dashboard = () => {
           <div>
             <header className="px-6 pt-8 pb-6">
               <div className="flex justify-between items-center mb-1">
-              <div>
-                <p className="text-gray-500">Welcome, Felipe</p>
+               <div>
+                <img src={welcomeBanner} alt="Welcome message" className="h-16 object-contain" />
                 <p className="text-gray-400 text-sm">Ortega's account</p>
-              </div>
+               </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Avatar className="h-12 w-12 cursor-pointer">
