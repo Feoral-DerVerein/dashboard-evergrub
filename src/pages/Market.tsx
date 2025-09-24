@@ -1132,162 +1132,161 @@ const Market = () => {
                   <Save className="w-4 h-4 mr-1" />
                   Save Changes
                 </Button>
-      </div>
-
-      {/* Send to Market Dialog */}
-      <Dialog open={showSendToMarketDialog} onOpenChange={setShowSendToMarketDialog}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Send Product to Market</DialogTitle>
-          </DialogHeader>
-          
-          {selectedProductForMarket && (
-            <div className="space-y-6">
-              {/* Product Info */}
-              <div className="flex gap-4 p-4 bg-muted/50 rounded-lg">
-                <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                  {selectedProductForMarket.image ? (
-                    <img 
-                      src={selectedProductForMarket.image} 
-                      alt={selectedProductForMarket.name}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <Package className="w-6 h-6 text-muted-foreground" />
-                  )}
-                </div>
-                
-                <div className="flex-1">
-                  <h3 className="font-semibold">{selectedProductForMarket.name}</h3>
-                  <p className="text-sm text-muted-foreground">{selectedProductForMarket.category}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Available: {selectedProductForMarket.quantity} units
-                  </p>
-                </div>
               </div>
+            </DialogContent>
+          </Dialog>
 
-              {/* Form Fields */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Quantity */}
-                <div className="space-y-2">
-                  <Label htmlFor="quantity">Quantity</Label>
-                  <Input
-                    id="quantity"
-                    type="number"
-                    min="1"
-                    max={selectedProductForMarket.quantity}
-                    value={quantityToSend}
-                    onChange={(e) => setQuantityToSend(parseInt(e.target.value) || 1)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Max: {selectedProductForMarket.quantity}
-                  </p>
-                </div>
-
-                {/* Price */}
-                <div className="space-y-2">
-                  <Label htmlFor="price">Price per Unit ($)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={marketPrice}
-                    onChange={(e) => setMarketPrice(parseFloat(e.target.value) || 0)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Original: ${selectedProductForMarket.price}
-                  </p>
-                </div>
-              </div>
-
-              {/* Expiry Date */}
-              <div className="space-y-2">
-                <Label>Expiry Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !expiryDate && "text-muted-foreground"
+          {/* Send to Market Dialog */}
+          <Dialog open={showSendToMarketDialog} onOpenChange={setShowSendToMarketDialog}>
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Send Product to Market</DialogTitle>
+              </DialogHeader>
+              
+              {selectedProductForMarket && (
+                <div className="space-y-6">
+                  {/* Product Info */}
+                  <div className="flex gap-4 p-4 bg-muted/50 rounded-lg">
+                    <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                      {selectedProductForMarket.image ? (
+                        <img 
+                          src={selectedProductForMarket.image} 
+                          alt={selectedProductForMarket.name}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <Package className="w-6 h-6 text-muted-foreground" />
                       )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {expiryDate ? format(expiryDate, "PPP") : <span>Pick an expiry date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={expiryDate}
-                      onSelect={(date) => setExpiryDate(date)}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                      disabled={(date) => date < new Date()}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {/* Collection Location */}
-              <div className="space-y-2">
-                <Label htmlFor="collectFrom">Collection Location</Label>
-                <Select value={collectFrom} onValueChange={setCollectFrom}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Where can buyers collect this item?" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="store-front">Store Front</SelectItem>
-                    <SelectItem value="warehouse">Warehouse</SelectItem>
-                    <SelectItem value="loading-dock">Loading Dock</SelectItem>
-                    <SelectItem value="pickup-point">Designated Pickup Point</SelectItem>
-                    <SelectItem value="delivery-available">Delivery Available</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Summary */}
-              <div className="bg-primary/10 p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Summary</h4>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span>Quantity:</span>
-                    <span>{quantityToSend} units</span>
+                    </div>
+                    
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{selectedProductForMarket.name}</h3>
+                      <p className="text-sm text-muted-foreground">{selectedProductForMarket.category}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Available: {selectedProductForMarket.quantity} units
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Price per unit:</span>
-                    <span>${marketPrice.toFixed(2)}</span>
+
+                  {/* Form Fields */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Quantity */}
+                    <div className="space-y-2">
+                      <Label htmlFor="quantity">Quantity</Label>
+                      <Input
+                        id="quantity"
+                        type="number"
+                        min="1"
+                        max={selectedProductForMarket.quantity}
+                        value={quantityToSend}
+                        onChange={(e) => setQuantityToSend(parseInt(e.target.value) || 1)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Max: {selectedProductForMarket.quantity}
+                      </p>
+                    </div>
+
+                    {/* Price */}
+                    <div className="space-y-2">
+                      <Label htmlFor="price">Price per Unit ($)</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={marketPrice}
+                        onChange={(e) => setMarketPrice(parseFloat(e.target.value) || 0)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Original: ${selectedProductForMarket.price}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex justify-between font-medium">
-                    <span>Total value:</span>
-                    <span>${(marketPrice * quantityToSend).toFixed(2)}</span>
+
+                  {/* Expiry Date */}
+                  <div className="space-y-2">
+                    <Label>Expiry Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !expiryDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {expiryDate ? format(expiryDate, "PPP") : <span>Pick an expiry date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={expiryDate}
+                          onSelect={(date) => setExpiryDate(date)}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                          disabled={(date) => date < new Date()}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {/* Collection Location */}
+                  <div className="space-y-2">
+                    <Label htmlFor="collectFrom">Collection Location</Label>
+                    <Select value={collectFrom} onValueChange={setCollectFrom}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Where can buyers collect this item?" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="store-front">Store Front</SelectItem>
+                        <SelectItem value="warehouse">Warehouse</SelectItem>
+                        <SelectItem value="loading-dock">Loading Dock</SelectItem>
+                        <SelectItem value="pickup-point">Designated Pickup Point</SelectItem>
+                        <SelectItem value="delivery-available">Delivery Available</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Summary */}
+                  <div className="bg-primary/10 p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">Summary</h4>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span>Quantity:</span>
+                        <span>{quantityToSend} units</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Price per unit:</span>
+                        <span>${marketPrice.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between font-medium">
+                        <span>Total value:</span>
+                        <span>${(marketPrice * quantityToSend).toFixed(2)}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
 
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowSendToMarketDialog(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={confirmSendToMarket}>
-              <Send className="w-4 h-4 mr-2" />
-              Send to Market
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
+              <DialogFooter>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowSendToMarketDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={confirmSendToMarket}>
+                  <Send className="w-4 h-4 mr-2" />
+                  Send to Market
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+    );
+  };
 
 export default Market;
