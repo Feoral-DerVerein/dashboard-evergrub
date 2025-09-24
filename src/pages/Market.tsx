@@ -368,6 +368,30 @@ const Market = () => {
     setShowPaymentForm(false);
     setSelectedProduct(null);
   };
+
+  // Sales Management Functions
+  const handleAcceptSale = (saleItem: any) => {
+    toast({
+      title: "Sale Accepted!",
+      description: `You've accepted the ${saleItem.type === 'offer' ? 'offer' : 'order'} for ${saleItem.product}.`
+    });
+  };
+
+  const handleContactBuyer = (saleItem: any) => {
+    toast({
+      title: "Contact Buyer",
+      description: `Opening contact options for ${saleItem.buyer}.`
+    });
+    // In a real app, this would open a messaging system or contact modal
+  };
+
+  const handleDeclineSale = (saleItem: any) => {
+    toast({
+      title: "Sale Declined",
+      description: `You've declined the ${saleItem.type === 'offer' ? 'offer' : 'order'} for ${saleItem.product}.`,
+      variant: "destructive"
+    });
+  };
   const filteredOffers = marketOffers.filter(offer => {
     const matchesSearch = offer.products.some(product => product.name.toLowerCase().includes(searchQuery.toLowerCase()) || product.category.toLowerCase().includes(searchQuery.toLowerCase()) || product.supplier.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategory = selectedCategory === "All Products" || offer.products.some(product => product.category === selectedCategory);
@@ -597,14 +621,29 @@ const Market = () => {
                         <p>Quantity: 3 units</p>
                         <p>Total: $67.50</p>
                       </div>
-                      <div className="flex gap-2 mt-2">
-                        <Button size="sm" variant="default" className="text-xs px-2 py-1 h-6">
+                      <div className="flex gap-1 mt-2">
+                        <Button 
+                          size="sm" 
+                          variant="default" 
+                          className="text-xs px-2 py-1 h-6 flex-1"
+                          onClick={() => handleAcceptSale({product: "Pork Mince 5kg", buyer: "John Smith", type: "offer"})}
+                        >
                           Accept
                         </Button>
-                        <Button size="sm" variant="outline" className="text-xs px-2 py-1 h-6">
-                          Counter
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-xs px-2 py-1 h-6 flex-1"
+                          onClick={() => handleContactBuyer({product: "Pork Mince 5kg", buyer: "John Smith", type: "offer"})}
+                        >
+                          Contact
                         </Button>
-                        <Button size="sm" variant="destructive" className="text-xs px-2 py-1 h-6">
+                        <Button 
+                          size="sm" 
+                          variant="destructive" 
+                          className="text-xs px-2 py-1 h-6 flex-1"
+                          onClick={() => handleDeclineSale({product: "Pork Mince 5kg", buyer: "John Smith", type: "offer"})}
+                        >
                           Decline
                         </Button>
                       </div>
@@ -628,12 +667,30 @@ const Market = () => {
                         <p>Quantity: 2 units</p>
                         <p>Total: $36.00</p>
                       </div>
-                      <div className="flex gap-2 mt-2">
-                        <Button size="sm" variant="default" className="text-xs px-2 py-1 h-6">
-                          Accept Order
+                      <div className="flex gap-1 mt-2">
+                        <Button 
+                          size="sm" 
+                          variant="default" 
+                          className="text-xs px-2 py-1 h-6 flex-1"
+                          onClick={() => handleAcceptSale({product: "Buttermilk Chicken", buyer: "Maria Garcia", type: "order"})}
+                        >
+                          Accept
                         </Button>
-                        <Button size="sm" variant="outline" className="text-xs px-2 py-1 h-6">
-                          Contact Buyer
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-xs px-2 py-1 h-6 flex-1"
+                          onClick={() => handleContactBuyer({product: "Buttermilk Chicken", buyer: "Maria Garcia", type: "order"})}
+                        >
+                          Contact
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="destructive" 
+                          className="text-xs px-2 py-1 h-6 flex-1"
+                          onClick={() => handleDeclineSale({product: "Buttermilk Chicken", buyer: "Maria Garcia", type: "order"})}
+                        >
+                          Decline
                         </Button>
                       </div>
                     </div>
@@ -656,14 +713,29 @@ const Market = () => {
                         <p>Quantity: 20 units</p>
                         <p>Total: $170.00</p>
                       </div>
-                      <div className="flex gap-2 mt-2">
-                        <Button size="sm" variant="default" className="text-xs px-2 py-1 h-6">
-                          Accept B2B
+                      <div className="flex gap-1 mt-2">
+                        <Button 
+                          size="sm" 
+                          variant="default" 
+                          className="text-xs px-2 py-1 h-6 flex-1"
+                          onClick={() => handleAcceptSale({product: "Pitango Tomato Soup", buyer: "Restaurant ABC", type: "bulk_order"})}
+                        >
+                          Accept
                         </Button>
-                        <Button size="sm" variant="outline" className="text-xs px-2 py-1 h-6">
-                          Negotiate
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-xs px-2 py-1 h-6 flex-1"
+                          onClick={() => handleContactBuyer({product: "Pitango Tomato Soup", buyer: "Restaurant ABC", type: "bulk_order"})}
+                        >
+                          Contact
                         </Button>
-                        <Button size="sm" variant="destructive" className="text-xs px-2 py-1 h-6">
+                        <Button 
+                          size="sm" 
+                          variant="destructive" 
+                          className="text-xs px-2 py-1 h-6 flex-1"
+                          onClick={() => handleDeclineSale({product: "Pitango Tomato Soup", buyer: "Restaurant ABC", type: "bulk_order"})}
+                        >
                           Decline
                         </Button>
                       </div>
