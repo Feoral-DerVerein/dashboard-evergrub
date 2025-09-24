@@ -370,3 +370,8 @@
     opacity: 1;
   }
 }
+
+/* Ocultar el badge "Built with Spline" */
+.spline-badge {
+  display: none !important;
+}
