@@ -581,12 +581,68 @@ const KPI = () => {
           yPosition += lineHeight;
         });
 
-        // Generate filename with current date
-        const timestamp = new Date().toISOString().split('T')[0];
-        const filename = `NSW_EPA_Compliance_Report_${timestamp}.pdf`;
+        // Add official certification seals at the bottom
+        try {
+          // Ensure we have enough space for the certification section
+          if (yPosition > pageHeight - 80) {
+            pdf.addPage();
+            yPosition = 30;
+          } else {
+            yPosition += 20; // Add some spacing
+          }
 
-        // Download the PDF
-        pdf.save(filename);
+          // Load and add the certification image
+          const certificationImage = new Image();
+          certificationImage.onload = () => {
+            // Add the certification image
+            const imgWidth = 160;
+            const imgHeight = 80;
+            const xPos = (pageWidth - imgWidth) / 2; // Center the image
+            
+            pdf.addImage(certificationImage, 'PNG', xPos, yPosition, imgWidth, imgHeight);
+            
+            // Add official document text
+            yPosition += imgHeight + 10;
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'italic');
+            const officialText = 'This document has been certified through the Negentropy platform in compliance with NSW EPA food waste reporting requirements.';
+            const officialTextLines = pdf.splitTextToSize(officialText, maxLineWidth);
+            officialTextLines.forEach((line: string) => {
+              pdf.text(line, 20, yPosition);
+              yPosition += 5;
+            });
+
+            // Generate filename with current date
+            const timestamp = new Date().toISOString().split('T')[0];
+            const filename = `NSW_EPA_Compliance_Report_${timestamp}.pdf`;
+
+            // Download the PDF
+            pdf.save(filename);
+            toast.success("NSW EPA compliance report with official certification downloaded successfully!");
+          };
+          
+          certificationImage.onerror = () => {
+            console.warn('Could not load certification image, proceeding without it');
+            // Generate filename with current date
+            const timestamp = new Date().toISOString().split('T')[0];
+            const filename = `NSW_EPA_Compliance_Report_${timestamp}.pdf`;
+
+            // Download the PDF
+            pdf.save(filename);
+            toast.success("NSW EPA compliance report downloaded successfully!");
+          };
+          
+          // Load the certification image
+          certificationImage.src = '/src/assets/negentropy-impact-seals.png';
+          
+        } catch (error) {
+          console.warn('Error adding certification image:', error);
+          // Fallback - generate PDF without image
+          const timestamp = new Date().toISOString().split('T')[0];
+          const filename = `NSW_EPA_Compliance_Report_${timestamp}.pdf`;
+          pdf.save(filename);
+          toast.success("NSW EPA compliance report downloaded successfully!");
+        }
         toast.success("NSW EPA compliance report downloaded successfully!");
       } else {
         toast.error("Failed to generate compliance report. Please check your data.");
