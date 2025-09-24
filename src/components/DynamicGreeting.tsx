@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import welcomeBanner from '@/assets/welcome-banner.png';
 export const DynamicGreeting = () => {
   const [greeting, setGreeting] = useState('');
   const [userName, setUserName] = useState('');
@@ -43,9 +44,7 @@ export const DynamicGreeting = () => {
     return () => clearInterval(interval);
   }, [user]);
   return <div className="text-center">
-      <p className="text-muted-foreground mt-4 text-4xl font-thin">
-        {greeting}, {userName}!
-      </p>
+      <img src={welcomeBanner} alt="Hi Mate, What are we going to make possible today?" className="h-16 object-contain mx-auto mb-2" />
       <p className="text-muted-foreground text-lg mt-2">I'm Negen. How can I help you today?</p>
     </div>;
 };
