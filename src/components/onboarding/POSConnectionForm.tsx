@@ -668,17 +668,19 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                 delay: 0.8
               }}>
                   <Button 
-                    onClick={form.handleSubmit(handleSubmit)} 
+                    onClick={() => {
+                      if (uploadedFiles.length > 0 || googleSheetUrl || Object.values(manualData).some(value => value)) {
+                        localStorage.setItem("posOnboardingCompleted", "true");
+                        onComplete();
+                      } else {
+                        toast.error("Please upload files, connect Google Sheets, or enter manual data first");
+                      }
+                    }}
                     className="w-full h-12 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg transition-all duration-300 transform hover:scale-[1.02]" 
-                    disabled={isLoading}
+                    disabled={uploadedFiles.length === 0 && !googleSheetUrl && !Object.values(manualData).some(value => value)}
                   >
-                    {isLoading ? <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Connecting...
-                      </> : <>
-                        <Link className="mr-2 h-4 w-4" />
-                        Connect and Start Optimizing
-                      </>}
+                    <Link className="mr-2 h-4 w-4" />
+                    Continue with Uploaded Data
                   </Button>
                 </motion.div>
               </CardContent>
