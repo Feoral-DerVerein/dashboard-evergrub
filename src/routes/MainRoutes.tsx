@@ -31,6 +31,9 @@ import AppLayout from "@/components/layout/AppLayout";
 import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
 import Market from "@/pages/Market";
+import Marketplace from "@/pages/Marketplace";
+import MyOrders from "@/pages/MyOrders";
+import OrderManagement from "@/pages/OrderManagement";
 import ApiConfig from "@/pages/ApiConfig";
 
 
@@ -72,6 +75,10 @@ const MainRoutes = () => {
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
         <Route path="/market" element={<Market />} />
+        <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/my-orders" element={<MyOrders />} />
+        <Route path="/order-management" element={<OrderManagement />} />
+        <Route path="/add-product" element={<AddProduct />} />
         <Route path="/api-config" element={<ApiConfig />} />
         
       </Route>
