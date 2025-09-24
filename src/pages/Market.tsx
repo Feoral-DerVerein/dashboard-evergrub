@@ -4,6 +4,7 @@ import porkMinceImage from "@/assets/pork-mince-5kg.png";
 import pitangoChickenSoupImage from "@/assets/pitango-chicken-soup.png";
 import pitangoTomatoSoupImage from "@/assets/pitango-tomato-soup.png";
 import buttermilkChickenImage from "@/assets/buttermilk-chicken.png";
+import surplusMarketLogo from "@/assets/surplus-market-logo.png";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -521,7 +522,13 @@ const Market = () => {
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2 text-center">Surplus Market</h1>
+          <div className="flex justify-center">
+            <img 
+              src={surplusMarketLogo} 
+              alt="Surplus Market Logo" 
+              className="h-20 w-auto object-contain"
+            />
+          </div>
         </div>
 
         {/* Category Navigation */}
