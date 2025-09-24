@@ -371,7 +371,40 @@
   }
 }
 
-/* Ocultar el badge "Built with Spline" */
+/* Ocultar el badge "Built with Spline" - Reglas más específicas */
 .spline-badge {
   display: none !important;
+}
+
+/* Ocultar todos los posibles elementos del badge de Spline */
+spline-viewer .logo,
+spline-viewer .watermark,
+spline-viewer .branding,
+spline-viewer a[href*="spline.design"],
+spline-viewer a[href*="spline.com"],
+spline-viewer div[class*="logo"],
+spline-viewer div[class*="watermark"],
+spline-viewer div[class*="branding"],
+spline-viewer div[class*="badge"],
+spline-viewer > div:last-child,
+spline-viewer > a:last-child {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Reglas adicionales para ocultar elementos que aparecen dinámicamente */
+spline-viewer::after,
+spline-viewer::before {
+  display: none !important;
+}
+
+/* Ocultar cualquier elemento con texto "Built with" o "Spline" */
+spline-viewer *:contains("Built with"),
+spline-viewer *:contains("Spline"),
+spline-viewer *[title*="Spline"],
+spline-viewer *[alt*="Spline"] {
+  display: none !important;
+  visibility: hidden !important;
 }
