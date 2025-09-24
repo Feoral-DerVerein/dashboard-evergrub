@@ -200,7 +200,7 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
 const Market = () => {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
@@ -470,7 +470,7 @@ const Market = () => {
                 <SelectValue placeholder="All Locations" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Locations</SelectItem>
+                <SelectItem value="all">All Locations</SelectItem>
                 <SelectItem value="sydney">Sydney</SelectItem>
                 <SelectItem value="melbourne">Melbourne</SelectItem>
                 <SelectItem value="brisbane">Brisbane</SelectItem>
