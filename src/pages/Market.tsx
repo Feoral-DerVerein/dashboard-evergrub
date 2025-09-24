@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Calendar, MapPin, Package, Plus, ShoppingCart, Building2, Edit, Save, X, Fish, Beef, Apple, Cookie, Milk, Wheat, Coffee, UtensilsCrossed, Grape, Grid3X3, Trash2, Eye, DollarSign } from "lucide-react";
+import { Search, Calendar, MapPin, Package, Plus, ShoppingCart, Building2, Edit, Save, X, Fish, Beef, Apple, Cookie, Milk, Wheat, Coffee, UtensilsCrossed, Grape, Grid3X3, Trash2, Eye, DollarSign, Send } from "lucide-react";
 import porkMinceImage from "@/assets/pork-mince-5kg.png";
 import pitangoChickenSoupImage from "@/assets/pitango-chicken-soup.png";
 import pitangoTomatoSoupImage from "@/assets/pitango-tomato-soup.png";
@@ -23,6 +23,7 @@ const MyProductsListed = () => {
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [pendingProducts, setPendingProducts] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchUserProducts = async () => {
@@ -82,6 +83,22 @@ const MyProductsListed = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleSendToMarket = (product: any) => {
+    // Add product to pending delivery with current timestamp
+    const pendingProduct = {
+      ...product,
+      sentToMarketAt: new Date().toISOString(),
+      marketStatus: 'pending_delivery'
+    };
+    
+    setPendingProducts(prev => [pendingProduct, ...prev]);
+    
+    toast({
+      title: "Product Sent to Market",
+      description: `${product.name} has been sent to pending delivery`,
+    });
   };
 
   const getStatusBadge = (product: any) => {
@@ -205,6 +222,14 @@ const MyProductsListed = () => {
                         <Edit className="w-4 h-4 mr-2" />
                         Edit
                       </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleSendToMarket(product)}
+                      >
+                        <Send className="w-4 h-4 mr-2" />
+                        Send to Market
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -232,6 +257,7 @@ const Market = () => {
   const [listedProducts, setListedProducts] = useState<any[]>([]);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [pendingProducts, setPendingProducts] = useState<any[]>([]);
   const { toast } = useToast();
 
   const handleDeleteProduct = (productId: any) => {
@@ -645,11 +671,83 @@ const Market = () => {
           </TabsContent>
 
           <TabsContent value="pending-delivery" className="mt-6">
-            <div className="text-center py-12">
-              <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-lg font-medium mb-2">No pending deliveries</p>
-              <p className="text-muted-foreground">Orders pending delivery will appear here</p>
-            </div>
+            {pendingProducts.length === 0 ? (
+              <div className="text-center py-12">
+                <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-lg font-medium mb-2">No pending deliveries</p>
+                <p className="text-muted-foreground">Products sent to market will appear here</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold">Pending Delivery ({pendingProducts.length})</h2>
+                </div>
+                
+                <div className="grid gap-4">
+                  {pendingProducts.map((product) => (
+                    <Card key={`pending-${product.id}`}>
+                      <CardContent className="p-6">
+                        <div className="flex gap-4">
+                          <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center">
+                            {product.image ? (
+                              <img 
+                                src={product.image} 
+                                alt={product.name}
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            ) : (
+                              <Package className="w-8 h-8 text-muted-foreground" />
+                            )}
+                          </div>
+                          
+                          <div className="flex-1">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                              <div>
+                                <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                                <p className="text-sm text-muted-foreground">{product.category}</p>
+                                {product.sku && (
+                                  <p className="text-sm text-muted-foreground">SKU: {product.sku}</p>
+                                )}
+                              </div>
+                              
+                              <div>
+                                <div className="mb-2">
+                                  <p className="text-sm font-medium">Price</p>
+                                  <p className="text-lg font-bold">${product.price}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium">Quantity</p>
+                                  <p className="text-sm text-muted-foreground">{product.quantity} units</p>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <div className="mb-2">
+                                  <p className="text-sm font-medium">Sent to Market</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {product.sentToMarketAt && new Date(product.sentToMarketAt).toLocaleDateString()}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium">Status</p>
+                                  <Badge variant="secondary">Pending Delivery</Badge>
+                                </div>
+                              </div>
+                              
+                              <div className="flex flex-col justify-center">
+                                <Badge variant="outline" className="w-fit">
+                                  Awaiting Buyer
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="delivered" className="mt-6">
