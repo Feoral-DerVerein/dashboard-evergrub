@@ -1,5 +1,5 @@
 import { Search, Plus, Edit, Trash2, Bell, Store, Eye, EyeOff, Upload, FileSpreadsheet, Heart, Info, Calendar, ShoppingBag, Package, BarChart3, Megaphone, Clock } from "lucide-react";
-import dailyDayLogo from "@/assets/daily-day-strawberry-logo.png";
+import dailyDayLogo from "@/assets/daily-day-logo.png";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
@@ -351,7 +351,13 @@ const Products = () => {
   };
   return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 z-10">
-        
+        <div className="flex justify-center mb-6">
+          <img 
+            src={dailyDayLogo} 
+            alt="Daily Day Logo" 
+            className="h-20 w-auto object-contain"
+          />
+        </div>
       </header>
 
       {/* Navigation Icons Section */}
