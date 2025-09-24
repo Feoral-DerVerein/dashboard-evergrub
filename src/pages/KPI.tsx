@@ -1,4 +1,4 @@
-import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink, Store } from "lucide-react";
+import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Link } from "react-router-dom";
@@ -6,7 +6,6 @@ import { BottomNav } from "@/components/Dashboard";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/components/LogoutButton";
 import { productService, Product } from "@/services/productService";
@@ -723,196 +722,14 @@ const KPI = () => {
 
           {/* Marketplace Button */}
           <div className="px-6 mb-4">
-            <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Dashboard B2B Marketplace
-              </h1>
-              <Button 
-                asChild
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Link to="/add-product" className="flex items-center gap-2">
-                  <Plus className="w-4 h-4" />
-                  Añadir Producto
-                </Link>
-              </Button>
+            <div className="flex justify-end">
+              
             </div>
           </div>
 
           {/* AI ChatBot - Inline */}
           <div className="px-6 mb-6">
             <ChatBot variant="inline" />
-          </div>
-
-          {/* Main Tabs - Mis Productos y Marketplace */}
-          <div className="px-6 mb-8">
-            <Tabs defaultValue="my-products" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="my-products" className="flex items-center gap-2">
-                  <Package className="w-4 h-4" />
-                  Mis Productos
-                </TabsTrigger>
-                <TabsTrigger value="marketplace" className="flex items-center gap-2">
-                  <Store className="w-4 h-4" />
-                  Marketplace
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Mis Productos Tab */}
-              <TabsContent value="my-products" className="mt-6">
-                {/* Quick Stats for My Products */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <Package className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-blue-600">
-                        {products.filter(p => p.quantity > 0 && p.isMarketplaceVisible).length}
-                      </div>
-                      <p className="text-sm text-gray-600">Productos Activos</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <AlertTriangle className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-yellow-600">
-                        {products.filter(p => {
-                          if (!p.expirationDate) return false;
-                          const expiry = new Date(p.expirationDate);
-                          const today = new Date();
-                          const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                          return diffDays <= 3;
-                        }).length}
-                      </div>
-                      <p className="text-sm text-gray-600">Por Vencer</p>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-green-600">
-                        ${products.reduce((sum, p) => sum + (p.price * p.quantity), 0).toLocaleString()}
-                      </div>
-                      <p className="text-sm text-gray-600">Valor Inventario</p>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <CheckCircle className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-emerald-600">
-                        {Math.round(products.length * 0.85)}
-                      </div>
-                      <p className="text-sm text-gray-600">Órdenes Este Mes</p>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* My Products Grid */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Mis Productos Publicados</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {products.slice(0, 6).map((product, index) => (
-                      <Card key={index} className="overflow-hidden">
-                        <div className="aspect-video relative">
-                          <img
-                            src={product.image || '/placeholder.svg'}
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                          />
-                          <Badge 
-                            className={`absolute top-2 right-2 ${
-                              product.quantity > 10 ? 'bg-green-500' :
-                              product.quantity > 0 ? 'bg-yellow-500' : 'bg-red-500'
-                            }`}
-                          >
-                            {product.quantity} unidades
-                          </Badge>
-                        </div>
-                        <CardContent className="p-4">
-                          <h4 className="font-semibold text-lg mb-2">{product.name}</h4>
-                          <p className="text-sm text-gray-600 mb-2">{product.category}</p>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xl font-bold text-blue-600">
-                              ${product.price}
-                            </span>
-                            <Button variant="outline" size="sm">
-                              Ver detalles
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                  
-                  {products.length === 0 && (
-                    <div className="text-center py-12">
-                      <Package className="mx-auto h-12 w-12 text-gray-400" />
-                      <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                        No tienes productos publicados
-                      </h3>
-                      <p className="mt-2 text-gray-600">
-                        Comienza agregando tu primer producto al marketplace.
-                      </p>
-                      <Button asChild className="mt-4">
-                        <Link to="/add-product">Añadir Primer Producto</Link>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-
-              {/* Marketplace Tab */}
-              <TabsContent value="marketplace" className="mt-6">
-                <div className="space-y-6">
-                  {/* Marketplace Quick Actions */}
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">Explorar Marketplace</h3>
-                    <Button asChild variant="outline">
-                      <Link to="/marketplace">
-                        Ver Todo el Marketplace
-                      </Link>
-                    </Button>
-                  </div>
-
-                  {/* Featured Categories */}
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    {["Carnes", "Lácteos", "Vegetales", "Panadería", "Otros"].map((category) => (
-                      <Card key={category} className="hover:shadow-lg transition-shadow cursor-pointer">
-                        <CardContent className="p-4 text-center">
-                          <div className="text-3xl mb-2">
-                            {category === "Carnes" ? "🥩" :
-                             category === "Lácteos" ? "🥛" :
-                             category === "Vegetales" ? "🥬" :
-                             category === "Panadería" ? "🍞" : "📦"}
-                          </div>
-                          <h4 className="font-semibold text-sm">{category}</h4>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-
-                  {/* Marketplace Preview */}
-                  <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6">
-                    <h4 className="text-xl font-semibold mb-2">
-                      Encuentra excedentes de otros proveedores
-                    </h4>
-                    <p className="text-gray-600 mb-4">
-                      Conecta con otros vendedores y reduce el desperdicio alimentario juntos.
-                    </p>
-                    <div className="flex gap-4">
-                      <Button asChild>
-                        <Link to="/marketplace">Explorar Productos</Link>
-                      </Button>
-                      <Button asChild variant="outline">
-                        <Link to="/my-orders">Mis Órdenes</Link>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
           </div>
 
 

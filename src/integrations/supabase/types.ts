@@ -165,45 +165,6 @@ export type Database = {
           },
         ]
       }
-      company_profiles: {
-        Row: {
-          address: string | null
-          business_type: string | null
-          company_name: string
-          created_at: string | null
-          email: string
-          id: string
-          is_active: boolean | null
-          phone: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          address?: string | null
-          business_type?: string | null
-          company_name: string
-          created_at?: string | null
-          email: string
-          id?: string
-          is_active?: boolean | null
-          phone?: string | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          address?: string | null
-          business_type?: string | null
-          company_name?: string
-          created_at?: string | null
-          email?: string
-          id?: string
-          is_active?: boolean | null
-          phone?: string | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       customer_preferences: {
         Row: {
           category_preferences: Json | null
@@ -384,98 +345,54 @@ export type Database = {
       }
       orders: {
         Row: {
-          actual_delivery: string | null
-          buyer_id: string | null
-          buyer_notes: string | null
           created_at: string | null
           customer_image: string | null
           customer_name: string
-          delivery_method: string | null
-          expected_delivery: string | null
           from_orders_page: boolean | null
           id: string
           location: string | null
-          order_date: string | null
           phone: string | null
-          product_id: number | null
-          quantity_ordered: number | null
-          seller_id: string | null
-          seller_notes: string | null
-          shipping_address: string | null
           special_request: string | null
           status: string
           store_id: string | null
           timestamp: string | null
           total: number
-          unit_price: number | null
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
-          actual_delivery?: string | null
-          buyer_id?: string | null
-          buyer_notes?: string | null
           created_at?: string | null
           customer_image?: string | null
           customer_name: string
-          delivery_method?: string | null
-          expected_delivery?: string | null
           from_orders_page?: boolean | null
           id?: string
           location?: string | null
-          order_date?: string | null
           phone?: string | null
-          product_id?: number | null
-          quantity_ordered?: number | null
-          seller_id?: string | null
-          seller_notes?: string | null
-          shipping_address?: string | null
           special_request?: string | null
           status?: string
           store_id?: string | null
           timestamp?: string | null
           total: number
-          unit_price?: number | null
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
-          actual_delivery?: string | null
-          buyer_id?: string | null
-          buyer_notes?: string | null
           created_at?: string | null
           customer_image?: string | null
           customer_name?: string
-          delivery_method?: string | null
-          expected_delivery?: string | null
           from_orders_page?: boolean | null
           id?: string
           location?: string | null
-          order_date?: string | null
           phone?: string | null
-          product_id?: number | null
-          quantity_ordered?: number | null
-          seller_id?: string | null
-          seller_notes?: string | null
-          shipping_address?: string | null
           special_request?: string | null
           status?: string
           store_id?: string | null
           timestamp?: string | null
           total?: number
-          unit_price?: number | null
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "orders_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       partners: {
         Row: {
@@ -644,96 +561,66 @@ export type Database = {
       }
       products: {
         Row: {
-          bbd_end: string | null
-          bbd_start: string | null
           brand: string
           category: string
           created_at: string
           description: string
           discount: number
-          ean: string | null
           expirationdate: string
           id: number
           image: string
-          image_urls: Json | null
           is_marketplace_visible: boolean
           is_surprise_bag: boolean | null
           name: string
           original_price: number | null
-          pickup_location: string | null
           pickup_time_end: string | null
           pickup_time_start: string | null
           price: number
-          price_per_unit: number | null
           quantity: number
-          sku: string | null
-          status: string | null
           storeid: string | null
           surprise_bag_contents: string | null
-          total_value: number | null
-          unit_type: string | null
           userid: string
         }
         Insert: {
-          bbd_end?: string | null
-          bbd_start?: string | null
-          brand?: string
-          category?: string
+          brand: string
+          category: string
           created_at?: string
-          description?: string
+          description: string
           discount?: number
-          ean?: string | null
           expirationdate: string
           id?: number
           image?: string
-          image_urls?: Json | null
           is_marketplace_visible?: boolean
           is_surprise_bag?: boolean | null
           name: string
           original_price?: number | null
-          pickup_location?: string | null
           pickup_time_end?: string | null
           pickup_time_start?: string | null
           price: number
-          price_per_unit?: number | null
           quantity?: number
-          sku?: string | null
-          status?: string | null
           storeid?: string | null
           surprise_bag_contents?: string | null
-          total_value?: number | null
-          unit_type?: string | null
           userid: string
         }
         Update: {
-          bbd_end?: string | null
-          bbd_start?: string | null
           brand?: string
           category?: string
           created_at?: string
           description?: string
           discount?: number
-          ean?: string | null
           expirationdate?: string
           id?: number
           image?: string
-          image_urls?: Json | null
           is_marketplace_visible?: boolean
           is_surprise_bag?: boolean | null
           name?: string
           original_price?: number | null
-          pickup_location?: string | null
           pickup_time_end?: string | null
           pickup_time_start?: string | null
           price?: number
-          price_per_unit?: number | null
           quantity?: number
-          sku?: string | null
-          status?: string | null
           storeid?: string | null
           surprise_bag_contents?: string | null
-          total_value?: number | null
-          unit_type?: string | null
           userid?: string
         }
         Relationships: []
