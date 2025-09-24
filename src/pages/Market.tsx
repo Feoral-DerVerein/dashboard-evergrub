@@ -18,12 +18,15 @@ import { useLocation } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 
-const MyProductsListed = () => {
+const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) => void }) => {
   const { user } = useAuth();
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const [pendingProducts, setPendingProducts] = useState<any[]>([]);
+  const [showSendToMarketDialog, setShowSendToMarketDialog] = useState(false);
+  const [selectedProductForMarket, setSelectedProductForMarket] = useState<any>(null);
+  const [quantityToSend, setQuantityToSend] = useState<number>(1);
 
   useEffect(() => {
     const fetchUserProducts = async () => {
@@ -83,22 +86,6 @@ const MyProductsListed = () => {
         variant: "destructive"
       });
     }
-  };
-
-  const handleSendToMarket = (product: any) => {
-    // Add product to pending delivery with current timestamp
-    const pendingProduct = {
-      ...product,
-      sentToMarketAt: new Date().toISOString(),
-      marketStatus: 'pending_delivery'
-    };
-    
-    setPendingProducts(prev => [pendingProduct, ...prev]);
-    
-    toast({
-      title: "Product Sent to Market",
-      description: `${product.name} has been sent to pending delivery`,
-    });
   };
 
   const getStatusBadge = (product: any) => {
@@ -225,7 +212,7 @@ const MyProductsListed = () => {
                       <Button
                         variant="secondary"
                         size="sm"
-                        onClick={() => handleSendToMarket(product)}
+                        onClick={() => onSendToMarket(product)}
                       >
                         <Send className="w-4 h-4 mr-2" />
                         Send to Market
@@ -258,6 +245,9 @@ const Market = () => {
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [pendingProducts, setPendingProducts] = useState<any[]>([]);
+  const [showSendToMarketDialog, setShowSendToMarketDialog] = useState(false);
+  const [selectedProductForMarket, setSelectedProductForMarket] = useState<any>(null);
+  const [quantityToSend, setQuantityToSend] = useState<number>(1);
   const { toast } = useToast();
 
   const handleDeleteProduct = (productId: any) => {
@@ -266,6 +256,43 @@ const Market = () => {
       title: "Product Deleted",
       description: "Product has been removed from the marketplace",
     });
+  };
+
+  const handleSendToMarket = (product: any) => {
+    setSelectedProductForMarket(product);
+    setQuantityToSend(1);
+    setShowSendToMarketDialog(true);
+  };
+
+  const confirmSendToMarket = () => {
+    if (!selectedProductForMarket || quantityToSend <= 0 || quantityToSend > selectedProductForMarket.quantity) {
+      toast({
+        title: "Invalid Quantity",
+        description: "Please enter a valid quantity",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Add product to pending delivery with specified quantity
+    const pendingProduct = {
+      ...selectedProductForMarket,
+      quantityForSale: quantityToSend,
+      originalQuantity: selectedProductForMarket.quantity,
+      sentToMarketAt: new Date().toISOString(),
+      marketStatus: 'pending_delivery'
+    };
+    
+    setPendingProducts(prev => [pendingProduct, ...prev]);
+    
+    toast({
+      title: "Product Sent to Market",
+      description: `${quantityToSend} units of ${selectedProductForMarket.name} sent to pending delivery`,
+    });
+
+    setShowSendToMarketDialog(false);
+    setSelectedProductForMarket(null);
+    setQuantityToSend(1);
   };
 
   // Check for payment status and incoming product on component mount
@@ -667,7 +694,7 @@ const Market = () => {
           </TabsContent>
 
           <TabsContent value="my-products-listed" className="mt-6">
-            <MyProductsListed />
+            <MyProductsListed onSendToMarket={handleSendToMarket} />
           </TabsContent>
 
           <TabsContent value="pending-delivery" className="mt-6">
@@ -716,8 +743,12 @@ const Market = () => {
                                   <p className="text-lg font-bold">${product.price}</p>
                                 </div>
                                 <div>
-                                  <p className="text-sm font-medium">Quantity</p>
-                                  <p className="text-sm text-muted-foreground">{product.quantity} units</p>
+                                  <p className="text-sm font-medium">Quantity for Sale</p>
+                                  <p className="text-sm text-muted-foreground">{product.quantityForSale} units</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium">Total Available</p>
+                                  <p className="text-sm text-muted-foreground">{product.originalQuantity} units</p>
                                 </div>
                               </div>
                               
@@ -1068,8 +1099,78 @@ const Market = () => {
                   <Save className="w-4 h-4 mr-1" />
                   Save Changes
                 </Button>
+      </div>
+
+      {/* Send to Market Dialog */}
+      <Dialog open={showSendToMarketDialog} onOpenChange={setShowSendToMarketDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send Product to Market</DialogTitle>
+          </DialogHeader>
+          
+          {selectedProductForMarket && (
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                  {selectedProductForMarket.image ? (
+                    <img 
+                      src={selectedProductForMarket.image} 
+                      alt={selectedProductForMarket.name}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <Package className="w-6 h-6 text-muted-foreground" />
+                  )}
+                </div>
+                
+                <div className="flex-1">
+                  <h3 className="font-semibold">{selectedProductForMarket.name}</h3>
+                  <p className="text-sm text-muted-foreground">{selectedProductForMarket.category}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Available: {selectedProductForMarket.quantity} units
+                  </p>
+                  <p className="text-sm font-medium">Price: ${selectedProductForMarket.price}</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="quantity">Quantity to Send</Label>
+                <Input
+                  id="quantity"
+                  type="number"
+                  min="1"
+                  max={selectedProductForMarket.quantity}
+                  value={quantityToSend}
+                  onChange={(e) => setQuantityToSend(parseInt(e.target.value) || 1)}
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Maximum: {selectedProductForMarket.quantity} units
+                </p>
+              </div>
+
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <p className="text-sm">
+                  <span className="font-medium">Total value:</span> ${(selectedProductForMarket.price * quantityToSend).toFixed(2)}
+                </p>
               </div>
             </div>
+          )}
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowSendToMarketDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={confirmSendToMarket}>
+              Confirm Send to Market
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
           )}
         </DialogContent>
       </Dialog>
