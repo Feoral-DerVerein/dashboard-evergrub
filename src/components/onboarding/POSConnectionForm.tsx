@@ -749,7 +749,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                      onClick={() => {
                        localStorage.setItem("posOnboardingCompleted", "true");
                        onComplete();
-                       navigate("/kpi");
+                       // Don't navigate manually - let ProtectedRoute handle it after state updates
                      }}
                      className="bg-white text-gray-900 hover:bg-white/90 px-8 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
                    >
