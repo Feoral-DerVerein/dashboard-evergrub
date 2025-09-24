@@ -512,54 +512,65 @@ const KPI = () => {
       }
 
       if (reportData?.success && reportData?.report) {
-        // Create a new window/tab to display the report
-        const reportWindow = window.open('', '_blank');
-        if (reportWindow) {
-          reportWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <title>NSW EPA Compliance Report</title>
-              <style>
-                body { 
-                  font-family: Arial, sans-serif; 
-                  max-width: 800px; 
-                  margin: 0 auto; 
-                  padding: 20px; 
-                  line-height: 1.6;
-                }
-                h1 { color: #2c5530; border-bottom: 3px solid #10b981; padding-bottom: 10px; }
-                h2 { color: #059669; margin-top: 30px; }
-                h3 { color: #047857; }
-                .compliant { color: #059669; font-weight: bold; }
-                .non-compliant { color: #dc2626; font-weight: bold; }
-                table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f3f4f6; }
-                .print-btn { 
-                  position: fixed; 
-                  top: 20px; 
-                  right: 20px; 
-                  padding: 10px 20px; 
-                  background: #10b981; 
-                  color: white; 
-                  border: none; 
-                  border-radius: 5px; 
-                  cursor: pointer; 
-                }
-                @media print { .print-btn { display: none; } }
-              </style>
-            </head>
-            <body>
-              <button class="print-btn" onclick="window.print()">Print Report</button>
-              <div>${reportData.report.replace(/\n/g, '<br>').replace(/^# (.+)/gm, '<h1>$1</h1>').replace(/^## (.+)/gm, '<h2>$1</h2>').replace(/^### (.+)/gm, '<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/✅ COMPLIANT/g, '<span class="compliant">✅ COMPLIANT</span>').replace(/❌ NON-COMPLIANT/g, '<span class="non-compliant">❌ NON-COMPLIANT</span>')}</div>
-            </body>
-            </html>
-          `);
-          reportWindow.document.close();
-        }
+        // Import jsPDF dynamically
+        const jsPDF = (await import('jspdf')).default;
+        
+        // Create new PDF document
+        const pdf = new jsPDF();
+        
+        // Convert markdown to plain text for PDF
+        const cleanText = reportData.report
+          .replace(/#{1,6}\s/g, '') // Remove markdown headers
+          .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markdown
+          .replace(/\*(.*?)\*/g, '$1') // Remove italic markdown
+          .replace(/✅|❌/g, '') // Remove emoji symbols
+          .split('\n')
+          .filter(line => line.trim()) // Remove empty lines
+          .join('\n');
 
-        toast.success("NSW EPA compliance report generated successfully!");
+        // Add title
+        pdf.setFontSize(16);
+        pdf.setFont(undefined, 'bold');
+        pdf.text('NSW EPA Food Waste Compliance Report', 20, 30);
+        
+        // Add business name
+        pdf.setFontSize(12);
+        pdf.setFont(undefined, 'normal');
+        pdf.text('WiseBite Demo Store', 20, 45);
+        
+        // Add date
+        const currentDate = new Date().toLocaleDateString();
+        pdf.text(`Generated: ${currentDate}`, 20, 55);
+        
+        // Split text into lines that fit the page width
+        const pageWidth = pdf.internal.pageSize.width;
+        const maxLineWidth = pageWidth - 40; // 20px margin on each side
+        const lines = pdf.splitTextToSize(cleanText, maxLineWidth);
+        
+        // Add content starting from y position 70
+        let yPosition = 70;
+        const lineHeight = 6;
+        const pageHeight = pdf.internal.pageSize.height;
+        
+        lines.forEach((line: string) => {
+          // Check if we need a new page
+          if (yPosition > pageHeight - 30) {
+            pdf.addPage();
+            yPosition = 30;
+          }
+          
+          pdf.text(line, 20, yPosition);
+          yPosition += lineHeight;
+        });
+        
+        // Generate filename with current date
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = `NSW_EPA_Compliance_Report_${timestamp}.pdf`;
+        
+        // Download the PDF
+        pdf.save(filename);
+        
+        toast.success("NSW EPA compliance report downloaded successfully!");
       } else {
         toast.error("Failed to generate compliance report. Please check your data.");
       }
