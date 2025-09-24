@@ -21,24 +21,27 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-
-const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) => void }) => {
-  const { user } = useAuth();
+const MyProductsListed = ({
+  onSendToMarket
+}: {
+  onSendToMarket: (product: any) => void;
+}) => {
+  const {
+    user
+  } = useAuth();
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
     const fetchUserProducts = async () => {
       if (!user?.id) return;
-      
       try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*')
-          .eq('userid', user.id)
-          .eq('is_marketplace_visible', true);
-
+        const {
+          data,
+          error
+        } = await supabase.from('products').select('*').eq('userid', user.id).eq('is_marketplace_visible', true);
         if (error) throw error;
         setUserProducts(data || []);
       } catch (error) {
@@ -52,28 +55,24 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
         setLoading(false);
       }
     };
-
     fetchUserProducts();
   }, [user?.id, toast]);
-
   const handleEditProduct = (product: any) => {
     console.log('Edit product:', product);
     // Add edit functionality here
   };
-
   const handleDeleteProduct = async (product: any) => {
     try {
-      const { error } = await supabase
-        .from('products')
-        .update({ is_marketplace_visible: false })
-        .eq('id', product.id);
-
+      const {
+        error
+      } = await supabase.from('products').update({
+        is_marketplace_visible: false
+      }).eq('id', product.id);
       if (error) throw error;
-
       setUserProducts(prev => prev.filter(p => p.id !== product.id));
       toast({
         title: "Product Removed",
-        description: `${product.name} has been removed from the marketplace`,
+        description: `${product.name} has been removed from the marketplace`
       });
     } catch (error) {
       console.error('Error removing product:', error);
@@ -84,7 +83,6 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
       });
     }
   };
-
   const getStockBadge = (product: any) => {
     if (product.quantity === 0) {
       return <Badge variant="destructive">Out of Stock</Badge>;
@@ -94,19 +92,14 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
     }
     return <Badge variant="default">In Stock</Badge>;
   };
-
   if (loading) {
-    return (
-      <div className="text-center py-12">
+    return <div className="text-center py-12">
         <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
         <p className="text-lg font-medium mb-2">Loading your products...</p>
-      </div>
-    );
+      </div>;
   }
-
   if (userProducts.length === 0) {
-    return (
-      <div className="text-center py-12">
+    return <div className="text-center py-12">
         <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
         <p className="text-lg font-medium mb-2">No products listed yet</p>
         <p className="text-muted-foreground mb-4">
@@ -115,12 +108,9 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
         <Button onClick={() => window.location.href = '/products/add'}>
           Add Products
         </Button>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="space-y-4">
+  return <div className="space-y-4">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">My Products Listed ({userProducts.length})</h2>
         <Button onClick={() => window.location.href = '/products/add'} size="sm">
@@ -130,40 +120,19 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {userProducts.map((product) => (
-          <Card key={product.id} className="hover:shadow-md transition-shadow">
+        {userProducts.map(product => <Card key={product.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-4">
               <div className="flex gap-3">
                 <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                  {product.image ? (
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <Package className="w-6 h-6 text-muted-foreground" />
-                  )}
+                  {product.image ? <img src={product.image} alt={product.name} className="w-full h-full object-cover rounded-lg" /> : <Package className="w-6 h-6 text-muted-foreground" />}
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-semibold text-sm truncate">{product.name}</h3>
                     <div className="flex gap-1 flex-shrink-0 ml-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditProduct(product)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Edit className="w-3 h-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteProduct(product)}
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                      >
+                      
+                      <Button variant="ghost" size="sm" onClick={() => handleDeleteProduct(product)} className="h-8 w-8 p-0 text-destructive hover:text-destructive">
                         <Trash2 className="w-3 h-3" />
                       </Button>
                     </div>
@@ -177,12 +146,7 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
                     </div>
                     <p className="text-xs text-muted-foreground">Qty: {product.quantity}</p>
                     
-                    <Button 
-                      onClick={() => onSendToMarket(product)}
-                      size="sm" 
-                      variant="outline" 
-                      className="w-full mt-2"
-                    >
+                    <Button onClick={() => onSendToMarket(product)} size="sm" variant="outline" className="w-full mt-2">
                       <Send className="w-3 h-3 mr-2" />
                       Send to Market
                     </Button>
@@ -190,13 +154,10 @@ const MyProductsListed = ({ onSendToMarket }: { onSendToMarket: (product: any) =
                 </div>
               </div>
             </CardContent>
-          </Card>
-        ))}
+          </Card>)}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 const Market = () => {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -219,66 +180,79 @@ const Market = () => {
   const [marketPrice, setMarketPrice] = useState<number>(0);
   const [expiryDate, setExpiryDate] = useState<Date>();
   const [collectFrom, setCollectFrom] = useState<string>("");
-
-  const { toast } = useToast();
-
-  const categories = [
-    { name: "All Products", icon: Grid3X3 },
-    { name: "Fish", icon: Fish },
-    { name: "Meat", icon: Beef },
-    { name: "Fruit", icon: Apple },
-    { name: "Bakery", icon: Cookie },
-    { name: "Dairy", icon: Milk },
-    { name: "Grains", icon: Wheat },
-    { name: "Beverages", icon: Coffee },
-    { name: "Ready Meals", icon: UtensilsCrossed },
-    { name: "Wine", icon: Grape }
-  ];
+  const {
+    toast
+  } = useToast();
+  const categories = [{
+    name: "All Products",
+    icon: Grid3X3
+  }, {
+    name: "Fish",
+    icon: Fish
+  }, {
+    name: "Meat",
+    icon: Beef
+  }, {
+    name: "Fruit",
+    icon: Apple
+  }, {
+    name: "Bakery",
+    icon: Cookie
+  }, {
+    name: "Dairy",
+    icon: Milk
+  }, {
+    name: "Grains",
+    icon: Wheat
+  }, {
+    name: "Beverages",
+    icon: Coffee
+  }, {
+    name: "Ready Meals",
+    icon: UtensilsCrossed
+  }, {
+    name: "Wine",
+    icon: Grape
+  }];
 
   // Handle incoming product data from other pages
   useEffect(() => {
     if (location.state?.product) {
       const product = location.state.product;
       setIncomingProduct(product);
-      
       if (location.state.action === 'list') {
         setShowProductListingDialog(true);
       } else if (location.state.action === 'b2b') {
         setShowB2BOfferDialog(true);
       }
-      
+
       // Clear location state to prevent re-execution
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [toast, location.state]);
 
   // Mock data for market offers
-  const marketOffers = [
-    {
+  const marketOffers = [{
+    id: 1,
+    date: "31 Jul 2023",
+    deliveryAddress: "47 Bryna Rd, Palm Beach NSW 2108, Australia",
+    deliveryNote: "Call 14439201",
+    products: [{
       id: 1,
-      date: "31 Jul 2023",
-      deliveryAddress: "47 Bryna Rd, Palm Beach NSW 2108, Australia",
-      deliveryNote: "Call 14439201",
-      products: [
-        {
-          id: 1,
-          name: "Pork Mince 5kg",
-          image: porkMinceImage,
-          quantity: 5,
-          price: 25.00,
-          originalPrice: 30.00,
-          category: "Meat",
-          expirationDate: "2023-08-15",
-          supplier: "Fresh Meat Co.",
-          distance: "2.5 km",
-          ratings: 4.8,
-          totalRatings: 124,
-          description: "Fresh premium pork mince, perfect for cooking. Must be used within 3 days of collection."
-        }
-      ]
-    }
-  ];
-
+      name: "Pork Mince 5kg",
+      image: porkMinceImage,
+      quantity: 5,
+      price: 25.00,
+      originalPrice: 30.00,
+      category: "Meat",
+      expirationDate: "2023-08-15",
+      supplier: "Fresh Meat Co.",
+      distance: "2.5 km",
+      ratings: 4.8,
+      totalRatings: 124,
+      description: "Fresh premium pork mince, perfect for cooking. Must be used within 3 days of collection."
+    }]
+  }];
   const handleSendToMarket = (product: any) => {
     setSelectedProductForMarket(product);
     setQuantityToSend(1);
@@ -287,7 +261,6 @@ const Market = () => {
     setCollectFrom("");
     setShowSendToMarketDialog(true);
   };
-
   const confirmSendToMarket = () => {
     if (!selectedProductForMarket || !expiryDate || !collectFrom) {
       toast({
@@ -308,61 +281,48 @@ const Market = () => {
       status: "pending_approval",
       submittedAt: new Date().toISOString()
     };
-
     setPendingProducts(prev => [...prev, newPendingProduct]);
-    
     toast({
       title: "Sent to Market!",
-      description: `${selectedProductForMarket.name} has been submitted for marketplace approval.`,
+      description: `${selectedProductForMarket.name} has been submitted for marketplace approval.`
     });
-    
     setShowSendToMarketDialog(false);
     setSelectedProductForMarket(null);
   };
-
   const handleProductSelection = (product: any) => {
     setSelectedProduct(product);
     setShowReviewDialog(true);
   };
-
   const handleAddToCart = (product: any) => {
     toast({
       title: "Added to Cart!",
-      description: `${product.name} has been added to your cart.`,
+      description: `${product.name} has been added to your cart.`
     });
     setShowReviewDialog(false);
   };
-
   const handleBuyNow = (product: any) => {
     setSelectedProduct(product);
     setShowPaymentForm(true);
     setShowReviewDialog(false);
   };
-
   const handlePaymentComplete = () => {
     toast({
       title: "Payment Successful!",
-      description: "Your order has been placed successfully.",
+      description: "Your order has been placed successfully."
     });
     setShowPaymentForm(false);
     setSelectedProduct(null);
   };
-
   const filteredOffers = marketOffers.filter(offer => {
-    const matchesSearch = offer.products.some(product =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.supplier.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    
-    const matchesCategory = selectedCategory === "All Products" || 
-      offer.products.some(product => product.category === selectedCategory);
-    
+    const matchesSearch = offer.products.some(product => product.name.toLowerCase().includes(searchQuery.toLowerCase()) || product.category.toLowerCase().includes(searchQuery.toLowerCase()) || product.supplier.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory = selectedCategory === "All Products" || offer.products.some(product => product.category === selectedCategory);
     return matchesSearch && matchesCategory;
   });
-
-  const ProductReviewCard = ({ product }: { product: any }) => (
-    <Card className="w-full max-w-md mx-auto">
+  const ProductReviewCard = ({
+    product
+  }: {
+    product: any;
+  }) => <Card className="w-full max-w-md mx-auto">
       <CardHeader className="pb-4">
         <div className="flex gap-4">
           <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center">
@@ -398,9 +358,7 @@ const Market = () => {
               <p className="text-sm text-muted-foreground">Price per unit</p>
               <div className="flex items-center gap-2">
                 <span className="text-lg font-bold text-primary">${product.price}</span>
-                {product.originalPrice > product.price && (
-                  <span className="text-sm line-through text-muted-foreground">${product.originalPrice}</span>
-                )}
+                {product.originalPrice > product.price && <span className="text-sm line-through text-muted-foreground">${product.originalPrice}</span>}
               </div>
             </div>
           </div>
@@ -417,11 +375,8 @@ const Market = () => {
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
-
-  return (
-    <div className="min-h-screen bg-background">
+    </Card>;
+  return <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="mb-6">
@@ -431,23 +386,13 @@ const Market = () => {
         {/* Category Navigation */}
         <div className="mb-6">
           <div className="grid grid-cols-5 md:grid-cols-10 gap-3">
-            {categories.map((category) => {
-              const IconComponent = category.icon;
-              return (
-                <button
-                  key={category.name}
-                  onClick={() => setSelectedCategory(category.name)}
-                  className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all hover:scale-105 ${
-                    selectedCategory === category.name
-                      ? "bg-primary text-primary-foreground border-primary shadow-md"
-                      : "bg-background hover:bg-accent border-border"
-                  }`}
-                >
+            {categories.map(category => {
+            const IconComponent = category.icon;
+            return <button key={category.name} onClick={() => setSelectedCategory(category.name)} className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all hover:scale-105 ${selectedCategory === category.name ? "bg-primary text-primary-foreground border-primary shadow-md" : "bg-background hover:bg-accent border-border"}`}>
                   <IconComponent size={24} className="mb-2" />
                   <span className="text-xs font-medium text-center">{category.name}</span>
-                </button>
-              );
-            })}
+                </button>;
+          })}
           </div>
         </div>
 
@@ -455,13 +400,7 @@ const Market = () => {
         <div className="mb-6 space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
-            <Input
-              type="text"
-              placeholder="Search for products, suppliers, or categories..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+            <Input type="text" placeholder="Search for products, suppliers, or categories..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10" />
           </div>
           
           <div className="flex gap-4">
@@ -490,13 +429,7 @@ const Market = () => {
           <TabsContent value="browse" className="space-y-6">
             {/* Market Offers Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredOffers.map((offer) =>
-                offer.products.map((product) => (
-                  <Card 
-                    key={`${offer.id}-${product.id}`}
-                    className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
-                    onClick={() => handleProductSelection(product)}
-                  >
+              {filteredOffers.map(offer => offer.products.map(product => <Card key={`${offer.id}-${product.id}`} className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.02]" onClick={() => handleProductSelection(product)}>
                     <CardContent className="p-4">
                       <div className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden">
                         <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
@@ -520,9 +453,7 @@ const Market = () => {
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-2">
                             <span className="text-2xl font-bold text-primary">${product.price}</span>
-                            {product.originalPrice > product.price && (
-                              <span className="text-lg line-through text-muted-foreground">${product.originalPrice}</span>
-                            )}
+                            {product.originalPrice > product.price && <span className="text-lg line-through text-muted-foreground">${product.originalPrice}</span>}
                           </div>
                           <Badge variant="secondary">{product.quantity} left</Badge>
                         </div>
@@ -535,18 +466,14 @@ const Market = () => {
                         <p className="text-sm text-muted-foreground">By {product.supplier}</p>
                       </div>
                     </CardContent>
-                  </Card>
-                ))
-              )}
+                  </Card>))}
             </div>
 
-            {filteredOffers.length === 0 && (
-              <div className="text-center py-12">
+            {filteredOffers.length === 0 && <div className="text-center py-12">
                 <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 <p className="text-lg font-medium mb-2">No products found</p>
                 <p className="text-muted-foreground">Try adjusting your search or filters</p>
-              </div>
-            )}
+              </div>}
           </TabsContent>
 
           <TabsContent value="my-products">
@@ -558,28 +485,16 @@ const Market = () => {
               <h2 className="text-xl font-semibold">Pending Market Submissions</h2>
             </div>
 
-            {pendingProducts.length === 0 ? (
-              <div className="text-center py-12">
+            {pendingProducts.length === 0 ? <div className="text-center py-12">
                 <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 <p className="text-lg font-medium mb-2">No pending submissions</p>
                 <p className="text-muted-foreground">Products you send to market will appear here while awaiting approval</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {pendingProducts.map((product, index) => (
-                  <Card key={index} className="border-orange-200 bg-orange-50/50">
+              </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pendingProducts.map((product, index) => <Card key={index} className="border-orange-200 bg-orange-50/50">
                     <CardContent className="p-4">
                       <div className="flex gap-3">
                         <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                          {product.image ? (
-                            <img 
-                              src={product.image} 
-                              alt={product.name}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <Package className="w-6 h-6 text-muted-foreground" />
-                          )}
+                          {product.image ? <img src={product.image} alt={product.name} className="w-full h-full object-cover rounded-lg" /> : <Package className="w-6 h-6 text-muted-foreground" />}
                         </div>
                         
                         <div className="flex-1 min-w-0">
@@ -597,10 +512,8 @@ const Market = () => {
                         </div>
                       </div>
                     </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+                  </Card>)}
+              </div>}
           </TabsContent>
         </Tabs>
       </div>
@@ -632,14 +545,10 @@ const Market = () => {
           <DialogHeader>
             <DialogTitle>Complete Purchase</DialogTitle>
           </DialogHeader>
-          {selectedProduct && (
-            <PaymentForm
-              offer={null}
-              products={[{...selectedProduct, totalPrice: selectedProduct.price}]}
-              onPaymentSuccess={handlePaymentComplete}
-              onCancel={() => setShowPaymentForm(false)}
-            />
-          )}
+          {selectedProduct && <PaymentForm offer={null} products={[{
+          ...selectedProduct,
+          totalPrice: selectedProduct.price
+        }]} onPaymentSuccess={handlePaymentComplete} onCancel={() => setShowPaymentForm(false)} />}
         </DialogContent>
       </Dialog>
 
@@ -653,8 +562,7 @@ const Market = () => {
             </DialogTitle>
           </DialogHeader>
           
-          {incomingProduct && (
-            <div className="space-y-4">
+          {incomingProduct && <div className="space-y-4">
               <div className="p-4 bg-blue-50 rounded-lg">
                 <h3 className="font-semibold text-blue-900">{incomingProduct.name}</h3>
                 <p className="text-sm text-blue-700">Quantity: {incomingProduct.quantity}</p>
@@ -664,13 +572,12 @@ const Market = () => {
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={() => setShowProductListingDialog(false)}>Cancel</Button>
                 <Button onClick={() => {
-                  // Product already added in useEffect, just close dialog
-                  setShowProductListingDialog(false);
-                  setIncomingProduct(null);
-                }}>Confirm Listing</Button>
+              // Product already added in useEffect, just close dialog
+              setShowProductListingDialog(false);
+              setIncomingProduct(null);
+            }}>Confirm Listing</Button>
               </div>
-            </div>
-          )}
+            </div>}
         </DialogContent>
       </Dialog>
 
@@ -684,8 +591,7 @@ const Market = () => {
             </DialogTitle>
           </DialogHeader>
           
-          {incomingProduct && (
-            <div className="space-y-4">
+          {incomingProduct && <div className="space-y-4">
               <div className="p-4 bg-purple-50 rounded-lg">
                 <h3 className="font-semibold text-purple-900">{incomingProduct.name}</h3>
                 <p className="text-sm text-purple-700">Quantity: {incomingProduct.quantity}</p>
@@ -695,13 +601,12 @@ const Market = () => {
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={() => setShowB2BOfferDialog(false)}>Cancel</Button>
                 <Button onClick={() => {
-                  // Product already added in useEffect, just close dialog
-                  setShowB2BOfferDialog(false);
-                  setIncomingProduct(null);
-                }}>Confirm Offer</Button>
+              // Product already added in useEffect, just close dialog
+              setShowB2BOfferDialog(false);
+              setIncomingProduct(null);
+            }}>Confirm Offer</Button>
               </div>
-            </div>
-          )}
+            </div>}
         </DialogContent>
       </Dialog>
 
@@ -715,82 +620,62 @@ const Market = () => {
             </DialogTitle>
           </DialogHeader>
           
-          {editingProduct && (
-            <div className="space-y-4">
+          {editingProduct && <div className="space-y-4">
               <div>
                 <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
-                  value={editingProduct.category}
-                  onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
-                  placeholder="Enter category"
-                />
+                <Input id="category" value={editingProduct.category} onChange={e => setEditingProduct({
+              ...editingProduct,
+              category: e.target.value
+            })} placeholder="Enter category" />
               </div>
               
               <div>
                 <Label htmlFor="quantity">Quantity</Label>
-                <Input
-                  id="quantity"
-                  type="number"
-                  value={editingProduct.quantity}
-                  onChange={(e) => setEditingProduct({...editingProduct, quantity: parseInt(e.target.value) || 0})}
-                  placeholder="Enter quantity"
-                />
+                <Input id="quantity" type="number" value={editingProduct.quantity} onChange={e => setEditingProduct({
+              ...editingProduct,
+              quantity: parseInt(e.target.value) || 0
+            })} placeholder="Enter quantity" />
               </div>
               
               <div>
                 <Label htmlFor="price">Price ($)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={editingProduct.price}
-                  onChange={(e) => setEditingProduct({...editingProduct, price: parseFloat(e.target.value) || 0})}
-                  placeholder="Enter price"
-                />
+                <Input id="price" type="number" step="0.01" value={editingProduct.price} onChange={e => setEditingProduct({
+              ...editingProduct,
+              price: parseFloat(e.target.value) || 0
+            })} placeholder="Enter price" />
               </div>
               
               <div>
                 <Label htmlFor="expirationDate">Expires</Label>
-                <Input
-                  id="expirationDate"
-                  type="date"
-                  value={editingProduct.expirationDate}
-                  onChange={(e) => setEditingProduct({...editingProduct, expirationDate: e.target.value})}
-                />
+                <Input id="expirationDate" type="date" value={editingProduct.expirationDate} onChange={e => setEditingProduct({
+              ...editingProduct,
+              expirationDate: e.target.value
+            })} />
               </div>
               
               <div className="flex gap-2 justify-end pt-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setShowEditDialog(false);
-                    setEditingProduct(null);
-                  }}
-                >
+                <Button variant="outline" onClick={() => {
+              setShowEditDialog(false);
+              setEditingProduct(null);
+            }}>
                   <X className="w-4 h-4 mr-1" />
                   Cancel
                 </Button>
-                <Button 
-                  onClick={() => {
-                    // Update the product in the listed products array
-                    setListedProducts(prev => 
-                      prev.map(p => p.id === editingProduct.id ? editingProduct : p)
-                    );
-                    toast({
-                      title: "Product Updated!",
-                      description: `${editingProduct.name} details have been updated.`,
-                    });
-                    setShowEditDialog(false);
-                    setEditingProduct(null);
-                  }}
-                >
+                <Button onClick={() => {
+              // Update the product in the listed products array
+              setListedProducts(prev => prev.map(p => p.id === editingProduct.id ? editingProduct : p));
+              toast({
+                title: "Product Updated!",
+                description: `${editingProduct.name} details have been updated.`
+              });
+              setShowEditDialog(false);
+              setEditingProduct(null);
+            }}>
                   <Save className="w-4 h-4 mr-1" />
                   Save Changes
                 </Button>
               </div>
-            </div>
-          )}
+            </div>}
         </DialogContent>
       </Dialog>
 
@@ -801,20 +686,11 @@ const Market = () => {
             <DialogTitle>Send Product to Market</DialogTitle>
           </DialogHeader>
           
-          {selectedProductForMarket && (
-            <div className="space-y-6">
+          {selectedProductForMarket && <div className="space-y-6">
               {/* Product Info */}
               <div className="flex gap-4 p-4 bg-muted/50 rounded-lg">
                 <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                  {selectedProductForMarket.image ? (
-                    <img 
-                      src={selectedProductForMarket.image} 
-                      alt={selectedProductForMarket.name}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <Package className="w-6 h-6 text-muted-foreground" />
-                  )}
+                  {selectedProductForMarket.image ? <img src={selectedProductForMarket.image} alt={selectedProductForMarket.name} className="w-full h-full object-cover rounded-lg" /> : <Package className="w-6 h-6 text-muted-foreground" />}
                 </div>
                 
                 <div className="flex-1">
@@ -831,14 +707,7 @@ const Market = () => {
                 {/* Quantity */}
                 <div className="space-y-2">
                   <Label htmlFor="quantity">Quantity</Label>
-                  <Input
-                    id="quantity"
-                    type="number"
-                    min="1"
-                    max={selectedProductForMarket.quantity}
-                    value={quantityToSend}
-                    onChange={(e) => setQuantityToSend(parseInt(e.target.value) || 1)}
-                  />
+                  <Input id="quantity" type="number" min="1" max={selectedProductForMarket.quantity} value={quantityToSend} onChange={e => setQuantityToSend(parseInt(e.target.value) || 1)} />
                   <p className="text-xs text-muted-foreground">
                     Max: {selectedProductForMarket.quantity}
                   </p>
@@ -847,14 +716,7 @@ const Market = () => {
                 {/* Price */}
                 <div className="space-y-2">
                   <Label htmlFor="price">Price per Unit ($)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={marketPrice}
-                    onChange={(e) => setMarketPrice(parseFloat(e.target.value) || 0)}
-                  />
+                  <Input id="price" type="number" min="0" step="0.01" value={marketPrice} onChange={e => setMarketPrice(parseFloat(e.target.value) || 0)} />
                   <p className="text-xs text-muted-foreground">
                     Original: ${selectedProductForMarket.price}
                   </p>
@@ -866,26 +728,13 @@ const Market = () => {
                 <Label>Expiry Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !expiryDate && "text-muted-foreground"
-                      )}
-                    >
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !expiryDate && "text-muted-foreground")}>
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {expiryDate ? format(expiryDate, "PPP") : <span>Pick an expiry date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={expiryDate}
-                      onSelect={(date) => setExpiryDate(date)}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                      disabled={(date) => date < new Date()}
-                    />
+                    <Calendar mode="single" selected={expiryDate} onSelect={date => setExpiryDate(date)} initialFocus className="p-3 pointer-events-auto" disabled={date => date < new Date()} />
                   </PopoverContent>
                 </Popover>
               </div>
@@ -925,14 +774,10 @@ const Market = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            </div>}
 
           <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowSendToMarketDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowSendToMarketDialog(false)}>
               Cancel
             </Button>
             <Button onClick={confirmSendToMarket}>
@@ -942,8 +787,6 @@ const Market = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>;
 };
-
 export default Market;
