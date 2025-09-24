@@ -261,21 +261,17 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Spline 3D Background */}
-      <div className="absolute inset-0 z-0">
-        <spline-viewer 
-          url="https://prod.spline.design/XM3cjMqxA7CFeI62/scene.splinecode"
-          style={{ 
-            width: '100%', 
-            height: '100%',
-            pointerEvents: 'none' // Prevents interaction with 3D scene
-          }}
-        />
-      </div>
-
+    <div 
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        backgroundImage: `url('/src/assets/gradient-background.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       {/* Overlay to ensure content visibility */}
-      <div className="absolute inset-0 z-1 bg-black/20" />
+      <div className="absolute inset-0 z-1 bg-black/10" />
 
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-4xl mx-auto space-y-8">
