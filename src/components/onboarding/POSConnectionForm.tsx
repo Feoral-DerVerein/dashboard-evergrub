@@ -312,9 +312,9 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                     </div>
                     <h3 className="text-lg font-semibold">Get Your API Key</h3>
                   </div>
-                  <p className="text-muted-foreground ml-11">
-                    Find your API key in your POS system's developer settings.
-                  </p>
+                   <p className="text-black ml-11">
+                     Find your API key in your POS system's developer settings.
+                   </p>
                 </motion.div>
 
                 <Separator className="border-white/30" />
