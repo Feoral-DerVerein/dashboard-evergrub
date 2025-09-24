@@ -634,8 +634,10 @@ const Market = () => {
           </DialogHeader>
           {selectedProduct && (
             <PaymentForm
-              products={[selectedProduct]}
-              onPaymentComplete={handlePaymentComplete}
+              offer={null}
+              products={[{...selectedProduct, totalPrice: selectedProduct.price}]}
+              onPaymentSuccess={handlePaymentComplete}
+              onCancel={() => setShowPaymentForm(false)}
             />
           )}
         </DialogContent>
