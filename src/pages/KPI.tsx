@@ -444,10 +444,129 @@ const KPI = () => {
   const handleDownloadReport = async () => {
     try {
       setIsGeneratingReport(true);
-      toast.info("Report generation feature has been removed.");
+      toast.info("Generating NSW EPA compliance report...");
+
+      // Parse numeric values from string data
+      const parseNumericValue = (value: string) => {
+        return parseFloat(value.replace(/[^0-9.-]+/g, '')) || 0;
+      };
+
+      // Sample data structure for NSW EPA compliance report
+      // In a real implementation, this would come from your database/API
+      const complianceData = {
+        businessName: "WiseBite Demo Store",
+        address: "123 Main Street, Sydney, NSW 2000",
+        ABN: "12 345 678 901",
+        businessType: "Food Retail/Café",
+        reportPeriod: {
+          startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          endDate: new Date().toISOString().split('T')[0]
+        },
+        residualWaste: {
+          volumeLitres: Math.max(2000 - parseNumericValue(realData.co2Saved), 500),
+          containers: [
+            { type: "240 L bin", quantity: 8 },
+            { type: "120 L bin", quantity: 4 }
+          ],
+          collectionFrequency: "twice weekly",
+          provider: "Metro Waste Services Pty Ltd"
+        },
+        foodWaste: {
+          volumeLitres: Math.max(parseNumericValue(realData.co2Saved) * 10, 1250),
+          containers: [
+            { type: "140 L organics bin", quantity: 6 },
+            { type: "80 L kitchen caddy", quantity: 3 }
+          ],
+          collectionFrequency: "weekly",
+          provider: "GreenCycle Organics Ltd",
+          destination: "Sydney Organics Processing Facility"
+        },
+        foodDonations: [
+          { category: "Fresh Produce", weightKg: Math.max(parseNumericValue(realData.foodWasteReduced), 85), recipient: "OzHarvest Sydney" },
+          { category: "Bakery Items", weightKg: 25, recipient: "Local Community Kitchen" },
+          { category: "Packaged Goods", weightKg: 40, recipient: "Salvation Army Food Bank" }
+        ],
+        reductionActions: [
+          { action: "Implemented smart inventory tracking via Negentropy platform", startDate: "2025-08-01" },
+          { action: "Regular food donation program establishment", startDate: "2025-08-15" },
+          { action: "Staff training on food waste reduction", startDate: "2025-09-01" },
+          { action: "Kitchen waste separation procedures", startDate: "2025-07-15" }
+        ],
+        historicalData: {
+          previousPeriod: {
+            residualVolumeLitres: 3200,
+            foodWasteVolumeLitres: 800
+          }
+        }
+      };
+
+      // Call the edge function to generate the report
+      const { data: reportData, error } = await supabase.functions.invoke('generate-nsw-epa-report', {
+        body: complianceData
+      });
+
+      if (error) {
+        console.error('Edge function error:', error);
+        toast.error("Failed to generate compliance report. Please try again.");
+        return;
+      }
+
+      if (reportData?.success && reportData?.report) {
+        // Create a new window/tab to display the report
+        const reportWindow = window.open('', '_blank');
+        if (reportWindow) {
+          reportWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>NSW EPA Compliance Report</title>
+              <style>
+                body { 
+                  font-family: Arial, sans-serif; 
+                  max-width: 800px; 
+                  margin: 0 auto; 
+                  padding: 20px; 
+                  line-height: 1.6;
+                }
+                h1 { color: #2c5530; border-bottom: 3px solid #10b981; padding-bottom: 10px; }
+                h2 { color: #059669; margin-top: 30px; }
+                h3 { color: #047857; }
+                .compliant { color: #059669; font-weight: bold; }
+                .non-compliant { color: #dc2626; font-weight: bold; }
+                table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f3f4f6; }
+                .print-btn { 
+                  position: fixed; 
+                  top: 20px; 
+                  right: 20px; 
+                  padding: 10px 20px; 
+                  background: #10b981; 
+                  color: white; 
+                  border: none; 
+                  border-radius: 5px; 
+                  cursor: pointer; 
+                }
+                @media print { .print-btn { display: none; } }
+              </style>
+            </head>
+            <body>
+              <button class="print-btn" onclick="window.print()">Print Report</button>
+              <div>${reportData.report.replace(/\n/g, '<br>').replace(/^# (.+)/gm, '<h1>$1</h1>').replace(/^## (.+)/gm, '<h2>$1</h2>').replace(/^### (.+)/gm, '<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/✅ COMPLIANT/g, '<span class="compliant">✅ COMPLIANT</span>').replace(/❌ NON-COMPLIANT/g, '<span class="non-compliant">❌ NON-COMPLIANT</span>')}</div>
+            </body>
+            </html>
+          `);
+          reportWindow.document.close();
+        }
+
+        toast.success("NSW EPA compliance report generated successfully!");
+      } else {
+        toast.error("Failed to generate compliance report. Please check your data.");
+      }
+
     } catch (error) {
-      console.error("Error:", error);
-      toast.error("This feature is no longer available.");
+      console.error("Error generating report:", error);
+      toast.error("An error occurred while generating the report.");
     } finally {
       setIsGeneratingReport(false);
     }
