@@ -693,7 +693,7 @@ const KPI = () => {
                 <div className="flex justify-center mb-4">
                   
                 </div>
-                <p className="text-center text-xl text-gray-950">Hi Mate, What are we going to make possible today?</p>
+                <p className="text-center text-gray-950 text-xl">                                                         Hi Mate, What are we going to make possible today?</p>
                 
               </div>
               <DropdownMenu>
