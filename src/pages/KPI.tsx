@@ -688,12 +688,12 @@ const KPI = () => {
       <div className="max-w-md md:max-w-6xl mx-auto glass-card md:rounded-xl md:my-0 min-h-screen md:min-h-0 animate-fade-in">
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
-              <div>
+               <div>
                 
                 <div className="flex justify-center mb-4">
                   
                 </div>
-                <p className="text-gray-500 text-center">                                                                          {Hi Mate, What are we going to make possible today?</p>
+                <p className="text-gray-500 text-center">Hi Mate, What are we going to make possible today?</p>
                 
               </div>
               <DropdownMenu>
