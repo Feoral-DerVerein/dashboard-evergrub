@@ -59,9 +59,51 @@ const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
     script.src = 'https://unpkg.com/@splinetool/viewer@1.10.64/build/spline-viewer.js';
     document.head.appendChild(script);
     
+    // Function to hide Spline badge aggressively
+    const hideSplineBadge = () => {
+      const splineViewer = document.querySelector('spline-viewer');
+      if (splineViewer) {
+        const shadowRoot = splineViewer.shadowRoot;
+        if (shadowRoot) {
+          // Hide elements in shadow DOM
+          const style = document.createElement('style');
+          style.textContent = `
+            .logo, .watermark, .branding, [class*="logo"], [class*="watermark"], 
+            [class*="branding"], [class*="badge"], a[href*="spline"] {
+              display: none !important;
+              visibility: hidden !important;
+              opacity: 0 !important;
+            }
+          `;
+          shadowRoot.appendChild(style);
+        }
+        
+        // Also hide any direct children that might be badges
+        const allElements = splineViewer.querySelectorAll('*');
+        allElements.forEach(element => {
+          const htmlElement = element as HTMLElement;
+          if (element.textContent?.includes('Built with') || 
+              element.textContent?.includes('Spline') ||
+              element.getAttribute('href')?.includes('spline')) {
+            htmlElement.style.display = 'none';
+            htmlElement.style.visibility = 'hidden';
+            htmlElement.style.opacity = '0';
+          }
+        });
+      }
+    };
+    
+    // Try to hide badge multiple times as it loads asynchronously
+    const intervals = [500, 1000, 2000, 3000];
+    intervals.forEach(delay => {
+      setTimeout(hideSplineBadge, delay);
+    });
+    
     return () => {
       // Cleanup: remove script when component unmounts
-      document.head.removeChild(script);
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
     };
   }, []);
 
@@ -753,7 +795,6 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                      onClick={() => {
                        localStorage.setItem("posOnboardingCompleted", "true");
                        onComplete();
-                       navigate("/kpi");
                      }}
                      className="bg-white text-gray-900 hover:bg-white/90 px-8 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
                    >
