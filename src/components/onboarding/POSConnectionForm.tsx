@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +34,7 @@ interface POSConnectionFormProps {
 }
 
 const POSConnectionForm = ({ onComplete }: POSConnectionFormProps) => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -751,6 +753,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                      onClick={() => {
                        localStorage.setItem("posOnboardingCompleted", "true");
                        onComplete();
+                       navigate("/kpi");
                      }}
                      className="bg-white text-gray-900 hover:bg-white/90 px-8 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
                    >
