@@ -180,6 +180,9 @@ const Market = () => {
   const [marketPrice, setMarketPrice] = useState<number>(0);
   const [expiryDate, setExpiryDate] = useState<Date>();
   const [collectFrom, setCollectFrom] = useState<string>("");
+  const [showMakeOfferDialog, setShowMakeOfferDialog] = useState(false);
+  const [offerPrice, setOfferPrice] = useState<number>(0);
+  const [offerQuantity, setOfferQuantity] = useState<number>(1);
   const {
     toast
   } = useToast();
@@ -299,6 +302,32 @@ const Market = () => {
       description: `${product.name} has been added to your cart.`
     });
     setShowReviewDialog(false);
+  };
+
+  const handleMakeOffer = (product: any) => {
+    setSelectedProduct(product);
+    setOfferPrice(product.price * 0.8); // Start with 80% of listed price
+    setOfferQuantity(1);
+    setShowMakeOfferDialog(true);
+    setShowReviewDialog(false);
+  };
+
+  const handleSubmitOffer = () => {
+    if (!selectedProduct || offerPrice <= 0 || offerQuantity <= 0) {
+      toast({
+        title: "Invalid Offer",
+        description: "Please enter a valid price and quantity",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    toast({
+      title: "Offer Submitted!",
+      description: `Your offer of $${offerPrice} for ${offerQuantity} units has been sent to ${selectedProduct.supplier}.`
+    });
+    setShowMakeOfferDialog(false);
+    setSelectedProduct(null);
   };
   const handleBuyNow = (product: any) => {
     setSelectedProduct(product);
@@ -527,9 +556,9 @@ const Market = () => {
               <X className="w-4 h-4 mr-1" />
               Close
             </Button>
-            <Button variant="outline" onClick={() => handleAddToCart(selectedProduct)}>
+            <Button variant="outline" onClick={() => handleMakeOffer(selectedProduct)}>
               <ShoppingCart className="w-4 h-4 mr-1" />
-              Add to Cart
+              Make an Offer
             </Button>
             <Button onClick={() => handleBuyNow(selectedProduct)}>
               <DollarSign className="w-4 h-4 mr-1" />
@@ -783,6 +812,95 @@ const Market = () => {
             <Button onClick={confirmSendToMarket}>
               <Send className="w-4 h-4 mr-2" />
               Send to Market
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Make Offer Dialog */}
+      <Dialog open={showMakeOfferDialog} onOpenChange={setShowMakeOfferDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Make an Offer</DialogTitle>
+          </DialogHeader>
+          
+          {selectedProduct && (
+            <div className="space-y-6">
+              {/* Product Info */}
+              <div className="flex gap-4 p-4 bg-muted/50 rounded-lg">
+                <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                  <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover rounded-lg" />
+                </div>
+                
+                <div className="flex-1">
+                  <h3 className="font-semibold">{selectedProduct.name}</h3>
+                  <p className="text-sm text-muted-foreground">{selectedProduct.supplier}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Listed at: ${selectedProduct.price}/unit
+                  </p>
+                </div>
+              </div>
+
+              {/* Offer Form */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="offerQuantity">Quantity</Label>
+                  <Input 
+                    id="offerQuantity" 
+                    type="number" 
+                    min="1" 
+                    max={selectedProduct.quantity}
+                    value={offerQuantity} 
+                    onChange={(e) => setOfferQuantity(parseInt(e.target.value) || 1)} 
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Available: {selectedProduct.quantity}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="offerPrice">Your Offer (per unit)</Label>
+                  <Input 
+                    id="offerPrice" 
+                    type="number" 
+                    min="0" 
+                    step="0.01"
+                    value={offerPrice} 
+                    onChange={(e) => setOfferPrice(parseFloat(e.target.value) || 0)} 
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Listed: ${selectedProduct.price}
+                  </p>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="bg-primary/10 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Offer Summary</h4>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>Quantity:</span>
+                    <span>{offerQuantity} units</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Price per unit:</span>
+                    <span>${offerPrice.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-medium border-t pt-1">
+                    <span>Total offer:</span>
+                    <span>${(offerPrice * offerQuantity).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowMakeOfferDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmitOffer}>
+              Submit Offer
             </Button>
           </DialogFooter>
         </DialogContent>
