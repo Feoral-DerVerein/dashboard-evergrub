@@ -274,15 +274,6 @@ const Products = () => {
     refreshProducts();
   };
   return <>
-      <header className="px-6 pt-8 pb-6 sticky top-0 z-10">
-        <div className="flex justify-center mb-6">
-          <img 
-            src={dailyDayLogo} 
-            alt="Daily Day Logo" 
-            className="h-20 w-auto object-contain"
-          />
-        </div>
-      </header>
 
       {/* Navigation Icons Section */}
       <div className="px-6 py-4 border-b bg-gray-50/60">
