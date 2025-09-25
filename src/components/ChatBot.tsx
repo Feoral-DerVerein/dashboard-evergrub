@@ -135,7 +135,7 @@ const ChatBot = ({
                           {message.type === 'bot' ? 'Negentropy AI' : 'You'}
                         </span>
                         <span className="text-xs opacity-60 ml-auto">
-                          {message.timestamp.toLocaleTimeString('es-ES', { 
+                          {message.timestamp.toLocaleTimeString('en-US', { 
                             hour: '2-digit', 
                             minute: '2-digit' 
                           })}
@@ -235,12 +235,12 @@ const ChatBot = ({
                        <span className="text-sm font-medium">
                          {message.type === 'bot' ? 'AI' : 'You'}
                        </span>
-                      <span className="text-xs opacity-60 ml-auto">
-                        {message.timestamp.toLocaleTimeString('es-ES', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </span>
+                       <span className="text-xs opacity-60 ml-auto">
+                         {message.timestamp.toLocaleTimeString('en-US', { 
+                           hour: '2-digit', 
+                           minute: '2-digit' 
+                         })}
+                       </span>
                     </div>
                     <div className="text-sm leading-relaxed">{message.content}</div>
                   </div>
