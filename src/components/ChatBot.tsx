@@ -88,15 +88,23 @@ const ChatBot = ({
             <CardContent className="p-6">
               {/* Input Section */}
               <div className="relative flex gap-3 mb-4">
-                {/* Cube Question Counter above send button */}
-                <div className="absolute -top-16 right-0 z-10">
-                  <div className={`relative w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-md shadow-lg border-2 border-primary/30 transform rotate-3 hover:rotate-0 transition-all duration-300 ${questionsRemaining <= 5 ? 'from-destructive to-destructive/80 border-destructive/30' : ''}`}>
-                    <div className="absolute inset-0 bg-black/10 rounded-md transform translate-x-1 translate-y-1 -z-10"></div>
-                    <div className="flex flex-col items-center justify-center h-full text-white">
-                      <div className="text-xs font-bold leading-none">{questionsUsed}</div>
-                      <div className="text-[10px] opacity-80">/{maxQuestions}</div>
+                {/* Enhanced Question Counter Cube */}
+                <div className="absolute -top-20 right-2 z-20">
+                  <div className={`group relative w-14 h-14 bg-gradient-to-br ${questionsRemaining <= 5 ? 'from-destructive via-destructive/90 to-destructive/70' : 'from-primary via-primary/90 to-primary/70'} rounded-xl shadow-xl border-2 ${questionsRemaining <= 5 ? 'border-destructive/40' : 'border-primary/40'} transform rotate-2 hover:rotate-0 hover:scale-110 transition-all duration-500 cursor-pointer`}>
+                    {/* 3D Shadow Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 rounded-xl transform translate-x-1.5 translate-y-1.5 -z-10 blur-sm"></div>
+                    
+                    {/* Inner Content */}
+                    <div className="relative flex flex-col items-center justify-center h-full text-white z-10">
+                      <div className="text-sm font-black leading-none drop-shadow-lg">{questionsUsed}</div>
+                      <div className="text-[9px] opacity-90 font-medium">/{maxQuestions}</div>
                     </div>
-                    <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-[10px] text-muted-foreground whitespace-nowrap">
+                    
+                    {/* Shine Effect on Hover */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
+                    {/* Bottom Label */}
+                    <div className="absolute -bottom-7 left-1/2 transform -translate-x-1/2 text-[10px] text-muted-foreground whitespace-nowrap bg-background/80 backdrop-blur-sm px-2 py-0.5 rounded-full border border-border/50">
                       {questionsRemaining} left
                     </div>
                   </div>
