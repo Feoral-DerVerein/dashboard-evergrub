@@ -165,6 +165,39 @@ export type Database = {
           },
         ]
       }
+      company_profile_audit_log: {
+        Row: {
+          accessed_fields: string[] | null
+          action: string
+          company_profile_id: string
+          id: string
+          ip_address: string | null
+          timestamp: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accessed_fields?: string[] | null
+          action: string
+          company_profile_id: string
+          id?: string
+          ip_address?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accessed_fields?: string[] | null
+          action?: string
+          company_profile_id?: string
+          id?: string
+          ip_address?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       company_profiles: {
         Row: {
           address: string | null
@@ -1172,6 +1205,21 @@ export type Database = {
           wishlist_users: Json
         }[]
       }
+      get_company_profile_secure: {
+        Args: { profile_user_id: string }
+        Returns: {
+          address: string
+          business_type: string
+          company_name: string
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+          phone: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       get_pickup_availability: {
         Args: { p_date: string; p_user_id: string }
         Returns: {
@@ -1222,6 +1270,14 @@ export type Database = {
           category_id: string
           count: number
         }[]
+      }
+      log_company_profile_access: {
+        Args: {
+          p_accessed_fields?: string[]
+          p_action: string
+          p_company_profile_id: string
+        }
+        Returns: undefined
       }
       log_payment_access: {
         Args: { access_type: string; profile_id: string }
