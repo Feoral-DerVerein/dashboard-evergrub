@@ -19,6 +19,8 @@ import { SurpriseBagForm } from "@/components/SurpriseBagForm";
 import { SurpriseBagCard } from "@/components/SurpriseBagCard";
 import { SmartBagCreator } from "@/components/SmartBagCreator";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
+import { useRealtimeProducts } from "@/hooks/useRealtimeProducts";
+
 const categories = ["General Stock", "Surprise Bag"];
 
 // Food banks from Australia
@@ -42,20 +44,16 @@ const foodBanks = [{
   description: "Supports communities with food relief and assistance through local conferences and services."
 }];
 const Products = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("General Stock");
   const [searchQuery, setSearchQuery] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  
+  // Use the real-time products hook
+  const { products, loading, error, setProducts, refreshProducts } = useRealtimeProducts(user?.id);
   const [notifyingProductId, setNotifyingProductId] = useState<number | null>(null);
   const [notifyingShopsProductId, setNotifyingShopsProductId] = useState<number | null>(null);
-  const {
-    user
-  } = useAuth();
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const {
     notificationCount,
     orderCount,
@@ -73,47 +71,6 @@ const Products = () => {
   const [smartBagCreatorOpen, setSmartBagCreatorOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedProductForBag, setSelectedProductForBag] = useState<Product | null>(null);
-  useEffect(() => {
-    const loadProducts = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-      setError(null);
-      try {
-        console.log("Loading products for user:", user.id);
-
-        // Get both user's products and Saffire Freycinet products
-        const userProducts = await productService.getProductsByUser(user.id);
-        const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
-        console.log("User products loaded:", userProducts.length);
-        console.log("Saffire Freycinet store products loaded:", storeProducts.length);
-
-        // Combine products and remove duplicates by ID
-        const combinedProducts = [...userProducts];
-        storeProducts.forEach(storeProduct => {
-          if (!combinedProducts.some(p => p.id === storeProduct.id)) {
-            combinedProducts.push(storeProduct);
-          }
-        });
-        console.log("Combined unique products:", combinedProducts.length);
-        setProducts(combinedProducts);
-      } catch (error: any) {
-        console.error("Error loading products:", error);
-        setError("Failed to load products. Please try again later.");
-        toast({
-          title: "Error",
-          description: "Failed to load products: " + (error.message || "Unknown error"),
-          variant: "destructive"
-        });
-        // Set products as empty array to avoid rendering errors
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProducts();
-  }, [user, toast]);
   const handleDeleteProduct = async (id: number) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
     try {
@@ -313,41 +270,8 @@ const Products = () => {
     }
   }, [products, filteredProducts]);
   const handleRetry = () => {
-    setLoading(true);
-    setError(null);
-    // This will trigger the useEffect to run again
-    if (user) {
-      const loadProducts = async () => {
-        try {
-          // Get both user's products and Saffire Freycinet products
-          const userProducts = await productService.getProductsByUser(user.id);
-          const storeProducts = await productService.getProductsByStore(SAFFIRE_FREYCINET_STORE_ID);
-
-          // Combine products and remove duplicates by ID
-          const combinedProducts = [...userProducts];
-          storeProducts.forEach(storeProduct => {
-            if (!combinedProducts.some(p => p.id === storeProduct.id)) {
-              combinedProducts.push(storeProduct);
-            }
-          });
-          setProducts(combinedProducts);
-        } catch (error: any) {
-          console.error("Error retrying product load:", error);
-          setError("Failed to load products. Please try again.");
-          toast({
-            title: "Error",
-            description: "Failed to load products: " + (error.message || "Unknown error"),
-            variant: "destructive"
-          });
-          setProducts([]);
-        } finally {
-          setLoading(false);
-        }
-      };
-      loadProducts();
-    } else {
-      setLoading(false);
-    }
+    // Use the refresh function from the real-time hook
+    refreshProducts();
   };
   return <>
       <header className="px-6 pt-8 pb-6 sticky top-0 z-10">

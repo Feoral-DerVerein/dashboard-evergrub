@@ -613,15 +613,15 @@ const AddProduct = () => {
         result = await productService.updateProduct(parseInt(id), productData);
         console.log("Product updated successfully:", result);
         toast({
-          title: "Product updated",
-          description: "Your product has been updated successfully"
+          title: "✅ Product Updated & Synced",
+          description: `${productData.name} has been updated in Supabase and is available for n8n + Claude chatbot`
         });
       } else {
         result = await productService.createProduct(productData);
         console.log("Product created successfully:", result);
         toast({
-          title: "Product added",
-          description: "Your product has been added successfully"
+          title: "✅ Product Created & Synced",
+          description: `${productData.name} has been saved to Supabase and is now accessible by n8n + Claude chatbot`
         });
       }
 
