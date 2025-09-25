@@ -1,211 +1,100 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageCircle, Send, X, Minimize2, Bot, User } from 'lucide-react';
-import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { BusinessCard, LoadingCard, type BusinessCardData } from '@/components/chat/BusinessCards';
-import { BusinessIntelligenceService } from '@/services/businessIntelligenceService';
+import { MessageCircle, Send, X, Minimize2, Bot, User, Sparkles } from 'lucide-react';
+import { BusinessCard, type BusinessCardData } from '@/components/chat/BusinessCards';
 import { useTaskList } from '@/hooks/useTaskList';
 import TaskList from '@/components/chat/TaskList';
-import { useAutoTaskGeneration } from '@/hooks/useAutoTaskGeneration';
-import { productService } from '@/services/productService';
-import { ChatSuggestionCards } from '@/components/chat/ChatSuggestionCards';
-interface ChatMessage {
-  id: string;
-  type: 'user' | 'bot';
-  content: string;
-  cards?: BusinessCardData[];
-  timestamp: Date;
-}
+import { useChatbot } from '@/hooks/useChatbot';
+import { ChatMessage } from '@/types/chatbot.types';
+
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
 }
+
 const ChatBot = ({
   variant = 'floating'
 }: ChatBotProps) => {
   const [isOpen, setIsOpen] = useState(variant === 'inline' ? true : false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([{
-    id: '1',
-    type: 'bot',
-    content: 'Add any potential changes to your to-do list so that you can make the best decisions for your business.',
-    timestamp: new Date()
-  }]);
-  const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Task list hook
-  const { tasks, addTask, addProductDecisionTask, completeTask, removeTask, archiveTask, clearCompletedTasks, takeAction } = useTaskList();
+  const { tasks, addTask, completeTask, removeTask, archiveTask, clearCompletedTasks, takeAction } = useTaskList();
   
-  // Auto-generate tasks from current inventory
-  const [products, setProducts] = useState([]);
-  useAutoTaskGeneration({ products });
-  
-  // Load products for auto task generation
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const fetchedProducts = await productService.getAllProducts();
-        console.log('ChatBot: Loaded products for auto tasks:', fetchedProducts.length);
-        
-        // If no products exist, create some demo products to generate tasks
-        if (fetchedProducts.length === 0) {
-          console.log('No products found, creating demo products for task generation');
-          const demoProducts = [
-            {
-              id: 999901,
-              name: 'Pan Integral',
-              category: 'Panadería',
-              quantity: 3, // Low stock
-              price: 2.50,
-              expirationDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Expires tomorrow
-              description: 'Pan integral artesanal',
-              userId: 'demo',
-              userid: 'demo'
-            },
-            {
-              id: 999902,
-              name: 'Leche Fresca',
-              category: 'Lácteos',
-              quantity: 2, // Low stock
-              price: 1.80,
-              expirationDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Expires in 2 days
-              description: 'Leche fresca de granja',
-              userId: 'demo',
-              userid: 'demo'
-            },
-            {
-              id: 999903,
-              name: 'Yogurt Natural',
-              category: 'Lácteos',
-              quantity: 15, // Good stock
-              price: 3.20,
-              expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Expires in 7 days
-              description: 'Yogurt natural sin azúcar',
-              userId: 'demo',
-              userid: 'demo'
-            }
-          ];
-          setProducts(demoProducts as any);
-        } else {
-          setProducts(fetchedProducts);
-        }
-      } catch (error) {
-        console.error('Error loading products for auto tasks:', error);
-        // Fallback to demo products if there's an error
-        const fallbackProducts = [
-          {
-            id: 999901,
-            name: 'Producto Demo',
-            category: 'General',
-            quantity: 2,
-            price: 5.00,
-            expirationDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            description: 'Producto de demostración',
-            userId: 'demo',
-            userid: 'demo'
-          }
-        ];
-        setProducts(fallbackProducts as any);
-      }
-    };
-    loadProducts();
-  }, []);
+  // Enhanced chatbot hook with intelligence
+  const { 
+    messages, 
+    inputValue, 
+    setInputValue, 
+    isLoading, 
+    isTyping,
+    sendMessage, 
+    quickSuggestions,
+    messagesEndRef 
+  } = useChatbot();
 
-  // Task generation is now handled by auto task generation logic only
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: 'smooth'
-    });
-  };
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-  const generateInfoCards = async (question: string): Promise<BusinessCardData[]> => {
-    return await BusinessIntelligenceService.processQuery(question);
-  };
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return;
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: inputValue,
-      timestamp: new Date()
-    };
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsLoading(true);
-    try {
-      // Call AI service to get response
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('chatbot-ai-response', {
-        body: {
-          question: inputValue
-        }
-      });
-      if (error) throw error;
-      const botResponse = data?.response || BusinessIntelligenceService.getResponseText(inputValue);
-      const cards = await generateInfoCards(inputValue);
-      const botMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        type: 'bot',
-        content: botResponse,
-        cards: cards,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
-      console.error('Error sending message:', error);
-
-      // Fallback response
-      const fallbackResponse = 'Add any potential changes to your to-do list so that you can make the best decisions for your business.';
-      const cards = await generateInfoCards(inputValue);
-      const botMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        type: 'bot',
-        content: fallbackResponse,
-        cards: cards,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
   const renderInfoCard = (card: BusinessCardData) => {
     return <BusinessCard key={card.id} card={card} onAddToTaskList={addTask} />;
   };
+
+  // Enhanced suggestion cards with real analytics
+  const SuggestionCard = ({ suggestion, onClick }: { suggestion: string; onClick: () => void }) => (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={onClick}
+      className="text-xs px-3 py-2 h-auto whitespace-nowrap bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20 hover:from-primary/20 hover:to-secondary/20 transition-all duration-200 animate-fade-in"
+    >
+      <Sparkles className="w-3 h-3 mr-1" />
+      {suggestion}
+    </Button>
+  );
+
+  const TypingIndicator = () => (
+    <div className="flex items-center gap-2 p-3 bg-card rounded-lg border animate-fade-in">
+      <Bot className="w-4 h-4 text-primary" />
+      <div className="flex space-x-1">
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+      </div>
+      <span className="text-sm text-muted-foreground">Negentropy está analizando...</span>
+    </div>
+  );
+
   if (!isOpen && variant === 'floating') {
-    return <Button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg z-50">
-        <MessageCircle className="w-6 h-6" />
-      </Button>;
+    return (
+      <Button 
+        onClick={() => setIsOpen(true)} 
+        className="fixed bottom-6 right-6 h-16 w-16 rounded-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-xl z-50 transform hover:scale-105 transition-all duration-200"
+      >
+        <MessageCircle className="w-7 h-7 animate-pulse" />
+      </Button>
+    );
   }
+
   if (variant === 'inline') {
     return (
       <div className="space-y-6">
-        <Card className="w-full shadow-lg border-primary/20">
+        <Card className="w-full shadow-lg border-primary/20 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
           {!isMinimized && (
-            <CardContent className="p-4">
+            <CardContent className="p-6">
               {/* Input Section */}
               <div className="flex gap-3 mb-4">
                 <Input 
                   value={inputValue} 
                   onChange={e => setInputValue(e.target.value)} 
-                  placeholder="Ask me about inventory, sales, products nearing expiry, profitability analysis..." 
-                  onKeyPress={e => e.key === 'Enter' && handleSendMessage()} 
+                  placeholder="Pregúntame sobre productos por vencer, ventas, inventario, reportes ambientales..." 
+                  onKeyPress={e => e.key === 'Enter' && sendMessage()} 
                   disabled={isLoading} 
-                  className="flex-1" 
+                  className="flex-1 bg-gradient-to-r from-background to-card border-primary/20 focus:border-primary/40 transition-all duration-200" 
                 />
                 <Button 
-                  onClick={handleSendMessage} 
+                  onClick={() => sendMessage()} 
                   disabled={isLoading || !inputValue.trim()} 
-                  className="bg-primary hover:bg-primary/90 px-6"
+                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 px-6 transform hover:scale-105 transition-all duration-200"
                 >
                   {isLoading ? (
                     <div className="flex space-x-1">
@@ -217,46 +106,66 @@ const ChatBot = ({
                 </Button>
               </div>
 
-              {/* Suggestion Cards */}
-              <ChatSuggestionCards onSuggestionClick={setInputValue} />
-
-              {/* Recent Messages - Show last 2 messages only in inline mode */}
-              {messages.length > 1 && (
-                <div className="space-y-3">
-                  {messages.slice(-2).map(message => (
-                    <div key={message.id} className={`${message.type === 'user' ? 'text-right' : ''}`}>
-                      <div className={`inline-block max-w-[80%] p-4 rounded-lg shadow-sm animate-fade-in ${
-                        message.type === 'user' 
-                          ? 'bg-primary text-primary-foreground ml-auto' 
-                          : 'bg-card text-card-foreground border border-border'
-                      }`}>
-                        <div className="flex items-center gap-2">
-                          {message.type === 'bot' && <Bot className="w-4 h-4" />}
-                          {message.type === 'user' && <User className="w-4 h-4" />}
-                          <span className="text-sm font-medium">
-                            {message.type === 'bot' ? 'Negentropy Assistant' : 'You'}
-                          </span>
-                        </div>
-                        <div className="mt-2">{message.content}</div>
-                        {message.type === 'bot' && (
-                          <div className="text-xs opacity-70 mt-2">
-                            {message.timestamp.toLocaleTimeString('en-GB')}
-                          </div>
-                        )}
-                      </div>
-                      {/* Render info cards with staggered animation */}
-                      {message.type === 'bot' && message.cards && message.cards.length > 0 && (
-                        <div 
-                          className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 text-left" 
-                          style={{ animationDelay: '0.2s' }}
-                        >
-                          {message.cards.map(renderInfoCard)}
-                        </div>
-                      )}
-                    </div>
+              {/* Enhanced Suggestion Cards */}
+              <div className="mb-4">
+                <div className="flex flex-wrap gap-2">
+                  {quickSuggestions.slice(0, 4).map((suggestion, index) => (
+                    <SuggestionCard
+                      key={index}
+                      suggestion={suggestion}
+                      onClick={() => sendMessage(suggestion)}
+                    />
                   ))}
                 </div>
-              )}
+              </div>
+
+              {/* Enhanced Messages Display */}
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {messages.slice(-3).map((message, index) => (
+                  <div key={message.id} className={`${message.type === 'user' ? 'text-right' : ''} animate-fade-in`} style={{animationDelay: `${index * 100}ms`}}>
+                    <div className={`inline-block max-w-[85%] p-4 rounded-2xl shadow-lg transition-all duration-200 hover:shadow-xl ${
+                      message.type === 'user' 
+                        ? 'bg-gradient-to-r from-primary to-secondary text-primary-foreground ml-auto transform hover:scale-[1.02]' 
+                        : 'bg-gradient-to-r from-card to-card/80 text-card-foreground border border-primary/10'
+                    }`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        {message.type === 'bot' && <Bot className="w-5 h-5 text-primary animate-pulse" />}
+                        {message.type === 'user' && <User className="w-5 h-5 opacity-90" />}
+                        <span className="text-sm font-semibold">
+                          {message.type === 'bot' ? 'Negentropy AI' : 'Tú'}
+                        </span>
+                        <span className="text-xs opacity-60 ml-auto">
+                          {message.timestamp.toLocaleTimeString('es-ES', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </span>
+                      </div>
+                      <div className="leading-relaxed">{message.content}</div>
+                    </div>
+                    
+                    {/* Enhanced Business Cards */}
+                    {message.type === 'bot' && message.cards && message.cards.length > 0 && (
+                      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 text-left">
+                        {message.cards.map((card, cardIndex) => (
+                          <div 
+                            key={card.id}
+                            className="animate-fade-in"
+                            style={{ animationDelay: `${(index * 100) + (cardIndex * 50)}ms` }}
+                          >
+                            {renderInfoCard(card)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {/* Enhanced Typing Indicator */}
+                {isTyping && <TypingIndicator />}
+                
+                <div ref={messagesEndRef} />
+              </div>
             </CardContent>
           )}
         </Card>
@@ -274,68 +183,122 @@ const ChatBot = ({
     );
   }
 
-  // Floating version (original design)
-
-  return <div className={`fixed bottom-6 right-6 w-96 bg-card rounded-lg shadow-xl border border-border z-50 transition-all duration-300 ${isMinimized ? 'h-14' : 'h-96'}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-t-lg">
+  // Enhanced Floating version
+  return (
+    <div className={`fixed bottom-6 right-6 w-[420px] bg-gradient-to-br from-card to-card/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/20 z-50 transition-all duration-300 ${isMinimized ? 'h-16' : 'h-[500px]'}`}>
+      {/* Enhanced Header */}
+      <div className="flex items-center justify-between p-4 border-b border-primary/20 bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-t-2xl">
         <div className="flex items-center gap-3">
-          <div className="p-1 bg-white/20 rounded-full">
-            <Bot className="w-4 h-4 animate-spin" />
+          <div className="p-2 bg-white/20 rounded-full backdrop-blur-sm">
+            <Bot className="w-5 h-5 animate-pulse" />
           </div>
-          <span className="font-medium">Negentropy Assistant</span>
+          <div>
+            <span className="font-semibold">Negentropy AI</span>
+            <div className="text-xs opacity-80">Asistente Antidespericio</div>
+          </div>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" variant="ghost" onClick={() => setIsMinimized(!isMinimized)} className="text-white hover:bg-blue-700 h-6 w-6 p-0">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={() => setIsMinimized(!isMinimized)} 
+            className="text-white hover:bg-white/20 h-8 w-8 p-0 rounded-full transition-all duration-200"
+          >
             <Minimize2 className="w-4 h-4" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => setIsOpen(false)} className="text-white hover:bg-blue-700 h-6 w-6 p-0">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={() => setIsOpen(false)} 
+            className="text-white hover:bg-white/20 h-8 w-8 p-0 rounded-full transition-all duration-200"
+          >
             <X className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
-      {!isMinimized && <>
-          {/* Messages */}
-          <ScrollArea className="h-64 p-4">
-            {messages.map(message => <div key={message.id} className={`mb-4 ${message.type === 'user' ? 'text-right' : ''}`}>
-                <div className={`inline-block max-w-[80%] p-2 rounded-lg ${message.type === 'user' ? 'bg-blue-600 text-white ml-auto' : 'bg-gray-100 text-gray-800'}`}>
-                  <div className="text-sm">{message.content}</div>
-                  {message.type === 'bot' && <div className="text-xs text-gray-500 mt-1">
-                      {message.timestamp.toLocaleTimeString()}
-                    </div>}
-                </div>
-                
-                {/* Render info cards for bot messages */}
-                {message.type === 'bot' && message.cards && message.cards.length > 0 && <div className="mt-3 text-left">
-                    {message.cards.map(renderInfoCard)}
-                  </div>}
-              </div>)}
-            {isLoading && <div className="mb-4">
-                <div className="inline-block bg-gray-100 p-3 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+      {!isMinimized && (
+        <>
+          {/* Enhanced Messages */}
+          <ScrollArea className="h-80 p-4">
+            <div className="space-y-4">
+              {messages.map((message, index) => (
+                <div key={message.id} className={`${message.type === 'user' ? 'text-right' : ''} animate-fade-in`} style={{animationDelay: `${index * 100}ms`}}>
+                  <div className={`inline-block max-w-[85%] p-3 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md ${
+                    message.type === 'user' 
+                      ? 'bg-gradient-to-r from-primary to-secondary text-primary-foreground ml-auto' 
+                      : 'bg-gradient-to-r from-background to-card border border-primary/10'
+                  }`}>
+                    <div className="flex items-center gap-2 mb-1">
+                      {message.type === 'bot' && <Bot className="w-4 h-4 text-primary" />}
+                      {message.type === 'user' && <User className="w-4 h-4" />}
+                      <span className="text-sm font-medium">
+                        {message.type === 'bot' ? 'AI' : 'Tú'}
+                      </span>
+                      <span className="text-xs opacity-60 ml-auto">
+                        {message.timestamp.toLocaleTimeString('es-ES', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </span>
                     </div>
-                    <span className="text-sm text-gray-600">Negentropy Assistant está pensando...</span>
+                    <div className="text-sm leading-relaxed">{message.content}</div>
                   </div>
+                  
+                  {/* Business Cards */}
+                  {message.type === 'bot' && message.cards && message.cards.length > 0 && (
+                    <div className="mt-3 space-y-2 text-left">
+                      {message.cards.map(renderInfoCard)}
+                    </div>
+                  )}
                 </div>
-              </div>}
-            <div ref={messagesEndRef} />
+              ))}
+              
+              {isTyping && <TypingIndicator />}
+              <div ref={messagesEndRef} />
+            </div>
           </ScrollArea>
 
-          {/* Input */}
-          <div className="p-4 border-t">
-            <div className="flex gap-2">
-              <Input value={inputValue} onChange={e => setInputValue(e.target.value)} placeholder="Ask me about your business..." onKeyPress={e => e.key === 'Enter' && handleSendMessage()} disabled={isLoading} />
-              <Button onClick={handleSendMessage} size="sm" disabled={isLoading || !inputValue.trim()} className="bg-blue-600 hover:bg-blue-700">
+          {/* Enhanced Input */}
+          <div className="p-4 border-t border-primary/20 bg-gradient-to-r from-background/50 to-card/50 rounded-b-2xl">
+            <div className="flex gap-2 mb-2">
+              <Input 
+                value={inputValue} 
+                onChange={e => setInputValue(e.target.value)} 
+                placeholder="Pregunta sobre inventario, ventas, reportes..." 
+                onKeyPress={e => e.key === 'Enter' && sendMessage()} 
+                disabled={isLoading}
+                className="bg-gradient-to-r from-background to-card border-primary/20 focus:border-primary/40"
+              />
+              <Button 
+                onClick={() => sendMessage()} 
+                size="sm" 
+                disabled={isLoading || !inputValue.trim()} 
+                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform hover:scale-105 transition-all duration-200"
+              >
                 <Send className="w-4 h-4" />
               </Button>
             </div>
+            
+            {/* Quick suggestions */}
+            <div className="flex flex-wrap gap-1 mt-2">
+              {quickSuggestions.slice(0, 3).map((suggestion, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => sendMessage(suggestion)}
+                  className="text-xs px-2 py-1 h-auto bg-primary/5 border-primary/20 hover:bg-primary/10 transition-all duration-200"
+                >
+                  {suggestion}
+                </Button>
+              ))}
+            </div>
           </div>
-        </>}
-    </div>;
+        </>
+      )}
+    </div>
+  );
 };
+
 export default ChatBot;
