@@ -112,6 +112,7 @@ export const useChatbot = () => {
         type: 'bot',
         content: data.bot_response || 'I apologize, but I received an empty response. Please try again.',
         cards: businessCards,
+        product_cards: data.show_cards === true ? data.product_cards : undefined,
         timestamp: new Date()
       };
 

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageCircle, Send, X, Minimize2, Bot, User, Sparkles } from 'lucide-react';
 import { BusinessCard, type BusinessCardData } from '@/components/chat/BusinessCards';
+import { ProductCards } from '@/components/chat/ProductCards';
 import { useTaskList } from '@/hooks/useTaskList';
 import TaskList from '@/components/chat/TaskList';
 import { useChatbot } from '@/hooks/useChatbot';
@@ -175,6 +176,16 @@ const ChatBot = ({
                         ))}
                       </div>
                     )}
+
+                    {/* Product Cards */}
+                    {message.type === 'bot' && message.product_cards && message.product_cards.length > 0 && (
+                      <div className="text-left">
+                        <ProductCards 
+                          products={message.product_cards} 
+                          onAddToTaskList={addTask}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
                 
@@ -266,6 +277,16 @@ const ChatBot = ({
                   {message.type === 'bot' && message.cards && message.cards.length > 0 && (
                     <div className="mt-3 space-y-2 text-left">
                       {message.cards.map(renderInfoCard)}
+                    </div>
+                  )}
+
+                  {/* Product Cards */}
+                  {message.type === 'bot' && message.product_cards && message.product_cards.length > 0 && (
+                    <div className="mt-3 text-left">
+                      <ProductCards 
+                        products={message.product_cards} 
+                        onAddToTaskList={addTask}
+                      />
                     </div>
                   )}
                 </div>

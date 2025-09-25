@@ -1,8 +1,21 @@
+export interface ProductCardData {
+  id: string;
+  name: string;
+  category: string;
+  original_price: number;
+  days_until_expiry: number;
+  suggested_discount: number;
+  urgency_level: 'critical' | 'high' | 'medium' | 'low';
+  image?: string;
+  quantity?: number;
+}
+
 export interface ChatMessage {
   id: string;
   type: 'user' | 'bot';
   content: string;
   cards?: import('@/components/chat/BusinessCards').BusinessCardData[];
+  product_cards?: ProductCardData[];
   timestamp: Date;
   isTyping?: boolean;
 }
