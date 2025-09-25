@@ -85,29 +85,21 @@ const ChatBot = ({
         <Card className="w-full shadow-lg border-primary/20 bg-card">
           {!isMinimized && (
             <CardContent className="p-6">
-              {/* Question Counter */}
-              <div className="mb-2 p-2 bg-primary/5 rounded-md border border-primary/20">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-foreground">Daily Questions</span>
-                  <span className={`font-semibold ${questionsRemaining <= 5 ? 'text-destructive' : 'text-primary'}`}>
-                    {questionsUsed}/{maxQuestions}
-                  </span>
-                </div>
-                <div className="mt-1 w-full bg-muted rounded-full h-1">
-                  <div 
-                    className={`h-1 rounded-full transition-all duration-500 ${
-                      questionsRemaining <= 5 ? 'bg-destructive' : 'bg-primary'
-                    }`}
-                    style={{ width: `${(questionsUsed / maxQuestions) * 100}%` }}
-                  />
-                </div>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  {canAsk ? `${questionsRemaining} remaining` : 'Daily limit reached'}
-                </div>
-              </div>
-
               {/* Input Section */}
-              <div className="flex gap-3 mb-4">
+              <div className="relative flex gap-3 mb-4">
+                {/* Cube Question Counter above send button */}
+                <div className="absolute -top-16 right-0 z-10">
+                  <div className={`relative w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-md shadow-lg border-2 border-primary/30 transform rotate-3 hover:rotate-0 transition-all duration-300 ${questionsRemaining <= 5 ? 'from-destructive to-destructive/80 border-destructive/30' : ''}`}>
+                    <div className="absolute inset-0 bg-black/10 rounded-md transform translate-x-1 translate-y-1 -z-10"></div>
+                    <div className="flex flex-col items-center justify-center h-full text-white">
+                      <div className="text-xs font-bold leading-none">{questionsUsed}</div>
+                      <div className="text-[10px] opacity-80">/{maxQuestions}</div>
+                    </div>
+                    <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-[10px] text-muted-foreground whitespace-nowrap">
+                      {questionsRemaining} left
+                    </div>
+                  </div>
+                </div>
                 <Input 
                   value={inputValue} 
                   onChange={e => setInputValue(e.target.value)} 
@@ -286,17 +278,20 @@ const ChatBot = ({
 
           {/* Enhanced Input */}
           <div className="p-4 border-t border-primary/20 bg-background rounded-b-2xl">
-            {/* Question Counter - Floating */}
-            <div className="mb-3 text-xs text-center">
-              <span className={`font-medium ${questionsRemaining <= 5 ? 'text-destructive' : 'text-primary'}`}>
-                {questionsUsed}/{maxQuestions} questions
-              </span>
-              <span className="text-muted-foreground ml-2">
-                ({questionsRemaining} remaining)
-              </span>
-            </div>
-            
-            <div className="flex gap-2 mb-2">
+            <div className="relative flex gap-2 mb-2">
+              {/* Cube Question Counter above send button - Floating */}
+              <div className="absolute -top-14 right-0 z-10">
+                <div className={`relative w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-md shadow-lg border-2 border-primary/30 transform rotate-3 hover:rotate-0 transition-all duration-300 ${questionsRemaining <= 5 ? 'from-destructive to-destructive/80 border-destructive/30' : ''}`}>
+                  <div className="absolute inset-0 bg-black/10 rounded-md transform translate-x-1 translate-y-1 -z-10"></div>
+                  <div className="flex flex-col items-center justify-center h-full text-white">
+                    <div className="text-xs font-bold leading-none">{questionsUsed}</div>
+                    <div className="text-[9px] opacity-80">/{maxQuestions}</div>
+                  </div>
+                  <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-[9px] text-muted-foreground whitespace-nowrap">
+                    {questionsRemaining} left
+                  </div>
+                </div>
+              </div>
               <Input 
                 value={inputValue} 
                 onChange={e => setInputValue(e.target.value)} 
