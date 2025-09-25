@@ -260,7 +260,7 @@ const ChatBot = ({
           </ScrollArea>
 
           {/* Enhanced Input */}
-          <div className="p-4 border-t border-primary/20 bg-gradient-to-r from-background/50 to-card/50 rounded-b-2xl">
+          <div className="p-4 border-t border-primary/20 bg-background rounded-b-2xl">
             <div className="flex gap-2 mb-2">
               <Input 
                 value={inputValue} 
