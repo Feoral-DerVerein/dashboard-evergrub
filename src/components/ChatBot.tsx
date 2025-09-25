@@ -60,7 +60,7 @@ const ChatBot = ({
         <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
         <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
       </div>
-      <span className="text-sm text-muted-foreground">Negentropy está analizando...</span>
+      <span className="text-sm text-muted-foreground">Negentropy is analyzing...</span>
     </div>
   );
 
@@ -78,7 +78,7 @@ const ChatBot = ({
   if (variant === 'inline') {
     return (
       <div className="space-y-6">
-        <Card className="w-full shadow-lg border-primary/20 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+        <Card className="w-full shadow-lg border-primary/20 bg-gradient-to-br from-card to-card/50">
           {!isMinimized && (
             <CardContent className="p-6">
               {/* Input Section */}
@@ -86,7 +86,7 @@ const ChatBot = ({
                 <Input 
                   value={inputValue} 
                   onChange={e => setInputValue(e.target.value)} 
-                  placeholder="Pregúntame sobre productos por vencer, ventas, inventario, reportes ambientales..." 
+                  placeholder="Ask me about expiring products, sales, inventory, environmental reports..." 
                   onKeyPress={e => e.key === 'Enter' && sendMessage()} 
                   disabled={isLoading} 
                   className="flex-1 bg-gradient-to-r from-background to-card border-primary/20 focus:border-primary/40 transition-all duration-200" 
@@ -132,7 +132,7 @@ const ChatBot = ({
                         {message.type === 'bot' && <Bot className="w-5 h-5 text-primary animate-pulse" />}
                         {message.type === 'user' && <User className="w-5 h-5 opacity-90" />}
                         <span className="text-sm font-semibold">
-                          {message.type === 'bot' ? 'Negentropy AI' : 'Tú'}
+                          {message.type === 'bot' ? 'Negentropy AI' : 'You'}
                         </span>
                         <span className="text-xs opacity-60 ml-auto">
                           {message.timestamp.toLocaleTimeString('es-ES', { 
@@ -185,16 +185,16 @@ const ChatBot = ({
 
   // Enhanced Floating version
   return (
-    <div className={`fixed bottom-6 right-6 w-[420px] bg-gradient-to-br from-card to-card/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/20 z-50 transition-all duration-300 ${isMinimized ? 'h-16' : 'h-[500px]'}`}>
+    <div className={`fixed bottom-6 right-6 w-[420px] bg-gradient-to-br from-card to-card/80 rounded-2xl shadow-2xl border border-primary/20 z-50 transition-all duration-300 ${isMinimized ? 'h-16' : 'h-[500px]'}`}>
       {/* Enhanced Header */}
       <div className="flex items-center justify-between p-4 border-b border-primary/20 bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-t-2xl">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-white/20 rounded-full backdrop-blur-sm">
+          <div className="p-2 bg-white/20 rounded-full">
             <Bot className="w-5 h-5 animate-pulse" />
           </div>
           <div>
             <span className="font-semibold">Negentropy AI</span>
-            <div className="text-xs opacity-80">Asistente Antidespericio</div>
+            <div className="text-xs opacity-80">Anti-Waste Assistant</div>
           </div>
         </div>
         <div className="flex gap-2">
@@ -232,9 +232,9 @@ const ChatBot = ({
                     <div className="flex items-center gap-2 mb-1">
                       {message.type === 'bot' && <Bot className="w-4 h-4 text-primary" />}
                       {message.type === 'user' && <User className="w-4 h-4" />}
-                      <span className="text-sm font-medium">
-                        {message.type === 'bot' ? 'AI' : 'Tú'}
-                      </span>
+                       <span className="text-sm font-medium">
+                         {message.type === 'bot' ? 'AI' : 'You'}
+                       </span>
                       <span className="text-xs opacity-60 ml-auto">
                         {message.timestamp.toLocaleTimeString('es-ES', { 
                           hour: '2-digit', 
@@ -265,7 +265,7 @@ const ChatBot = ({
               <Input 
                 value={inputValue} 
                 onChange={e => setInputValue(e.target.value)} 
-                placeholder="Pregunta sobre inventario, ventas, reportes..." 
+                placeholder="Ask about inventory, sales, reports..." 
                 onKeyPress={e => e.key === 'Enter' && sendMessage()} 
                 disabled={isLoading}
                 className="bg-gradient-to-r from-background to-card border-primary/20 focus:border-primary/40"

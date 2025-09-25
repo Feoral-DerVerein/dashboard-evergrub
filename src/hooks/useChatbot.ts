@@ -8,7 +8,7 @@ export const useChatbot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([{
     id: '1',
     type: 'bot',
-    content: '¡Hola! Soy tu asistente Negentropy. Te ayudo a optimizar tu negocio antidespericio. ¿En qué puedo ayudarte hoy?',
+    content: 'Hello! I\'m your Negentropy assistant. I help you optimize your anti-waste business. How can I help you today?',
     timestamp: new Date()
   }]);
   
@@ -17,11 +17,12 @@ export const useChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive (disabled)
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: 'smooth'
-    });
+    // Disabled auto-scroll as requested
+    // messagesEndRef.current?.scrollIntoView({
+    //   behavior: 'smooth'
+    // });
   };
 
   useEffect(() => {
@@ -126,7 +127,7 @@ export const useChatbot = () => {
         const errorMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'bot',
-          content: 'Disculpa, estoy teniendo dificultades técnicas. Por favor intenta de nuevo en unos momentos.',
+          content: 'Sorry, I\'m having technical difficulties. Please try again in a few moments.',
           timestamp: new Date()
         };
         
@@ -139,12 +140,12 @@ export const useChatbot = () => {
 
   // Quick suggestions for common queries
   const quickSuggestions = [
-    '¿Productos próximos a vencer?',
-    '¿Cómo van las ventas esta semana?',
-    'Ver métricas del negocio',
-    '¿Necesito generar reportes?',
-    'Impacto ambiental del mes',
-    'Estrategias antidespericio'
+    'Expiring products?',
+    'How are sales this week?',
+    'View business metrics',
+    'Do I need to generate reports?',
+    'Monthly environmental impact',
+    'Anti-waste strategies'
   ];
 
   return {

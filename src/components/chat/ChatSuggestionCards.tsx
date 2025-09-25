@@ -5,7 +5,7 @@ interface ChatSuggestionCardsProps {
 }
 
 const suggestions = [
-  'Products Nearing Expiry',
+  'Expiring Products',
   'Current Inventory',
   'Top Wasted Products',
   'Daily/Weekly/Monthly Sales',

@@ -8,38 +8,38 @@ class ChatbotService {
     const lowerMessage = message.toLowerCase();
     
     // Expiring products keywords
-    if (lowerMessage.includes('venc') || lowerMessage.includes('expir') || 
-        lowerMessage.includes('caduc') || lowerMessage.includes('próximo')) {
+    if (lowerMessage.includes('expir') || lowerMessage.includes('expire') || 
+        lowerMessage.includes('due') || lowerMessage.includes('soon')) {
       return 'expiring_products';
     }
     
     // Sales analysis keywords
-    if (lowerMessage.includes('venta') || lowerMessage.includes('ingreso') ||
-        lowerMessage.includes('facturación') || lowerMessage.includes('transacci')) {
+    if (lowerMessage.includes('sales') || lowerMessage.includes('revenue') ||
+        lowerMessage.includes('income') || lowerMessage.includes('transact')) {
       return 'sales_analysis';
     }
     
     // Reports keywords
-    if (lowerMessage.includes('reporte') || lowerMessage.includes('informe') ||
-        lowerMessage.includes('epa') || lowerMessage.includes('nsw')) {
+    if (lowerMessage.includes('report') || lowerMessage.includes('nsw') ||
+        lowerMessage.includes('epa') || lowerMessage.includes('compliance')) {
       return 'reports_status';
     }
     
     // Inventory keywords
-    if (lowerMessage.includes('inventario') || lowerMessage.includes('stock') ||
-        lowerMessage.includes('producto') || lowerMessage.includes('cantidad')) {
+    if (lowerMessage.includes('inventory') || lowerMessage.includes('stock') ||
+        lowerMessage.includes('product') || lowerMessage.includes('quantity')) {
       return 'inventory_status';
     }
     
     // Business metrics
-    if (lowerMessage.includes('métrica') || lowerMessage.includes('estadística') ||
-        lowerMessage.includes('rendimiento') || lowerMessage.includes('desempeño')) {
+    if (lowerMessage.includes('metric') || lowerMessage.includes('statistic') ||
+        lowerMessage.includes('performance') || lowerMessage.includes('analytics')) {
       return 'business_metrics';
     }
     
     // Waste reduction
-    if (lowerMessage.includes('desperdicio') || lowerMessage.includes('residuo') ||
-        lowerMessage.includes('co2') || lowerMessage.includes('impacto')) {
+    if (lowerMessage.includes('waste') || lowerMessage.includes('reduction') ||
+        lowerMessage.includes('co2') || lowerMessage.includes('impact')) {
       return 'waste_reduction';
     }
     
@@ -147,20 +147,20 @@ class ChatbotService {
     
     if (expiringProducts === 0) {
       return {
-        message: '¡Excelente! No tienes productos próximos a vencer en los próximos 3 días. Tu gestión de inventario está funcionando muy bien.',
+        message: 'Excellent! You have no products expiring in the next 3 days. Your inventory management is working very well.',
         intent: 'expiring_products',
-        suggestions: ['¿Cómo van las ventas?', '¿Necesito generar reportes?', 'Ver métricas del negocio']
+        suggestions: ['How are sales?', 'Do I need to generate reports?', 'View business metrics']
       };
     }
 
     const categoriesText = topCategories.length > 0 
-      ? `principalmente en ${topCategories.map(c => c.name).join(', ')}`
+      ? `mainly in ${topCategories.map(c => c.name).join(', ')}`
       : '';
 
     return {
-      message: `Tienes ${expiringProducts} productos que vencen en los próximos 3 días ${categoriesText}. Te recomiendo aplicar descuentos del 30-40% o crear bolsas sorpresa para reducir el desperdicio.`,
+      message: `You have ${expiringProducts} products expiring in the next 3 days ${categoriesText}. I recommend applying 30-40% discounts or creating surprise bags to reduce waste.`,
       intent: 'expiring_products',
-      suggestions: ['Crear bolsa sorpresa', 'Ver productos específicos', '¿Cómo van las ventas?']
+      suggestions: ['Create surprise bag', 'View specific products', 'How are sales?']
     };
   }
 
@@ -169,20 +169,20 @@ class ChatbotService {
     
     if (salesThisWeek === 0) {
       return {
-        message: 'No hay ventas registradas esta semana. ¿Has estado actualizando tu inventario? Te sugiero revisar tus productos más populares.',
+        message: 'No sales recorded this week. Have you been updating your inventory? I suggest reviewing your most popular products.',
         intent: 'sales_analysis',
-        suggestions: ['Ver inventario completo', 'Productos próximos a vencer', 'Crear promociones']
+        suggestions: ['View full inventory', 'Expiring products', 'Create promotions']
       };
     }
 
     const categoriesText = topCategories.length > 0 
-      ? `Top categorías: ${topCategories.map(c => `${c.name} (${c.percentage}%)`).join(', ')}`
+      ? `Top categories: ${topCategories.map(c => `${c.name} (${c.percentage}%)`).join(', ')}`
       : '';
 
     return {
-      message: `Esta semana: $${salesThisWeek.toFixed(2)} en ventas. ${categoriesText}. ${this.getSalesEncouragement(salesThisWeek)}`,
+      message: `This week: $${salesThisWeek.toFixed(2)} in sales. ${categoriesText}. ${this.getSalesEncouragement(salesThisWeek)}`,
       intent: 'sales_analysis',
-      suggestions: ['Ver productos más vendidos', 'Productos próximos a vencer', 'Generar reporte de ventas']
+      suggestions: ['View best-selling products', 'Expiring products', 'Generate sales report']
     };
   }
 
@@ -191,20 +191,20 @@ class ChatbotService {
     
     if (totalProducts === 0) {
       return {
-        message: 'Tu inventario está vacío. ¡Es hora de agregar productos! Te ayudo a comenzar con algunas categorías populares.',
+        message: 'Your inventory is empty. Time to add products! I can help you get started with some popular categories.',
         intent: 'inventory_status',
-        suggestions: ['Agregar productos', 'Importar inventario', 'Ver tutorial']
+        suggestions: ['Add products', 'Import inventory', 'View tutorial']
       };
     }
 
     const categoriesText = topCategories.length > 0 
-      ? `Principales categorías: ${topCategories.map(c => `${c.name} (${c.percentage}%)`).join(', ')}`
+      ? `Main categories: ${topCategories.map(c => `${c.name} (${c.percentage}%)`).join(', ')}`
       : '';
 
     return {
-      message: `Tienes ${totalProducts} productos en inventario. ${categoriesText}. ${this.getInventoryAdvice(totalProducts)}`,
+      message: `You have ${totalProducts} products in inventory. ${categoriesText}. ${this.getInventoryAdvice(totalProducts)}`,
       intent: 'inventory_status',
-      suggestions: ['Productos próximos a vencer', 'Productos con bajo stock', 'Agregar más inventario']
+      suggestions: ['Expiring products', 'Low stock products', 'Add more inventory']
     };
   }
 
@@ -212,9 +212,9 @@ class ChatbotService {
     const { wasteReduced, co2Saved } = analytics;
     
     return {
-      message: `Impacto ambiental: Has reducido ${wasteReduced}kg de desperdicio = ${co2Saved}kg CO2 ahorrados este mes. ¡Excelente trabajo para el medio ambiente!`,
+      message: `Environmental impact: You've reduced ${wasteReduced}kg of waste = ${co2Saved}kg CO2 saved this month. Excellent work for the environment!`,
       intent: 'reports_status',
-      suggestions: ['Generar reporte NSW EPA', 'Ver métricas detalladas', 'Descargar certificado de impacto']
+      suggestions: ['Generate NSW EPA report', 'View detailed metrics', 'Download impact certificate']
     };
   }
 
@@ -222,9 +222,9 @@ class ChatbotService {
     const { totalProducts, salesThisWeek, expiringProducts, wasteReduced } = analytics;
     
     return {
-      message: `📊 Resumen ejecutivo: ${totalProducts} productos, $${salesThisWeek.toFixed(2)} ventas semanales, ${expiringProducts} productos por vencer, ${wasteReduced}kg desperdicio evitado. ${this.getBusinessAdvice(analytics)}`,
+      message: `📊 Executive summary: ${totalProducts} products, $${salesThisWeek.toFixed(2)} weekly sales, ${expiringProducts} expiring products, ${wasteReduced}kg waste avoided. ${this.getBusinessAdvice(analytics)}`,
       intent: 'business_metrics',
-      suggestions: ['Ver análisis detallado', 'Productos próximos a vencer', 'Estrategias de crecimiento']
+      suggestions: ['View detailed analysis', 'Expiring products', 'Growth strategies']
     };
   }
 
@@ -232,45 +232,45 @@ class ChatbotService {
     const { wasteReduced, co2Saved, expiringProducts } = analytics;
     
     return {
-      message: `🌱 Impacto sostenible: ${wasteReduced}kg residuos evitados, ${co2Saved}kg CO2 ahorrados. ${expiringProducts > 0 ? `Actualmente tienes ${expiringProducts} productos que necesitan atención urgente.` : '¡Excelente gestión antidespericio!'}`,
+      message: `🌱 Sustainable impact: ${wasteReduced}kg waste avoided, ${co2Saved}kg CO2 saved. ${expiringProducts > 0 ? `Currently you have ${expiringProducts} products that need urgent attention.` : 'Excellent anti-waste management!'}`,
       intent: 'waste_reduction',
-      suggestions: ['Crear bolsas sorpresa', 'Ver certificado ambiental', 'Estrategias de reducción']
+      suggestions: ['Create surprise bags', 'View environmental certificate', 'Reduction strategies']
     };
   }
 
   private handleGeneralHelp(): ChatbotResponse {
     return {
-      message: '¡Hola! Soy tu asistente Negentropy. Puedo ayudarte con inventario, ventas, productos próximos a vencer, reportes ambientales y métricas de tu negocio. ¿En qué te puedo ayudar?',
+      message: 'Hello! I\'m your Negentropy assistant. I can help you with inventory, sales, expiring products, environmental reports, and business metrics. How can I help you?',
       intent: 'general_help',
-      suggestions: ['¿Productos próximos a vencer?', '¿Cómo van las ventas?', 'Ver métricas del negocio', '¿Necesito reportes?']
+      suggestions: ['Expiring products?', 'How are sales?', 'View business metrics', 'Need reports?']
     };
   }
 
   // Helper methods for dynamic advice
   private getSalesEncouragement(sales: number): string {
-    if (sales > 1000) return '¡Excelente semana!';
-    if (sales > 500) return 'Buen rendimiento, sigue así!';
-    if (sales > 100) return 'Progreso constante.';
-    return 'Oportunidad de mejora - revisa tus promociones.';
+    if (sales > 1000) return 'Excellent week!';
+    if (sales > 500) return 'Good performance, keep it up!';
+    if (sales > 100) return 'Steady progress.';
+    return 'Improvement opportunity - check your promotions.';
   }
 
   private getInventoryAdvice(totalProducts: number): string {
-    if (totalProducts > 100) return 'Inventario robusto, controla las fechas de vencimiento.';
-    if (totalProducts > 50) return 'Buen nivel de inventario.';
-    if (totalProducts > 20) return 'Inventario moderado, considera expandir.';
-    return 'Inventario limitado, tiempo de reabastecerse.';
+    if (totalProducts > 100) return 'Robust inventory, monitor expiration dates.';
+    if (totalProducts > 50) return 'Good inventory level.';
+    if (totalProducts > 20) return 'Moderate inventory, consider expanding.';
+    return 'Limited inventory, time to restock.';
   }
 
   private getBusinessAdvice(analytics: ChatAnalytics): string {
     const { totalProducts, salesThisWeek, expiringProducts } = analytics;
     
     if (expiringProducts > totalProducts * 0.2) {
-      return 'Prioridad: gestionar productos próximos a vencer.';
+      return 'Priority: manage expiring products.';
     }
     if (salesThisWeek < 500) {
-      return 'Oportunidad: impulsar ventas con promociones.';
+      return 'Opportunity: boost sales with promotions.';
     }
-    return 'Operación estable, mantén el buen trabajo.';
+    return 'Stable operation, keep up the good work.';
   }
 
   // Generate business cards based on intent
@@ -283,12 +283,12 @@ class ChatbotService {
         cards.push({
           id: 'expiring-alert',
           type: 'alert',
-          title: 'Productos por Vencer',
+          title: 'Expiring Products',
           data: {
             count: analytics.expiringProducts,
             urgency: 'high',
             categories: analytics.topCategories,
-            recommendation: 'Aplicar descuentos del 30-40% o crear bolsas sorpresa'
+            recommendation: 'Apply 30-40% discounts or create surprise bags'
           }
         });
         }
@@ -298,10 +298,10 @@ class ChatbotService {
         cards.push({
           id: 'sales-weekly',
           type: 'sales',
-          title: 'Ventas Semanales',
+          title: 'Weekly Sales',
           data: {
             amount: analytics.salesThisWeek,
-            period: '7 días',
+            period: '7 days',
             performance: analytics.salesThisWeek > 500 ? 'excellent' : 'needs_improvement',
             topCategories: analytics.topCategories
           }
@@ -312,11 +312,11 @@ class ChatbotService {
         cards.push({
           id: 'environmental-impact',
           type: 'analytics',
-          title: 'Impacto Ambiental',
+          title: 'Environmental Impact',
           data: {
             wasteReduced: analytics.wasteReduced,
             co2Saved: analytics.co2Saved,
-            period: 'Este mes',
+            period: 'This month',
             impact_level: 'positive'
           }
         });
