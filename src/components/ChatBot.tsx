@@ -185,9 +185,9 @@ const ChatBot = ({
 
   // Enhanced Floating version
   return (
-    <div className={`fixed bottom-6 right-6 w-[420px] bg-gradient-to-br from-card to-card/80 rounded-2xl shadow-2xl border border-primary/20 z-50 transition-all duration-300 ${isMinimized ? 'h-16' : 'h-[500px]'}`}>
+    <div className={`fixed bottom-6 right-6 w-[420px] bg-card rounded-2xl shadow-2xl border border-primary/20 z-50 transition-all duration-300 ${isMinimized ? 'h-16' : 'h-[500px]'}`}>
       {/* Enhanced Header */}
-      <div className="flex items-center justify-between p-4 border-b border-primary/20 bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-t-2xl">
+      <div className="flex items-center justify-between p-4 border-b border-primary/20 bg-primary text-primary-foreground rounded-t-2xl">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white/20 rounded-full">
             <Bot className="w-5 h-5 animate-pulse" />
@@ -226,8 +226,8 @@ const ChatBot = ({
                 <div key={message.id} className={`${message.type === 'user' ? 'text-right' : ''} animate-fade-in`} style={{animationDelay: `${index * 100}ms`}}>
                   <div className={`inline-block max-w-[85%] p-3 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md ${
                     message.type === 'user' 
-                      ? 'bg-gradient-to-r from-primary to-secondary text-primary-foreground ml-auto' 
-                      : 'bg-gradient-to-r from-background to-card border border-primary/10'
+                      ? 'bg-primary text-primary-foreground ml-auto' 
+                      : 'bg-card border border-primary/10'
                   }`}>
                     <div className="flex items-center gap-2 mb-1">
                       {message.type === 'bot' && <Bot className="w-4 h-4 text-primary" />}
@@ -268,13 +268,13 @@ const ChatBot = ({
                 placeholder="Ask about inventory, sales, reports..." 
                 onKeyPress={e => e.key === 'Enter' && sendMessage()} 
                 disabled={isLoading}
-                className="bg-gradient-to-r from-background to-card border-primary/20 focus:border-primary/40"
+                className="bg-background border-primary/20 focus:border-primary/40"
               />
               <Button 
                 onClick={() => sendMessage()} 
                 size="sm" 
                 disabled={isLoading || !inputValue.trim()} 
-                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform hover:scale-105 transition-all duration-200"
+                className="bg-primary hover:bg-primary/90 transform hover:scale-105 transition-all duration-200"
               >
                 <Send className="w-4 h-4" />
               </Button>
