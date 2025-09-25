@@ -116,6 +116,35 @@ export const notificationService = {
     }
   },
   
+  async createPurchaseRequestNotification(productId: string, productName: string, buyerName: string, quantity: number, offerPrice?: number): Promise<void> {
+    try {
+      const title = offerPrice 
+        ? `New offer for ${productName}`
+        : `Someone wants to buy ${productName}`;
+      
+      const description = offerPrice 
+        ? `${buyerName} made an offer of $${offerPrice} for ${quantity} units`
+        : `${buyerName} is interested in buying ${quantity} units`;
+        
+      const { error } = await supabase
+        .from('notifications')
+        .insert({
+          title,
+          description,
+          product_id: productId,
+          customer_name: buyerName,
+          type: 'purchase'
+        });
+      
+      if (error) {
+        console.error("Error creating purchase request notification:", error);
+        throw error;
+      }
+    } catch (error) {
+      console.error("Error in createPurchaseRequestNotification:", error);
+    }
+  },
+  
   async createSampleProductNotifications(): Promise<void> {
     const sampleProducts = [
       {

@@ -23,6 +23,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
+import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 const MyProductsListed = ({
   onSendToMarket
 }: {
@@ -33,6 +34,7 @@ const MyProductsListed = ({
   } = useAuth();
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [purchaseNotificationCount, setPurchaseNotificationCount] = useState(0);
   const {
     toast
   } = useToast();
@@ -57,7 +59,46 @@ const MyProductsListed = ({
         setLoading(false);
       }
     };
+
+    const fetchPurchaseNotifications = async () => {
+      if (!user?.id) return;
+      try {
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('id')
+          .eq('type', 'purchase')
+          .eq('is_read', false);
+        
+        if (error) throw error;
+        setPurchaseNotificationCount(data?.length || 0);
+      } catch (error) {
+        console.error('Error fetching purchase notifications:', error);
+      }
+    };
+
     fetchUserProducts();
+    fetchPurchaseNotifications();
+
+    // Set up real-time subscription for purchase notifications
+    const notificationsChannel = supabase
+      .channel('purchase-notifications')
+      .on(
+        'postgres_changes',
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'notifications',
+          filter: 'type=eq.purchase'
+        },
+        () => {
+          fetchPurchaseNotifications();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(notificationsChannel);
+    };
   }, [user?.id, toast]);
   const handleEditProduct = (product: any) => {
     console.log('Edit product:', product);
@@ -114,7 +155,16 @@ const MyProductsListed = ({
   }
   return <div className="space-y-4">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">My Products Listed ({userProducts.length})</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-semibold">My Products Listed ({userProducts.length})</h2>
+          {purchaseNotificationCount > 0 && (
+            <div className="relative">
+              <Badge variant="destructive" className="bg-red-500 text-white animate-pulse">
+                {purchaseNotificationCount} new purchase{purchaseNotificationCount === 1 ? '' : 's'}
+              </Badge>
+            </div>
+          )}
+        </div>
         <Button onClick={() => window.location.href = '/products/add'} size="sm">
           <Plus className="w-4 h-4 mr-2" />
           Add Product
