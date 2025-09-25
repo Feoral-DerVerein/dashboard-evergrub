@@ -45,7 +45,7 @@ const ChatBot = ({
       variant="outline"
       size="sm"
       onClick={onClick}
-      className="text-xs px-3 py-2 h-auto whitespace-nowrap bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20 hover:from-primary/20 hover:to-secondary/20 transition-all duration-200 animate-fade-in"
+      className="text-xs px-3 py-2 h-auto whitespace-nowrap bg-primary/10 border-primary/20 hover:bg-primary/20 transition-all duration-200 animate-fade-in"
     >
       <Sparkles className="w-3 h-3 mr-1" />
       {suggestion}
@@ -78,7 +78,7 @@ const ChatBot = ({
   if (variant === 'inline') {
     return (
       <div className="space-y-6">
-        <Card className="w-full shadow-lg border-primary/20 bg-gradient-to-br from-card to-card/50">
+        <Card className="w-full shadow-lg border-primary/20 bg-card">
           {!isMinimized && (
             <CardContent className="p-6">
               {/* Input Section */}
@@ -89,12 +89,12 @@ const ChatBot = ({
                   placeholder="Ask me about expiring products, sales, inventory, environmental reports..." 
                   onKeyPress={e => e.key === 'Enter' && sendMessage()} 
                   disabled={isLoading} 
-                  className="flex-1 bg-gradient-to-r from-background to-card border-primary/20 focus:border-primary/40 transition-all duration-200" 
+                  className="flex-1 bg-background border-primary/20 focus:border-primary/40 transition-all duration-200" 
                 />
                 <Button 
                   onClick={() => sendMessage()} 
                   disabled={isLoading || !inputValue.trim()} 
-                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 px-6 transform hover:scale-105 transition-all duration-200"
+                  className="bg-primary hover:bg-primary/90 px-6 transform hover:scale-105 transition-all duration-200"
                 >
                   {isLoading ? (
                     <div className="flex space-x-1">
@@ -125,8 +125,8 @@ const ChatBot = ({
                   <div key={message.id} className={`${message.type === 'user' ? 'text-right' : ''} animate-fade-in`} style={{animationDelay: `${index * 100}ms`}}>
                     <div className={`inline-block max-w-[85%] p-4 rounded-2xl shadow-lg transition-all duration-200 hover:shadow-xl ${
                       message.type === 'user' 
-                        ? 'bg-gradient-to-r from-primary to-secondary text-primary-foreground ml-auto transform hover:scale-[1.02]' 
-                        : 'bg-gradient-to-r from-card to-card/80 text-card-foreground border border-primary/10'
+                        ? 'bg-primary text-primary-foreground ml-auto transform hover:scale-[1.02]' 
+                        : 'bg-card text-card-foreground border border-primary/10'
                     }`}>
                       <div className="flex items-center gap-2 mb-2">
                         {message.type === 'bot' && <Bot className="w-5 h-5 text-primary animate-pulse" />}
