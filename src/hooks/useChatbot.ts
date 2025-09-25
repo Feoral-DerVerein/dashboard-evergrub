@@ -44,7 +44,7 @@ export const useChatbot = () => {
     });
   };
 
-  // Send message and get intelligent response
+  // Send message and get intelligent response with n8n + Claude Haiku
   const sendMessage = async (customMessage?: string) => {
     const messageText = customMessage || inputValue;
     if (!messageText.trim() || isLoading) return;
@@ -61,44 +61,49 @@ export const useChatbot = () => {
     setIsLoading(true);
 
     try {
-      // First try the existing Supabase edge function for advanced AI
-      let botResponse: ChatbotResponse;
-      
-      try {
-        const { data, error } = await supabase.functions.invoke('chatbot-ai-response', {
-          body: { question: messageText }
-        });
-        
-        if (error) throw error;
-        
-        // If we get a response from the edge function, use it
-        if (data?.response) {
-          botResponse = {
-            message: data.response,
-            intent: 'general_help',
-            suggestions: []
-          };
-        } else {
-          // Otherwise use local intelligent service
-          botResponse = await chatbotService.generateResponse(messageText);
-        }
-      } catch (edgeFunctionError) {
-        console.log('Edge function not available, using local service:', edgeFunctionError);
-        // Fallback to local intelligent service
-        botResponse = await chatbotService.generateResponse(messageText);
+      // Get current user ID from Supabase auth
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id || 'anonymous';
+
+      // Call n8n webhook with Claude Haiku
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+
+      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/negentropy-chatbot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_message: messageText,
+          user_id: userId,
+          timestamp: new Date().toISOString()
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`API call failed: ${response.status}`);
       }
 
-      // Simulate typing
-      await simulateTyping(botResponse.message);
+      const data = await response.json();
+      
+      // Simulate typing with Claude message
+      await simulateTyping(data.bot_response || 'Claude has analyzed your request.');
 
-      // Generate business cards based on intent
+      // Generate business cards based on intention from Claude
       const analytics = await chatbotService.getAnalytics();
-      const businessCards = await chatbotService.generateBusinessCards(botResponse.intent, analytics);
+      const businessCards = await chatbotService.generateBusinessCards(
+        data.intention || 'general_help', 
+        analytics
+      );
 
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
-        content: botResponse.message,
+        content: data.bot_response || 'I apologize, but I received an empty response. Please try again.',
         cards: businessCards,
         timestamp: new Date()
       };
@@ -106,17 +111,21 @@ export const useChatbot = () => {
       setMessages(prev => [...prev, botMessage]);
 
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error with n8n + Claude API:', error);
       
-      // Enhanced fallback with analytics
+      // Fallback to local service
       try {
         const fallbackResponse = await chatbotService.generateResponse(messageText);
         await simulateTyping(fallbackResponse.message);
+        
+        const analytics = await chatbotService.getAnalytics();
+        const businessCards = await chatbotService.generateBusinessCards(fallbackResponse.intent, analytics);
         
         const fallbackMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'bot',
           content: fallbackResponse.message,
+          cards: businessCards,
           timestamp: new Date()
         };
         
@@ -127,7 +136,7 @@ export const useChatbot = () => {
         const errorMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'bot',
-          content: 'Sorry, I\'m having technical difficulties. Please try again in a few moments.',
+          content: 'Lo siento, estoy experimentando dificultades técnicas. Por favor, intenta de nuevo en unos momentos.',
           timestamp: new Date()
         };
         
