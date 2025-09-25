@@ -88,7 +88,7 @@ const ChatBot = ({
               {/* Question Counter */}
               <div className="mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-foreground">Preguntas diarias</span>
+                  <span className="font-medium text-foreground">Daily Questions</span>
                   <span className={`font-semibold ${questionsRemaining <= 5 ? 'text-destructive' : 'text-primary'}`}>
                     {questionsUsed}/{maxQuestions}
                   </span>
@@ -102,7 +102,7 @@ const ChatBot = ({
                   />
                 </div>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  {canAsk ? `${questionsRemaining} preguntas restantes` : 'Límite diario alcanzado'}
+                  {canAsk ? `${questionsRemaining} questions remaining` : 'Daily limit reached'}
                 </div>
               </div>
 
@@ -111,7 +111,7 @@ const ChatBot = ({
                 <Input 
                   value={inputValue} 
                   onChange={e => setInputValue(e.target.value)} 
-                  placeholder={canAsk ? "Ask me about expiring products, sales, inventory, environmental reports..." : "Límite diario de preguntas alcanzado"} 
+                  placeholder={canAsk ? "Ask me about expiring products, sales, inventory, environmental reports..." : "Daily question limit reached"} 
                   onKeyPress={e => e.key === 'Enter' && sendMessage()} 
                   disabled={isLoading || !canAsk} 
                   className="flex-1 bg-background border-primary/20 focus:border-primary/40 transition-all duration-200" 
@@ -289,10 +289,10 @@ const ChatBot = ({
             {/* Question Counter - Floating */}
             <div className="mb-3 text-xs text-center">
               <span className={`font-medium ${questionsRemaining <= 5 ? 'text-destructive' : 'text-primary'}`}>
-                {questionsUsed}/{maxQuestions} preguntas
+                {questionsUsed}/{maxQuestions} questions
               </span>
               <span className="text-muted-foreground ml-2">
-                ({questionsRemaining} restantes)
+                ({questionsRemaining} remaining)
               </span>
             </div>
             
@@ -300,7 +300,7 @@ const ChatBot = ({
               <Input 
                 value={inputValue} 
                 onChange={e => setInputValue(e.target.value)} 
-                placeholder={canAsk ? "Ask about inventory, sales, reports..." : "Límite diario alcanzado"} 
+                placeholder={canAsk ? "Ask about inventory, sales, reports..." : "Daily limit reached"} 
                 onKeyPress={e => e.key === 'Enter' && sendMessage()} 
                 disabled={isLoading || !canAsk}
                 className="bg-background border-primary/20 focus:border-primary/40"
