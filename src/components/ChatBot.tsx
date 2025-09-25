@@ -86,23 +86,23 @@ const ChatBot = ({
           {!isMinimized && (
             <CardContent className="p-6">
               {/* Question Counter */}
-              <div className="mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
-                <div className="flex items-center justify-between text-sm">
+              <div className="mb-2 p-2 bg-primary/5 rounded-md border border-primary/20">
+                <div className="flex items-center justify-between text-xs">
                   <span className="font-medium text-foreground">Daily Questions</span>
                   <span className={`font-semibold ${questionsRemaining <= 5 ? 'text-destructive' : 'text-primary'}`}>
                     {questionsUsed}/{maxQuestions}
                   </span>
                 </div>
-                <div className="mt-2 w-full bg-muted rounded-full h-2">
+                <div className="mt-1 w-full bg-muted rounded-full h-1">
                   <div 
-                    className={`h-2 rounded-full transition-all duration-500 ${
+                    className={`h-1 rounded-full transition-all duration-500 ${
                       questionsRemaining <= 5 ? 'bg-destructive' : 'bg-primary'
                     }`}
                     style={{ width: `${(questionsUsed / maxQuestions) * 100}%` }}
                   />
                 </div>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  {canAsk ? `${questionsRemaining} questions remaining` : 'Daily limit reached'}
+                  {canAsk ? `${questionsRemaining} remaining` : 'Daily limit reached'}
                 </div>
               </div>
 
