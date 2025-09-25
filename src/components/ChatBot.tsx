@@ -32,7 +32,11 @@ const ChatBot = ({
     isTyping,
     sendMessage, 
     quickSuggestions,
-    messagesEndRef 
+    messagesEndRef,
+    questionsUsed,
+    questionsRemaining,
+    maxQuestions,
+    canAsk
   } = useChatbot();
 
   const renderInfoCard = (card: BusinessCardData) => {
@@ -81,19 +85,40 @@ const ChatBot = ({
         <Card className="w-full shadow-lg border-primary/20 bg-card">
           {!isMinimized && (
             <CardContent className="p-6">
+              {/* Question Counter */}
+              <div className="mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-foreground">Preguntas diarias</span>
+                  <span className={`font-semibold ${questionsRemaining <= 5 ? 'text-destructive' : 'text-primary'}`}>
+                    {questionsUsed}/{maxQuestions}
+                  </span>
+                </div>
+                <div className="mt-2 w-full bg-muted rounded-full h-2">
+                  <div 
+                    className={`h-2 rounded-full transition-all duration-500 ${
+                      questionsRemaining <= 5 ? 'bg-destructive' : 'bg-primary'
+                    }`}
+                    style={{ width: `${(questionsUsed / maxQuestions) * 100}%` }}
+                  />
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {canAsk ? `${questionsRemaining} preguntas restantes` : 'Límite diario alcanzado'}
+                </div>
+              </div>
+
               {/* Input Section */}
               <div className="flex gap-3 mb-4">
                 <Input 
                   value={inputValue} 
                   onChange={e => setInputValue(e.target.value)} 
-                  placeholder="Ask me about expiring products, sales, inventory, environmental reports..." 
+                  placeholder={canAsk ? "Ask me about expiring products, sales, inventory, environmental reports..." : "Límite diario de preguntas alcanzado"} 
                   onKeyPress={e => e.key === 'Enter' && sendMessage()} 
-                  disabled={isLoading} 
+                  disabled={isLoading || !canAsk} 
                   className="flex-1 bg-background border-primary/20 focus:border-primary/40 transition-all duration-200" 
                 />
                 <Button 
                   onClick={() => sendMessage()} 
-                  disabled={isLoading || !inputValue.trim()} 
+                  disabled={isLoading || !inputValue.trim() || !canAsk} 
                   className="bg-primary hover:bg-primary/90 px-6 transform hover:scale-105 transition-all duration-200"
                 >
                   {isLoading ? (
@@ -110,10 +135,10 @@ const ChatBot = ({
               <div className="mb-4">
                 <div className="flex flex-wrap gap-2">
                   {quickSuggestions.slice(0, 4).map((suggestion, index) => (
-                    <SuggestionCard
+                     <SuggestionCard
                       key={index}
                       suggestion={suggestion}
-                      onClick={() => sendMessage(suggestion)}
+                      onClick={() => canAsk && sendMessage(suggestion)}
                     />
                   ))}
                 </div>
@@ -261,19 +286,29 @@ const ChatBot = ({
 
           {/* Enhanced Input */}
           <div className="p-4 border-t border-primary/20 bg-background rounded-b-2xl">
+            {/* Question Counter - Floating */}
+            <div className="mb-3 text-xs text-center">
+              <span className={`font-medium ${questionsRemaining <= 5 ? 'text-destructive' : 'text-primary'}`}>
+                {questionsUsed}/{maxQuestions} preguntas
+              </span>
+              <span className="text-muted-foreground ml-2">
+                ({questionsRemaining} restantes)
+              </span>
+            </div>
+            
             <div className="flex gap-2 mb-2">
               <Input 
                 value={inputValue} 
                 onChange={e => setInputValue(e.target.value)} 
-                placeholder="Ask about inventory, sales, reports..." 
+                placeholder={canAsk ? "Ask about inventory, sales, reports..." : "Límite diario alcanzado"} 
                 onKeyPress={e => e.key === 'Enter' && sendMessage()} 
-                disabled={isLoading}
+                disabled={isLoading || !canAsk}
                 className="bg-background border-primary/20 focus:border-primary/40"
               />
               <Button 
                 onClick={() => sendMessage()} 
                 size="sm" 
-                disabled={isLoading || !inputValue.trim()} 
+                disabled={isLoading || !inputValue.trim() || !canAsk} 
                 className="bg-primary hover:bg-primary/90 transform hover:scale-105 transition-all duration-200"
               >
                 <Send className="w-4 h-4" />
@@ -287,7 +322,7 @@ const ChatBot = ({
                   key={index}
                   variant="outline"
                   size="sm"
-                  onClick={() => sendMessage(suggestion)}
+                  onClick={() => canAsk && sendMessage(suggestion)}
                   className="text-xs px-2 py-1 h-auto bg-primary/5 border-primary/20 hover:bg-primary/10 transition-all duration-200"
                 >
                   {suggestion}

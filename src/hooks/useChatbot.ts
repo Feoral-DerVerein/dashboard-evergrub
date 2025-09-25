@@ -3,6 +3,7 @@ import { ChatMessage, ChatbotResponse } from '@/types/chatbot.types';
 import { chatbotService } from '@/services/chatbotService';
 import { supabase } from '@/integrations/supabase/client';
 import { BusinessCardData } from '@/components/chat/BusinessCards';
+import { useQuestionCounter } from './useQuestionCounter';
 
 export const useChatbot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([{
@@ -16,6 +17,9 @@ export const useChatbot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Question counter hook
+  const { questionsUsed, questionsRemaining, maxQuestions, canAsk, incrementCounter } = useQuestionCounter();
 
   // Auto-scroll to bottom when new messages arrive (disabled)
   const scrollToBottom = () => {
@@ -47,7 +51,7 @@ export const useChatbot = () => {
   // Send message and get intelligent response with n8n + Claude Haiku
   const sendMessage = async (customMessage?: string) => {
     const messageText = customMessage || inputValue;
-    if (!messageText.trim() || isLoading) return;
+    if (!messageText.trim() || isLoading || !canAsk) return;
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -59,6 +63,9 @@ export const useChatbot = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
+    
+    // Increment question counter
+    incrementCounter();
 
     try {
       // Get current user ID from Supabase auth
@@ -165,6 +172,10 @@ export const useChatbot = () => {
     isTyping,
     sendMessage,
     quickSuggestions,
-    messagesEndRef
+    messagesEndRef,
+    questionsUsed,
+    questionsRemaining,
+    maxQuestions,
+    canAsk
   };
 };
