@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ChatIntent, ChatAnalytics, ChatbotResponse, BusinessCardData } from '@/types/chatbot.types';
+import { ChatIntent, ChatAnalytics, ChatbotResponse } from '@/types/chatbot.types';
+import { BusinessCardData } from '@/components/chat/BusinessCards';
 
 class ChatbotService {
   // Intent analysis - detect what the user is asking about
@@ -283,11 +284,12 @@ class ChatbotService {
           id: 'expiring-alert',
           type: 'alert',
           title: 'Productos por Vencer',
-          subtitle: 'Próximos 3 días',
-          description: `${analytics.expiringProducts} productos necesitan atención urgente`,
-          primaryMetric: `${analytics.expiringProducts}`,
-          actionText: 'Ver productos',
-          actionType: 'urgent'
+          data: {
+            count: analytics.expiringProducts,
+            urgency: 'high',
+            categories: analytics.topCategories,
+            recommendation: 'Aplicar descuentos del 30-40% o crear bolsas sorpresa'
+          }
         });
         }
         break;
@@ -297,11 +299,12 @@ class ChatbotService {
           id: 'sales-weekly',
           type: 'sales',
           title: 'Ventas Semanales',
-          subtitle: 'Últimos 7 días',
-          description: 'Rendimiento de ventas actual',
-          primaryMetric: `$${analytics.salesThisWeek.toFixed(2)}`,
-          actionText: 'Ver detalles',
-          actionType: analytics.salesThisWeek > 500 ? 'success' : 'warning'
+          data: {
+            amount: analytics.salesThisWeek,
+            period: '7 días',
+            performance: analytics.salesThisWeek > 500 ? 'excellent' : 'needs_improvement',
+            topCategories: analytics.topCategories
+          }
         });
         break;
         
@@ -310,12 +313,12 @@ class ChatbotService {
           id: 'environmental-impact',
           type: 'analytics',
           title: 'Impacto Ambiental',
-          subtitle: 'Este mes',
-          description: `${analytics.wasteReduced}kg desperdicio evitado`,
-          primaryMetric: `${analytics.co2Saved}kg CO2`,
-          secondaryMetric: 'ahorrados',
-          actionText: 'Ver certificado',
-          actionType: 'success'
+          data: {
+            wasteReduced: analytics.wasteReduced,
+            co2Saved: analytics.co2Saved,
+            period: 'Este mes',
+            impact_level: 'positive'
+          }
         });
         break;
     }

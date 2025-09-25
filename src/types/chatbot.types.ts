@@ -2,22 +2,9 @@ export interface ChatMessage {
   id: string;
   type: 'user' | 'bot';
   content: string;
-  cards?: BusinessCardData[];
+  cards?: import('@/components/chat/BusinessCards').BusinessCardData[];
   timestamp: Date;
   isTyping?: boolean;
-}
-
-export interface BusinessCardData {
-  id: string;
-  type: 'inventory' | 'expiry' | 'sales' | 'recommendation' | 'alert' | 'analytics';
-  title: string;
-  subtitle?: string;
-  description: string;
-  primaryMetric?: string;
-  secondaryMetric?: string;
-  actionText?: string;
-  actionType?: 'info' | 'warning' | 'success' | 'urgent';
-  data?: any;
 }
 
 export type ChatIntent = 

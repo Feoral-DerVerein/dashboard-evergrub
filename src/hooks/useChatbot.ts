@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ChatMessage, ChatbotResponse } from '@/types/chatbot.types';
 import { chatbotService } from '@/services/chatbotService';
 import { supabase } from '@/integrations/supabase/client';
+import { BusinessCardData } from '@/components/chat/BusinessCards';
 
 export const useChatbot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([{
