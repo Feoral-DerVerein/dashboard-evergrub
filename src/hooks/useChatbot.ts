@@ -14,16 +14,12 @@ export const useChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Scroll to bottom function (manual use only)
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: 'smooth'
     });
   };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   // Simulate typing animation
   const simulateTyping = async (response: string): Promise<void> => {
