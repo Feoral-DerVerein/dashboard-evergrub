@@ -1,14 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChatMessage, ChatbotResponse } from '@/types/chatbot.types';
-import { chatbotService } from '@/services/chatbotService';
-import { supabase } from '@/integrations/supabase/client';
-import { BusinessCardData } from '@/components/chat/BusinessCards';
+import { ChatMessage } from '@/types/chatbot.types';
 
 export const useChatbot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([{
     id: '1',
     type: 'bot',
-    content: 'Hello! I\'m your Negentropy assistant. I help you optimize your anti-waste business. How can I help you today?',
+    content: 'Hello! I\'m your Negentropy assistant. How can I help you today?',
     timestamp: new Date()
   }]);
   
@@ -17,12 +14,11 @@ export const useChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive (disabled)
+  // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
-    // Disabled auto-scroll as requested
-    // messagesEndRef.current?.scrollIntoView({
-    //   behavior: 'smooth'
-    // });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: 'smooth'
+    });
   };
 
   useEffect(() => {
@@ -44,26 +40,7 @@ export const useChatbot = () => {
     });
   };
 
-  // Check for specific product queries
-  const getProductQuery = (message: string): string | null => {
-    const lowerMessage = message.toLowerCase();
-    
-    if (lowerMessage.includes('productos más vendidos') || lowerMessage.includes('best sellers') || lowerMessage.includes('más vendidos')) {
-      return 'best_sellers';
-    }
-    
-    if (lowerMessage.includes('productos con pocas ventas') || lowerMessage.includes('slow movers') || lowerMessage.includes('pocas ventas')) {
-      return 'slow_movers';
-    }
-    
-    if (lowerMessage.includes('stock bajo') || lowerMessage.includes('inventario crítico') || lowerMessage.includes('low stock')) {
-      return 'low_stock';
-    }
-    
-    return null;
-  };
-
-  // Send message and get intelligent response with n8n + Claude Haiku
+  // Send message to n8n webhook and get response
   const sendMessage = async (customMessage?: string) => {
     const messageText = customMessage || inputValue;
     if (!messageText.trim() || isLoading) return;
@@ -80,13 +57,6 @@ export const useChatbot = () => {
     setIsLoading(true);
 
     try {
-      // Get current user ID from Supabase auth
-      const { data: { user } } = await supabase.auth.getUser();
-      const userId = user?.id || 'anonymous';
-
-      // Detect product queries and include in the payload
-      const productQuery = getProductQuery(messageText);
-
       // Call n8n webhook
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
@@ -110,59 +80,31 @@ export const useChatbot = () => {
 
       const data = await response.json();
       
-      // Simulate typing with Claude message
-      await simulateTyping(data.bot_response || 'Claude has analyzed your request.');
-
-      // Generate business cards based on intention from Claude
-      const analytics = await chatbotService.getAnalytics();
-      const businessCards = await chatbotService.generateBusinessCards(
-        data.intention || 'general_help', 
-        analytics
-      );
+      // Simulate typing animation
+      await simulateTyping(data.response || data.message || 'I received your message.');
 
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
-        content: data.bot_response || 'I apologize, but I received an empty response. Please try again.',
-        cards: businessCards,
-        product_cards: data.show_cards === true ? data.product_cards : undefined,
+        content: data.response || data.message || 'I apologize, but I received an empty response. Please try again.',
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, botMessage]);
 
     } catch (error) {
-      console.error('Error with n8n + Claude API:', error);
+      console.error('Error with n8n webhook:', error);
       
-      // Fallback to local service
-      try {
-        const fallbackResponse = await chatbotService.generateResponse(messageText);
-        await simulateTyping(fallbackResponse.message);
-        
-        const analytics = await chatbotService.getAnalytics();
-        const businessCards = await chatbotService.generateBusinessCards(fallbackResponse.intent, analytics);
-        
-        const fallbackMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          type: 'bot',
-          content: fallbackResponse.message,
-          cards: businessCards,
-          timestamp: new Date()
-        };
-        
-        setMessages(prev => [...prev, fallbackMessage]);
-      } catch (fallbackError) {
-        console.error('Fallback error:', fallbackError);
-        
-        const errorMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          type: 'bot',
-          content: 'Lo siento, estoy experimentando dificultades técnicas. Por favor, intenta de nuevo en unos momentos.',
-          timestamp: new Date()
-        };
-        
-        setMessages(prev => [...prev, errorMessage]);
-      }
+      await simulateTyping('Sorry, there was an error.');
+      
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot',
+        content: 'Lo siento, estoy experimentando dificultades técnicas. Por favor, intenta de nuevo en unos momentos.',
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
