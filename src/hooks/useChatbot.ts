@@ -63,39 +63,6 @@ export const useChatbot = () => {
     return null;
   };
 
-  // Call n8n for specific product data
-  const callProductDataWebhook = async (query: string, userMessage: string, userId: string) => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-    try {
-      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/negentropy-chatbot', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query,
-          user_message: userMessage,
-          user_id: userId,
-          timestamp: new Date().toISOString()
-        }),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`Product data API call failed: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      clearTimeout(timeoutId);
-      throw error;
-    }
-  };
-
   // Send message and get intelligent response with n8n + Claude Haiku
   const sendMessage = async (customMessage?: string) => {
     const messageText = customMessage || inputValue;
@@ -117,33 +84,10 @@ export const useChatbot = () => {
       const { data: { user } } = await supabase.auth.getUser();
       const userId = user?.id || 'anonymous';
 
-      // Check if this is a specific product query
+      // Detect product queries and include in the payload
       const productQuery = getProductQuery(messageText);
-      
-      if (productQuery) {
-        // Call product-specific webhook
-        try {
-          await simulateTyping('Consultando datos específicos de productos...');
-          
-          const productData = await callProductDataWebhook(productQuery, messageText, userId);
-          
-          const botMessage: ChatMessage = {
-            id: (Date.now() + 1).toString(),
-            type: 'bot',
-            content: productData.response || 'He obtenido los datos de productos solicitados.',
-            product_cards: productData.products || undefined,
-            timestamp: new Date()
-          };
 
-          setMessages(prev => [...prev, botMessage]);
-          return;
-        } catch (productError) {
-          console.error('Product data webhook failed, falling back to general chatbot:', productError);
-          // Fall through to general chatbot logic
-        }
-      }
-
-      // Call general n8n webhook with Claude Haiku
+      // Call single n8n webhook with all data
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
 
@@ -155,7 +99,8 @@ export const useChatbot = () => {
         body: JSON.stringify({
           user_message: messageText,
           user_id: userId,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          product_query: productQuery // Include product query if detected
         }),
         signal: controller.signal
       });
