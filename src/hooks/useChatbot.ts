@@ -87,20 +87,17 @@ export const useChatbot = () => {
       // Detect product queries and include in the payload
       const productQuery = getProductQuery(messageText);
 
-      // Call single n8n webhook with all data
+      // Call n8n webhook
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
 
-      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/negentropy-chatbot', {
+      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/fc7630b0-e2eb-44d0-957d-f55162b32271', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          user_message: messageText,
-          user_id: userId,
-          timestamp: new Date().toISOString(),
-          product_query: productQuery // Include product query if detected
+          message: messageText
         }),
         signal: controller.signal
       });
