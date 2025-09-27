@@ -1,5 +1,75 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '@/types/chatbot.types';
+import type { BusinessCardData } from '@/components/chat/BusinessCards';
+
+// Generate cards based on response content
+const generateCardsFromResponse = (responseText: string, userMessage: string): BusinessCardData[] => {
+  const cards: BusinessCardData[] = [];
+  const lowerResponse = responseText.toLowerCase();
+  const lowerMessage = userMessage.toLowerCase();
+
+  // Sales analysis card
+  if (lowerResponse.includes('sales') || lowerResponse.includes('revenue') || lowerMessage.includes('sales')) {
+    cards.push({
+      id: 'sales-card',
+      type: 'sales',
+      title: 'Sales Analysis',
+      data: {
+        totalSales: extractNumber(responseText, ['revenue', 'sales']) || 84213,
+        growth: extractPercentage(responseText) || 12,
+        topProducts: ['Organic Produce', 'Dairy', 'Bakery']
+      }
+    });
+  }
+
+  // Business metrics card
+  if (lowerResponse.includes('metrics') || lowerResponse.includes('performance') || lowerMessage.includes('metrics')) {
+    cards.push({
+      id: 'metrics-card',
+      type: 'analytics',
+      title: 'Business Analytics', 
+      data: {
+        totalProducts: 1250,
+        activeUsers: 12348,
+        conversionRate: 32.4,
+        trends: ['Organic growth +8%', 'AOV +3%', 'Waste -1.2%']
+      }
+    });
+  }
+
+  // Expiring products card
+  if (lowerResponse.includes('expir') || lowerResponse.includes('waste') || lowerMessage.includes('expir')) {
+    cards.push({
+      id: 'expiry-card',
+      type: 'expiry',
+      title: 'Expiring Products Alert',
+      data: {
+        expiringCount: extractNumber(responseText, ['products', 'items']) || 23,
+        totalValue: extractNumber(responseText, ['loss', 'value']) || 2847,
+        urgentItems: ['Fuji Apples', 'Greek Yogurt', 'Whole Grain Bread']
+      }
+    });
+  }
+
+  return cards;
+};
+
+// Helper functions to extract numbers from text
+const extractNumber = (text: string, keywords: string[]): number | null => {
+  for (const keyword of keywords) {
+    const regex = new RegExp(`${keyword}[^\\d]*(\\d+(?:,\\d+)*)`, 'i');
+    const match = text.match(regex);
+    if (match) {
+      return parseInt(match[1].replace(/,/g, ''));
+    }
+  }
+  return null;
+};
+
+const extractPercentage = (text: string): number | null => {
+  const match = text.match(/(\d+(?:\.\d+)?)%/);
+  return match ? parseFloat(match[1]) : null;
+};
 
 export const useChatbot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([{
@@ -75,14 +145,19 @@ export const useChatbot = () => {
       }
 
       const data = await response.json();
+      const responseText = data.output || data.response || data.message || 'I received your message.';
       
       // Simulate typing animation
-      await simulateTyping(data.response || data.message || 'I received your message.');
+      await simulateTyping(responseText);
+
+      // Generate cards based on response content
+      const cards = generateCardsFromResponse(responseText, messageText);
 
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
-        content: `Perfect, here it is:\n\n${data.response || data.message || 'I apologize, but I received an empty response. Please try again.'}`,
+        content: `Perfect, here it is:\n\n${responseText}`,
+        cards: cards,
         timestamp: new Date()
       };
 
