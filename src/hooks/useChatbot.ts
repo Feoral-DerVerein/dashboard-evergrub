@@ -82,7 +82,7 @@ export const useChatbot = () => {
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
-        content: data.response || data.message || 'I apologize, but I received an empty response. Please try again.',
+        content: `Perfect, here it is:\n\n${data.response || data.message || 'I apologize, but I received an empty response. Please try again.'}`,
         timestamp: new Date()
       };
 
