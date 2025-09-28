@@ -29,10 +29,12 @@ const generateCardsFromResponse = (responseText: string, userMessage: string): B
       type: 'analytics',
       title: 'Business Analytics', 
       data: {
-        totalProducts: 1250,
-        activeUsers: 12348,
-        conversionRate: 32.4,
-        trends: ['Organic growth +8%', 'AOV +3%', 'Waste -1.2%']
+        metrics: {
+          totalProducts: 1250,
+          activeUsers: 12348,
+          conversionRate: 32.4
+        },
+        insights: 'Organic growth +8%, AOV +3%, Waste -1.2%'
       }
     });
   }

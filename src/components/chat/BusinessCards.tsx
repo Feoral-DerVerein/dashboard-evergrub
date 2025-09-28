@@ -394,7 +394,7 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
             </CardHeader>
             <CardContent className="pt-0">
               <div className="grid grid-cols-2 gap-4">
-                {Object.entries(card.data.metrics).map(([key, value]: [string, any]) => (
+                {card.data.metrics && Object.entries(card.data.metrics).map(([key, value]: [string, any]) => (
                   <div key={key} className="text-center bg-indigo-50 p-3 rounded-lg">
                     <div className="text-lg font-bold text-indigo-900">{value}</div>
                     <div className="text-xs text-indigo-600 capitalize">{key.replace('_', ' ')}</div>
