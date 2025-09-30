@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, XCircle, Loader2, Upload, FileSpreadsheet, Edit3, Download, Link, Coffee } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Upload, FileSpreadsheet, Edit3, Download, Link, Coffee, FileJson, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
@@ -53,6 +53,14 @@ const POSConnectionForm = ({
     productCategories: "",
     averageOrderValue: ""
   });
+  
+  // New states for JSON and PDF uploads
+  const [jsonFile, setJsonFile] = useState<File | null>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  const WEBHOOK_URL = 'https://n8n.srv1024074.hstgr.cloud/webhook/fc7630b0-e2eb-44d0-957d-f55162b32271';
+  const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
   // Load Spline viewer script
   useEffect(() => {
@@ -156,6 +164,52 @@ const POSConnectionForm = ({
     setIsManualEntryOpen(false);
     toast.success("Manual data saved successfully!");
   };
+  const handleJsonFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/json') {
+      toast.error("Please select a valid JSON file");
+      return;
+    }
+
+    // Validate JSON content
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        JSON.parse(event.target?.result as string);
+        setJsonFile(file);
+        toast.success(`${file.name} is ready to upload`);
+      } catch (error) {
+        toast.error("The selected file contains invalid JSON format");
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handlePdfFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      toast.error("Please select a valid PDF file");
+      return;
+    }
+
+    if (file.size > MAX_PDF_SIZE) {
+      toast.error("PDF file must be less than 10MB");
+      return;
+    }
+
+    setPdfFile(file);
+    toast.success(`${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB) is ready to upload`);
+  };
+
+  const validateGoogleSheetUrl = (url: string): boolean => {
+    const googleSheetRegex = /^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+/;
+    return googleSheetRegex.test(url);
+  };
+
   const downloadTemplate = () => {
     // Create a simple CSV template
     const csvContent = `Business Name,Daily Sales,Monthly Transactions,Product Categories,Average Order Value
@@ -660,6 +714,107 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
 
                 </div>
 
+                {/* New data upload sections */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  {/* JSON File Upload */}
+                  <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
+                    scale: 1.02
+                  }} transition={{
+                    type: "spring",
+                    stiffness: 300
+                  }}>
+                    <div className="flex items-center gap-3 mb-4">
+                      <FileJson className="h-6 w-6 text-white" />
+                      <h3 className="font-semibold">Subir archivo JSON</h3>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="relative">
+                        <Input
+                          id="json-upload-onboarding"
+                          type="file"
+                          accept=".json,application/json"
+                          onChange={handleJsonFileChange}
+                          className="glass-input bg-white/50 border-white/30 focus:border-green-400"
+                        />
+                        {jsonFile && (
+                          <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600" />
+                        )}
+                      </div>
+                      {jsonFile && (
+                        <p className="text-xs text-muted-foreground">
+                          Selected: {jsonFile.name}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+
+                  {/* PDF File Upload */}
+                  <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
+                    scale: 1.02
+                  }} transition={{
+                    type: "spring",
+                    stiffness: 300
+                  }}>
+                    <div className="flex items-center gap-3 mb-4">
+                      <FileText className="h-6 w-6 text-white" />
+                      <h3 className="font-semibold">Subir archivo PDF</h3>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="relative">
+                        <Input
+                          id="pdf-upload-onboarding"
+                          type="file"
+                          accept=".pdf,application/pdf"
+                          onChange={handlePdfFileChange}
+                          className="glass-input bg-white/50 border-white/30 focus:border-green-400"
+                        />
+                        {pdfFile && (
+                          <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600" />
+                        )}
+                      </div>
+                      {pdfFile && (
+                        <p className="text-xs text-muted-foreground">
+                          Selected: {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)}MB)
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Maximum file size: 10MB
+                      </p>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Status Message */}
+                {statusMessage && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`mt-6 p-4 rounded-lg flex items-start gap-3 ${
+                      statusMessage.type === 'success' 
+                        ? 'bg-green-50/80 border border-green-200' 
+                        : 'bg-red-50/80 border border-red-200'
+                    }`}
+                  >
+                    {statusMessage.type === 'success' ? (
+                      <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    )}
+                    <div className="flex-1">
+                      <p className={`text-sm font-medium ${
+                        statusMessage.type === 'success' ? 'text-green-900' : 'text-red-900'
+                      }`}>
+                        {statusMessage.type === 'success' ? 'Success!' : 'Error'}
+                      </p>
+                      <p className={`text-sm ${
+                        statusMessage.type === 'success' ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                        {statusMessage.message}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
                 <motion.div className="mt-8 text-center" initial={{
                 opacity: 0
               }} animate={{
@@ -668,19 +823,117 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                 delay: 0.8
               }}>
                   <Button 
-                    onClick={() => {
-                      if (uploadedFiles.length > 0 || googleSheetUrl || Object.values(manualData).some(value => value)) {
-                        localStorage.setItem("posOnboardingCompleted", "true");
-                        onComplete();
-                      } else {
+                    onClick={async () => {
+                      const hasData = uploadedFiles.length > 0 || googleSheetUrl || jsonFile || pdfFile || Object.values(manualData).some(value => value);
+                      
+                      if (!hasData) {
                         toast.error("Please upload files, connect Google Sheets, or enter manual data first");
+                        return;
+                      }
+
+                      // Validate Google Sheets URL if provided
+                      if (googleSheetUrl && !validateGoogleSheetUrl(googleSheetUrl)) {
+                        toast.error("Please enter a valid Google Sheets URL");
+                        return;
+                      }
+
+                      setIsUploading(true);
+                      setStatusMessage(null);
+
+                      try {
+                        // Read JSON file content
+                        let jsonData = null;
+                        if (jsonFile) {
+                          const jsonText = await jsonFile.text();
+                          jsonData = JSON.parse(jsonText);
+                        }
+
+                        // Prepare PDF info
+                        let pdfInfo = null;
+                        if (pdfFile) {
+                          pdfInfo = {
+                            name: pdfFile.name,
+                            size: pdfFile.size,
+                            type: pdfFile.type
+                          };
+                        }
+
+                        // Prepare CSV info
+                        let csvInfo = null;
+                        if (uploadedFiles.length > 0) {
+                          csvInfo = uploadedFiles.map(f => ({
+                            name: f.name,
+                            size: f.size,
+                            type: f.type
+                          }));
+                        }
+
+                        // Prepare payload for webhook
+                        const payload = {
+                          timestamp: new Date().toISOString(),
+                          business_name: form.getValues("businessName") || "Unknown",
+                          business_type: form.getValues("businessType") || "Unknown",
+                          data: {
+                            json_data: jsonData,
+                            pdf_info: pdfInfo,
+                            csv_files: csvInfo,
+                            google_sheet_url: googleSheetUrl || null,
+                            manual_data: Object.values(manualData).some(value => value) ? manualData : null
+                          }
+                        };
+
+                        // Send to n8n webhook
+                        const response = await fetch(WEBHOOK_URL, {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                          throw new Error(`Webhook error: ${response.statusText}`);
+                        }
+
+                        setStatusMessage({
+                          type: 'success',
+                          message: 'Data successfully sent to webhook and saved!'
+                        });
+
+                        toast.success("Data has been saved successfully");
+
+                        // Complete onboarding after success
+                        setTimeout(() => {
+                          localStorage.setItem("posOnboardingCompleted", "true");
+                          onComplete();
+                        }, 1500);
+
+                      } catch (error) {
+                        console.error('Error uploading data:', error);
+                        setStatusMessage({
+                          type: 'error',
+                          message: error instanceof Error ? error.message : 'Failed to upload data'
+                        });
+                        
+                        toast.error("Could not save data. Please try again.");
+                      } finally {
+                        setIsUploading(false);
                       }
                     }}
                     className="w-full h-12 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg transition-all duration-300 transform hover:scale-[1.02]" 
-                    disabled={uploadedFiles.length === 0 && !googleSheetUrl && !Object.values(manualData).some(value => value)}
+                    disabled={isUploading || (uploadedFiles.length === 0 && !googleSheetUrl && !jsonFile && !pdfFile && !Object.values(manualData).some(value => value))}
                   >
-                    <Link className="mr-2 h-4 w-4" />
-                    Continue with Uploaded Data
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Guardando...
+                      </>
+                    ) : (
+                      <>
+                        <Link className="mr-2 h-4 w-4" />
+                        Save & Continue
+                      </>
+                    )}
                   </Button>
                 </motion.div>
               </CardContent>
