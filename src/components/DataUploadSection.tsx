@@ -5,12 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { FileJson, FileText, Sheet, Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
-const WEBHOOK_URL = 'https://n8n.srv1024074.hstgr.cloud/webhook/fc7630b0-e2eb-44d0-957d-f55162b32271';
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 export const DataUploadSection = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [jsonFile, setJsonFile] = useState<File | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [googleSheetUrl, setGoogleSheetUrl] = useState('');
@@ -86,6 +88,15 @@ export const DataUploadSection = () => {
   };
 
   const handleSave = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to upload data",
+        variant: "destructive"
+      });
+      return;
+    }
+
     // Validate inputs
     if (!jsonFile && !pdfFile && !googleSheetUrl) {
       toast({
@@ -109,6 +120,13 @@ export const DataUploadSection = () => {
     setStatusMessage(null);
 
     try {
+      // Get store profile for business info
+      const { data: storeProfile } = await supabase
+        .from('store_profiles')
+        .select('name, categories')
+        .eq('userId', user.id)
+        .maybeSingle();
+
       // Read JSON file content
       let jsonData = null;
       if (jsonFile) {
@@ -126,39 +144,28 @@ export const DataUploadSection = () => {
         };
       }
 
-      // Prepare payload for webhook
-      const payload = {
-        timestamp: new Date().toISOString(),
-        data: {
+      // Save to Supabase
+      const { error } = await supabase
+        .from('uploaded_data')
+        .insert({
+          user_id: user.id,
+          business_name: storeProfile?.name || 'Unknown',
+          business_type: storeProfile?.categories?.[0] || 'Unknown',
           json_data: jsonData,
           pdf_info: pdfInfo,
           google_sheet_url: googleSheetUrl || null
-        }
-      };
+        });
 
-      // Send to n8n webhook
-      const response = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error(`Webhook error: ${response.statusText}`);
-      }
-
-      const result = await response.json();
+      if (error) throw error;
       
       setStatusMessage({
         type: 'success',
-        message: 'Data successfully sent to webhook!'
+        message: 'Data successfully saved to Supabase!'
       });
 
       toast({
         title: "Success",
-        description: "Data has been saved to the database successfully"
+        description: "Data has been saved to Supabase successfully. n8n can now access it via realtime."
       });
 
       // Clear form

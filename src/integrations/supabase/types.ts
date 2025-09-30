@@ -273,6 +273,27 @@ export type Database = {
         }
         Relationships: []
       }
+      documents: {
+        Row: {
+          content: string | null
+          embedding: string | null
+          id: number
+          metadata: Json | null
+        }
+        Insert: {
+          content?: string | null
+          embedding?: string | null
+          id?: number
+          metadata?: Json | null
+        }
+        Update: {
+          content?: string | null
+          embedding?: string | null
+          id?: number
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       grain_transactions: {
         Row: {
           amount: number
@@ -313,6 +334,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      n8n_chat_histories: {
+        Row: {
+          id: number
+          message: Json
+          session_id: string
+        }
+        Insert: {
+          id?: number
+          message: Json
+          session_id: string
+        }
+        Update: {
+          id?: number
+          message?: Json
+          session_id?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -413,6 +452,13 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
         ]
       }
       orders: {
@@ -507,6 +553,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
           },
         ]
       }
@@ -1027,6 +1080,45 @@ export type Database = {
         }
         Relationships: []
       }
+      uploaded_data: {
+        Row: {
+          business_name: string | null
+          business_type: string | null
+          created_at: string
+          csv_files: Json | null
+          google_sheet_url: string | null
+          id: string
+          json_data: Json | null
+          manual_data: string | null
+          pdf_info: Json | null
+          user_id: string
+        }
+        Insert: {
+          business_name?: string | null
+          business_type?: string | null
+          created_at?: string
+          csv_files?: Json | null
+          google_sheet_url?: string | null
+          id?: string
+          json_data?: Json | null
+          manual_data?: string | null
+          pdf_info?: Json | null
+          user_id: string
+        }
+        Update: {
+          business_name?: string | null
+          business_type?: string | null
+          created_at?: string
+          csv_files?: Json | null
+          google_sheet_url?: string | null
+          id?: string
+          json_data?: Json | null
+          manual_data?: string | null
+          pdf_info?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_grain_balance: {
         Row: {
           cash_redeemed: number
@@ -1155,7 +1247,26 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      sales_analytics: {
+        Row: {
+          avg_selling_price: number | null
+          brand: string | null
+          category: string | null
+          current_price: number | null
+          current_stock: number | null
+          days_since_last_sale: number | null
+          last_sale_date: string | null
+          original_price: number | null
+          performance_category: string | null
+          product_id: number | null
+          product_name: string | null
+          stock_status: string | null
+          total_orders: number | null
+          total_quantity_sold: number | null
+          total_revenue: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_wishlist_item: {
@@ -1173,6 +1284,10 @@ export type Database = {
           product_id: string
           user_id: string
         }
+      }
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
       }
       check_wishlist_item: {
         Args: { p_product_id: string; p_user_id: string }
@@ -1271,6 +1386,58 @@ export type Database = {
           count: number
         }[]
       }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
+      }
       log_company_profile_access: {
         Args: {
           p_accessed_fields?: string[]
@@ -1287,9 +1454,30 @@ export type Database = {
         Args: { payment_data: Json }
         Returns: Json
       }
+      match_documents: {
+        Args: { filter?: Json; match_count?: number; query_embedding: string }
+        Returns: {
+          content: string
+          id: number
+          metadata: Json
+          similarity: number
+        }[]
+      }
       remove_wishlist_item: {
         Args: { p_product_id: string; p_user_id: string }
         Returns: boolean
+      }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
       update_wishlist_category: {
         Args: { p_category_id: string; p_id: string }
@@ -1301,6 +1489,30 @@ export type Database = {
           product_id: string
           user_id: string
         }
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
     }
     Enums: {

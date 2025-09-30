@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { useOnboarding } from "@/hooks/useOnboarding";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +36,7 @@ const POSConnectionForm = ({
   onComplete
 }: POSConnectionFormProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const {
     completeOnboarding
   } = useOnboarding();
@@ -824,6 +827,11 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
               }}>
                   <Button 
                     onClick={async () => {
+                      if (!user) {
+                        toast.error("You must be logged in to continue");
+                        return;
+                      }
+
                       const hasData = uploadedFiles.length > 0 || googleSheetUrl || jsonFile || pdfFile || Object.values(manualData).some(value => value);
                       
                       if (!hasData) {
@@ -841,6 +849,13 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                       setStatusMessage(null);
 
                       try {
+                        // Get store profile for business info
+                        const { data: storeProfile } = await supabase
+                          .from('store_profiles')
+                          .select('name, categories')
+                          .eq('userId', user.id)
+                          .maybeSingle();
+
                         // Read JSON file content
                         let jsonData = null;
                         if (jsonFile) {
@@ -868,39 +883,28 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                           }));
                         }
 
-                        // Prepare payload for webhook
-                        const payload = {
-                          timestamp: new Date().toISOString(),
-                          business_name: form.getValues("businessName") || "Unknown",
-                          business_type: form.getValues("businessType") || "Unknown",
-                          data: {
+                        // Save to Supabase
+                        const { error } = await supabase
+                          .from('uploaded_data')
+                          .insert({
+                            user_id: user.id,
+                            business_name: storeProfile?.name || form.getValues("businessName") || 'Unknown',
+                            business_type: storeProfile?.categories?.[0] || form.getValues("businessType") || 'Unknown',
                             json_data: jsonData,
                             pdf_info: pdfInfo,
                             csv_files: csvInfo,
                             google_sheet_url: googleSheetUrl || null,
-                            manual_data: Object.values(manualData).some(value => value) ? manualData : null
-                          }
-                        };
+                            manual_data: Object.values(manualData).some(value => value) ? JSON.stringify(manualData) : null
+                          });
 
-                        // Send to n8n webhook
-                        const response = await fetch(WEBHOOK_URL, {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify(payload)
-                        });
-
-                        if (!response.ok) {
-                          throw new Error(`Webhook error: ${response.statusText}`);
-                        }
+                        if (error) throw error;
 
                         setStatusMessage({
                           type: 'success',
-                          message: 'Data successfully sent to webhook and saved!'
+                          message: 'Data successfully saved to Supabase!'
                         });
 
-                        toast.success("Data has been saved successfully");
+                        toast.success("Data saved to Supabase! n8n can now access it via realtime.");
 
                         // Complete onboarding after success
                         setTimeout(() => {
