@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Mail, Phone, Lock, Camera, Bell, Shield, Palette, Globe, Save, Eye, EyeOff, CreditCard, Cloud } from 'lucide-react';
+import { DataUploadSection } from '@/components/DataUploadSection';
 const Configuration = () => {
   const {
     user
@@ -678,6 +679,9 @@ const Configuration = () => {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Data Upload Section */}
+          <DataUploadSection />
 
           {/* Preferences */}
           <Card>
