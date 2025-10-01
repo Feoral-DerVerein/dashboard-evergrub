@@ -145,18 +145,21 @@ const ChatBot = ({
                       <div className="leading-relaxed">{message.content}</div>
                     </div>
                     
-                    {/* Enhanced Business Cards */}
+                    {/* Enhanced Business Cards - Only show when relevant */}
                     {message.type === 'bot' && message.cards && message.cards.length > 0 && (
-                      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 text-left">
-                        {message.cards.map((card, cardIndex) => (
-                          <div 
-                            key={card.id}
-                            className="animate-fade-in"
-                            style={{ animationDelay: `${(index * 100) + (cardIndex * 50)}ms` }}
-                          >
-                            {renderInfoCard(card)}
-                          </div>
-                        ))}
+                      <div className="mt-4 space-y-3 text-left">
+                        <p className="text-sm font-medium text-muted-foreground px-1">📊 Análisis de datos:</p>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                          {message.cards.map((card, cardIndex) => (
+                            <div 
+                              key={card.id}
+                              className="animate-fade-in"
+                              style={{ animationDelay: `${(index * 100) + (cardIndex * 50)}ms` }}
+                            >
+                              {renderInfoCard(card)}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
 
@@ -256,9 +259,10 @@ const ChatBot = ({
                     <div className="text-sm leading-relaxed">{message.content}</div>
                   </div>
                   
-                  {/* Business Cards */}
+                  {/* Business Cards - Only show when relevant */}
                   {message.type === 'bot' && message.cards && message.cards.length > 0 && (
-                    <div className="mt-3 space-y-2 text-left">
+                    <div className="mt-3 text-left space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground px-1">📊 Análisis:</p>
                       {message.cards.map(renderInfoCard)}
                     </div>
                   )}

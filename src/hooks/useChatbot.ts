@@ -2,14 +2,26 @@ import { useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '@/types/chatbot.types';
 import type { BusinessCardData } from '@/components/chat/BusinessCards';
 
-// Generate cards based on response content
+// Generate cards based on response content - only when truly relevant
 const generateCardsFromResponse = (responseText: string, userMessage: string): BusinessCardData[] => {
   const cards: BusinessCardData[] = [];
   const lowerResponse = responseText.toLowerCase();
   const lowerMessage = userMessage.toLowerCase();
 
-  // Sales analysis card
-  if (lowerResponse.includes('sales') || lowerResponse.includes('revenue') || lowerMessage.includes('sales')) {
+  // Check if user is asking about products/inventory specifically
+  const isProductQuery = lowerMessage.includes('product') || 
+                        lowerMessage.includes('inventory') || 
+                        lowerMessage.includes('stock') ||
+                        lowerMessage.includes('expir') ||
+                        lowerMessage.includes('waste');
+
+  // Only generate cards for product-related queries
+  if (!isProductQuery) {
+    return cards;
+  }
+
+  // Sales analysis card - only if explicitly about sales
+  if (lowerMessage.includes('sales') && (lowerResponse.includes('sales') || lowerResponse.includes('revenue'))) {
     cards.push({
       id: 'sales-card',
       type: 'sales',
@@ -22,8 +34,9 @@ const generateCardsFromResponse = (responseText: string, userMessage: string): B
     });
   }
 
-  // Business metrics card
-  if (lowerResponse.includes('metrics') || lowerResponse.includes('performance') || lowerMessage.includes('metrics')) {
+  // Business metrics card - only for analytics/metrics queries
+  if ((lowerMessage.includes('analytics') || lowerMessage.includes('metrics') || lowerMessage.includes('performance')) &&
+      (lowerResponse.includes('metrics') || lowerResponse.includes('performance'))) {
     cards.push({
       id: 'metrics-card',
       type: 'analytics',
@@ -39,8 +52,9 @@ const generateCardsFromResponse = (responseText: string, userMessage: string): B
     });
   }
 
-  // Expiring products card
-  if (lowerResponse.includes('expir') || lowerResponse.includes('waste') || lowerMessage.includes('expir')) {
+  // Expiring products card - only if specifically asking about expiring products
+  if ((lowerMessage.includes('expir') || lowerMessage.includes('waste')) && 
+      (lowerResponse.includes('expir') || lowerResponse.includes('days'))) {
     cards.push({
       id: 'expiry-card',
       type: 'expiry',
