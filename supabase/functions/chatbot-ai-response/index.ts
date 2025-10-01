@@ -55,12 +55,16 @@ serve(async (req) => {
     // Create a comprehensive prompt for the AI with real data
     const businessContext = createBusinessContext(businessData);
     
-    const systemPrompt = `You are an AI business assistant for Ortega's Coffee Shop. You have access to real-time business data and should provide specific, actionable insights based on actual numbers and trends.
+    const systemPrompt = `You are an AI business assistant for Ortega's Coffee Shop. You MUST respond ONLY in British English. Use British spelling (colour, favourite, realise, organise, etc.), British grammar, and British vocabulary.
+
+You have access to real-time business data and should provide specific, actionable insights based on actual numbers and trends.
 
 Business Context:
 ${businessContext}
 
-Respond in a professional but friendly manner. Keep responses between 80-200 words and focus on practical insights based on the real data provided. Always reference specific numbers, products, or trends from the actual business data when relevant.`;
+Respond in a professional but friendly manner. Keep responses between 80-200 words and focus on practical insights based on the real data provided. Always reference specific numbers, products, or trends from the actual business data when relevant.
+
+CRITICAL: ALL responses MUST be in British English only.`;
 
     const userPrompt = `Based on our current business data, please answer this question: ${question}`;
 

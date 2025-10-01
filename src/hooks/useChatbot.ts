@@ -108,7 +108,7 @@ export const useChatbot = () => {
     });
   };
 
-  // Send message to n8n webhook and get response
+  // Send message to Supabase edge function
   const sendMessage = async (customMessage?: string) => {
     const messageText = customMessage || inputValue;
     if (!messageText.trim() || isLoading) return;
@@ -125,18 +125,17 @@ export const useChatbot = () => {
     setIsLoading(true);
 
     try {
-      // Call n8n webhook
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/fc7630b0-e2eb-44d0-957d-f55162b32271', {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chatbot-ai-response`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
-          message: messageText,
-          language_instruction: "You must respond ONLY in British English. All responses must use British English spelling, grammar, and vocabulary."
+          question: messageText
         }),
         signal: controller.signal
       });
@@ -148,7 +147,7 @@ export const useChatbot = () => {
       }
 
       const data = await response.json();
-      const responseText = data.output || data.response || data.message || 'I received your message.';
+      const responseText = data.response || 'I received your message.';
       
       // Simulate typing animation
       await simulateTyping(responseText);
