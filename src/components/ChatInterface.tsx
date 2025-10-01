@@ -16,17 +16,22 @@ export function ChatInterface() {
 
     setMessages(prev => [...prev, { role: "user", content: userMsg }]);
 
+    console.log("Sending to N8N:", userMsg);
+
     try {
       const response = await fetch("https://n8n.srv1024074.hstgr.cloud/webhook/fc7630b0-e2eb-44d0-957d-f55162b32271", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           message: userMsg,
-          client_id: localStorage.getItem("client_id") || "default"
+          client_id: localStorage.getItem("client_id") || "test-client-123"
         })
       });
 
       const data = await response.json();
+      console.log("N8N Response:", data);
 
       setMessages(prev => [...prev, {
         role: "assistant",
