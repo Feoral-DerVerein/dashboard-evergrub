@@ -108,7 +108,7 @@ export const useChatbot = () => {
     });
   };
 
-  // Send message to Supabase edge function
+  // Send message to n8n webhook
   const sendMessage = async (customMessage?: string) => {
     const messageText = customMessage || inputValue;
     if (!messageText.trim() || isLoading) return;
@@ -124,18 +124,20 @@ export const useChatbot = () => {
     setInputValue('');
     setIsLoading(true);
 
+    console.log("Sending to N8N:", messageText);
+
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chatbot-ai-response`, {
+      const response = await fetch("https://n8n.srv1024074.hstgr.cloud/webhook-test/fc7630b0-e2eb-44d0-957d-f55162b32271", {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          question: messageText
+          message: messageText,
+          client_id: localStorage.getItem("client_id") || "test-client-123"
         }),
         signal: controller.signal
       });
@@ -147,6 +149,8 @@ export const useChatbot = () => {
       }
 
       const data = await response.json();
+      console.log("N8N Response:", data);
+      
       const responseText = data.response || 'I received your message.';
       
       // Simulate typing animation
@@ -160,6 +164,7 @@ export const useChatbot = () => {
         type: 'bot',
         content: `Perfect, here it is:\n\n${responseText}`,
         cards: cards,
+        product_cards: data.product_cards,
         timestamp: new Date()
       };
 
