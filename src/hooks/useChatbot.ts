@@ -135,7 +135,8 @@ export const useChatbot = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          message: messageText
+          message: messageText,
+          language_instruction: "You must respond ONLY in British English. All responses must use British English spelling, grammar, and vocabulary."
         }),
         signal: controller.signal
       });
@@ -173,7 +174,7 @@ export const useChatbot = () => {
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
-        content: 'Lo siento, estoy experimentando dificultades técnicas. Por favor, intenta de nuevo en unos momentos.',
+        content: 'Sorry, I\'m experiencing technical difficulties. Please try again in a few moments.',
         timestamp: new Date()
       };
       
