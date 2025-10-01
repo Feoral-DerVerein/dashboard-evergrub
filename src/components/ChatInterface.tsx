@@ -17,7 +17,7 @@ export function ChatInterface() {
     setMessages(prev => [...prev, { role: "user", content: userMsg }]);
 
     try {
-      const response = await fetch("YOUR_N8N_WEBHOOK_URL_HERE", {
+      const response = await fetch("https://n8n.srv1024074.hstgr.cloud/webhook/fc7630b0-e2eb-44d0-957d-f55162b32271", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
