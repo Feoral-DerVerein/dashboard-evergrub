@@ -144,10 +144,12 @@ export const useChatbot = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-      const response = await fetch("https://n8n.srv1024074.hstgr.cloud/webhook-test/fc7630b0-e2eb-44d0-957d-f55162b32271", {
+      // Call Supabase edge function instead of N8N to get real database data
+      const response = await fetch("https://jiehjbbdeyngslfpgfnt.supabase.co/functions/v1/chatbot-query", {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZWhqYmJkZXluZ3NsZnBnZm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA3NDQxNzAsImV4cCI6MjA1NjMyMDE3MH0.s2152q-oy3qBMsJmVQ8-L9whBQDjebEQSo6GVYhXtlg'
         },
         body: JSON.stringify({
           message: messageText,
@@ -163,7 +165,7 @@ export const useChatbot = () => {
       }
 
       const data = await response.json();
-      console.log("N8N Response:", data);
+      console.log("Chatbot Response (from Supabase):", data);
       
       const responseText = data.response || 'I received your message.';
       
