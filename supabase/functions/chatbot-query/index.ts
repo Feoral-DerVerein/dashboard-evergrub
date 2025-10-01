@@ -6,6 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// N8N Webhook URL - Replace with your actual webhook URL
+const N8N_WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -31,175 +34,119 @@ serve(async (req) => {
 
     console.log("User ID:", userId);
 
-    // Analyze the message to determine what data to fetch
-    const lowerMessage = message.toLowerCase();
-    let response = "";
-    let product_cards = [];
-
-    // Query products based on message content
-    if (lowerMessage.includes('product') || lowerMessage.includes('inventory') || 
-        lowerMessage.includes('stock') || lowerMessage.includes('expir')) {
-      
-      let query = supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      // Filter by user if available
-      if (userId) {
-        query = query.eq('userid', userId);
-      }
-
-      // Search for specific product
-      if (lowerMessage.includes('tomato') || lowerMessage.includes('tomate')) {
-        query = query.ilike('name', '%tomato%');
-      } else if (lowerMessage.includes('spaghetti') || lowerMessage.includes('pasta')) {
-        query = query.ilike('name', '%pasta%');
-      }
-
-      const { data: products, error } = await query.limit(10);
-
-      if (error) {
-        console.error("Error fetching products:", error);
-        throw error;
-      }
-
-      console.log("Found products:", products?.length);
-
-      if (products && products.length > 0) {
-        // Generate response based on products
-        response = `Encontré ${products.length} producto(s) en tu inventario:\n\n`;
-        
-        products.forEach((product, index) => {
-          response += `${index + 1}. **${product.name}**\n`;
-          response += `   - Categoría: ${product.category}\n`;
-          response += `   - Precio: $${product.price}\n`;
-          response += `   - Stock: ${product.quantity} unidades\n`;
-          response += `   - Marca: ${product.brand || 'N/A'}\n`;
-          
-          if (product.expirationdate) {
-            const expDate = new Date(product.expirationdate);
-            const today = new Date();
-            const daysUntilExpiry = Math.ceil((expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            response += `   - Vence en: ${daysUntilExpiry} días (${product.expirationdate})\n`;
-            
-            if (daysUntilExpiry <= 7) {
-              response += `   - ⚠️ **Próximo a vencer**\n`;
-            }
-          }
-          response += `\n`;
-
-          // Create product cards
-          if (index < 3) { // Limit to 3 cards
-            product_cards.push({
-              id: product.id.toString(),
-              name: product.name,
-              price: product.price,
-              quantity: product.quantity,
-              category: product.category,
-              image_url: product.image || 'https://via.placeholder.com/150?text=Product',
-              expiration_date: product.expirationdate,
-              suggested_actions: ['surprise_bag', 'marketplace', 'donation']
-            });
-          }
-        });
-      } else {
-        response = "No encontré productos que coincidan con tu búsqueda en la base de datos.";
-      }
-    } else if (lowerMessage.includes('sales') || lowerMessage.includes('ventas')) {
-      // Query sales
-      const { data: sales, error } = await supabase
-        .from('sales')
-        .select('*')
-        .order('sale_date', { ascending: false })
-        .limit(10);
-
-      if (error) {
-        console.error("Error fetching sales:", error);
-        throw error;
-      }
-
-      if (sales && sales.length > 0) {
-        const totalSales = sales.reduce((sum, sale) => sum + Number(sale.amount), 0);
-        response = `Análisis de ventas recientes:\n\n`;
-        response += `- Total de ventas: ${sales.length}\n`;
-        response += `- Ingresos totales: $${totalSales.toFixed(2)}\n\n`;
-        response += `Últimas ventas:\n`;
-        
-        sales.slice(0, 5).forEach((sale, index) => {
-          response += `${index + 1}. $${sale.amount} - ${sale.customer_name} (${new Date(sale.sale_date).toLocaleDateString()})\n`;
-        });
-      } else {
-        response = "No hay ventas registradas en la base de datos.";
-      }
-    } else if (lowerMessage.includes('orders') || lowerMessage.includes('pedidos') || lowerMessage.includes('órdenes')) {
-      // Query orders
-      let orderQuery = supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (userId) {
-        orderQuery = orderQuery.eq('user_id', userId);
-      }
-
-      const { data: orders, error } = await orderQuery.limit(10);
-
-      if (error) {
-        console.error("Error fetching orders:", error);
-        throw error;
-      }
-
-      if (orders && orders.length > 0) {
-        const pendingOrders = orders.filter(o => o.status === 'pending').length;
-        const completedOrders = orders.filter(o => o.status === 'completed').length;
-        
-        response = `Resumen de órdenes:\n\n`;
-        response += `- Total de órdenes: ${orders.length}\n`;
-        response += `- Órdenes pendientes: ${pendingOrders}\n`;
-        response += `- Órdenes completadas: ${completedOrders}\n\n`;
-        response += `Últimas órdenes:\n`;
-        
-        orders.slice(0, 5).forEach((order, index) => {
-          response += `${index + 1}. ${order.customer_name} - $${order.total} (${order.status})\n`;
-        });
-      } else {
-        response = "No hay órdenes registradas en la base de datos.";
-      }
-    } else {
-      // Default response
-      response = `Recibí tu mensaje: "${message}". \n\nPuedo ayudarte con:\n- Consultar productos e inventario\n- Ver ventas recientes\n- Revisar órdenes pendientes\n\n¿Qué te gustaría saber?`;
+    // Fetch all relevant data from database
+    let productsQuery = supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (userId) {
+      productsQuery = productsQuery.eq('userid', userId);
     }
 
+    const { data: products, error: productsError } = await productsQuery.limit(50);
+    
+    if (productsError) {
+      console.error("Error fetching products:", productsError);
+    }
+
+    // Query orders
+    let ordersQuery = supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (userId) {
+      ordersQuery = ordersQuery.eq('user_id', userId);
+    }
+
+    const { data: orders, error: ordersError } = await ordersQuery.limit(20);
+
+    if (ordersError) {
+      console.error("Error fetching orders:", ordersError);
+    }
+
+    // Query sales
+    const { data: sales, error: salesError } = await supabase
+      .from('sales')
+      .select('*')
+      .order('sale_date', { ascending: false })
+      .limit(20);
+
+    if (salesError) {
+      console.error("Error fetching sales:", salesError);
+    }
+
+    console.log(`Database data: ${products?.length || 0} products, ${orders?.length || 0} orders, ${sales?.length || 0} sales`);
+
+    // Send data to n8n webhook for AI processing
+    console.log('Sending data to n8n webhook for AI processing...');
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 seconds
+
+    const n8nResponse = await fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: message,
+        client_id: client_id,
+        user_id: userId,
+        database_context: {
+          products: products || [],
+          orders: orders || [],
+          sales: sales || [],
+          summary: {
+            total_products: products?.length || 0,
+            total_orders: orders?.length || 0,
+            total_sales: sales?.length || 0,
+            pending_orders: orders?.filter(o => o.status === 'pending').length || 0,
+            completed_orders: orders?.filter(o => o.status === 'completed').length || 0
+          }
+        }
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!n8nResponse.ok) {
+      throw new Error(`N8N webhook failed with status: ${n8nResponse.status}`);
+    }
+
+    const n8nData = await n8nResponse.json();
+    console.log('N8N Response received successfully');
+
+    // Return the AI-processed response from n8n
     return new Response(
       JSON.stringify({
         success: true,
-        response: response,
+        response: n8nData.response || n8nData.message || 'Procesado por IA',
         timestamp: new Date().toISOString(),
-        product_cards: product_cards,
-        data_source: 'supabase_database'
+        product_cards: n8nData.product_cards || [],
+        data_source: 'n8n_ai_agent'
       }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
       }
     );
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in chatbot-query function:', error);
+    
+    // Fallback response if n8n fails
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: false,
         error: error.message,
-        response: 'Lo siento, hubo un error al procesar tu consulta. Por favor intenta de nuevo.'
+        response: 'Lo siento, hubo un problema al procesar tu consulta con el agente de IA. Por favor intenta de nuevo.',
+        timestamp: new Date().toISOString()
       }),
-      { 
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
       }
     );
   }
