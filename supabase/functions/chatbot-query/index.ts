@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 // N8N Webhook URL
-const N8N_WEBHOOK_URL = "https://n8n.srv1024074.hstgr.cloud/webhook/fc7630b0-e2eb-44d0-957d-f55162b32271";
+const N8N_WEBHOOK_URL = "https://n8n.srv1024074.hstgr.cloud/webhook-test/fc7630b0-e2eb-44d0-957d-f55162b32271";
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
