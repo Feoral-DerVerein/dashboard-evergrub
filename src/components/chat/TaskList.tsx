@@ -139,11 +139,11 @@ const TaskList = ({
   // Check if task is expiry-related (food waste task)
   const isExpiryRelatedTask = (task: Task) => {
     return task.cardType === 'product-decision' || 
-           task.title.toLowerCase().includes('expiry') ||
-           task.title.toLowerCase().includes('expiring') ||
-           task.title.toLowerCase().includes('nearing expiry') ||
-           task.description.toLowerCase().includes('expire') ||
-           task.description.toLowerCase().includes('expiring');
+           task.title?.toLowerCase().includes('expiry') ||
+           task.title?.toLowerCase().includes('expiring') ||
+           task.title?.toLowerCase().includes('nearing expiry') ||
+           task.description?.toLowerCase().includes('expire') ||
+           task.description?.toLowerCase().includes('expiring');
   };
   const pendingTasks = tasks.filter(task => !task.completed && !task.archived);
   const completedTasks = tasks.filter(task => task.completed && !task.archived);
