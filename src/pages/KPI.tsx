@@ -598,9 +598,9 @@ const KPI = () => {
             const imgWidth = 160;
             const imgHeight = 80;
             const xPos = (pageWidth - imgWidth) / 2; // Center the image
-            
+
             pdf.addImage(certificationImage, 'PNG', xPos, yPosition, imgWidth, imgHeight);
-            
+
             // Add official document text
             yPosition += imgHeight + 10;
             pdf.setFontSize(10);
@@ -620,7 +620,6 @@ const KPI = () => {
             pdf.save(filename);
             toast.success("NSW EPA compliance report with official certification downloaded successfully!");
           };
-          
           certificationImage.onerror = () => {
             console.warn('Could not load certification image, proceeding without it');
             // Generate filename with current date
@@ -631,10 +630,9 @@ const KPI = () => {
             pdf.save(filename);
             toast.success("NSW EPA compliance report downloaded successfully!");
           };
-          
+
           // Load the certification image
           certificationImage.src = '/src/assets/negentropy-impact-seals.png';
-          
         } catch (error) {
           console.warn('Error adding certification image:', error);
           // Fallback - generate PDF without image
@@ -749,7 +747,7 @@ const KPI = () => {
                 <div className="flex justify-center mb-4">
                   
                 </div>
-                <p className="text-center text-gray-950 text-xl">                                                         Hi Mate, What are we going to make possible today?</p>
+                
                 
               </div>
               <DropdownMenu>
