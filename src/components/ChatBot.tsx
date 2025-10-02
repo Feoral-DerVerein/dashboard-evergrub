@@ -68,8 +68,8 @@ const ChatBot = ({
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Header */}
           <div className="text-center mb-16 mt-8">
-            <h1 className="text-4xl md:text-5xl font-semibold text-[#202123] mb-2">
-              AI Insights Chat
+            <h1 className="text-3xl md:text-4xl font-medium text-[#202123] mb-2 leading-relaxed">
+              Hi Mate, What are we going to make possible today?
             </h1>
           </div>
 
