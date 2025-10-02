@@ -1402,6 +1402,26 @@ export type Database = {
           start_time: string
         }[]
       }
+      get_user_sales_analytics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avg_selling_price: number
+          brand: string
+          category: string
+          current_price: number
+          current_stock: number
+          days_since_last_sale: number
+          last_sale_date: string
+          original_price: number
+          performance_category: string
+          product_id: number
+          product_name: string
+          stock_status: string
+          total_orders: number
+          total_quantity_sold: number
+          total_revenue: number
+        }[]
+      }
       get_wishlist_based_suggestions: {
         Args: {
           p_category?: string
