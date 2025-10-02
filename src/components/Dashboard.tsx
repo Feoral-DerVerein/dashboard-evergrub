@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings } from "lucide-react";
+import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Link } from "react-router-dom";
@@ -84,29 +84,22 @@ const RecentActivityItem = ({
     {amount && <span className="font-medium">{amount}</span>}
   </div>;
 export const BottomNav = () => {
-  const {
-    orderCount,
-    notificationCount
-  } = useNotificationsAndOrders();
   return <div className="fixed bottom-0 left-0 right-0 glass-card border-t border-gray-200 px-6 py-3 flex justify-between md:hidden">
       <Link to="/kpi" className="bottom-nav-item">
-        <Home className="w-6 h-6" />
-        <span className="text-xs">Dashboard</span>
+        <BarChart3 className="w-6 h-6" />
+        <span className="text-xs">Performance</span>
       </Link>
-      <Link to="/ai" className="bottom-nav-item">
-        <Sparkles className="w-6 h-6" />
-        <span className="text-xs">AI</span>
+      <Link to="/products" className="bottom-nav-item">
+        <ShoppingCart className="w-6 h-6" />
+        <span className="text-xs">B2C</span>
       </Link>
-      <Link to="/products/add" className="bottom-nav-item">
-        <Plus className="w-6 h-6" />
-        <span className="text-xs">Add</span>
+      <Link to="/market" className="bottom-nav-item">
+        <Store className="w-6 h-6" />
+        <span className="text-xs">B2B</span>
       </Link>
-      <Link to="/notifications" className="bottom-nav-item relative">
-        <Bell className="w-6 h-6" />
-        <span className="text-xs">Notifications</span>
-        {notificationCount > 0 && <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-            {notificationCount > 99 ? '99+' : notificationCount}
-          </div>}
+      <Link to="/configuration" className="bottom-nav-item">
+        <Settings className="w-6 h-6" />
+        <span className="text-xs">Settings</span>
       </Link>
     </div>;
 };
