@@ -15,7 +15,7 @@ export interface ChatMessage {
   type: 'user' | 'bot';
   content: string;
   cards?: import('@/components/chat/BusinessCards').BusinessCardData[];
-  product_cards?: ProductCardData[];
+  product_cards?: any[]; // Allow any product card format from different sources
   timestamp: Date;
   isTyping?: boolean;
 }

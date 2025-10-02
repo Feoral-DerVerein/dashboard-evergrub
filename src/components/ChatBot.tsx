@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Send, TrendingUp, DollarSign, Zap, ArrowRight } from 'lucide-react';
 import { BusinessCard, type BusinessCardData } from '@/components/chat/BusinessCards';
 import { ProductCards } from '@/components/chat/ProductCards';
+import { ProductActionCards } from '@/components/chat/ProductActionCards';
 import { useTaskList } from '@/hooks/useTaskList';
 import TaskList from '@/components/chat/TaskList';
 import { useChatbot } from '@/hooks/useChatbot';
@@ -134,12 +135,11 @@ const ChatBot = ({
                     </div>
                   )}
 
-                  {/* Product Cards */}
+                  {/* Product Cards - Use ProductActionCards for N8N responses */}
                   {message.type === 'bot' && message.product_cards && message.product_cards.length > 0 && (
                     <div className="text-left mt-4">
-                      <ProductCards 
-                        products={message.product_cards} 
-                        onAddToTaskList={addTask}
+                      <ProductActionCards 
+                        products={message.product_cards}
                       />
                     </div>
                   )}
