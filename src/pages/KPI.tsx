@@ -738,8 +738,8 @@ const KPI = () => {
       setIsGeneratingInsights(false);
     }
   };
-  return <div className="min-h-screen pb-20 md:pb-0 bg-[url('/lovable-uploads/b20288e6-b6b7-4a03-95cf-99585bbbd6d5.png')] bg-cover bg-center bg-no-repeat bg-fixed">
-      <div className="w-full glass-card min-h-screen animate-fade-in">
+  return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
+      <div className="max-w-md md:max-w-6xl mx-auto glass-card md:rounded-xl md:my-0 min-h-screen md:min-h-0 animate-fade-in">
           <header className="px-6 pt-8 pb-6">
             <div className="flex justify-between items-center mb-1">
               <div>
