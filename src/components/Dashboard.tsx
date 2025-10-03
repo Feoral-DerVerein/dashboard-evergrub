@@ -244,11 +244,11 @@ const Dashboard = () => {
       return 'Recently';
     }
   };
-  return <div className="min-h-screen pb-20 md:pb-0 md:flex md:items-center md:justify-center bg-[url('/lovable-uploads/b20288e6-b6b7-4a03-95cf-99585bbbd6d5.png')] bg-cover bg-center bg-no-repeat bg-fixed">
-      <div className="max-w-md md:max-w-6xl mx-auto glass-card md:rounded-xl md:my-0 min-h-screen md:min-h-0 animate-fade-in">
+  return <div className="min-h-screen pb-20 md:pb-0 bg-[url('/lovable-uploads/b20288e6-b6b7-4a03-95cf-99585bbbd6d5.png')] bg-cover bg-center bg-no-repeat bg-fixed">
+      <div className="w-full glass-card min-h-screen animate-fade-in">
         <div className="md:grid md:grid-cols-[220px_1fr]">
           {/* Sidebar - desktop only */}
-          <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen md:rounded-l-xl">
+          <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen">
             <div className="mb-6 px-2">
               <img src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" alt="Main Logo" className="h-10 w-auto" />
             </div>

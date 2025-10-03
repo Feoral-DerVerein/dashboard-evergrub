@@ -10,11 +10,11 @@ const AppLayout = () => {
     orderCount,
     salesCount
   } = useNotificationsAndOrders();
-  return <div className="min-h-screen bg-gray-50 md:flex md:items-center md:justify-center">
-      <div className="w-full max-w-7xl mx-auto glass-card md:rounded-xl md:my-0 min-h-screen md:min-h-0">
+  return <div className="min-h-screen bg-gray-50">
+      <div className="w-full glass-card min-h-screen">
         <div className={isDashboard ? "" : "md:grid md:grid-cols-[220px_1fr]"}>
           {/* Sidebar - hide on dashboard to avoid duplication (dashboard already renders its own) */}
-          {!isDashboard && <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen md:rounded-l-xl">
+          {!isDashboard && <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen">
               <div className="mb-6 px-2">
                 <img src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" alt="Main Logo" className="h-10 w-auto" />
               </div>
