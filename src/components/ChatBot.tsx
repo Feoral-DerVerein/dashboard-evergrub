@@ -66,7 +66,7 @@ const ChatBot = ({
   if (variant === 'inline') {
     return (
       <div className="w-full bg-white min-h-screen">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="w-full px-4 py-8">
           {/* Header */}
           <div className="text-center mb-16 mt-8">
             <img 
@@ -183,7 +183,7 @@ const ChatBot = ({
         </div>
 
         {/* Task List */}
-        <div className="max-w-6xl mx-auto px-4 pb-8">
+        <div className="w-full px-4 pb-8">
           <TaskList 
             tasks={tasks}
             onCompleteTask={completeTask}
