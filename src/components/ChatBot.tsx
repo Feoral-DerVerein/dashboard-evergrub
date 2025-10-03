@@ -80,7 +80,7 @@ const ChatBot = ({
           </div>
 
           {/* Three columns grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-16">
             {suggestionCategories.map((category, idx) => (
               <div key={idx} className="flex flex-col items-center">
                 {/* Icon */}
@@ -94,12 +94,12 @@ const ChatBot = ({
                 </h2>
                 
                 {/* Example cards */}
-                <div className="w-full space-y-3">
+                <div className="w-full space-y-2">
                   {category.suggestions.map((suggestion, sIdx) => (
                     <button
                       key={sIdx}
                       onClick={() => sendMessage(suggestion)}
-                      className="w-full bg-[#f7f7f8] hover:bg-[#ececec] border border-[#e5e5e5] hover:border-[#d1d1d1] rounded-lg px-5 py-4 text-sm text-[#202123] text-center transition-all duration-200 cursor-pointer leading-relaxed"
+                      className="w-full bg-[#f7f7f8] hover:bg-[#ececec] border border-[#e5e5e5] hover:border-[#d1d1d1] rounded-lg px-5 py-4 text-sm text-[#202123] text-center transition-all duration-200 cursor-pointer leading-relaxed shadow-none"
                     >
                       {suggestion}
                       <span className="ml-2 text-xs opacity-70">→</span>
@@ -156,7 +156,7 @@ const ChatBot = ({
 
           {/* Chat Input Section */}
           <div className="max-w-3xl mx-auto mt-10">
-            <div className="bg-white border border-[#d9d9e3] rounded-xl px-4 py-3 flex items-center gap-3 shadow-[0_0_10px_rgba(0,0,0,0.05)]">
+            <div className="bg-white border border-[#d9d9e3] rounded-xl px-4 py-3 flex items-center gap-3 shadow-none">
               <input
                 type="text"
                 value={inputValue}
