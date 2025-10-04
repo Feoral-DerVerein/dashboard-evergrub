@@ -40,7 +40,7 @@ export const PricingCard = ({
         <Badge 
           className="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white border-0"
         >
-          RECOMENDADO
+          RECOMMENDED
         </Badge>
       )}
       
