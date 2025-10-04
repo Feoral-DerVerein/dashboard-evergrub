@@ -45,107 +45,82 @@ export const ProductActionCards = ({ products }: ProductActionCardsProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
       {products.map((product) => {
-        const imageUrl = product.image || product.image_url || "/placeholder.svg";
         const productName = product.name || `Producto ${product.id}`;
-        const stockAmount = product.stock || 0;
         
         return (
           <Card 
             key={product.id} 
-            className="overflow-hidden hover:shadow-lg transition-shadow duration-200"
+            className="p-6 hover:shadow-lg transition-all duration-200 border-border"
           >
-            {/* Product Image with Stock Badge */}
-            <div className="relative aspect-video bg-gray-100">
-              <img
-                src={imageUrl}
-                alt={productName}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  const parent = e.currentTarget.parentElement;
-                  if (parent) {
-                    const iconDiv = document.createElement('div');
-                    iconDiv.className = 'w-full h-full flex items-center justify-center';
-                    iconDiv.innerHTML = '<svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>';
-                    parent.appendChild(iconDiv);
-                  }
-                }}
-              />
-              <Badge 
-                className="absolute top-2 left-2 bg-green-100 text-green-800 hover:bg-green-100 font-semibold px-3 py-1"
-              >
-                Stock: {stockAmount}
-              </Badge>
+            {/* Product Name */}
+            <h3 className="text-2xl font-bold text-foreground mb-1">
+              {productName}
+            </h3>
+
+            {/* Category */}
+            <p className="text-sm text-muted-foreground mb-3">
+              {product.category}
+            </p>
+
+            {/* Price */}
+            <p className="text-3xl font-bold text-green-600 mb-4">
+              ${product.price.toFixed(2)}
+            </p>
+
+            {/* Pickup Status */}
+            <div className="flex items-center gap-2 text-muted-foreground text-sm mb-6">
+              <Clock className="w-4 h-4" />
+              <span>
+                {product.pickupAvailable 
+                  ? "Pickup available" 
+                  : "Pickup schedule not available"}
+              </span>
             </div>
 
-            {/* Product Info */}
-            <div className="p-4 space-y-2">
-              {/* Product Name */}
-              <h3 className="text-lg font-bold text-gray-900 line-clamp-2">
-                {productName}
-              </h3>
-
-              {/* Category */}
-              <p className="text-sm text-gray-500">
-                {product.category}
-              </p>
-
-              {/* Price */}
-              <p className="text-2xl font-bold text-green-600">
-                ${product.price.toFixed(2)}
-              </p>
-
-              {/* Pickup Status */}
-              <div className="flex items-center gap-2 text-gray-600 text-sm">
-                <Clock className="w-4 h-4" />
-                <span>
-                  {product.pickupAvailable 
-                    ? "Pickup available" 
-                    : "Pickup schedule not available"}
-                </span>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-2 pt-2">
-                {/* B2B and Delete Row */}
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant="secondary"
-                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900"
-                    onClick={() => handleB2B(product)}
-                  >
-                    B2B
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    className="w-full bg-red-50 hover:bg-red-100 text-red-600"
-                    onClick={() => handleDelete(product)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    Delete
-                  </Button>
-                </div>
-
-                {/* Surprise Bag Button */}
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              {/* B2B and Delete Row */}
+              <div className="grid grid-cols-2 gap-3">
                 <Button
                   variant="secondary"
-                  className="w-full bg-green-50 hover:bg-green-100 text-green-700"
-                  onClick={() => handleSurpriseBag(product)}
+                  size="lg"
+                  className="w-full bg-muted hover:bg-muted/80 text-foreground font-semibold"
+                  onClick={() => handleB2B(product)}
                 >
-                  <Package className="w-4 h-4 mr-2" />
-                  Surprise Bag
+                  B2B
                 </Button>
-
-                {/* Donation Button */}
                 <Button
                   variant="secondary"
-                  className="w-full bg-pink-50 hover:bg-pink-100 text-pink-600"
-                  onClick={() => handleDonation(product)}
+                  size="lg"
+                  className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold dark:bg-red-950 dark:text-red-400 dark:hover:bg-red-900"
+                  onClick={() => handleDelete(product)}
                 >
-                  <Heart className="w-4 h-4 mr-2" />
-                  Donation
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  Delete
                 </Button>
               </div>
+
+              {/* Surprise Bag Button (B2C) */}
+              <Button
+                variant="secondary"
+                size="lg"
+                className="w-full bg-green-50 hover:bg-green-100 text-green-700 font-semibold dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900"
+                onClick={() => handleSurpriseBag(product)}
+              >
+                <Package className="w-4 h-4 mr-2" />
+                Surprise Bag
+              </Button>
+
+              {/* Donation Button */}
+              <Button
+                variant="secondary"
+                size="lg"
+                className="w-full bg-pink-50 hover:bg-pink-100 text-pink-600 font-semibold dark:bg-pink-950 dark:text-pink-400 dark:hover:bg-pink-900"
+                onClick={() => handleDonation(product)}
+              >
+                <Heart className="w-4 h-4 mr-2" />
+                Donation
+              </Button>
             </div>
           </Card>
         );
