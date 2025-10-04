@@ -27,6 +27,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 153 100% 33%;
     --radius: 0.5rem;
+    --cream-background: 40 33% 96%; /* Creamy white background */
     
     /* Glass effect variables */
     --glass-bg: 255 255 255 / 0.1;

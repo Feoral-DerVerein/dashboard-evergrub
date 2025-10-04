@@ -61,7 +61,7 @@ const Pricing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
+    <div className="min-h-screen bg-[hsl(var(--cream-background))]">
       {/* Header */}
       <div className="container mx-auto px-4 pt-16 pb-8">
         <div className="text-center space-y-4 max-w-3xl mx-auto">
