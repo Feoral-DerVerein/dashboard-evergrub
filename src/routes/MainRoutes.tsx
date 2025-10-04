@@ -17,6 +17,7 @@ import Wishlist from "@/pages/Wishlist";
 import Users from "@/pages/Users";
 import PaymentPortal from "@/pages/PaymentPortal";
 import Onboarding from "@/pages/Onboarding";
+import Pricing from "@/pages/Pricing";
 
 import Login from "@/pages/Login";
 import Phone from "@/pages/Phone";
@@ -49,6 +50,9 @@ const MainRoutes = () => {
       
       {/* Onboarding route - accessible only when logged in but onboarding not completed */}
       <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+      
+      {/* Pricing route - accessible after onboarding */}
+      <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
       
       {/* Protected routes - only accessible when logged in */}
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
