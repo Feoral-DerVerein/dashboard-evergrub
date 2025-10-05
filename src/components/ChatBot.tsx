@@ -7,6 +7,7 @@ import { ProductActionCards } from '@/components/chat/ProductActionCards';
 import { useTaskList } from '@/hooks/useTaskList';
 import TaskList from '@/components/chat/TaskList';
 import { useChatbot } from '@/hooks/useChatbot';
+import { ChatLoadingIndicator } from '@/components/chat/ChatLoadingIndicator';
 
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -150,6 +151,10 @@ const ChatBot = ({
                   )}
                 </div>
               ))}
+              
+              {/* Loading Indicator */}
+              {isLoading && <ChatLoadingIndicator />}
+              
               <div ref={messagesEndRef} />
             </div>
           )}
