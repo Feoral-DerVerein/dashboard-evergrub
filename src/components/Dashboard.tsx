@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store, RefreshCw, Plug, CreditCard } from "lucide-react";
+import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store, RefreshCw, Plug, CreditCard, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Link } from "react-router-dom";
@@ -23,6 +23,9 @@ import { Progress } from "./ui/progress";
 import { useSurpriseBags } from "@/hooks/useSurpriseBags";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { formatCurrency, formatDateTime } from "@/services/posApiService";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 type QuickAccessItemProps = {
   icon: React.ComponentType<{
     className?: string;
@@ -110,6 +113,8 @@ export const BottomNav = () => {
     </div>;
 };
 const Dashboard = () => {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const {
     orderCount,
     notificationCount
@@ -354,8 +359,21 @@ const Dashboard = () => {
                           Pricing
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <LogoutButton />
+                      <DropdownMenuItem 
+                        className="flex items-center gap-2 cursor-pointer" 
+                        onClick={async () => {
+                          try {
+                            await signOut();
+                            toast.success("Session closed successfully");
+                            navigate("/login");
+                          } catch (error) {
+                            console.error("Error logging out:", error);
+                            toast.error("Error logging out");
+                          }
+                        }}
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Log out
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
