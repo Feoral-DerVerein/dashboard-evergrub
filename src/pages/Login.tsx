@@ -287,6 +287,19 @@ const Login = () => {
           </Button>
         </form>
 
+        {/* Resend Confirmation - Only in Signup */}
+        {activeTab === 'signup' && (
+          <div className="text-center mt-4">
+            <button 
+              onClick={handleResendConfirmation} 
+              className="text-white/60 hover:text-white text-sm"
+              disabled={loading}
+            >
+              Resend confirmation email
+            </button>
+          </div>
+        )}
+
         {/* Toggle between Login/Signup */}
         <div className="text-center mt-6">
           <button onClick={() => setActiveTab(activeTab === 'login' ? 'signup' : 'login')} className="text-white/80 hover:text-white text-sm">
@@ -294,19 +307,14 @@ const Login = () => {
           </button>
         </div>
 
-        {/* Forgot Password & Resend Confirmation */}
-        {activeTab === 'login' && <div className="text-center mt-4 space-y-2">
-            <Link to="/forgot-password" className="block text-white/60 hover:text-white text-sm">
+        {/* Forgot Password - Only in Login */}
+        {activeTab === 'login' && (
+          <div className="text-center mt-4">
+            <Link to="/forgot-password" className="text-white/60 hover:text-white text-sm">
               Forgot Password?
             </Link>
-            <button 
-              onClick={handleResendConfirmation} 
-              className="block w-full text-white/60 hover:text-white text-sm"
-              disabled={loading}
-            >
-              Resend confirmation email
-            </button>
-          </div>}
+          </div>
+        )}
 
         {/* Social Login */}
         <div className="mt-8">
