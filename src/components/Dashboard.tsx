@@ -27,8 +27,15 @@ import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useMetricsData } from "@/hooks/useMetricsData";
+import { 
+  useSalesMetrics, 
+  useSustainabilityMetrics, 
+  useCustomerMetrics, 
+  useSurpriseBagsMetrics 
+} from "@/hooks/useMetricsApi";
 import { MetricCard } from "@/components/MetricCard";
 import { MetricDetailModal } from "@/components/MetricDetailModal";
+import { MetricsTestPanel } from "@/components/MetricsTestPanel";
 import type { MetricValue } from "@/hooks/useMetricsData";
 type QuickAccessItemProps = {
   icon: React.ComponentType<{
@@ -126,7 +133,137 @@ const Dashboard = () => {
   const { surpriseBagCount } = useSurpriseBags();
   const { metrics, isLoading: isLoadingMetrics, lastUpdated, refreshData, isUsingMockData } = useDashboardData();
   const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month">("week");
-  const { data: liveMetrics, isLoading: isLoadingLiveMetrics } = useMetricsData(selectedPeriod);
+  
+  // Fetch metrics from API endpoints
+  const { 
+    data: salesData, 
+    isLoading: isLoadingSales, 
+    isError: isErrorSales,
+    refetch: refetchSales 
+  } = useSalesMetrics(selectedPeriod);
+  
+  const { 
+    data: sustainabilityData, 
+    isLoading: isLoadingSustainability,
+    isError: isErrorSustainability,
+    refetch: refetchSustainability 
+  } = useSustainabilityMetrics(selectedPeriod);
+  
+  const { 
+    data: customerData, 
+    isLoading: isLoadingCustomer,
+    isError: isErrorCustomer,
+    refetch: refetchCustomer 
+  } = useCustomerMetrics(selectedPeriod);
+  
+  const { 
+    data: surpriseBagsData, 
+    isLoading: isLoadingSurpriseBags,
+    isError: isErrorSurpriseBags,
+    refetch: refetchSurpriseBags 
+  } = useSurpriseBagsMetrics('available', 10);
+
+  const isLoadingLiveMetrics = isLoadingSales || isLoadingSustainability || isLoadingCustomer || isLoadingSurpriseBags;
+
+  // Convert API data to MetricValue format
+  const liveMetrics = salesData && sustainabilityData && customerData && surpriseBagsData ? {
+    totalSales: {
+      current: salesData.current.totalSales,
+      previous: salesData.previous.totalSales,
+      change: salesData.changes.totalSales,
+      currency: 'USD'
+    },
+    transactions: {
+      current: salesData.current.transactions,
+      previous: salesData.previous.transactions,
+      change: salesData.changes.transactions
+    },
+    profit: {
+      current: salesData.current.profit,
+      previous: salesData.previous.profit,
+      change: salesData.changes.profit,
+      currency: 'USD'
+    },
+    revenue: {
+      current: salesData.current.revenue,
+      previous: salesData.previous.revenue,
+      change: salesData.changes.revenue,
+      currency: 'USD'
+    },
+    avgOrderValue: {
+      current: salesData.current.avgOrderValue,
+      previous: salesData.previous.avgOrderValue,
+      change: salesData.changes.avgOrderValue,
+      currency: 'USD'
+    },
+    co2Saved: {
+      current: sustainabilityData.current.co2Saved,
+      previous: sustainabilityData.previous.co2Saved,
+      change: sustainabilityData.changes.co2Saved
+    },
+    wasteReduced: {
+      current: sustainabilityData.current.wasteReduced,
+      previous: sustainabilityData.previous.wasteReduced,
+      change: sustainabilityData.changes.wasteReduced
+    },
+    foodWasteReduced: {
+      current: sustainabilityData.current.foodWasteKg,
+      previous: sustainabilityData.previous.foodWasteKg,
+      change: sustainabilityData.changes.foodWasteKg
+    },
+    conversionRate: {
+      current: customerData.current.conversionRate,
+      previous: customerData.previous.conversionRate,
+      change: customerData.changes.conversionRate
+    },
+    returnRate: {
+      current: customerData.current.returnRate,
+      previous: customerData.previous.returnRate,
+      change: customerData.changes.returnRate
+    },
+    costSavings: {
+      current: customerData.current.avgOrderValue * 0.3,
+      previous: customerData.previous.avgOrderValue * 0.3,
+      change: 20,
+      currency: 'USD'
+    },
+    activeSurpriseBags: {
+      current: surpriseBagsData.summary.activeBags,
+      previous: surpriseBagsData.summary.activeBags * 0.8,
+      change: 25
+    },
+    surpriseBagRevenue: {
+      current: surpriseBagsData.summary.totalRevenue,
+      previous: surpriseBagsData.summary.totalRevenue * 0.8,
+      change: 25,
+      currency: 'USD'
+    },
+    operationalSavings: {
+      current: salesData.current.profit * 0.2,
+      previous: salesData.previous.profit * 0.2,
+      change: 15,
+      currency: 'USD'
+    },
+    environmentalImpact: {
+      current: sustainabilityData.current.environmentalImpact,
+      previous: sustainabilityData.previous.environmentalImpact,
+      change: sustainabilityData.changes.environmentalImpact
+    },
+    foodWastePrevented: {
+      current: sustainabilityData.current.foodWasteKg,
+      previous: sustainabilityData.previous.foodWasteKg,
+      change: sustainabilityData.changes.foodWasteKg
+    }
+  } : null;
+
+  // Manual refresh all metrics
+  const refreshAllMetrics = () => {
+    refetchSales();
+    refetchSustainability();
+    refetchCustomer();
+    refetchSurpriseBags();
+  };
+
   const [selectedMetric, setSelectedMetric] = useState<{
     title: string;
     value: MetricValue;
@@ -336,11 +473,11 @@ const Dashboard = () => {
                  <Button
                    variant="outline"
                    size="sm"
-                   onClick={refreshData}
-                   disabled={isLoadingMetrics}
+                   onClick={refreshAllMetrics}
+                   disabled={isLoadingLiveMetrics}
                    className="gap-2"
                  >
-                   <RefreshCw className={`w-4 h-4 ${isLoadingMetrics ? 'animate-spin' : ''}`} />
+                   <RefreshCw className={`w-4 h-4 ${isLoadingLiveMetrics ? 'animate-spin' : ''}`} />
                    <span className="hidden md:inline">Refresh</span>
                  </Button>
                  
@@ -443,7 +580,9 @@ const Dashboard = () => {
                         title="Total Sales"
                         value={liveMetrics.totalSales}
                         icon={<DollarSign className="w-5 h-5" />}
-                        isLoading={isLoadingLiveMetrics}
+                        isLoading={isLoadingSales}
+                        isError={isErrorSales}
+                        onRetry={refetchSales}
                         format="currency"
                         onClick={() => setSelectedMetric({ 
                           title: 'Total Sales', 
@@ -455,7 +594,9 @@ const Dashboard = () => {
                         title="Transactions"
                         value={liveMetrics.transactions}
                         icon={<ShoppingCart className="w-5 h-5" />}
-                        isLoading={isLoadingLiveMetrics}
+                        isLoading={isLoadingSales}
+                        isError={isErrorSales}
+                        onRetry={refetchSales}
                         onClick={() => setSelectedMetric({ 
                           title: 'Transactions', 
                           value: liveMetrics.transactions, 
@@ -466,7 +607,9 @@ const Dashboard = () => {
                         title="Profit"
                         value={liveMetrics.profit}
                         icon={<TrendingUp className="w-5 h-5" />}
-                        isLoading={isLoadingLiveMetrics}
+                        isLoading={isLoadingSales}
+                        isError={isErrorSales}
+                        onRetry={refetchSales}
                         format="currency"
                         onClick={() => setSelectedMetric({ 
                           title: 'Profit', 
@@ -478,7 +621,9 @@ const Dashboard = () => {
                         title="Active Surprise Bags"
                         value={liveMetrics.activeSurpriseBags}
                         icon={<Package className="w-5 h-5" />}
-                        isLoading={isLoadingLiveMetrics}
+                        isLoading={isLoadingSurpriseBags}
+                        isError={isErrorSurpriseBags}
+                        onRetry={refetchSurpriseBags}
                         onClick={() => setSelectedMetric({ 
                           title: 'Active Surprise Bags', 
                           value: liveMetrics.activeSurpriseBags, 
@@ -496,7 +641,9 @@ const Dashboard = () => {
                         title="CO₂ Saved"
                         value={liveMetrics.co2Saved}
                         icon={<Leaf className="w-5 h-5" />}
-                        isLoading={isLoadingLiveMetrics}
+                        isLoading={isLoadingSustainability}
+                        isError={isErrorSustainability}
+                        onRetry={refetchSustainability}
                         format="kg"
                         onClick={() => setSelectedMetric({ 
                           title: 'CO₂ Saved', 
@@ -508,7 +655,9 @@ const Dashboard = () => {
                         title="Food Waste Reduced"
                         value={liveMetrics.foodWasteReduced}
                         icon={<Recycle className="w-5 h-5" />}
-                        isLoading={isLoadingLiveMetrics}
+                        isLoading={isLoadingSustainability}
+                        isError={isErrorSustainability}
+                        onRetry={refetchSustainability}
                         format="kg"
                         onClick={() => setSelectedMetric({ 
                           title: 'Food Waste Reduced', 
@@ -520,7 +669,9 @@ const Dashboard = () => {
                         title="Cost Savings"
                         value={liveMetrics.costSavings}
                         icon={<Target className="w-5 h-5" />}
-                        isLoading={isLoadingLiveMetrics}
+                        isLoading={isLoadingCustomer}
+                        isError={isErrorCustomer}
+                        onRetry={refetchCustomer}
                         format="currency"
                         onClick={() => setSelectedMetric({ 
                           title: 'Cost Savings', 
@@ -553,6 +704,11 @@ const Dashboard = () => {
                   trend={metrics ? `${metrics.transactionsChange > 0 ? '+' : ''}${metrics.transactionsChange.toFixed(1)}%` : "3.1% vs last week"}
                   isLoading={isLoadingMetrics || stats.isLoading}
                 />
+              </div>
+
+              {/* Metrics Testing Panel - For Development */}
+              <div className="mb-8">
+                <MetricsTestPanel />
               </div>
 
               {/* Recent Activity */}

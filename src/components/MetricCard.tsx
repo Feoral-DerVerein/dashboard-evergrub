@@ -1,6 +1,7 @@
-import { ArrowUpIcon, ArrowDownIcon, TrendingUp } from 'lucide-react';
+import { ArrowUpIcon, ArrowDownIcon, TrendingUp, RefreshCw, AlertCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { MetricValue } from '@/hooks/useMetricsData';
 
@@ -10,6 +11,7 @@ interface MetricCardProps {
   icon?: React.ReactNode;
   isLoading?: boolean;
   isError?: boolean;
+  onRetry?: () => void;
   onClick?: () => void;
   format?: 'currency' | 'number' | 'percentage' | 'kg';
 }
@@ -20,6 +22,7 @@ export function MetricCard({
   icon, 
   isLoading, 
   isError,
+  onRetry,
   onClick,
   format = 'number'
 }: MetricCardProps) {
@@ -53,9 +56,28 @@ export function MetricCard({
 
   if (isError) {
     return (
-      <Card className="border-destructive">
+      <Card className="border-destructive/50 bg-destructive/5">
         <CardContent className="p-6">
-          <div className="text-sm text-destructive">Failed to load {title}</div>
+          <div className="flex flex-col items-center justify-center gap-3 py-4">
+            <AlertCircle className="w-8 h-8 text-destructive" />
+            <div className="text-sm text-destructive text-center">
+              Failed to load {title}
+            </div>
+            {onRetry && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRetry();
+                }}
+                className="gap-2"
+              >
+                <RefreshCw className="w-3 h-3" />
+                Retry
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     );
