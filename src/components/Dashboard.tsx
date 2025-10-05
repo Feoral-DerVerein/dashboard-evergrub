@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store, RefreshCw, Plug } from "lucide-react";
+import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store, RefreshCw, Plug, CreditCard } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Link } from "react-router-dom";
@@ -328,31 +328,37 @@ const Dashboard = () => {
                    <span className="hidden md:inline">Refresh</span>
                  </Button>
                  
-                 <DropdownMenu>
-                   <DropdownMenuTrigger asChild>
-                     <Avatar className="h-12 w-12 cursor-pointer">
-                       <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
-                       <AvatarFallback>O</AvatarFallback>
-                     </Avatar>
-                   </DropdownMenuTrigger>
-                   <DropdownMenuContent align="end" className="w-48">
-                     <DropdownMenuItem asChild>
-                       <Link to="/configuration" className="flex items-center gap-2 w-full">
-                         <Settings className="h-4 w-4" />
-                         Settings
-                       </Link>
-                     </DropdownMenuItem>
-                     <DropdownMenuItem asChild>
-                       <Link to="/api-config" className="flex items-center gap-2 w-full">
-                         <Plug className="h-4 w-4" />
-                         API Config
-                       </Link>
-                     </DropdownMenuItem>
-                     <DropdownMenuItem asChild>
-                       <LogoutButton />
-                     </DropdownMenuItem>
-                   </DropdownMenuContent>
-                 </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Avatar className="h-14 w-14 cursor-pointer">
+                        <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
+                        <AvatarFallback>O</AvatarFallback>
+                      </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem asChild>
+                        <Link to="/configuration" className="flex items-center gap-2 w-full">
+                          <Settings className="h-4 w-4" />
+                          Settings
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/api-config" className="flex items-center gap-2 w-full">
+                          <Plug className="h-4 w-4" />
+                          API Config
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/pricing" className="flex items-center gap-2 w-full">
+                          <CreditCard className="h-4 w-4" />
+                          Pricing
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <LogoutButton />
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                </div>
             </header>
