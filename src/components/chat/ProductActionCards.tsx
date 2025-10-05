@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Clock, Trash2, Package, Heart, ShoppingBag } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { ActionDetailsDialog } from "@/components/modals/ActionDetailsDialog";
+import { useRipple } from "@/hooks/useRipple";
 
 export interface ProductActionCardData {
   id: string | number;
@@ -22,35 +25,60 @@ interface ProductActionCardsProps {
 }
 
 export const ProductActionCards = ({ products }: ProductActionCardsProps) => {
-  const handleB2B = (product: ProductActionCardData) => {
-    const name = product.name || `Producto ${product.id}`;
-    toast.info(`Preparando orden B2B para ${name}`);
+  const [selectedProduct, setSelectedProduct] = useState<ProductActionCardData | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const createRipple = useRipple();
+
+  const handleCardClick = (product: ProductActionCardData) => {
+    setSelectedProduct(product);
+    setDialogOpen(true);
   };
 
-  const handleDelete = (product: ProductActionCardData) => {
-    const name = product.name || `Producto ${product.id}`;
-    toast.success(`${name} marcado para eliminación`);
+  const handleB2B = (product: ProductActionCardData, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    createRipple(e);
+    const name = product.name || `Product ${product.id}`;
+    toast.info(`Preparing B2B order for ${name}`);
   };
 
-  const handleSurpriseBag = (product: ProductActionCardData) => {
-    const name = product.name || `Producto ${product.id}`;
-    toast.success(`${name} agregado a Surprise Bag`);
+  const handleDelete = (product: ProductActionCardData, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    createRipple(e);
+    const name = product.name || `Product ${product.id}`;
+    toast.success(`${name} marked for deletion`);
   };
 
-  const handleDonation = (product: ProductActionCardData) => {
-    const name = product.name || `Producto ${product.id}`;
-    toast.success(`${name} marcado para donación`);
+  const handleSurpriseBag = (product: ProductActionCardData, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    createRipple(e);
+    const name = product.name || `Product ${product.id}`;
+    toast.success(`${name} added to Surprise Bag`);
+  };
+
+  const handleDonation = (product: ProductActionCardData, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    createRipple(e);
+    const name = product.name || `Product ${product.id}`;
+    toast.success(`${name} marked for donation`);
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
+    <>
+      <ActionDetailsDialog 
+        product={selectedProduct}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
       {products.map((product) => {
         const productName = product.name || `Producto ${product.id}`;
         
         return (
           <Card 
             key={product.id} 
-            className="p-6 hover:shadow-lg transition-all duration-200 border-border"
+            className="p-6 hover:shadow-xl hover:scale-102 transition-all duration-200 border-border cursor-pointer relative overflow-hidden group"
+            onClick={() => handleCardClick(product)}
           >
             {/* Product Name */}
             <h3 className="text-2xl font-bold text-foreground mb-1">
@@ -84,16 +112,16 @@ export const ProductActionCards = ({ products }: ProductActionCardsProps) => {
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="w-full bg-muted hover:bg-muted/80 text-foreground font-semibold"
-                  onClick={() => handleB2B(product)}
+                  className="w-full bg-muted hover:bg-muted/80 text-foreground font-semibold relative overflow-hidden"
+                  onClick={(e) => handleB2B(product, e)}
                 >
                   B2B
                 </Button>
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold dark:bg-red-950 dark:text-red-400 dark:hover:bg-red-900"
-                  onClick={() => handleDelete(product)}
+                  className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold dark:bg-red-950 dark:text-red-400 dark:hover:bg-red-900 relative overflow-hidden"
+                  onClick={(e) => handleDelete(product, e)}
                 >
                   <Trash2 className="w-4 h-4 mr-1" />
                   Delete
@@ -104,8 +132,8 @@ export const ProductActionCards = ({ products }: ProductActionCardsProps) => {
               <Button
                 variant="secondary"
                 size="lg"
-                className="w-full bg-green-50 hover:bg-green-100 text-green-700 font-semibold dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900"
-                onClick={() => handleSurpriseBag(product)}
+                className="w-full bg-green-50 hover:bg-green-100 text-green-700 font-semibold dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900 relative overflow-hidden"
+                onClick={(e) => handleSurpriseBag(product, e)}
               >
                 <Package className="w-4 h-4 mr-2" />
                 Surprise Bag
@@ -115,8 +143,8 @@ export const ProductActionCards = ({ products }: ProductActionCardsProps) => {
               <Button
                 variant="secondary"
                 size="lg"
-                className="w-full bg-pink-50 hover:bg-pink-100 text-pink-600 font-semibold dark:bg-pink-950 dark:text-pink-400 dark:hover:bg-pink-900"
-                onClick={() => handleDonation(product)}
+                className="w-full bg-pink-50 hover:bg-pink-100 text-pink-600 font-semibold dark:bg-pink-950 dark:text-pink-400 dark:hover:bg-pink-900 relative overflow-hidden"
+                onClick={(e) => handleDonation(product, e)}
               >
                 <Heart className="w-4 h-4 mr-2" />
                 Donation
@@ -126,5 +154,6 @@ export const ProductActionCards = ({ products }: ProductActionCardsProps) => {
         );
       })}
     </div>
+    </>
   );
 };

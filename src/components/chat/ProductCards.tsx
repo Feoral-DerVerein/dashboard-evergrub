@@ -78,7 +78,7 @@ export const ProductCards = ({ products, onAddToTaskList }: ProductCardsProps) =
       {products.map((product, index) => (
         <Card 
           key={product.id}
-          className={`border-l-4 ${getBorderColor(product.urgency_level)} hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in`}
+          className={`border-l-4 ${getBorderColor(product.urgency_level)} hover:shadow-xl hover:scale-102 transition-all duration-300 animate-fade-in cursor-pointer`}
           style={{ animationDelay: `${index * 100}ms` }}
         >
           <CardHeader className="pb-3">

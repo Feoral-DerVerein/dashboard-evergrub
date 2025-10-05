@@ -50,7 +50,7 @@ export function InteractiveProductCard({ product, onAction }: InteractiveProduct
   return (
     <>
       <Card 
-        className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2"
+        className="group hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer border-2 relative overflow-hidden"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => handleAction('details')}

@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Clock, Package, DollarSign, Percent, MapPin, Store, EyeOff, Edit, Trash2 } from "lucide-react";
 import { Product } from "@/types/product.types";
 import { Badge } from "@/components/ui/badge";
 import PointsBadge from "@/components/PointsBadge";
 import surpriseBagBanner from "@/assets/surprise-bag-banner.png";
+import { SurpriseBagDetailsDialog } from "@/components/modals/SurpriseBagDetailsDialog";
 
 interface SurpriseBagCardProps {
   product: Product;
@@ -19,12 +21,24 @@ export const SurpriseBagCard = ({
   onToggleVisibility,
   isTogglingVisibility = false
 }: SurpriseBagCardProps) => {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
   const discount = product.originalPrice && product.price 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
   return (
-    <div className="border-2 border-green-200 rounded-lg overflow-hidden bg-gradient-to-br from-green-50 to-green-100 shadow-sm relative">
+    <>
+      <SurpriseBagDetailsDialog 
+        product={product}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+      />
+      
+      <div 
+        className="border-2 border-green-200 rounded-lg overflow-hidden bg-gradient-to-br from-green-50 to-green-100 shadow-sm relative cursor-pointer hover:shadow-xl hover:scale-102 transition-all duration-200"
+        onClick={() => setDetailsOpen(true)}
+      >
       {/* Special Surprise Bag Badge */}
       <div className="absolute top-2 left-2 z-20">
         <Badge variant="default" className="bg-green-600 text-white text-xs font-bold">
@@ -35,7 +49,10 @@ export const SurpriseBagCard = ({
 
       {/* Visibility Toggle */}
       <button 
-        onClick={() => onToggleVisibility(product)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleVisibility(product);
+        }}
         disabled={isTogglingVisibility}
         className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white border border-gray-200 text-gray-700 p-2 rounded-md shadow-sm disabled:opacity-60"
         title={(product as any).isMarketplaceVisible ? "Hide from marketplace" : "Show in marketplace"}
@@ -128,14 +145,20 @@ export const SurpriseBagCard = ({
         <div className="space-y-1">
           <div className="flex gap-1">
             <button 
-              onClick={() => onEdit(product)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(product);
+              }}
               className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
             >
               <Edit className="w-3 h-3" />
               Edit
             </button>
             <button 
-              onClick={() => product.id && onDelete(product.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                product.id && onDelete(product.id);
+              }}
               className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
             >
               <Trash2 className="w-3 h-3" />
@@ -145,5 +168,6 @@ export const SurpriseBagCard = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
