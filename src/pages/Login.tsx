@@ -89,10 +89,23 @@ const Login = () => {
         });
         if (error) throw error;
         console.log("Registration successful", data);
-        toast({
-          title: "Registration successful",
-          description: "Your account has been created. Check your email to verify it."
-        });
+        
+        // Check if email confirmation is required
+        if (data.user && !data.session) {
+          toast({
+            title: "Registration successful",
+            description: "Check your email to verify your account before logging in."
+          });
+        } else if (data.session) {
+          // User is automatically logged in (email confirmation disabled)
+          toast({
+            title: "Registration successful",
+            description: "Welcome! Redirecting to dashboard..."
+          });
+          setTimeout(() => {
+            navigate("/dashboard", { replace: true });
+          }, 1500);
+        }
         
         // Clear signup fields
         setFirstName("");
