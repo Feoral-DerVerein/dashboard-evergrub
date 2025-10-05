@@ -4,10 +4,12 @@ import { Send, TrendingUp, DollarSign, Zap, ArrowRight } from 'lucide-react';
 import { BusinessCard, type BusinessCardData } from '@/components/chat/BusinessCards';
 import { ProductCards } from '@/components/chat/ProductCards';
 import { ProductActionCards } from '@/components/chat/ProductActionCards';
+import { InteractiveProductCard } from '@/components/chat/InteractiveProductCard';
 import { useTaskList } from '@/hooks/useTaskList';
 import TaskList from '@/components/chat/TaskList';
 import { useChatbot } from '@/hooks/useChatbot';
 import { ChatLoadingIndicator } from '@/components/chat/ChatLoadingIndicator';
+import { useToast } from '@/hooks/use-toast';
 
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -18,6 +20,27 @@ const ChatBot = ({
 }: ChatBotProps) => {
   // Task list hook
   const { tasks, addTask, completeTask, removeTask, archiveTask, clearCompletedTasks, takeAction } = useTaskList();
+  const { toast } = useToast();
+
+  const handleProductAction = (action: 'reserve' | 'cart' | 'details', productId: string) => {
+    switch (action) {
+      case 'reserve':
+        toast({
+          title: "Reservation Created",
+          description: `Product ${productId} has been reserved successfully.`,
+        });
+        break;
+      case 'cart':
+        toast({
+          title: "Added to Cart",
+          description: `Product ${productId} has been added to your cart.`,
+        });
+        break;
+      case 'details':
+        // Details modal is handled in the component
+        break;
+    }
+  };
   
   // Enhanced chatbot hook with intelligence
   const { 
@@ -141,12 +164,30 @@ const ChatBot = ({
                     </div>
                   )}
 
-                  {/* Product Cards - Use ProductActionCards for N8N responses */}
+                  {/* Product Cards - Use Interactive Product Cards */}
                   {message.type === 'bot' && message.product_cards && message.product_cards.length > 0 && (
                     <div className="text-left mt-4">
-                      <ProductActionCards 
-                        products={message.product_cards}
-                      />
+                      <p className="text-sm font-medium text-[#6e6e80] px-1 mb-3">📦 Available Products:</p>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {message.product_cards.map((product: any) => (
+                          <InteractiveProductCard
+                            key={product.id}
+                            product={{
+                              id: product.id.toString(),
+                              name: product.name || 'Product',
+                              category: product.category || 'General',
+                              price: product.price || 0,
+                              image: product.image_url,
+                              location: product.location,
+                              pickupTime: product.pickupTime,
+                              quantity: product.quantity,
+                              urgency: product.urgency,
+                              description: product.reason
+                            }}
+                            onAction={handleProductAction}
+                          />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>

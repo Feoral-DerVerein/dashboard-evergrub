@@ -175,12 +175,20 @@ export const useChatbot = () => {
       // Generate cards based on response content
       const cards = generateCardsFromResponse(responseText, messageText);
 
+      // Transform product cards to include more interactive data
+      const transformedProductCards = data.product_cards?.map((card: any) => ({
+        ...card,
+        location: 'Store Location',
+        pickupTime: '5:00 PM - 7:00 PM',
+        urgency: card.reason?.includes('expire') ? 'high' : 'medium'
+      }));
+
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
         content: `Perfect, here it is:\n\n${responseText}`,
         cards: cards,
-        product_cards: data.product_cards,
+        product_cards: transformedProductCards,
         timestamp: new Date()
       };
 

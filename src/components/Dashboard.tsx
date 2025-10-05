@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store, RefreshCw, Plug, CreditCard, LogOut } from "lucide-react";
+import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store, RefreshCw, Plug, CreditCard, LogOut, TrendingUp, Package, Target } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Link } from "react-router-dom";
@@ -26,6 +26,10 @@ import { formatCurrency, formatDateTime } from "@/services/posApiService";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useMetricsData } from "@/hooks/useMetricsData";
+import { MetricCard } from "@/components/MetricCard";
+import { MetricDetailModal } from "@/components/MetricDetailModal";
+import type { MetricValue } from "@/hooks/useMetricsData";
 type QuickAccessItemProps = {
   icon: React.ComponentType<{
     className?: string;
@@ -121,6 +125,13 @@ const Dashboard = () => {
   } = useNotificationsAndOrders();
   const { surpriseBagCount } = useSurpriseBags();
   const { metrics, isLoading: isLoadingMetrics, lastUpdated, refreshData, isUsingMockData } = useDashboardData();
+  const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month">("week");
+  const { data: liveMetrics, isLoading: isLoadingLiveMetrics } = useMetricsData(selectedPeriod);
+  const [selectedMetric, setSelectedMetric] = useState<{
+    title: string;
+    value: MetricValue;
+    format: 'currency' | 'number' | 'percentage' | 'kg';
+  } | null>(null);
   const [recentActivity, setRecentActivity] = useState<RecentActivityItemProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -403,11 +414,130 @@ const Dashboard = () => {
                 <QuickAccessItem icon={Recycle} label="Surprise Bag" to="/products" badgeCount={surpriseBagCount} />
               </div>
 
+              {/* Live Metrics Section */}
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Live Business Metrics</h2>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={selectedPeriod === "week" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedPeriod("week")}
+                    >
+                      Week
+                    </Button>
+                    <Button
+                      variant={selectedPeriod === "month" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedPeriod("month")}
+                    >
+                      Month
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  {liveMetrics && (
+                    <>
+                      <MetricCard
+                        title="Total Sales"
+                        value={liveMetrics.totalSales}
+                        icon={<DollarSign className="w-5 h-5" />}
+                        isLoading={isLoadingLiveMetrics}
+                        format="currency"
+                        onClick={() => setSelectedMetric({ 
+                          title: 'Total Sales', 
+                          value: liveMetrics.totalSales, 
+                          format: 'currency' 
+                        })}
+                      />
+                      <MetricCard
+                        title="Transactions"
+                        value={liveMetrics.transactions}
+                        icon={<ShoppingCart className="w-5 h-5" />}
+                        isLoading={isLoadingLiveMetrics}
+                        onClick={() => setSelectedMetric({ 
+                          title: 'Transactions', 
+                          value: liveMetrics.transactions, 
+                          format: 'number' 
+                        })}
+                      />
+                      <MetricCard
+                        title="Profit"
+                        value={liveMetrics.profit}
+                        icon={<TrendingUp className="w-5 h-5" />}
+                        isLoading={isLoadingLiveMetrics}
+                        format="currency"
+                        onClick={() => setSelectedMetric({ 
+                          title: 'Profit', 
+                          value: liveMetrics.profit, 
+                          format: 'currency' 
+                        })}
+                      />
+                      <MetricCard
+                        title="Active Surprise Bags"
+                        value={liveMetrics.activeSurpriseBags}
+                        icon={<Package className="w-5 h-5" />}
+                        isLoading={isLoadingLiveMetrics}
+                        onClick={() => setSelectedMetric({ 
+                          title: 'Active Surprise Bags', 
+                          value: liveMetrics.activeSurpriseBags, 
+                          format: 'number' 
+                        })}
+                      />
+                    </>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {liveMetrics && (
+                    <>
+                      <MetricCard
+                        title="CO₂ Saved"
+                        value={liveMetrics.co2Saved}
+                        icon={<Leaf className="w-5 h-5" />}
+                        isLoading={isLoadingLiveMetrics}
+                        format="kg"
+                        onClick={() => setSelectedMetric({ 
+                          title: 'CO₂ Saved', 
+                          value: liveMetrics.co2Saved, 
+                          format: 'kg' 
+                        })}
+                      />
+                      <MetricCard
+                        title="Food Waste Reduced"
+                        value={liveMetrics.foodWasteReduced}
+                        icon={<Recycle className="w-5 h-5" />}
+                        isLoading={isLoadingLiveMetrics}
+                        format="kg"
+                        onClick={() => setSelectedMetric({ 
+                          title: 'Food Waste Reduced', 
+                          value: liveMetrics.foodWasteReduced, 
+                          format: 'kg' 
+                        })}
+                      />
+                      <MetricCard
+                        title="Cost Savings"
+                        value={liveMetrics.costSavings}
+                        icon={<Target className="w-5 h-5" />}
+                        isLoading={isLoadingLiveMetrics}
+                        format="currency"
+                        onClick={() => setSelectedMetric({ 
+                          title: 'Cost Savings', 
+                          value: liveMetrics.costSavings, 
+                          format: 'currency' 
+                        })}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+
               {/* Stats Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                 <StatCard 
-                  label="Total Sales" 
-                  value={metrics ? formatCurrency(metrics.totalSales) : formatCurrency(stats.totalSales)} 
+                  label="Total Sales (Legacy)" 
+                  value={metrics ? formatCurrency(metrics.totalSales) : formatCurrency(stats.totalSales)}
                   trend={metrics ? `${metrics.salesChange > 0 ? '+' : ''}${metrics.salesChange.toFixed(1)}%` : "5.2% vs last week"}
                   isLoading={isLoadingMetrics || stats.isLoading}
                 />
@@ -459,6 +589,17 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Metric Detail Modal */}
+      {selectedMetric && (
+        <MetricDetailModal
+          open={!!selectedMetric}
+          onOpenChange={() => setSelectedMetric(null)}
+          title={selectedMetric.title}
+          metric={selectedMetric.value}
+          format={selectedMetric.format}
+        />
+      )}
     </div>;
 };
 export default Dashboard;
