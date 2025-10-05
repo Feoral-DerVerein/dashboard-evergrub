@@ -34,6 +34,14 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  // Additional signup fields
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState("");
+  const [businessType, setBusinessType] = useState("");
+  
   const navigate = useNavigate();
   const {
     toast
@@ -66,7 +74,18 @@ const Login = () => {
           error
         } = await supabase.auth.signUp({
           email,
-          password
+          password,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              full_name: `${firstName} ${lastName}`,
+              phone: phone,
+              country: country,
+              business_type: businessType
+            },
+            emailRedirectTo: `${window.location.origin}/dashboard`
+          }
         });
         if (error) throw error;
         console.log("Registration successful", data);
@@ -74,6 +93,13 @@ const Login = () => {
           title: "Registration successful",
           description: "Your account has been created. Check your email to verify it."
         });
+        
+        // Clear signup fields
+        setFirstName("");
+        setLastName("");
+        setPhone("");
+        setCountry("");
+        setBusinessType("");
       }
     } catch (error: any) {
       console.error("Authentication error:", error);
@@ -143,6 +169,57 @@ const Login = () => {
         
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Signup-only fields */}
+          {activeTab === 'signup' && (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <Input 
+                  type="text" 
+                  placeholder="First Name" 
+                  className="bg-white/80 border-gray-200 rounded-full py-3 px-4 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
+                  value={firstName} 
+                  onChange={e => setFirstName(e.target.value)} 
+                  required 
+                />
+                <Input 
+                  type="text" 
+                  placeholder="Last Name" 
+                  className="bg-white/80 border-gray-200 rounded-full py-3 px-4 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
+                  value={lastName} 
+                  onChange={e => setLastName(e.target.value)} 
+                  required 
+                />
+              </div>
+              
+              <Input 
+                type="tel" 
+                placeholder="Phone Number" 
+                className="bg-white/80 border-gray-200 rounded-full py-3 px-4 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
+                value={phone} 
+                onChange={e => setPhone(e.target.value)} 
+                required 
+              />
+              
+              <Input 
+                type="text" 
+                placeholder="Country" 
+                className="bg-white/80 border-gray-200 rounded-full py-3 px-4 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
+                value={country} 
+                onChange={e => setCountry(e.target.value)} 
+                required 
+              />
+              
+              <Input 
+                type="text" 
+                placeholder="Business Type (e.g., Cafe, Restaurant)" 
+                className="bg-white/80 border-gray-200 rounded-full py-3 px-4 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" 
+                value={businessType} 
+                onChange={e => setBusinessType(e.target.value)} 
+                required 
+              />
+            </>
+          )}
+          
           {/* Email Input */}
           <div>
             <Input type="email" placeholder={activeTab === 'login' ? "Username or email" : "Email"} className="bg-white/80 border-gray-200 rounded-full py-3 px-4 text-gray-700 placeholder-gray-500 focus:bg-white focus:border-gray-300" value={email} onChange={e => setEmail(e.target.value)} required />
