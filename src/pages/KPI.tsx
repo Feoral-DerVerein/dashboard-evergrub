@@ -1,7 +1,7 @@
-import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink } from "lucide-react";
+import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink, Plug, CreditCard, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/Dashboard";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -236,9 +236,8 @@ const KPI = () => {
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
   // Inventory POS state
-  const {
-    user
-  } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [suppliers, setSuppliers] = useState<Array<{
     id: string;
@@ -752,20 +751,45 @@ const KPI = () => {
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar className="h-8 w-8 cursor-pointer absolute top-2 right-2">
+                  <Avatar className="h-14 w-14 cursor-pointer absolute top-2 right-2">
                     <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
                     <AvatarFallback>O</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-48 bg-white">
                   <DropdownMenuItem asChild>
-                    <Link to="/onboarding" className="flex items-center gap-2 w-full">
-                      <Settings2 className="h-4 w-4" />
-                      API
+                    <Link to="/configuration" className="flex items-center gap-2 w-full">
+                      <Settings className="h-4 w-4" />
+                      Settings
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <LogoutButton />
+                    <Link to="/api-config" className="flex items-center gap-2 w-full">
+                      <Plug className="h-4 w-4" />
+                      API Config
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/pricing" className="flex items-center gap-2 w-full">
+                      <CreditCard className="h-4 w-4" />
+                      Pricing
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="flex items-center gap-2 cursor-pointer" 
+                    onClick={async () => {
+                      try {
+                        await signOut();
+                        toast.success("Session closed successfully");
+                        navigate("/login");
+                      } catch (error) {
+                        console.error("Error logging out:", error);
+                        toast.error("Error logging out");
+                      }
+                    }}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
