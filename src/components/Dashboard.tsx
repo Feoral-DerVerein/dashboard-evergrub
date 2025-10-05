@@ -337,9 +337,15 @@ const Dashboard = () => {
                    </DropdownMenuTrigger>
                    <DropdownMenuContent align="end" className="w-48">
                      <DropdownMenuItem asChild>
-                       <Link to="/onboarding" className="flex items-center gap-2 w-full">
-                         <Settings2 className="h-4 w-4" />
-                         API
+                       <Link to="/configuration" className="flex items-center gap-2 w-full">
+                         <Settings className="h-4 w-4" />
+                         Settings
+                       </Link>
+                     </DropdownMenuItem>
+                     <DropdownMenuItem asChild>
+                       <Link to="/api-config" className="flex items-center gap-2 w-full">
+                         <Plug className="h-4 w-4" />
+                         API Config
                        </Link>
                      </DropdownMenuItem>
                      <DropdownMenuItem asChild>
