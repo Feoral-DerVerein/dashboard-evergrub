@@ -11,7 +11,7 @@ const ApiConfig = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="min-h-screen bg-white p-4">
       <div className="max-w-2xl mx-auto">
         <POSConnectionForm onComplete={handleConfigComplete} />
       </div>

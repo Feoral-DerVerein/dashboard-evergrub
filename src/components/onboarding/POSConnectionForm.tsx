@@ -322,16 +322,8 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
         </Card>
       </div>;
   }
-  return <div className="min-h-screen relative overflow-hidden" style={{
-    backgroundImage: `url('/src/assets/gradient-background.jpg')`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat'
-  }}>
-      {/* Overlay to ensure content visibility */}
-      <div className="absolute inset-0 z-1 bg-black/10" />
-
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+  return <div className="min-h-screen bg-white p-4">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-full max-w-4xl mx-auto space-y-8">
           
           {/* Main POS Connection Card */}
@@ -344,8 +336,8 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
         }} transition={{
           duration: 0.6
         }}>
-            <Card className="glass-card backdrop-blur-xl bg-white/25 border border-white/20 rounded-3xl shadow-[0_25px_45px_rgba(0,0,0,0.1)] overflow-hidden">
-              <CardHeader className="text-center pb-6 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm">
+            <Card className="bg-white border border-gray-200 rounded-3xl shadow-lg overflow-hidden">
+              <CardHeader className="text-center pb-6 bg-white border-b border-gray-100">
                 <motion.div initial={{
                 scale: 0.9
               }} animate={{
