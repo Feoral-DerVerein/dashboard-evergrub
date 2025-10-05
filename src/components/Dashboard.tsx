@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store } from "lucide-react";
+import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store, RefreshCw } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Link } from "react-router-dom";
@@ -21,6 +21,8 @@ import { Slider } from "./ui/slider";
 import { Switch } from "./ui/switch";
 import { Progress } from "./ui/progress";
 import { useSurpriseBags } from "@/hooks/useSurpriseBags";
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { formatCurrency, formatDateTime } from "@/services/posApiService";
 type QuickAccessItemProps = {
   icon: React.ComponentType<{
     className?: string;
@@ -109,6 +111,7 @@ const Dashboard = () => {
     notificationCount
   } = useNotificationsAndOrders();
   const { surpriseBagCount } = useSurpriseBags();
+  const { metrics, isLoading: isLoadingMetrics, lastUpdated, refreshData, isUsingMockData } = useDashboardData();
   const [recentActivity, setRecentActivity] = useState<RecentActivityItemProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -290,31 +293,54 @@ const Dashboard = () => {
           {/* Main content */}
           <div>
             <header className="px-6 pt-8 pb-6">
-              <div className="flex justify-between items-center mb-1">
-               <div>
-                <img src={welcomeBanner} alt="Welcome message" className="h-16 object-contain" />
-                <p className="text-gray-400 text-sm">Ortega's account</p>
+               <div className="flex justify-between items-center mb-1">
+                <div>
+                 <img src={welcomeBanner} alt="Welcome message" className="h-16 object-contain" />
+                 <p className="text-gray-400 text-sm">Ortega's account</p>
+                </div>
+                <div className="flex items-center gap-3">
+                 {/* Status Badge */}
+                 <Badge 
+                   variant={isUsingMockData ? "secondary" : "default"}
+                   className="hidden md:flex items-center gap-1.5"
+                 >
+                   <div className={`w-2 h-2 rounded-full ${isUsingMockData ? 'bg-yellow-500' : 'bg-green-500'}`} />
+                   {isUsingMockData ? 'Using sample data' : 'Connected to POS'}
+                 </Badge>
+                 
+                 {/* Refresh Button */}
+                 <Button
+                   variant="outline"
+                   size="sm"
+                   onClick={refreshData}
+                   disabled={isLoadingMetrics}
+                   className="gap-2"
+                 >
+                   <RefreshCw className={`w-4 h-4 ${isLoadingMetrics ? 'animate-spin' : ''}`} />
+                   <span className="hidden md:inline">Refresh</span>
+                 </Button>
+                 
+                 <DropdownMenu>
+                   <DropdownMenuTrigger asChild>
+                     <Avatar className="h-12 w-12 cursor-pointer">
+                       <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
+                       <AvatarFallback>O</AvatarFallback>
+                     </Avatar>
+                   </DropdownMenuTrigger>
+                   <DropdownMenuContent align="end" className="w-48">
+                     <DropdownMenuItem asChild>
+                       <Link to="/onboarding" className="flex items-center gap-2 w-full">
+                         <Settings2 className="h-4 w-4" />
+                         API
+                       </Link>
+                     </DropdownMenuItem>
+                     <DropdownMenuItem asChild>
+                       <LogoutButton />
+                     </DropdownMenuItem>
+                   </DropdownMenuContent>
+                 </DropdownMenu>
+                </div>
                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Avatar className="h-12 w-12 cursor-pointer">
-                      <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
-                      <AvatarFallback>O</AvatarFallback>
-                    </Avatar>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem asChild>
-                      <Link to="/onboarding" className="flex items-center gap-2 w-full">
-                        <Settings2 className="h-4 w-4" />
-                        API
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <LogoutButton />
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
             </header>
 
             {/* Main Dashboard Content */}
@@ -324,6 +350,11 @@ const Dashboard = () => {
                   This is your summary for today. Here you can view your key performance indicators, 
                   recent activity, and important metrics to help you manage your coffee shop efficiently.
                 </p>
+                {lastUpdated && (
+                  <p className="text-xs text-gray-400 mt-2">
+                    Last updated: {formatDateTime(lastUpdated)}
+                  </p>
+                )}
               </div>
               
               {/* Quick Access Grid */}
@@ -338,21 +369,21 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                 <StatCard 
                   label="Total Sales" 
-                  value={stats.totalSales} 
-                  trend="5.2% vs last week"
-                  isLoading={stats.isLoading}
+                  value={metrics ? formatCurrency(metrics.totalSales) : formatCurrency(stats.totalSales)} 
+                  trend={metrics ? `${metrics.salesChange > 0 ? '+' : ''}${metrics.salesChange.toFixed(1)}%` : "5.2% vs last week"}
+                  isLoading={isLoadingMetrics || stats.isLoading}
                 />
                 <StatCard 
                   label="Revenue" 
-                  value={`$${stats.totalRevenue.toFixed(2)}`} 
-                  trend="12.8% vs last week"
-                  isLoading={stats.isLoading}
+                  value={metrics ? formatCurrency(metrics.revenue) : `$${stats.totalRevenue.toFixed(2)}`} 
+                  trend={metrics ? `${metrics.revenueChange > 0 ? '+' : ''}${metrics.revenueChange.toFixed(1)}%` : "12.8% vs last week"}
+                  isLoading={isLoadingMetrics || stats.isLoading}
                 />
                 <StatCard 
-                  label="Active Users" 
-                  value={stats.activeUsers} 
-                  trend="3.1% vs last week"
-                  isLoading={stats.isLoading}
+                  label="Transactions" 
+                  value={metrics ? metrics.transactions : stats.activeUsers} 
+                  trend={metrics ? `${metrics.transactionsChange > 0 ? '+' : ''}${metrics.transactionsChange.toFixed(1)}%` : "3.1% vs last week"}
+                  isLoading={isLoadingMetrics || stats.isLoading}
                 />
               </div>
 
