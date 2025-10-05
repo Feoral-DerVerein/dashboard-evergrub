@@ -86,7 +86,7 @@ const Login = () => {
       setLoading(false);
     }
   };
-  const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
+  const handleSocialLogin = async (provider: 'google') => {
     try {
       console.log(`Attempting login with ${provider}`);
       const {
@@ -177,7 +177,7 @@ const Login = () => {
           </div>}
 
         {/* Social Login */}
-        <div className="mt-8 space-y-3">
+        <div className="mt-8">
           <Button variant="outline" className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/60 border-gray-200 text-gray-700 hover:bg-white/80" onClick={() => handleSocialLogin('google')} disabled={loading}>
             <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
               <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
@@ -188,16 +188,6 @@ const Login = () => {
               </g>
             </svg>
             Continue with Google
-          </Button>
-
-          <Button variant="outline" className="w-full py-3 flex items-center justify-center gap-3 rounded-full bg-white/60 border-gray-200 text-gray-700 hover:bg-white/80" onClick={() => handleSocialLogin('microsoft')} disabled={loading}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 21 21">
-              <rect x="1" y="1" width="9" height="9" fill="#f25022" />
-              <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
-              <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
-              <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
-            </svg>
-            Continue with Microsoft
           </Button>
         </div>
 
