@@ -93,15 +93,19 @@ export const BottomNav = () => {
       </Link>
       <Link to="/products" className="bottom-nav-item">
         <ShoppingCart className="w-6 h-6" />
-        <span className="text-xs">B2C</span>
+        <span className="text-xs">Market B2C</span>
       </Link>
       <Link to="/market" className="bottom-nav-item">
         <Store className="w-6 h-6" />
-        <span className="text-xs">B2B</span>
+        <span className="text-xs">Market B2B</span>
       </Link>
       <Link to="/configuration" className="bottom-nav-item">
         <Settings className="w-6 h-6" />
         <span className="text-xs">Settings</span>
+      </Link>
+      <Link to="/api-config" className="bottom-nav-item">
+        <Plug className="w-6 h-6" />
+        <span className="text-xs">API</span>
       </Link>
     </div>;
 };
