@@ -30,3 +30,6 @@ verify_jwt = true
 [functions.update-metrics]
 verify_jwt = true
 
+[functions.seed-test-data]
+verify_jwt = true
+
