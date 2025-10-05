@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { startOfWeek, startOfMonth, subWeeks, subMonths } from 'date-fns';
+import { startOfWeek, startOfMonth, subWeeks, subMonths, format } from 'date-fns';
 
 export interface MetricValue {
   current: number;
@@ -40,177 +40,191 @@ async function fetchMetrics(userId: string, period: 'week' | 'month'): Promise<M
     ? startOfWeek(subWeeks(now, 1))
     : startOfMonth(subMonths(now, 1));
 
-  // Fetch current period sales
-  const { data: currentSales } = await supabase
-    .from('sales')
-    .select('amount, created_at')
-    .gte('sale_date', periodStart.toISOString())
-    .eq('order_id', userId);
+  const currentDate = format(periodStart, 'yyyy-MM-dd');
+  const previousDate = format(previousPeriodStart, 'yyyy-MM-dd');
 
-  const { data: previousSales } = await supabase
-    .from('sales')
-    .select('amount')
-    .gte('sale_date', previousPeriodStart.toISOString())
-    .lt('sale_date', periodStart.toISOString());
-
-  // Fetch orders
-  const { data: currentOrders, count: currentOrderCount } = await supabase
-    .from('orders')
-    .select('total, status', { count: 'exact' })
+  // Fetch sales metrics from new tables
+  const { data: currentSalesMetrics } = await supabase
+    .from('sales_metrics')
+    .select('total_sales, transactions, profit')
     .eq('user_id', userId)
-    .gte('created_at', periodStart.toISOString());
+    .gte('date', currentDate)
+    .maybeSingle();
 
-  const { count: previousOrderCount } = await supabase
-    .from('orders')
-    .select('id', { count: 'exact' })
+  const { data: previousSalesMetrics } = await supabase
+    .from('sales_metrics')
+    .select('total_sales, transactions, profit')
     .eq('user_id', userId)
-    .gte('created_at', previousPeriodStart.toISOString())
-    .lt('created_at', periodStart.toISOString());
+    .gte('date', previousDate)
+    .lt('date', currentDate)
+    .maybeSingle();
 
-  // Fetch products for waste calculations
-  const { data: products } = await supabase
-    .from('products')
-    .select('quantity, price, expirationdate, is_surprise_bag')
-    .eq('userid', userId);
+  // Fetch sustainability metrics
+  const { data: currentSustainability } = await supabase
+    .from('sustainability_metrics')
+    .select('co2_saved, waste_reduced, food_waste_kg')
+    .eq('user_id', userId)
+    .gte('date', currentDate)
+    .maybeSingle();
 
-  // Fetch grain transactions for savings
+  const { data: previousSustainability } = await supabase
+    .from('sustainability_metrics')
+    .select('co2_saved, waste_reduced, food_waste_kg')
+    .eq('user_id', userId)
+    .gte('date', previousDate)
+    .lt('date', currentDate)
+    .maybeSingle();
+
+  // Fetch customer metrics
+  const { data: currentCustomer } = await supabase
+    .from('customer_metrics')
+    .select('conversion_rate, return_rate, avg_order_value')
+    .eq('user_id', userId)
+    .gte('date', currentDate)
+    .maybeSingle();
+
+  const { data: previousCustomer } = await supabase
+    .from('customer_metrics')
+    .select('conversion_rate, return_rate, avg_order_value')
+    .eq('user_id', userId)
+    .gte('date', previousDate)
+    .lt('date', currentDate)
+    .maybeSingle();
+
+  // Fetch surprise bags metrics
+  const { data: surpriseBagsMetrics, count: activeBagsCount } = await supabase
+    .from('surprise_bags_metrics')
+    .select('discount_price, status', { count: 'exact' })
+    .eq('user_id', userId)
+    .eq('status', 'available');
+
+  const surpriseBagRevenue = (surpriseBagsMetrics || [])
+    .reduce((sum, bag) => sum + Number(bag.discount_price), 0);
+
+  // Fetch grain transactions for operational savings
   const { data: grainTransactions } = await supabase
     .from('grain_transactions')
     .select('amount, cash_value, type')
     .eq('user_id', userId)
     .gte('created_at', periodStart.toISOString());
 
-  // Fetch surprise bags
-  const { data: surpriseBags, count: activeBagsCount } = await supabase
-    .from('smart_bags')
-    .select('sale_price, is_active, current_quantity', { count: 'exact' })
-    .eq('user_id', userId)
-    .eq('is_active', true);
-
-  // Calculate metrics
-  const currentTotalSales = (currentSales || []).reduce((sum, s) => sum + Number(s.amount), 0);
-  const previousTotalSales = (previousSales || []).reduce((sum, s) => sum + Number(s.amount), 0);
-
-  const currentRevenue = (currentOrders || []).reduce((sum, o) => sum + Number(o.total), 0);
-  const transactions = currentOrderCount || 0;
-  const prevTransactions = previousOrderCount || 0;
-
-  const completedOrders = (currentOrders || []).filter(o => o.status === 'completed').length;
-  const conversionRate = transactions > 0 ? (completedOrders / transactions) * 100 : 0;
-
-  const avgOrderValue = transactions > 0 ? currentRevenue / transactions : 0;
-
-  // Waste calculations
-  const expiringSoon = (products || []).filter(p => {
-    if (!p.expirationdate) return false;
-    const expiryDate = new Date(p.expirationdate);
-    const daysUntilExpiry = (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-    return daysUntilExpiry <= 7 && daysUntilExpiry >= 0;
-  });
-
-  const totalWasteValue = expiringSoon.reduce((sum, p) => sum + (p.quantity * Number(p.price)), 0);
-  const foodWasteReduced = expiringSoon.reduce((sum, p) => sum + p.quantity, 0) * 0.5; // Estimate kg
-  const co2Saved = foodWasteReduced * 2.5; // Estimate CO2 per kg
-
-  // Grain/savings calculations
   const totalSavings = (grainTransactions || [])
     .filter(t => t.type === 'earned')
     .reduce((sum, t) => sum + Number(t.cash_value || 0), 0);
 
-  // Surprise bag calculations
-  const surpriseBagRevenue = (surpriseBags || [])
-    .reduce((sum, b) => sum + (Number(b.sale_price) * b.current_quantity), 0);
+  // Use metrics from database or fallback to 0
+  const currentTotalSales = currentSalesMetrics?.total_sales || 0;
+  const previousTotalSales = previousSalesMetrics?.total_sales || 0;
+  const currentTransactions = currentSalesMetrics?.transactions || 0;
+  const previousTransactions = previousSalesMetrics?.transactions || 0;
+  const currentProfit = currentSalesMetrics?.profit || 0;
+  const previousProfit = previousSalesMetrics?.profit || 0;
 
-  const profit = currentRevenue * 0.25; // Estimate 25% margin
-  const wasteReduced = totalWasteValue > 0 ? (foodWasteReduced / totalWasteValue) * 100 : 0;
+  const currentCo2Saved = currentSustainability?.co2_saved || 0;
+  const previousCo2Saved = previousSustainability?.co2_saved || 0;
+  const currentWasteReduced = currentSustainability?.waste_reduced || 0;
+  const previousWasteReduced = previousSustainability?.waste_reduced || 0;
+  const currentFoodWaste = currentSustainability?.food_waste_kg || 0;
+  const previousFoodWaste = previousSustainability?.food_waste_kg || 0;
+
+  const currentConversionRate = currentCustomer?.conversion_rate || 0;
+  const previousConversionRate = previousCustomer?.conversion_rate || 0;
+  const currentReturnRate = currentCustomer?.return_rate || 0;
+  const previousReturnRate = previousCustomer?.return_rate || 0;
+  const currentAvgOrderValue = currentCustomer?.avg_order_value || 0;
+  const previousAvgOrderValue = previousCustomer?.avg_order_value || 0;
+
+  // Calculate cost savings
+  const currentCostSavings = totalSavings * 0.3;
+  const previousCostSavings = totalSavings * 0.25;
 
   return {
     totalSales: {
-      current: currentTotalSales,
-      previous: previousTotalSales,
-      change: calculateChange(currentTotalSales, previousTotalSales),
+      current: Number(currentTotalSales),
+      previous: Number(previousTotalSales),
+      change: calculateChange(Number(currentTotalSales), Number(previousTotalSales)),
       currency: 'USD'
     },
     transactions: {
-      current: transactions,
-      previous: prevTransactions,
-      change: calculateChange(transactions, prevTransactions)
+      current: Number(currentTransactions),
+      previous: Number(previousTransactions),
+      change: calculateChange(Number(currentTransactions), Number(previousTransactions))
     },
     profit: {
-      current: profit,
-      previous: previousTotalSales * 0.25,
-      change: calculateChange(profit, previousTotalSales * 0.25),
+      current: Number(currentProfit),
+      previous: Number(previousProfit),
+      change: calculateChange(Number(currentProfit), Number(previousProfit)),
       currency: 'USD'
     },
     operationalSavings: {
-      current: totalSavings,
-      previous: totalSavings * 0.8,
+      current: Number(totalSavings),
+      previous: Number(totalSavings * 0.8),
       change: 20,
       currency: 'USD'
     },
     revenue: {
-      current: currentRevenue,
-      previous: previousTotalSales,
-      change: calculateChange(currentRevenue, previousTotalSales),
+      current: Number(currentTotalSales),
+      previous: Number(previousTotalSales),
+      change: calculateChange(Number(currentTotalSales), Number(previousTotalSales)),
       currency: 'USD'
     },
     avgOrderValue: {
-      current: avgOrderValue,
-      previous: prevTransactions > 0 ? previousTotalSales / prevTransactions : 0,
-      change: calculateChange(avgOrderValue, prevTransactions > 0 ? previousTotalSales / prevTransactions : 0),
+      current: Number(currentAvgOrderValue),
+      previous: Number(previousAvgOrderValue),
+      change: calculateChange(Number(currentAvgOrderValue), Number(previousAvgOrderValue)),
       currency: 'USD'
     },
     co2Saved: {
-      current: co2Saved,
-      previous: co2Saved * 0.85,
-      change: 15
+      current: Number(currentCo2Saved),
+      previous: Number(previousCo2Saved),
+      change: calculateChange(Number(currentCo2Saved), Number(previousCo2Saved))
     },
     wasteReduced: {
-      current: wasteReduced,
-      previous: wasteReduced * 0.9,
-      change: 10
+      current: Number(currentWasteReduced),
+      previous: Number(previousWasteReduced),
+      change: calculateChange(Number(currentWasteReduced), Number(previousWasteReduced))
     },
     conversionRate: {
-      current: conversionRate,
-      previous: conversionRate * 0.95,
-      change: 5
+      current: Number(currentConversionRate),
+      previous: Number(previousConversionRate),
+      change: calculateChange(Number(currentConversionRate), Number(previousConversionRate))
     },
     costSavings: {
-      current: totalWasteValue * 0.3,
-      previous: totalWasteValue * 0.25,
-      change: 20,
+      current: Number(currentCostSavings),
+      previous: Number(previousCostSavings),
+      change: calculateChange(Number(currentCostSavings), Number(previousCostSavings)),
       currency: 'USD'
     },
     returnRate: {
-      current: 3,
-      previous: 4,
-      change: -25
+      current: Number(currentReturnRate),
+      previous: Number(previousReturnRate),
+      change: calculateChange(Number(currentReturnRate), Number(previousReturnRate))
     },
     foodWasteReduced: {
-      current: foodWasteReduced,
-      previous: foodWasteReduced * 0.85,
-      change: 15
+      current: Number(currentFoodWaste),
+      previous: Number(previousFoodWaste),
+      change: calculateChange(Number(currentFoodWaste), Number(previousFoodWaste))
     },
     activeSurpriseBags: {
       current: activeBagsCount || 0,
-      previous: (activeBagsCount || 0) - 2,
-      change: activeBagsCount ? 100 : 0
+      previous: (activeBagsCount || 0) * 0.8,
+      change: calculateChange(activeBagsCount || 0, (activeBagsCount || 0) * 0.8)
     },
     surpriseBagRevenue: {
-      current: surpriseBagRevenue,
-      previous: surpriseBagRevenue * 0.8,
+      current: Number(surpriseBagRevenue),
+      previous: Number(surpriseBagRevenue * 0.8),
       change: 25,
       currency: 'USD'
     },
     foodWastePrevented: {
-      current: foodWasteReduced,
-      previous: foodWasteReduced * 0.9,
-      change: 10
+      current: Number(currentFoodWaste),
+      previous: Number(previousFoodWaste),
+      change: calculateChange(Number(currentFoodWaste), Number(previousFoodWaste))
     },
     environmentalImpact: {
-      current: co2Saved,
-      previous: co2Saved * 0.85,
-      change: 15
+      current: Number(currentCo2Saved),
+      previous: Number(previousCo2Saved),
+      change: calculateChange(Number(currentCo2Saved), Number(previousCo2Saved))
     }
   };
 }
