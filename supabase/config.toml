@@ -15,3 +15,18 @@ verify_jwt = true
 [functions.create-market-payment]
 verify_jwt = true
 
+[functions.get-sales-metrics]
+verify_jwt = true
+
+[functions.get-sustainability-metrics]
+verify_jwt = true
+
+[functions.get-customer-metrics]
+verify_jwt = true
+
+[functions.get-surprise-bags-metrics]
+verify_jwt = true
+
+[functions.update-metrics]
+verify_jwt = true
+
