@@ -237,6 +237,39 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_metrics: {
+        Row: {
+          avg_order_value: number
+          conversion_rate: number
+          created_at: string | null
+          date: string
+          id: string
+          return_rate: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avg_order_value?: number
+          conversion_rate?: number
+          created_at?: string | null
+          date: string
+          id?: string
+          return_rate?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avg_order_value?: number
+          conversion_rate?: number
+          created_at?: string | null
+          date?: string
+          id?: string
+          return_rate?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       customer_preferences: {
         Row: {
           category_preferences: Json | null
@@ -961,6 +994,39 @@ export type Database = {
           },
         ]
       }
+      sales_metrics: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          profit: number
+          total_sales: number
+          transactions: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: string
+          profit?: number
+          total_sales?: number
+          transactions?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          profit?: number
+          total_sales?: number
+          transactions?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       smart_bag_analytics: {
         Row: {
           created_at: string
@@ -1149,6 +1215,78 @@ export type Database = {
           opening_hours?: string
           store_type?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      surprise_bags_metrics: {
+        Row: {
+          created_at: string | null
+          discount_price: number
+          id: string
+          items: Json
+          original_price: number
+          pickup_time: string | null
+          status: string
+          store_name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          discount_price: number
+          id?: string
+          items?: Json
+          original_price: number
+          pickup_time?: string | null
+          status?: string
+          store_name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          discount_price?: number
+          id?: string
+          items?: Json
+          original_price?: number
+          pickup_time?: string | null
+          status?: string
+          store_name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sustainability_metrics: {
+        Row: {
+          co2_saved: number
+          created_at: string | null
+          date: string
+          food_waste_kg: number
+          id: string
+          updated_at: string | null
+          user_id: string
+          waste_reduced: number
+        }
+        Insert: {
+          co2_saved?: number
+          created_at?: string | null
+          date: string
+          food_waste_kg?: number
+          id?: string
+          updated_at?: string | null
+          user_id: string
+          waste_reduced?: number
+        }
+        Update: {
+          co2_saved?: number
+          created_at?: string | null
+          date?: string
+          food_waste_kg?: number
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+          waste_reduced?: number
         }
         Relationships: []
       }
