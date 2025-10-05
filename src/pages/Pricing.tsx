@@ -41,7 +41,6 @@ const Pricing = () => {
     "Access to basic food waste dashboard",
     "Up to 100 listed products",
     "Automated monthly reports",
-    "Basic n8n integration",
     "Email support",
     "Access to B2B/B2C marketplace",
     "Automated inventory notifications",
@@ -52,7 +51,6 @@ const Pricing = () => {
     "Unlimited products",
     "Advanced dashboard with real-time analytics",
     "Automated regulatory reports (Bin Trim / NSW EPA)",
-    "Full n8n integration and custom APIs",
     "Custom ERP/POS integrations",
     "24/7 priority support",
     "Dedicated account manager",
@@ -61,7 +59,7 @@ const Pricing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--cream-background))]">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="container mx-auto px-4 pt-16 pb-8">
         <div className="text-center space-y-4 max-w-3xl mx-auto">
@@ -115,21 +113,13 @@ const Pricing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <RevenueModelCard
               icon={Percent}
               title="Transaction Fee"
               concept="B2B - B2C"
               value="3%"
               description="Commission on each marketplace transaction"
-            />
-
-            <RevenueModelCard
-              icon={Megaphone}
-              title="Premium Advertising"
-              concept="ADS - Positioning"
-              value="$15"
-              description="Per featured product on platform (monthly)"
             />
 
             <RevenueModelCard
