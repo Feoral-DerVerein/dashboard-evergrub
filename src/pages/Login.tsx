@@ -2,11 +2,12 @@ import { useState, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Smartphone } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Provider } from "@supabase/supabase-js";
 import MelbourneWeatherCard from "@/components/widgets/MelbourneWeatherCard";
+import CompleteProfile from "@/components/CompleteProfile";
 
 
 // Declare the spline-viewer custom element for TypeScript
@@ -42,20 +43,46 @@ const Login = () => {
   const [country, setCountry] = useState("");
   const [businessType, setBusinessType] = useState("");
   
+  // Complete profile modal state
+  const [showCompleteProfile, setShowCompleteProfile] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState("");
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
+  
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
+  // Check for OAuth callback and handle profile completion
+  useEffect(() => {
+    const checkOAuthCallback = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Check if profile needs completion
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('phone, country, business_type')
+          .eq('id', user.id)
+          .single();
+
+        if (profile && (!profile.phone || !profile.country || !profile.business_type)) {
+          setCurrentUserId(user.id);
+          setCurrentUserEmail(user.email || '');
+          setShowCompleteProfile(true);
+        } else if (profile) {
+          navigate("/kpi", { replace: true });
+        }
+      }
+    };
+
+    checkOAuthCallback();
+  }, [navigate]);
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       console.log(`Attempting to ${activeTab} with email: ${email}`);
       if (activeTab === 'login') {
-        const {
-          data,
-          error
-        } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
@@ -65,26 +92,30 @@ const Login = () => {
           title: "Login successful",
           description: "Welcome back!"
         });
-        navigate("/dashboard", {
-          replace: true
-        });
+        navigate("/kpi", { replace: true });
       } else {
-        const {
-          data,
-          error
-        } = await supabase.auth.signUp({
+        // Validate all fields for signup
+        if (!firstName || !lastName || !phone || !country || !businessType) {
+          toast({
+            title: "Error",
+            description: "Please complete all fields before signing up",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
               first_name: firstName,
               last_name: lastName,
-              full_name: `${firstName} ${lastName}`,
               phone: phone,
               country: country,
               business_type: businessType
             },
-            emailRedirectTo: `${window.location.origin}/dashboard`
+            emailRedirectTo: `${window.location.origin}/kpi`
           }
         });
         if (error) throw error;
@@ -97,13 +128,12 @@ const Login = () => {
             description: "Check your email to verify your account before logging in."
           });
         } else if (data.session) {
-          // User is automatically logged in (email confirmation disabled)
           toast({
             title: "Registration successful",
             description: "Welcome! Redirecting to dashboard..."
           });
           setTimeout(() => {
-            navigate("/dashboard", { replace: true });
+            navigate("/kpi", { replace: true });
           }, 1500);
         }
         
@@ -128,13 +158,10 @@ const Login = () => {
   const handleSocialLogin = async (provider: 'google') => {
     try {
       console.log(`Attempting login with ${provider}`);
-      const {
-        data,
-        error
-      } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider as Provider,
         options: {
-          redirectTo: window.location.origin + '/dashboard'
+          redirectTo: window.location.origin + '/kpi'
         }
       });
       if (error) throw error;
@@ -184,6 +211,17 @@ const Login = () => {
     }
   };
   return <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Complete Profile Modal */}
+      <CompleteProfile 
+        open={showCompleteProfile}
+        onComplete={() => {
+          setShowCompleteProfile(false);
+          navigate("/kpi", { replace: true });
+        }}
+        userId={currentUserId}
+        email={currentUserEmail}
+      />
+      
       {/* Spline Background */}
       <div className="absolute inset-0 z-0">
         <spline-viewer url="https://prod.spline.design/JM7ixbJx6pmDGkyo/scene.splinecode" style={{
