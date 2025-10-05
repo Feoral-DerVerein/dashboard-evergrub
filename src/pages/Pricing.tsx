@@ -2,7 +2,7 @@ import { PricingCard } from "@/components/pricing/PricingCard";
 import { RevenueModelCard } from "@/components/pricing/RevenueModelCard";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Percent, Megaphone, Mail } from "lucide-react";
+import { Percent, Megaphone, Mail, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -60,6 +60,18 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Back Button */}
+      <div className="absolute top-4 left-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate(-1)}
+          className="hover:bg-muted"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+      </div>
+
       {/* Header */}
       <div className="container mx-auto px-4 pt-16 pb-8">
         <div className="text-center space-y-4 max-w-3xl mx-auto">
