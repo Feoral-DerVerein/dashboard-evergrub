@@ -148,6 +148,41 @@ const Login = () => {
       });
     }
   };
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      toast({
+        title: "Error",
+        description: "Please enter your email address first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email sent!",
+        description: "Check your inbox for the confirmation email. Don't forget to check spam folder."
+      });
+    } catch (error: any) {
+      console.error("Error resending confirmation:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to resend confirmation email",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   return <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
       {/* Spline Background */}
       <div className="absolute inset-0 z-0">
@@ -259,11 +294,18 @@ const Login = () => {
           </button>
         </div>
 
-        {/* Forgot Password */}
-        {activeTab === 'login' && <div className="text-center mt-4">
-            <Link to="/forgot-password" className="text-white/60 hover:text-white text-sm">
+        {/* Forgot Password & Resend Confirmation */}
+        {activeTab === 'login' && <div className="text-center mt-4 space-y-2">
+            <Link to="/forgot-password" className="block text-white/60 hover:text-white text-sm">
               Forgot Password?
             </Link>
+            <button 
+              onClick={handleResendConfirmation} 
+              className="block w-full text-white/60 hover:text-white text-sm"
+              disabled={loading}
+            >
+              Resend confirmation email
+            </button>
           </div>}
 
         {/* Social Login */}
