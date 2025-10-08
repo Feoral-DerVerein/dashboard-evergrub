@@ -26,6 +26,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
 import ConnectPOS from "@/pages/ConnectPOS";
+import POSIntegrations from "@/pages/POSIntegrations";
 
 
 const MainRoutes = () => {
@@ -63,6 +64,7 @@ const MainRoutes = () => {
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
         <Route path="/connect-pos" element={<ConnectPOS />} />
+        <Route path="/pos-integrations" element={<POSIntegrations />} />
         
       </Route>
       
