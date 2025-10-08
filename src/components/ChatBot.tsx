@@ -132,29 +132,6 @@ const ChatBot = ({
             </div>
           </div>
 
-          {/* Three columns grid - moved closer */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-            {suggestionCategories.map((category, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <div className="flex items-center gap-2 mb-3 text-gray-700">
-                  {category.icon}
-                  <h3 className="font-semibold text-sm">{category.title}</h3>
-                </div>
-                <div className="space-y-2">
-                  {category.suggestions.map((suggestion, sIdx) => (
-                    <button
-                      key={sIdx}
-                      onClick={() => sendMessage(suggestion)}
-                      className="w-full text-left text-xs text-gray-600 hover:text-blue-600 hover:bg-white p-2 rounded-lg transition-colors"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
           {/* Messages Display Area (if there are messages) */}
           {messages.length > 0 && <div className="max-w-3xl mx-auto mb-8 space-y-4">
               {messages.map((message, index) => <div key={message.id} className={`${message.type === 'user' ? 'text-right' : 'text-left'}`}>
