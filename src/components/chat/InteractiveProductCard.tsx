@@ -72,18 +72,16 @@ export function InteractiveProductCard({ product, onAction }: InteractiveProduct
 
         {/* Product Info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-2 mb-1">
-            {product.urgency && (
-              <Badge 
-                className={`${urgencyColors[product.urgency]} px-2 py-0.5 rounded-full text-xs font-medium border-0`}
-              >
-                {product.urgency}
-              </Badge>
-            )}
-          </div>
+          {product.urgency && (
+            <Badge 
+              className={`${urgencyColors[product.urgency]} px-2 py-0.5 rounded-full text-xs font-medium border-0 inline-block mb-1`}
+            >
+              {product.urgency}
+            </Badge>
+          )}
           <div className="flex items-baseline gap-2">
-            <span className="font-bold text-gray-900">Product</span>
-            <span className="text-gray-600">{product.category}</span>
+            <span className="font-bold text-gray-900 text-base">Product</span>
+            <span className="text-gray-600 text-sm">{product.category}</span>
           </div>
         </div>
 
