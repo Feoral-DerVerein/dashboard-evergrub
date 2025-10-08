@@ -211,21 +211,16 @@ const SustainabilityCard = ({
   icon?: string;
   colorScheme?: 'blue' | 'green';
 }) => {
-  const bgColors = {
-    blue: 'bg-gradient-to-br from-blue-500 to-blue-400',
-    green: 'bg-gradient-to-br from-emerald-500 to-emerald-400'
-  };
-  
   return (
-    <div className={`${bgColors[colorScheme]} rounded-2xl p-6 h-[180px] flex flex-col justify-between shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-1`}>
-      <div className="flex items-start justify-between">
-        <span className="text-3xl">{icon}</span>
+    <div className="bg-white/30 rounded-2xl p-4 h-[90px] flex flex-col justify-between shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:shadow-lg transition-all duration-200 hover:-translate-y-1 backdrop-blur-[11.6px] border border-white/20">
+      <div className="flex items-center gap-2">
+        <span className="text-xl">{icon}</span>
+        <span className="text-foreground/70 text-[10px] uppercase tracking-wide font-medium">{label}</span>
       </div>
-      <div className="flex flex-col mt-auto">
-        <span className="text-white/70 text-xs uppercase tracking-wide mb-2 font-medium">{label}</span>
-        <span className="text-5xl font-bold text-white mb-2">{value}</span>
-        <span className="text-sm text-white/90 font-medium">{subtext}</span>
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-2xl font-bold text-foreground">{value}</span>
       </div>
+      <span className="text-xs text-foreground/80 font-medium">{subtext}</span>
     </div>
   );
 };
@@ -240,16 +235,14 @@ const InsightCard = ({
   trend: string;
   icon?: string;
 }) => (
-  <div className="bg-gradient-to-br from-purple-500 to-purple-400 rounded-2xl p-6 h-[180px] flex flex-col justify-between shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-    <div className="flex items-start justify-between">
-      <span className="text-3xl">{icon}</span>
+  <div className="bg-white/30 rounded-2xl p-4 h-[90px] flex flex-col justify-between shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:shadow-lg transition-all duration-200 hover:-translate-y-1 backdrop-blur-[11.6px] border border-white/20">
+    <div className="flex items-center gap-2">
+      <span className="text-xl">{icon}</span>
+      <span className="text-foreground/70 text-[10px] uppercase tracking-wide font-medium">{label}</span>
     </div>
-    <div className="flex flex-col mt-auto">
-      <span className="text-white/70 text-xs uppercase tracking-wide mb-2 font-medium">{label}</span>
-      <div className="flex items-baseline gap-3">
-        <span className="text-5xl font-bold text-white">{value}</span>
-        <span className="px-3 py-1 bg-emerald-400/20 text-emerald-100 rounded-full text-sm font-semibold">+{trend}</span>
-      </div>
+    <div className="flex items-center gap-2">
+      <span className="text-2xl font-bold text-foreground">{value}</span>
+      <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-semibold">+{trend}</span>
     </div>
   </div>
 );
@@ -914,7 +907,7 @@ const KPI = () => {
               {/* Sustainability Impact */}
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-4">Sustainability Impact</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <SustainabilityCard 
                     label="CO₂ Saved" 
                     value={realData.co2Saved} 
@@ -935,7 +928,7 @@ const KPI = () => {
               {/* Customer Insights */}
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-4">Customer Insights</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <InsightCard 
                     label="Conversion Rate" 
                     value={realData.conversionRate} 
@@ -954,7 +947,7 @@ const KPI = () => {
               {/* Savings & Food Waste */}
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-4">Savings & Food Waste</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <SustainabilityCard 
                     label="Cost Savings" 
                     value={realData.costSavings} 
