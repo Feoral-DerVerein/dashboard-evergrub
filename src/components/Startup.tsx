@@ -21,12 +21,6 @@ const Startup = () => {
       icon: <Monitor className="w-8 h-8 text-gray-800" />,
       description: "Hardware & software ecosystem",
       path: "/apple"
-    },
-    {
-      name: "Phone",
-      icon: <Server className="w-8 h-8 text-purple-600" />,
-      description: "Mobile telecommunications",
-      path: "/phone"
     }
   ];
 

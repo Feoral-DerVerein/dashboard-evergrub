@@ -19,7 +19,6 @@ import Onboarding from "@/pages/Onboarding";
 import Pricing from "@/pages/Pricing";
 
 import Login from "@/pages/Login";
-import Phone from "@/pages/Phone";
 import Apple from "@/pages/Apple";
 import Google from "@/pages/Google";
 import Microsoft from "@/pages/Microsoft";
@@ -41,7 +40,6 @@ const MainRoutes = () => {
     <Routes>
       {/* Auth routes - only accessible when not logged in */}
       <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
-      <Route path="/phone" element={<AuthRoute><Phone /></AuthRoute>} />
       <Route path="/apple" element={<AuthRoute><Apple /></AuthRoute>} />
       <Route path="/google" element={<AuthRoute><Google /></AuthRoute>} />
       <Route path="/microsoft" element={<AuthRoute><Microsoft /></AuthRoute>} />
