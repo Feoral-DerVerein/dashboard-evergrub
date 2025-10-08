@@ -1,5 +1,23 @@
 import { useState } from 'react';
-import { ShoppingBag, MapPin, Clock, DollarSign, Package } from 'lucide-react';
+import { 
+  ShoppingBag, 
+  MapPin, 
+  Clock, 
+  DollarSign, 
+  Package,
+  Apple,
+  Cookie,
+  Coffee,
+  Beef,
+  Fish,
+  Milk,
+  Carrot,
+  Salad,
+  Pizza,
+  Sandwich,
+  IceCream,
+  Wine
+} from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,13 +49,33 @@ interface InteractiveProductCardProps {
 
 export function InteractiveProductCard({ product, onAction }: InteractiveProductCardProps) {
   const [showDetails, setShowDetails] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   const urgencyColors = {
-    low: 'bg-green-100 text-green-800 border-green-200',
-    medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    high: 'bg-orange-100 text-orange-800 border-orange-200',
-    critical: 'bg-red-100 text-red-800 border-red-200'
+    low: 'bg-green-50 text-green-700',
+    medium: 'bg-yellow-50 text-yellow-700',
+    high: 'bg-orange-50 text-orange-700',
+    critical: 'bg-red-50 text-red-700'
+  };
+
+  // Get icon based on category
+  const getCategoryIcon = () => {
+    const category = product.category.toLowerCase();
+    const iconProps = { className: "w-16 h-16 text-gray-400" };
+    
+    if (category.includes('fruit') || category.includes('apple')) return <Apple {...iconProps} />;
+    if (category.includes('pastries') || category.includes('bakery') || category.includes('bread')) return <Cookie {...iconProps} />;
+    if (category.includes('coffee') || category.includes('beverage')) return <Coffee {...iconProps} />;
+    if (category.includes('meat') || category.includes('beef') || category.includes('pork')) return <Beef {...iconProps} />;
+    if (category.includes('fish') || category.includes('seafood')) return <Fish {...iconProps} />;
+    if (category.includes('dairy') || category.includes('milk') || category.includes('cheese')) return <Milk {...iconProps} />;
+    if (category.includes('vegetable') || category.includes('veggie')) return <Carrot {...iconProps} />;
+    if (category.includes('salad') || category.includes('greens')) return <Salad {...iconProps} />;
+    if (category.includes('pizza')) return <Pizza {...iconProps} />;
+    if (category.includes('sandwich') || category.includes('deli')) return <Sandwich {...iconProps} />;
+    if (category.includes('dessert') || category.includes('ice cream')) return <IceCream {...iconProps} />;
+    if (category.includes('wine') || category.includes('alcohol')) return <Wine {...iconProps} />;
+    
+    return <Package {...iconProps} />;
   };
 
   const handleAction = (action: 'reserve' | 'cart' | 'details') => {
@@ -50,85 +88,53 @@ export function InteractiveProductCard({ product, onAction }: InteractiveProduct
   return (
     <>
       <Card 
-        className="group hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer border-2 relative overflow-hidden"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-white rounded-xl border border-gray-200 overflow-hidden"
         onClick={() => handleAction('details')}
       >
-        <CardContent className="p-4">
-          <div className="relative mb-3">
-            {product.image && (
-              <img 
-                src={product.image} 
-                alt={product.name}
-                className="w-full h-40 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-              />
-            )}
+        <CardContent className="p-5">
+          {/* Header with Product title and urgency badge */}
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-normal text-gray-900">Product</h3>
             {product.urgency && (
               <Badge 
-                className={`absolute top-2 right-2 ${urgencyColors[product.urgency]}`}
-                variant="outline"
+                className={`${urgencyColors[product.urgency]} px-3 py-1 rounded-full text-xs font-medium border-0`}
               >
                 {product.urgency}
               </Badge>
             )}
           </div>
 
+          {/* Large centered icon area */}
+          <div className="flex items-center justify-center py-12 mb-6">
+            {getCategoryIcon()}
+          </div>
+
+          {/* Product info */}
           <div className="space-y-2">
-            <div className="flex justify-between items-start">
-              <h3 className="font-semibold text-lg line-clamp-1">{product.name}</h3>
-              <div className="flex items-center gap-1 text-primary font-bold">
-                <DollarSign className="w-4 h-4" />
-                {product.price.toFixed(2)}
-              </div>
+            {/* Product name and price */}
+            <div className="flex items-start justify-between gap-2">
+              <h4 className="text-xl font-bold text-gray-900 flex-1">{product.name}</h4>
+              <span className="text-xl font-bold text-emerald-500">$ {product.price.toFixed(2)}</span>
             </div>
 
-            <p className="text-sm text-muted-foreground">{product.category}</p>
+            {/* Category */}
+            <p className="text-sm text-gray-500">{product.category}</p>
 
+            {/* Location */}
             {product.location && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <MapPin className="w-3 h-3" />
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <MapPin className="w-4 h-4" />
                 <span>{product.location}</span>
               </div>
             )}
 
+            {/* Pickup time */}
             {product.pickupTime && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="w-3 h-3" />
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Clock className="w-4 h-4" />
                 <span>{product.pickupTime}</span>
               </div>
             )}
-
-            {product.quantity && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Package className="w-3 h-3" />
-                <span>{product.quantity} available</span>
-              </div>
-            )}
-          </div>
-
-          <div 
-            className={`mt-4 grid grid-cols-2 gap-2 transition-opacity duration-200 ${
-              isHovered ? 'opacity-100' : 'opacity-0'
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAction('cart')}
-              className="w-full"
-            >
-              <ShoppingBag className="w-4 h-4 mr-1" />
-              Add to Cart
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => handleAction('reserve')}
-              className="w-full"
-            >
-              Reserve Now
-            </Button>
           </div>
         </CardContent>
       </Card>

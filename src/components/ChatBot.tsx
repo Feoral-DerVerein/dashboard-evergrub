@@ -142,8 +142,8 @@ const ChatBot = ({
 
                    {/* Product Cards - Use Interactive Product Cards */}
                   {message.type === 'bot' && message.product_cards && message.product_cards.length > 0 && <div className="text-left mt-4">
-                      <p className="text-sm font-medium text-[#6e6e80] px-1 mb-3">📦 Available Products:</p>
-                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                      <p className="text-sm font-medium text-gray-700 px-1 mb-4">📦 Available Products:</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {message.product_cards.map((product: any) => <InteractiveProductCard key={product.id} product={{
                   id: product.id.toString(),
                   name: product.name || 'Product',
