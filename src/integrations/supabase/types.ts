@@ -818,6 +818,45 @@ export type Database = {
         }
         Relationships: []
       }
+      pos_connections: {
+        Row: {
+          api_credentials: Json
+          business_name: string
+          connection_status: string
+          created_at: string
+          error_message: string | null
+          id: string
+          last_sync_at: string | null
+          pos_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_credentials: Json
+          business_name: string
+          connection_status?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          last_sync_at?: string | null
+          pos_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_credentials?: Json
+          business_name?: string
+          connection_status?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          last_sync_at?: string | null
+          pos_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       product_donation_actions: {
         Row: {
           action: string
