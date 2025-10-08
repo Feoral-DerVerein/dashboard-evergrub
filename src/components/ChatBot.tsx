@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Send, TrendingUp, DollarSign, Zap, ArrowRight } from 'lucide-react';
+import { Send, TrendingUp, DollarSign, Zap, ArrowRight, Bell } from 'lucide-react';
 import { BusinessCard, type BusinessCardData } from '@/components/chat/BusinessCards';
 import { ProductCards } from '@/components/chat/ProductCards';
 import { ProductActionCards } from '@/components/chat/ProductActionCards';
@@ -8,15 +8,42 @@ import { InteractiveProductCard } from '@/components/chat/InteractiveProductCard
 import { useChatbot } from '@/hooks/useChatbot';
 import { ChatLoadingIndicator } from '@/components/chat/ChatLoadingIndicator';
 import { useToast } from '@/hooks/use-toast';
+import { IntelligentNewsCards } from '@/components/kpi/IntelligentNewsCards';
+import { supabase } from '@/integrations/supabase/client';
+import { productService, Product } from '@/services/productService';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
 }
 const ChatBot = ({
   variant = 'floating'
 }: ChatBotProps) => {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [notificationCount, setNotificationCount] = useState(0);
+  
+  // Load products for notifications
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const productsData = await productService.getAllProducts();
+        setProducts(productsData);
+        
+        // Count notifications (expiring products + low stock)
+        const expiringProducts = productsData.filter(p => {
+          if (!p.expirationDate) return false;
+          const daysUntilExpiry = Math.ceil(
+            (new Date(p.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+          );
+          return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+        });
+        const lowStockProducts = productsData.filter(p => p.quantity <= 5 && p.quantity > 0);
+        setNotificationCount(expiringProducts.length + lowStockProducts.length);
+      } catch (error) {
+        console.error('Error loading products:', error);
+      }
+    };
+    loadProducts();
+  }, []);
   const handleProductAction = (action: 'reserve' | 'cart' | 'details', productId: string) => {
     switch (action) {
       case 'reserve':
@@ -64,18 +91,68 @@ const ChatBot = ({
     title: "Smart Recommendations",
     suggestions: ["Recommend actions based on my current inventory", "Which products should I put on sale today?", "Optimize my stock for the weekend rush"]
   }];
+  const handleNotificationClick = () => {
+    // Create a message with smart notifications
+    const notificationMessage = {
+      id: Date.now().toString(),
+      type: 'bot' as const,
+      content: 'Here are your smart notifications based on current inventory and orders:',
+      smart_notifications: true
+    };
+    
+    // Add to messages manually to show the cards
+    sendMessage('Show me smart notifications');
+  };
+
   if (variant === 'inline') {
     return <div className="w-full bg-white min-h-screen">
         <div className="w-full px-4 py-8">
           {/* Header */}
-          <div className="text-center mb-16 mt-8">
+          <div className="text-center mb-8 mt-8">
             <img src="/lovable-uploads/negentropy-logo.png" alt="Negentropy" className="h-12 mx-auto mb-6" />
             
+            {/* AI Greeting with notification badge */}
+            <div className="relative inline-block">
+              <div className="bg-gray-100 rounded-2xl px-6 py-4 inline-block">
+                <div className="flex items-center gap-3">
+                  <div className="text-sm font-medium text-gray-700">AI</div>
+                  <div className="text-sm text-gray-900">Hello! I'm your Negentropy assistant. How can I help you today?</div>
+                </div>
+              </div>
+              
+              {/* Notification Badge */}
+              {notificationCount > 0 && (
+                <button
+                  onClick={handleNotificationClick}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-xs font-bold shadow-lg hover:bg-red-600 transition-all hover:scale-110 animate-pulse"
+                >
+                  {notificationCount}
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Three columns grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-16">
-            {suggestionCategories.map((category, idx) => {})}
+          {/* Three columns grid - moved closer */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+            {suggestionCategories.map((category, idx) => (
+              <div key={idx} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div className="flex items-center gap-2 mb-3 text-gray-700">
+                  {category.icon}
+                  <h3 className="font-semibold text-sm">{category.title}</h3>
+                </div>
+                <div className="space-y-2">
+                  {category.suggestions.map((suggestion, sIdx) => (
+                    <button
+                      key={sIdx}
+                      onClick={() => sendMessage(suggestion)}
+                      className="w-full text-left text-xs text-gray-600 hover:text-blue-600 hover:bg-white p-2 rounded-lg transition-colors"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Messages Display Area (if there are messages) */}
@@ -98,7 +175,7 @@ const ChatBot = ({
                       </div>
                     </div>}
 
-                  {/* Product Cards - Use Interactive Product Cards */}
+                   {/* Product Cards - Use Interactive Product Cards */}
                   {message.type === 'bot' && message.product_cards && message.product_cards.length > 0 && <div className="text-left mt-4">
                       <p className="text-sm font-medium text-[#6e6e80] px-1 mb-3">📦 Available Products:</p>
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -116,6 +193,17 @@ const ChatBot = ({
                 }} onAction={handleProductAction} />)}
                       </div>
                     </div>}
+                  
+                  {/* Smart Notifications */}
+                  {message.type === 'bot' && (message as any).smart_notifications && (
+                    <div className="text-left mt-4">
+                      <IntelligentNewsCards 
+                        products={products}
+                        orders={[]}
+                        insights={null}
+                      />
+                    </div>
+                  )}
                 </div>)}
               
               {/* Loading Indicator */}

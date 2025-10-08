@@ -803,19 +803,6 @@ const KPI = () => {
             <ChatBot variant="inline" />
           </div>
 
-          {/* Intelligent News Cards - AI-powered notifications */}
-          <section className="px-6 mb-6">
-            <div className="mb-3">
-              <h2 className="text-lg font-semibold text-gray-900">📢 Smart Notifications</h2>
-              <p className="text-sm text-gray-600">AI-powered alerts and pending actions</p>
-            </div>
-            <IntelligentNewsCards 
-              products={products}
-              orders={[]}
-              insights={aiInsights}
-            />
-          </section>
-
           {/* Main dashboard content and chart - Moved to top */}
           <section className="px-6 mt-8 mb-8 space-y-6">
             {/* Time Filters */}
