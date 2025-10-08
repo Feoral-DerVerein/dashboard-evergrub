@@ -235,7 +235,10 @@ const KPI = () => {
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
   // Inventory POS state
-  const { user, signOut } = useAuth();
+  const {
+    user,
+    signOut
+  } = useAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [suppliers, setSuppliers] = useState<Array<{
@@ -248,7 +251,6 @@ const KPI = () => {
   // AI insights state
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [aiInsights, setAiInsights] = useState<any | null>(null);
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentActionDetails, setCurrentActionDetails] = useState<any>(null);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -770,19 +772,16 @@ const KPI = () => {
                       Pricing
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className="flex items-center gap-2 cursor-pointer" 
-                    onClick={async () => {
-                      try {
-                        await signOut();
-                        toast.success("Session closed successfully");
-                        navigate("/login");
-                      } catch (error) {
-                        console.error("Error logging out:", error);
-                        toast.error("Error logging out");
-                      }
-                    }}
-                  >
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={async () => {
+                try {
+                  await signOut();
+                  toast.success("Session closed successfully");
+                  navigate("/login");
+                } catch (error) {
+                  console.error("Error logging out:", error);
+                  toast.error("Error logging out");
+                }
+              }}>
                     <LogOut className="h-4 w-4" />
                     Log out
                   </DropdownMenuItem>
@@ -927,15 +926,7 @@ const KPI = () => {
             </section>
 
             {/* AI Predictive Insights */}
-            <section className="md:col-span-4 order-3 md:order-2 mt-6">
-              <h3 className="text-lg font-semibold mb-4">AI Predictive Insights</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
-                <InsightCard label="Top Selling Product" value={predictiveData.topSellingProduct} trend={predictiveData.topSellingRate} />
-                <InsightCard label="Overstocked Item" value={predictiveData.overstockedItem} trend={predictiveData.overstockAmount} />
-                <InsightCard label="Demand Forecast" value={predictiveData.demandForecast} trend={predictiveData.forecastPeriod} />
-                <InsightCard label="Optimal Reorder" value={predictiveData.optimalReorder} trend={predictiveData.reorderCategory} />
-              </div>
-            </section>
+            
 
             {/* Surprise Bags Performance */}
             <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
