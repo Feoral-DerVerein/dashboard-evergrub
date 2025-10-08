@@ -109,7 +109,25 @@ const ChatBot = ({
         <div className="w-full px-4 py-8">
           {/* Header */}
           <div className="text-center mb-8 mt-8">
-            <img src="/lovable-uploads/negentropy-logo.png" alt="Negentropy" className="h-12 mx-auto mb-6" />
+            {/* AI Greeting with notification badge */}
+            <div className="relative inline-block">
+              <div className="bg-gray-100 rounded-2xl px-6 py-4 inline-block">
+                <div className="flex items-center gap-3">
+                  <div className="text-sm font-medium text-gray-700">AI</div>
+                  <div className="text-sm text-gray-900">Hello! I'm your Negentropy assistant. How can I help you today?</div>
+                </div>
+              </div>
+              
+              {/* Notification Badge */}
+              {notificationCount > 0 && (
+                <button
+                  onClick={handleNotificationClick}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-xs font-bold shadow-lg hover:bg-red-600 transition-all hover:scale-110 animate-pulse"
+                >
+                  {notificationCount}
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Messages Display Area (if there are messages) */}
