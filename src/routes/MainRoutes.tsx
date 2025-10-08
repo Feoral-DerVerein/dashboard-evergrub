@@ -21,7 +21,6 @@ import Pricing from "@/pages/Pricing";
 import Login from "@/pages/Login";
 import Apple from "@/pages/Apple";
 import Google from "@/pages/Google";
-import Microsoft from "@/pages/Microsoft";
 import NotFound from "@/pages/NotFound";
 import AuthRoute from "@/components/auth/AuthRoutes";
 import ProtectedRoute from "@/components/auth/ProtectedRoutes";
@@ -41,7 +40,6 @@ const MainRoutes = () => {
       <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
       <Route path="/apple" element={<AuthRoute><Apple /></AuthRoute>} />
       <Route path="/google" element={<AuthRoute><Google /></AuthRoute>} />
-      <Route path="/microsoft" element={<AuthRoute><Microsoft /></AuthRoute>} />
       
       {/* Onboarding route - accessible only when logged in but onboarding not completed */}
       <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
