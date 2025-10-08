@@ -17,23 +17,23 @@ interface ChatBotProps {
 const ChatBot = ({
   variant = 'floating'
 }: ChatBotProps) => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [notificationCount, setNotificationCount] = useState(0);
-  
+
   // Load products for notifications
   useEffect(() => {
     const loadProducts = async () => {
       try {
         const productsData = await productService.getAllProducts();
         setProducts(productsData);
-        
+
         // Count notifications (expiring products + low stock)
         const expiringProducts = productsData.filter(p => {
           if (!p.expirationDate) return false;
-          const daysUntilExpiry = Math.ceil(
-            (new Date(p.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
-          );
+          const daysUntilExpiry = Math.ceil((new Date(p.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
           return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
         });
         const lowStockProducts = productsData.filter(p => p.quantity <= 5 && p.quantity > 0);
@@ -99,11 +99,10 @@ const ChatBot = ({
       content: 'Here are your smart notifications based on current inventory and orders:',
       smart_notifications: true
     };
-    
+
     // Add to messages manually to show the cards
     sendMessage('Show me smart notifications');
   };
-
   if (variant === 'inline') {
     return <div className="w-full bg-white min-h-screen">
         <div className="w-full px-4 py-8">
@@ -119,26 +118,16 @@ const ChatBot = ({
               </div>
               
               {/* Notification Badge */}
-              {notificationCount > 0 && (
-                <button
-                  onClick={handleNotificationClick}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-xs font-bold shadow-lg hover:bg-red-600 transition-all hover:scale-110 animate-pulse"
-                >
+              {notificationCount > 0 && <button onClick={handleNotificationClick} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-xs font-bold shadow-lg hover:bg-red-600 transition-all hover:scale-110 animate-pulse">
                   {notificationCount}
-                </button>
-              )}
+                </button>}
             </div>
           </div>
 
           {/* Messages Display Area (if there are messages) */}
           {messages.length > 0 && <div className="max-w-3xl mx-auto mb-8 space-y-4">
               {messages.map((message, index) => <div key={message.id} className={`${message.type === 'user' ? 'text-right' : 'text-left'}`}>
-                  <div className={`inline-block max-w-[85%] p-4 rounded-xl ${message.type === 'user' ? 'bg-[#10a37f] text-white' : 'bg-[#f7f7f8] text-[#202123] border border-[#e5e5e5]'}`}>
-                    <div className="text-sm font-medium mb-1">
-                      {message.type === 'bot' ? 'AI' : 'You'}
-                    </div>
-                    <div className="leading-relaxed">{message.content}</div>
-                  </div>
+                  
                   
                   {/* Business Cards */}
                   {message.type === 'bot' && message.cards && message.cards.length > 0 && <div className="mt-4 space-y-3 text-left">
@@ -170,15 +159,9 @@ const ChatBot = ({
                     </div>}
                   
                   {/* Smart Notifications */}
-                  {message.type === 'bot' && (message as any).smart_notifications && (
-                    <div className="text-left mt-4">
-                      <IntelligentNewsCards 
-                        products={products}
-                        orders={[]}
-                        insights={null}
-                      />
-                    </div>
-                  )}
+                  {message.type === 'bot' && (message as any).smart_notifications && <div className="text-left mt-4">
+                      <IntelligentNewsCards products={products} orders={[]} insights={null} />
+                    </div>}
                 </div>)}
               
               {/* Loading Indicator */}
