@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import welcomeBanner from '@/assets/welcome-banner.png';
+import welcomeBanner from '@/assets/welcome-text.png';
 export const DynamicGreeting = () => {
   const [greeting, setGreeting] = useState('');
   const [userName, setUserName] = useState('');
