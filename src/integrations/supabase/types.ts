@@ -818,6 +818,66 @@ export type Database = {
         }
         Relationships: []
       }
+      product_donation_actions: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          organization: string
+          product_data: Json | null
+          product_id: number
+          user_id: string
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          id?: string
+          organization: string
+          product_data?: Json | null
+          product_id: number
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          organization?: string
+          product_data?: Json | null
+          product_id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      product_marketplace_actions: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          marketplace: string
+          product_data: Json | null
+          product_id: number
+          user_id: string
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          id?: string
+          marketplace: string
+          product_data?: Json | null
+          product_id: number
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          marketplace?: string
+          product_data?: Json | null
+          product_id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           bbd_end: string | null
