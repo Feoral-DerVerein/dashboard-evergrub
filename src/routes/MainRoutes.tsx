@@ -25,7 +25,6 @@ import ProtectedRoute from "@/components/auth/ProtectedRoutes";
 import AppLayout from "@/components/layout/AppLayout";
 import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
-import ApiConfig from "@/pages/ApiConfig";
 
 
 const MainRoutes = () => {
@@ -62,7 +61,6 @@ const MainRoutes = () => {
         
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
-        <Route path="/api-config" element={<ApiConfig />} />
         
       </Route>
       
