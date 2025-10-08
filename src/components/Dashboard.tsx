@@ -27,12 +27,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useMetricsData } from "@/hooks/useMetricsData";
-import { 
-  useSalesMetrics, 
-  useSustainabilityMetrics, 
-  useCustomerMetrics, 
-  useSurpriseBagsMetrics 
-} from "@/hooks/useMetricsApi";
+import { useSalesMetrics, useSustainabilityMetrics, useCustomerMetrics, useSurpriseBagsMetrics } from "@/hooks/useMetricsApi";
 import { MetricCard } from "@/components/MetricCard";
 import { MetricDetailModal } from "@/components/MetricDetailModal";
 import { MetricsTestPanel } from "@/components/MetricsTestPanel";
@@ -100,69 +95,54 @@ const RecentActivityItem = ({
     {amount && <span className="font-medium">{amount}</span>}
   </div>;
 export const BottomNav = () => {
-  return <div className="fixed bottom-0 left-0 right-0 glass-card border-t border-gray-200 px-6 py-3 flex justify-between md:hidden">
-      <Link to="/kpi" className="bottom-nav-item">
-        <BarChart3 className="w-6 h-6" />
-        <span className="text-xs">Performance</span>
-      </Link>
-      <Link to="/products" className="bottom-nav-item">
-        <ShoppingCart className="w-6 h-6" />
-        <span className="text-xs">Market B2C</span>
-      </Link>
-      <Link to="/market" className="bottom-nav-item">
-        <Store className="w-6 h-6" />
-        <span className="text-xs">Market B2B</span>
-      </Link>
-      <Link to="/configuration" className="bottom-nav-item">
-        <Settings className="w-6 h-6" />
-        <span className="text-xs">Settings</span>
-      </Link>
-      <Link to="/api-config" className="bottom-nav-item">
-        <Plug className="w-6 h-6" />
-        <span className="text-xs">API</span>
-      </Link>
-    </div>;
+  return;
 };
 const Dashboard = () => {
-  const { signOut } = useAuth();
+  const {
+    signOut
+  } = useAuth();
   const navigate = useNavigate();
   const {
     orderCount,
     notificationCount
   } = useNotificationsAndOrders();
-  const { surpriseBagCount } = useSurpriseBags();
-  const { metrics, isLoading: isLoadingMetrics, lastUpdated, refreshData, isUsingMockData } = useDashboardData();
+  const {
+    surpriseBagCount
+  } = useSurpriseBags();
+  const {
+    metrics,
+    isLoading: isLoadingMetrics,
+    lastUpdated,
+    refreshData,
+    isUsingMockData
+  } = useDashboardData();
   const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month">("week");
-  
+
   // Fetch metrics from API endpoints
-  const { 
-    data: salesData, 
-    isLoading: isLoadingSales, 
+  const {
+    data: salesData,
+    isLoading: isLoadingSales,
     isError: isErrorSales,
-    refetch: refetchSales 
+    refetch: refetchSales
   } = useSalesMetrics(selectedPeriod);
-  
-  const { 
-    data: sustainabilityData, 
+  const {
+    data: sustainabilityData,
     isLoading: isLoadingSustainability,
     isError: isErrorSustainability,
-    refetch: refetchSustainability 
+    refetch: refetchSustainability
   } = useSustainabilityMetrics(selectedPeriod);
-  
-  const { 
-    data: customerData, 
+  const {
+    data: customerData,
     isLoading: isLoadingCustomer,
     isError: isErrorCustomer,
-    refetch: refetchCustomer 
+    refetch: refetchCustomer
   } = useCustomerMetrics(selectedPeriod);
-  
-  const { 
-    data: surpriseBagsData, 
+  const {
+    data: surpriseBagsData,
     isLoading: isLoadingSurpriseBags,
     isError: isErrorSurpriseBags,
-    refetch: refetchSurpriseBags 
+    refetch: refetchSurpriseBags
   } = useSurpriseBagsMetrics('available', 10);
-
   const isLoadingLiveMetrics = isLoadingSales || isLoadingSustainability || isLoadingCustomer || isLoadingSurpriseBags;
 
   // Convert API data to MetricValue format
@@ -263,7 +243,6 @@ const Dashboard = () => {
     refetchCustomer();
     refetchSurpriseBags();
   };
-
   const [selectedMetric, setSelectedMetric] = useState<{
     title: string;
     value: MetricValue;
@@ -461,22 +440,13 @@ const Dashboard = () => {
                 </div>
                 <div className="flex items-center gap-3">
                  {/* Status Badge */}
-                 <Badge 
-                   variant={isUsingMockData ? "secondary" : "default"}
-                   className="hidden md:flex items-center gap-1.5"
-                 >
+                 <Badge variant={isUsingMockData ? "secondary" : "default"} className="hidden md:flex items-center gap-1.5">
                    <div className={`w-2 h-2 rounded-full ${isUsingMockData ? 'bg-yellow-500' : 'bg-green-500'}`} />
                    {isUsingMockData ? 'Using sample data' : 'Connected to POS'}
                  </Badge>
                  
                  {/* Refresh Button */}
-                 <Button
-                   variant="outline"
-                   size="sm"
-                   onClick={refreshAllMetrics}
-                   disabled={isLoadingLiveMetrics}
-                   className="gap-2"
-                 >
+                 <Button variant="outline" size="sm" onClick={refreshAllMetrics} disabled={isLoadingLiveMetrics} className="gap-2">
                    <RefreshCw className={`w-4 h-4 ${isLoadingLiveMetrics ? 'animate-spin' : ''}`} />
                    <span className="hidden md:inline">Refresh</span>
                  </Button>
@@ -507,19 +477,16 @@ const Dashboard = () => {
                           Pricing
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        className="flex items-center gap-2 cursor-pointer" 
-                        onClick={async () => {
-                          try {
-                            await signOut();
-                            toast.success("Session closed successfully");
-                            navigate("/login");
-                          } catch (error) {
-                            console.error("Error logging out:", error);
-                            toast.error("Error logging out");
-                          }
-                        }}
-                      >
+                      <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={async () => {
+                      try {
+                        await signOut();
+                        toast.success("Session closed successfully");
+                        navigate("/login");
+                      } catch (error) {
+                        console.error("Error logging out:", error);
+                        toast.error("Error logging out");
+                      }
+                    }}>
                         <LogOut className="h-4 w-4" />
                         Log out
                       </DropdownMenuItem>
@@ -536,11 +503,9 @@ const Dashboard = () => {
                   This is your summary for today. Here you can view your key performance indicators, 
                   recent activity, and important metrics to help you manage your coffee shop efficiently.
                 </p>
-                {lastUpdated && (
-                  <p className="text-xs text-gray-400 mt-2">
+                {lastUpdated && <p className="text-xs text-gray-400 mt-2">
                     Last updated: {formatDateTime(lastUpdated)}
-                  </p>
-                )}
+                  </p>}
               </div>
               
               {/* Quick Access Grid */}
@@ -556,154 +521,66 @@ const Dashboard = () => {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold">Live Business Metrics</h2>
                   <div className="flex gap-2">
-                    <Button
-                      variant={selectedPeriod === "week" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedPeriod("week")}
-                    >
+                    <Button variant={selectedPeriod === "week" ? "default" : "outline"} size="sm" onClick={() => setSelectedPeriod("week")}>
                       Week
                     </Button>
-                    <Button
-                      variant={selectedPeriod === "month" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedPeriod("month")}
-                    >
+                    <Button variant={selectedPeriod === "month" ? "default" : "outline"} size="sm" onClick={() => setSelectedPeriod("month")}>
                       Month
                     </Button>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  {liveMetrics && (
-                    <>
-                      <MetricCard
-                        title="Total Sales"
-                        value={liveMetrics.totalSales}
-                        icon={<DollarSign className="w-5 h-5" />}
-                        isLoading={isLoadingSales}
-                        isError={isErrorSales}
-                        onRetry={refetchSales}
-                        format="currency"
-                        onClick={() => setSelectedMetric({ 
-                          title: 'Total Sales', 
-                          value: liveMetrics.totalSales, 
-                          format: 'currency' 
-                        })}
-                      />
-                      <MetricCard
-                        title="Transactions"
-                        value={liveMetrics.transactions}
-                        icon={<ShoppingCart className="w-5 h-5" />}
-                        isLoading={isLoadingSales}
-                        isError={isErrorSales}
-                        onRetry={refetchSales}
-                        onClick={() => setSelectedMetric({ 
-                          title: 'Transactions', 
-                          value: liveMetrics.transactions, 
-                          format: 'number' 
-                        })}
-                      />
-                      <MetricCard
-                        title="Profit"
-                        value={liveMetrics.profit}
-                        icon={<TrendingUp className="w-5 h-5" />}
-                        isLoading={isLoadingSales}
-                        isError={isErrorSales}
-                        onRetry={refetchSales}
-                        format="currency"
-                        onClick={() => setSelectedMetric({ 
-                          title: 'Profit', 
-                          value: liveMetrics.profit, 
-                          format: 'currency' 
-                        })}
-                      />
-                      <MetricCard
-                        title="Active Surprise Bags"
-                        value={liveMetrics.activeSurpriseBags}
-                        icon={<Package className="w-5 h-5" />}
-                        isLoading={isLoadingSurpriseBags}
-                        isError={isErrorSurpriseBags}
-                        onRetry={refetchSurpriseBags}
-                        onClick={() => setSelectedMetric({ 
-                          title: 'Active Surprise Bags', 
-                          value: liveMetrics.activeSurpriseBags, 
-                          format: 'number' 
-                        })}
-                      />
-                    </>
-                  )}
+                  {liveMetrics && <>
+                      <MetricCard title="Total Sales" value={liveMetrics.totalSales} icon={<DollarSign className="w-5 h-5" />} isLoading={isLoadingSales} isError={isErrorSales} onRetry={refetchSales} format="currency" onClick={() => setSelectedMetric({
+                    title: 'Total Sales',
+                    value: liveMetrics.totalSales,
+                    format: 'currency'
+                  })} />
+                      <MetricCard title="Transactions" value={liveMetrics.transactions} icon={<ShoppingCart className="w-5 h-5" />} isLoading={isLoadingSales} isError={isErrorSales} onRetry={refetchSales} onClick={() => setSelectedMetric({
+                    title: 'Transactions',
+                    value: liveMetrics.transactions,
+                    format: 'number'
+                  })} />
+                      <MetricCard title="Profit" value={liveMetrics.profit} icon={<TrendingUp className="w-5 h-5" />} isLoading={isLoadingSales} isError={isErrorSales} onRetry={refetchSales} format="currency" onClick={() => setSelectedMetric({
+                    title: 'Profit',
+                    value: liveMetrics.profit,
+                    format: 'currency'
+                  })} />
+                      <MetricCard title="Active Surprise Bags" value={liveMetrics.activeSurpriseBags} icon={<Package className="w-5 h-5" />} isLoading={isLoadingSurpriseBags} isError={isErrorSurpriseBags} onRetry={refetchSurpriseBags} onClick={() => setSelectedMetric({
+                    title: 'Active Surprise Bags',
+                    value: liveMetrics.activeSurpriseBags,
+                    format: 'number'
+                  })} />
+                    </>}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {liveMetrics && (
-                    <>
-                      <MetricCard
-                        title="CO₂ Saved"
-                        value={liveMetrics.co2Saved}
-                        icon={<Leaf className="w-5 h-5" />}
-                        isLoading={isLoadingSustainability}
-                        isError={isErrorSustainability}
-                        onRetry={refetchSustainability}
-                        format="kg"
-                        onClick={() => setSelectedMetric({ 
-                          title: 'CO₂ Saved', 
-                          value: liveMetrics.co2Saved, 
-                          format: 'kg' 
-                        })}
-                      />
-                      <MetricCard
-                        title="Food Waste Reduced"
-                        value={liveMetrics.foodWasteReduced}
-                        icon={<Recycle className="w-5 h-5" />}
-                        isLoading={isLoadingSustainability}
-                        isError={isErrorSustainability}
-                        onRetry={refetchSustainability}
-                        format="kg"
-                        onClick={() => setSelectedMetric({ 
-                          title: 'Food Waste Reduced', 
-                          value: liveMetrics.foodWasteReduced, 
-                          format: 'kg' 
-                        })}
-                      />
-                      <MetricCard
-                        title="Cost Savings"
-                        value={liveMetrics.costSavings}
-                        icon={<Target className="w-5 h-5" />}
-                        isLoading={isLoadingCustomer}
-                        isError={isErrorCustomer}
-                        onRetry={refetchCustomer}
-                        format="currency"
-                        onClick={() => setSelectedMetric({ 
-                          title: 'Cost Savings', 
-                          value: liveMetrics.costSavings, 
-                          format: 'currency' 
-                        })}
-                      />
-                    </>
-                  )}
+                  {liveMetrics && <>
+                      <MetricCard title="CO₂ Saved" value={liveMetrics.co2Saved} icon={<Leaf className="w-5 h-5" />} isLoading={isLoadingSustainability} isError={isErrorSustainability} onRetry={refetchSustainability} format="kg" onClick={() => setSelectedMetric({
+                    title: 'CO₂ Saved',
+                    value: liveMetrics.co2Saved,
+                    format: 'kg'
+                  })} />
+                      <MetricCard title="Food Waste Reduced" value={liveMetrics.foodWasteReduced} icon={<Recycle className="w-5 h-5" />} isLoading={isLoadingSustainability} isError={isErrorSustainability} onRetry={refetchSustainability} format="kg" onClick={() => setSelectedMetric({
+                    title: 'Food Waste Reduced',
+                    value: liveMetrics.foodWasteReduced,
+                    format: 'kg'
+                  })} />
+                      <MetricCard title="Cost Savings" value={liveMetrics.costSavings} icon={<Target className="w-5 h-5" />} isLoading={isLoadingCustomer} isError={isErrorCustomer} onRetry={refetchCustomer} format="currency" onClick={() => setSelectedMetric({
+                    title: 'Cost Savings',
+                    value: liveMetrics.costSavings,
+                    format: 'currency'
+                  })} />
+                    </>}
                 </div>
               </div>
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                <StatCard 
-                  label="Total Sales (Legacy)" 
-                  value={metrics ? formatCurrency(metrics.totalSales) : formatCurrency(stats.totalSales)}
-                  trend={metrics ? `${metrics.salesChange > 0 ? '+' : ''}${metrics.salesChange.toFixed(1)}%` : "5.2% vs last week"}
-                  isLoading={isLoadingMetrics || stats.isLoading}
-                />
-                <StatCard 
-                  label="Revenue" 
-                  value={metrics ? formatCurrency(metrics.revenue) : `$${stats.totalRevenue.toFixed(2)}`} 
-                  trend={metrics ? `${metrics.revenueChange > 0 ? '+' : ''}${metrics.revenueChange.toFixed(1)}%` : "12.8% vs last week"}
-                  isLoading={isLoadingMetrics || stats.isLoading}
-                />
-                <StatCard 
-                  label="Transactions" 
-                  value={metrics ? metrics.transactions : stats.activeUsers} 
-                  trend={metrics ? `${metrics.transactionsChange > 0 ? '+' : ''}${metrics.transactionsChange.toFixed(1)}%` : "3.1% vs last week"}
-                  isLoading={isLoadingMetrics || stats.isLoading}
-                />
+                <StatCard label="Total Sales (Legacy)" value={metrics ? formatCurrency(metrics.totalSales) : formatCurrency(stats.totalSales)} trend={metrics ? `${metrics.salesChange > 0 ? '+' : ''}${metrics.salesChange.toFixed(1)}%` : "5.2% vs last week"} isLoading={isLoadingMetrics || stats.isLoading} />
+                <StatCard label="Revenue" value={metrics ? formatCurrency(metrics.revenue) : `$${stats.totalRevenue.toFixed(2)}`} trend={metrics ? `${metrics.revenueChange > 0 ? '+' : ''}${metrics.revenueChange.toFixed(1)}%` : "12.8% vs last week"} isLoading={isLoadingMetrics || stats.isLoading} />
+                <StatCard label="Transactions" value={metrics ? metrics.transactions : stats.activeUsers} trend={metrics ? `${metrics.transactionsChange > 0 ? '+' : ''}${metrics.transactionsChange.toFixed(1)}%` : "3.1% vs last week"} isLoading={isLoadingMetrics || stats.isLoading} />
               </div>
 
               {/* Metrics Testing Panel - For Development */}
@@ -715,28 +592,13 @@ const Dashboard = () => {
               <div className="apple-card-hover p-6 bg-white backdrop-blur-sm border border-slate-200/50 shadow-sm">
                 <h3 className="text-lg font-semibold mb-4 text-slate-900">Recent Activity</h3>
                 <div className="space-y-4">
-                  {isLoading ? (
-                    <div className="space-y-3">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="flex items-center space-x-4">
+                  {isLoading ? <div className="space-y-3">
+                      {[...Array(3)].map((_, i) => <div key={i} className="flex items-center space-x-4">
                           <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
                           <div className="h-4 flex-1 bg-gray-200 rounded animate-pulse"></div>
                           <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    recentActivity.map((activity, index) => (
-                      <RecentActivityItem 
-                        key={index}
-                        title={activity.title}
-                        time={activity.time}
-                        amount={activity.amount}
-                        type={activity.type}
-                        orderItems={activity.orderItems}
-                      />
-                    ))
-                  )}
+                        </div>)}
+                    </div> : recentActivity.map((activity, index) => <RecentActivityItem key={index} title={activity.title} time={activity.time} amount={activity.amount} type={activity.type} orderItems={activity.orderItems} />)}
                 </div>
               </div>
             </main>
@@ -747,15 +609,7 @@ const Dashboard = () => {
       </div>
 
       {/* Metric Detail Modal */}
-      {selectedMetric && (
-        <MetricDetailModal
-          open={!!selectedMetric}
-          onOpenChange={() => setSelectedMetric(null)}
-          title={selectedMetric.title}
-          metric={selectedMetric.value}
-          format={selectedMetric.format}
-        />
-      )}
+      {selectedMetric && <MetricDetailModal open={!!selectedMetric} onOpenChange={() => setSelectedMetric(null)} title={selectedMetric.title} metric={selectedMetric.value} format={selectedMetric.format} />}
     </div>;
 };
 export default Dashboard;
