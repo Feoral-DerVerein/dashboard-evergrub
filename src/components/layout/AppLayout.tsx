@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 const menuItems = [
   { title: "Performance", url: "/kpi", icon: BarChart3 },
-  { title: "Market B2C", url: "/products", icon: ShoppingCart },
+  { title: "Market", url: "/products", icon: ShoppingCart },
   { title: "Settings", url: "/configuration", icon: Settings },
 ];
 
