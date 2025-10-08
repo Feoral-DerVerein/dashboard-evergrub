@@ -7,9 +7,11 @@ class ChatbotService {
   analyzeIntent(message: string): ChatIntent {
     const lowerMessage = message.toLowerCase();
     
-    // Expiring products keywords
+    // Expiring products keywords - enhanced detection
     if (lowerMessage.includes('expir') || lowerMessage.includes('expire') || 
-        lowerMessage.includes('due') || lowerMessage.includes('soon')) {
+        lowerMessage.includes('due') || lowerMessage.includes('soon') ||
+        lowerMessage.includes('surplus') || lowerMessage.includes('venc') ||
+        lowerMessage.includes('caduc')) {
       return 'expiring_products';
     }
     
@@ -147,7 +149,7 @@ class ChatbotService {
     
     if (expiringProducts === 0) {
       return {
-        message: 'Excellent! You have no products expiring in the next 3 days. Your inventory management is working very well.',
+        message: '✅ Excellent! You have no products expiring soon (< 72 hours). Your inventory management is working very well.',
         intent: 'expiring_products',
         suggestions: ['How are sales?', 'Do I need to generate reports?', 'View business metrics']
       };
@@ -158,10 +160,53 @@ class ChatbotService {
       : '';
 
     return {
-      message: `You have ${expiringProducts} products expiring in the next 3 days ${categoriesText}. I recommend applying 30-40% discounts or creating surprise bags to reduce waste.`,
+      message: `📦 You have ${expiringProducts} products expiring soon (<72 hours) ${categoriesText}. Here are your options to reduce waste:`,
       intent: 'expiring_products',
-      suggestions: ['Create surprise bag', 'View specific products', 'How are sales?']
+      data: { show_expiring_cards: true }, // Flag to show expiring product cards
+      suggestions: ['Refresh list', 'View all inventory', 'Generate waste report']
     };
+  }
+
+  // Get expiring products with full details for cards
+  async getExpiringProducts() {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data: products } = await supabase
+        .from('products')
+        .select('*')
+        .eq('userid', user.id)
+        .order('expirationdate', { ascending: true });
+
+      if (!products) return [];
+
+      const now = new Date();
+      const threeDaysFromNow = new Date();
+      threeDaysFromNow.setHours(now.getHours() + 72);
+
+      return products
+        .filter(product => {
+          if (!product.expirationdate) return false;
+          const expDate = new Date(product.expirationdate);
+          return expDate <= threeDaysFromNow && expDate >= now;
+        })
+        .map(product => ({
+          id: product.id,
+          name: product.name,
+          brand: product.brand || 'N/A',
+          price: product.price,
+          image: product.image || '',
+          category: product.category,
+          expirationDate: product.expirationdate,
+          quantity: product.quantity,
+          daysUntilExpiry: Math.ceil((new Date(product.expirationdate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+        }))
+        .sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry);
+    } catch (error) {
+      console.error('Error getting expiring products:', error);
+      return [];
+    }
   }
 
   private async handleSalesAnalysis(analytics: ChatAnalytics): Promise<ChatbotResponse> {

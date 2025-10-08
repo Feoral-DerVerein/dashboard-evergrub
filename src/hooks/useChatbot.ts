@@ -138,6 +138,11 @@ export const useChatbot = () => {
     setInputValue('');
     setIsLoading(true);
 
+    // Check if asking for expiring products
+    const lowerMessage = messageText.toLowerCase();
+    const isAskingForExpiring = lowerMessage.includes('expir') || lowerMessage.includes('surplus') || 
+                                 lowerMessage.includes('venc') || lowerMessage.includes('caduc');
+
     console.log("Sending to N8N:", messageText);
 
     try {
@@ -189,6 +194,7 @@ export const useChatbot = () => {
         content: `Perfect, here it is:\n\n${responseText}`,
         cards: cards,
         product_cards: transformedProductCards,
+        expiring_products: isAskingForExpiring ? data.expiring_products : undefined,
         timestamp: new Date()
       };
 

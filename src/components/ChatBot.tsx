@@ -12,6 +12,7 @@ import { IntelligentNewsCards } from '@/components/kpi/IntelligentNewsCards';
 import { supabase } from '@/integrations/supabase/client';
 import { productService, Product } from '@/services/productService';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { ExpiringProductCard } from '@/components/chat/ExpiringProductCard';
 import aiIcon from '@/assets/ai-icon.png';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -169,9 +170,19 @@ const ChatBot = ({
                       </div>
                     </div>}
                   
-                  {/* Smart Notifications */}
+                   {/* Smart Notifications */}
                   {message.type === 'bot' && (message as any).smart_notifications && <div className="text-left mt-4">
                       <IntelligentNewsCards products={products} orders={[]} insights={null} />
+                    </div>}
+
+                   {/* Expiring Products Cards */}
+                  {message.type === 'bot' && (message as any).expiring_products && (message as any).expiring_products.length > 0 && <div className="text-left mt-4">
+                      <p className="text-sm font-medium text-gray-700 px-1 mb-4">📦 Products Expiring Soon (&lt;72 hours):</p>
+                      <div className="space-y-3">
+                        {(message as any).expiring_products.map((product: any) => <ExpiringProductCard key={product.id} product={product} onActionComplete={(productId, action, destination) => {
+                        console.log(`Product ${productId} ${action} to ${destination}`);
+                      }} />)}
+                      </div>
                     </div>}
                 </div>)}
               
