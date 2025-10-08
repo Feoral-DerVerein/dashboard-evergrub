@@ -105,10 +105,10 @@ const ChatBot = ({
     sendMessage('Show me smart notifications');
   };
   if (variant === 'inline') {
-    return <div className="w-full bg-white min-h-screen">
-        <div className="w-full px-4 py-8">
+    return <div className="w-full bg-white">
+        <div className="w-full px-4 py-4">
           {/* Header */}
-          <div className="text-center mb-8 mt-8">
+          <div className="text-center mb-6 mt-2">
             {/* AI Greeting with notification badge */}
             <div className="relative inline-block">
               <div className="bg-gray-100 rounded-2xl px-6 py-4 inline-block">
@@ -126,7 +126,7 @@ const ChatBot = ({
           </div>
 
           {/* Messages Display Area (if there are messages) */}
-          {messages.length > 0 && <div className="max-w-3xl mx-auto mb-8 space-y-4">
+          {messages.length > 0 && <div className="max-w-3xl mx-auto mb-4 space-y-4">
               {messages.map((message, index) => <div key={message.id} className={`${message.type === 'user' ? 'text-right' : 'text-left'}`}>
                   
                   
@@ -172,7 +172,7 @@ const ChatBot = ({
             </div>}
 
           {/* Chat Input Section */}
-          <div className="max-w-3xl mx-auto mt-10">
+          <div className="max-w-3xl mx-auto mt-4">
             <div className="bg-white border border-[#d9d9e3] rounded-xl px-4 py-3 flex items-center gap-3 shadow-none">
               <input type="text" value={inputValue} onChange={e => setInputValue(e.target.value)} onKeyPress={e => e.key === 'Enter' && !isLoading && inputValue.trim() && sendMessage()} placeholder="Send a message..." disabled={isLoading} className="flex-1 bg-transparent border-none text-[#202123] text-base outline-none px-2 py-2 placeholder:text-[#6e6e80]" />
               <button onClick={() => sendMessage()} disabled={isLoading || !inputValue.trim()} className="w-9 h-9 bg-[#10a37f] hover:bg-[#0d8c6d] disabled:bg-[#e5e5e5] disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-colors duration-200 text-white">
@@ -182,7 +182,7 @@ const ChatBot = ({
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-8 text-[#6e6e80] text-sm px-5 py-2 mb-0">
+          <div className="text-center mt-4 text-[#6e6e80] text-sm px-5 py-1 mb-0">
             AI Insights Chat - Powered by Advanced Machine Learning. Your data helps us improve.
           </div>
         </div>
