@@ -804,11 +804,9 @@ const KPI = () => {
             </div>
           </header>
 
-          {/* Marketplace Button */}
-          <div className="px-6 mb-4">
-            <div className="flex justify-end">
-              
-            </div>
+          {/* Welcome Banner */}
+          <div className="px-6 mb-6">
+            <DynamicGreeting />
           </div>
 
           {/* AI ChatBot - Inline */}
