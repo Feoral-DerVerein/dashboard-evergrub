@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { IntelligentNewsCards } from '@/components/kpi/IntelligentNewsCards';
 import { supabase } from '@/integrations/supabase/client';
 import { productService, Product } from '@/services/productService';
+import aiIcon from '@/assets/ai-icon.png';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
 }
@@ -112,7 +113,7 @@ const ChatBot = ({
             <div className="relative inline-block">
               <div className="bg-gray-100 rounded-2xl px-6 py-4 inline-block">
                 <div className="flex items-center gap-3">
-                  <div className="text-sm font-medium text-gray-700">AI</div>
+                  <img src={aiIcon} alt="AI" className="w-5 h-5 rounded object-contain" />
                   <div className="text-sm text-gray-900">Hello! I'm your Negentropy assistant. How can I help you today?</div>
                 </div>
               </div>
