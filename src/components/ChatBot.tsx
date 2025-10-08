@@ -50,6 +50,10 @@ const ChatBot = ({
     return <BusinessCard key={card.id} card={card} />;
   };
 
+  const handleSuggestionClick = (suggestion: string) => {
+    sendMessage(suggestion);
+  };
+
   // Three column suggestions organized by category
   const suggestionCategories = [{
     icon: <TrendingUp className="w-6 h-6" />,
@@ -75,7 +79,20 @@ const ChatBot = ({
 
           {/* Three columns grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-16">
-            {suggestionCategories.map((category, idx) => {})}
+            {suggestionCategories.map((category, idx) => (
+              <div key={idx}>
+                <h3 className="text-sm font-semibold mb-2 text-white">{category.title}</h3>
+                {category.suggestions.map((suggestion, sIdx) => (
+                  <button
+                    key={sIdx}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className="w-full text-left p-3 mb-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm transition-all"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            ))}
           </div>
 
           {/* Messages Display Area (if there are messages) */}
