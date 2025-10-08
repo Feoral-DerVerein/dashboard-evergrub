@@ -799,12 +799,12 @@ const KPI = () => {
           </div>
 
           {/* AI ChatBot - Inline */}
-          <div className="mb-2">
+          <div className="mb-0">
             <ChatBot variant="inline" />
           </div>
 
           {/* Main dashboard content and chart - Moved to top */}
-          <section className="px-6 mt-2 mb-8 space-y-6">
+          <section className="px-6 mt-0 mb-8 space-y-6">
             {/* Time Filters */}
             
 
