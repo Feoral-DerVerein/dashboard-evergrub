@@ -44,7 +44,7 @@ export const DynamicGreeting = () => {
     return () => clearInterval(interval);
   }, [user]);
   return <div className="text-center">
-      <img src={welcomeBanner} alt="Hi Mate, What are we going to make possible today?" className="h-16 object-contain mx-auto mb-2" />
+      
       
     </div>;
 };
