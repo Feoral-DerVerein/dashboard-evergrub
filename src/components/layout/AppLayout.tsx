@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { BarChart3, Settings, Store, ShoppingCart, LogOut } from "lucide-react";
+import { BarChart3, Settings, ShoppingCart, LogOut } from "lucide-react";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
 import {
   Sidebar,
@@ -21,7 +21,6 @@ import { toast } from "sonner";
 const menuItems = [
   { title: "Performance", url: "/kpi", icon: BarChart3 },
   { title: "Market B2C", url: "/products", icon: ShoppingCart },
-  { title: "Market B2B", url: "/market", icon: Store },
   { title: "Settings", url: "/configuration", icon: Settings },
 ];
 
