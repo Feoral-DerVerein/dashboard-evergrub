@@ -5,8 +5,6 @@ import { BusinessCard, type BusinessCardData } from '@/components/chat/BusinessC
 import { ProductCards } from '@/components/chat/ProductCards';
 import { ProductActionCards } from '@/components/chat/ProductActionCards';
 import { InteractiveProductCard } from '@/components/chat/InteractiveProductCard';
-import { useTaskList } from '@/hooks/useTaskList';
-import TaskList from '@/components/chat/TaskList';
 import { useChatbot } from '@/hooks/useChatbot';
 import { ChatLoadingIndicator } from '@/components/chat/ChatLoadingIndicator';
 import { useToast } from '@/hooks/use-toast';
@@ -18,8 +16,6 @@ interface ChatBotProps {
 const ChatBot = ({
   variant = 'floating'
 }: ChatBotProps) => {
-  // Task list hook
-  const { tasks, addTask, completeTask, removeTask, archiveTask, clearCompletedTasks, takeAction } = useTaskList();
   const { toast } = useToast();
 
   const handleProductAction = (action: 'reserve' | 'cart' | 'details', productId: string) => {
@@ -53,7 +49,7 @@ const ChatBot = ({
   } = useChatbot();
 
   const renderInfoCard = (card: BusinessCardData) => {
-    return <BusinessCard key={card.id} card={card} onAddToTaskList={addTask} />;
+    return <BusinessCard key={card.id} card={card} />;
   };
 
   // Three column suggestions organized by category
@@ -226,18 +222,6 @@ const ChatBot = ({
           <div className="text-center mt-8 text-[#6e6e80] text-sm px-5 py-4">
             AI Insights Chat - Powered by Advanced Machine Learning. Your data helps us improve.
           </div>
-        </div>
-
-        {/* Task List */}
-        <div className="w-full px-4 pb-8">
-          <TaskList 
-            tasks={tasks}
-            onCompleteTask={completeTask}
-            onRemoveTask={removeTask}
-            onArchiveTask={archiveTask}
-            onClearCompleted={clearCompletedTasks}
-            onTakeAction={takeAction}
-          />
         </div>
       </div>
     );

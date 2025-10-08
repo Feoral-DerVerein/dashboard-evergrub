@@ -3,7 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Phone, Clock, Users, Building, Heart } from 'lucide-react';
-import { Task } from '@/hooks/useTaskList';
+
+interface ProductInfo {
+  id: number;
+  name: string;
+  quantity: number;
+  expirationDate: string;
+  category: string;
+  price: number;
+  image: string;
+}
 
 interface Donee {
   id: string;
@@ -22,7 +31,7 @@ interface Donee {
 interface DoneeListDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  product: Task['product'] | null;
+  product: ProductInfo | null;
   onSelectDonee: (donee: Donee) => void;
 }
 

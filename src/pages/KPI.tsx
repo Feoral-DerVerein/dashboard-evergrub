@@ -22,8 +22,6 @@ import { ActionDetailsDialog } from "@/components/ActionDetailsDialog";
 import { aiInsightsService } from "@/services/aiInsightsService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAutoTaskGeneration } from "@/hooks/useAutoTaskGeneration";
-import AutoTaskSummary from "@/components/kpi/AutoTaskSummary";
 import hiMateBanner from "@/assets/hi-mate-banner.png";
 type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
 const chartDataSamples: Record<TimeFilterPeriod, {
@@ -250,10 +248,6 @@ const KPI = () => {
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [aiInsights, setAiInsights] = useState<any | null>(null);
 
-  // Auto-generate tasks for inventory management
-  useAutoTaskGeneration({
-    products
-  });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentActionDetails, setCurrentActionDetails] = useState<any>(null);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
