@@ -1,14 +1,30 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Plug, Square, Zap, Utensils, Sparkles } from "lucide-react";
+import { Plug, Square, Zap, Utensils, Sparkles, ExternalLink, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 type POSType = 'square' | 'lightspeed' | 'toast' | 'clover';
+
+interface SquareFormData {
+  businessName: string;
+  accessToken: string;
+  locationId: string;
+}
+
+interface LightspeedFormData {
+  businessName: string;
+  apiKey: string;
+  apiSecret: string;
+  accountId: string;
+}
 
 const posOptions = [
   {
@@ -50,12 +66,28 @@ const posOptions = [
 ];
 
 const ConnectPOS = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedPOS, setSelectedPOS] = useState<POSType | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const [isSquareDialogOpen, setIsSquareDialogOpen] = useState(false);
+  const [isLightspeedDialogOpen, setIsLightspeedDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const [squareFormData, setSquareFormData] = useState<SquareFormData>({
+    businessName: '',
+    accessToken: '',
+    locationId: '',
+  });
+
+  const [lightspeedFormData, setLightspeedFormData] = useState<LightspeedFormData>({
     businessName: '',
     apiKey: '',
+    apiSecret: '',
+    accountId: '',
   });
+
+  const [squareErrors, setSquareErrors] = useState<Partial<SquareFormData>>({});
+  const [lightspeedErrors, setLightspeedErrors] = useState<Partial<LightspeedFormData>>({});
 
   const handleConnectClick = (pos: typeof posOptions[0]) => {
     if (!pos.available) {
@@ -64,26 +96,139 @@ const ConnectPOS = () => {
       });
       return;
     }
+    
     setSelectedPOS(pos.id);
-    setIsDialogOpen(true);
+    
+    if (pos.id === 'square') {
+      setIsSquareDialogOpen(true);
+    } else if (pos.id === 'lightspeed') {
+      setIsLightspeedDialogOpen(true);
+    }
   };
 
-  const handleConnect = async () => {
-    if (!formData.businessName || !formData.apiKey) {
-      toast.error('Please fill in all fields');
+  const validateSquareForm = (): boolean => {
+    const errors: Partial<SquareFormData> = {};
+    
+    if (!squareFormData.businessName.trim()) {
+      errors.businessName = 'Business name is required';
+    }
+    if (!squareFormData.accessToken.trim()) {
+      errors.accessToken = 'Access token is required';
+    }
+    if (!squareFormData.locationId.trim()) {
+      errors.locationId = 'Location ID is required';
+    }
+    
+    setSquareErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateLightspeedForm = (): boolean => {
+    const errors: Partial<LightspeedFormData> = {};
+    
+    if (!lightspeedFormData.businessName.trim()) {
+      errors.businessName = 'Business name is required';
+    }
+    if (!lightspeedFormData.apiKey.trim()) {
+      errors.apiKey = 'API key is required';
+    }
+    if (!lightspeedFormData.apiSecret.trim()) {
+      errors.apiSecret = 'API secret is required';
+    }
+    if (!lightspeedFormData.accountId.trim()) {
+      errors.accountId = 'Account ID is required';
+    }
+    
+    setLightspeedErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSquareConnect = async () => {
+    if (!validateSquareForm()) {
       return;
     }
 
-    // TODO: Implement actual POS connection logic
-    toast.success('POS Connected', {
-      description: `Successfully connected to ${selectedPOS}`,
-    });
-    
-    setIsDialogOpen(false);
-    setFormData({ businessName: '', apiKey: '' });
+    if (!user) {
+      toast.error('You must be logged in to connect a POS system');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('pos_connections')
+        .insert({
+          user_id: user.id,
+          pos_type: 'square',
+          business_name: squareFormData.businessName,
+          api_credentials: {
+            access_token: squareFormData.accessToken,
+            location_id: squareFormData.locationId,
+          },
+          connection_status: 'pending',
+        });
+
+      if (error) throw error;
+
+      toast.success('✓ Square connected. Validating credentials...');
+      setIsSquareDialogOpen(false);
+      setSquareFormData({ businessName: '', accessToken: '', locationId: '' });
+      setSquareErrors({});
+      
+      // Redirect to pos-integrations page
+      navigate('/dashboard/pos-integrations');
+    } catch (error) {
+      console.error('Error connecting Square:', error);
+      toast.error('Failed to connect Square. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const selectedPOSData = posOptions.find(pos => pos.id === selectedPOS);
+  const handleLightspeedConnect = async () => {
+    if (!validateLightspeedForm()) {
+      return;
+    }
+
+    if (!user) {
+      toast.error('You must be logged in to connect a POS system');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('pos_connections')
+        .insert({
+          user_id: user.id,
+          pos_type: 'lightspeed',
+          business_name: lightspeedFormData.businessName,
+          api_credentials: {
+            api_key: lightspeedFormData.apiKey,
+            api_secret: lightspeedFormData.apiSecret,
+            account_id: lightspeedFormData.accountId,
+          },
+          connection_status: 'pending',
+        });
+
+      if (error) throw error;
+
+      toast.success('✓ Lightspeed connected. Validating credentials...');
+      setIsLightspeedDialogOpen(false);
+      setLightspeedFormData({ businessName: '', apiKey: '', apiSecret: '', accountId: '' });
+      setLightspeedErrors({});
+      
+      // Redirect to pos-integrations page
+      navigate('/dashboard/pos-integrations');
+    } catch (error) {
+      console.error('Error connecting Lightspeed:', error);
+      toast.error('Failed to connect Lightspeed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-8">
@@ -143,44 +288,225 @@ const ConnectPOS = () => {
         })}
       </div>
 
-      {/* Connection Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {/* Square Connection Dialog */}
+      <Dialog open={isSquareDialogOpen} onOpenChange={setIsSquareDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Connect to {selectedPOSData?.title}</DialogTitle>
+            <DialogTitle>Connect Square POS</DialogTitle>
             <DialogDescription>
-              Enter your {selectedPOSData?.title} credentials to sync your data
+              Enter your Square credentials to sync your data
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="businessName">Business Name</Label>
+              <Label htmlFor="square-businessName">Business Name *</Label>
               <Input
-                id="businessName"
+                id="square-businessName"
                 placeholder="Enter your business name"
-                value={formData.businessName}
-                onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
+                value={squareFormData.businessName}
+                onChange={(e) => {
+                  setSquareFormData({ ...squareFormData, businessName: e.target.value });
+                  if (squareErrors.businessName) {
+                    setSquareErrors({ ...squareErrors, businessName: undefined });
+                  }
+                }}
               />
+              {squareErrors.businessName && (
+                <p className="text-sm text-destructive">{squareErrors.businessName}</p>
+              )}
             </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="apiKey">API Key</Label>
+              <Label htmlFor="square-accessToken">Square Access Token *</Label>
               <Input
-                id="apiKey"
+                id="square-accessToken"
                 type="password"
-                placeholder="Enter your API key"
-                value={formData.apiKey}
-                onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                placeholder="Enter your access token"
+                value={squareFormData.accessToken}
+                onChange={(e) => {
+                  setSquareFormData({ ...squareFormData, accessToken: e.target.value });
+                  if (squareErrors.accessToken) {
+                    setSquareErrors({ ...squareErrors, accessToken: undefined });
+                  }
+                }}
               />
               <p className="text-sm text-muted-foreground">
-                Find your API key in your {selectedPOSData?.title} dashboard settings
+                Get your token at: Square Dashboard → Applications → API Tokens
               </p>
+              <a 
+                href="https://developer.squareup.com/docs/build-basics/access-tokens"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+              >
+                How to get my token? <ExternalLink className="h-3 w-3" />
+              </a>
+              {squareErrors.accessToken && (
+                <p className="text-sm text-destructive">{squareErrors.accessToken}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="square-locationId">Location ID *</Label>
+              <Input
+                id="square-locationId"
+                placeholder="Enter your location ID"
+                value={squareFormData.locationId}
+                onChange={(e) => {
+                  setSquareFormData({ ...squareFormData, locationId: e.target.value });
+                  if (squareErrors.locationId) {
+                    setSquareErrors({ ...squareErrors, locationId: undefined });
+                  }
+                }}
+              />
+              <p className="text-sm text-muted-foreground">
+                Your Square main location ID
+              </p>
+              {squareErrors.locationId && (
+                <p className="text-sm text-destructive">{squareErrors.locationId}</p>
+              )}
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsSquareDialogOpen(false);
+                setSquareErrors({});
+              }}
+              disabled={isLoading}
+            >
               Cancel
             </Button>
-            <Button onClick={handleConnect}>
+            <Button 
+              onClick={handleSquareConnect}
+              disabled={isLoading}
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Connect
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Lightspeed Connection Dialog */}
+      <Dialog open={isLightspeedDialogOpen} onOpenChange={setIsLightspeedDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Connect Lightspeed POS</DialogTitle>
+            <DialogDescription>
+              Enter your Lightspeed credentials to sync your data
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="lightspeed-businessName">Business Name *</Label>
+              <Input
+                id="lightspeed-businessName"
+                placeholder="Enter your business name"
+                value={lightspeedFormData.businessName}
+                onChange={(e) => {
+                  setLightspeedFormData({ ...lightspeedFormData, businessName: e.target.value });
+                  if (lightspeedErrors.businessName) {
+                    setLightspeedErrors({ ...lightspeedErrors, businessName: undefined });
+                  }
+                }}
+              />
+              {lightspeedErrors.businessName && (
+                <p className="text-sm text-destructive">{lightspeedErrors.businessName}</p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="lightspeed-apiKey">API Key *</Label>
+              <Input
+                id="lightspeed-apiKey"
+                type="password"
+                placeholder="Enter your API key"
+                value={lightspeedFormData.apiKey}
+                onChange={(e) => {
+                  setLightspeedFormData({ ...lightspeedFormData, apiKey: e.target.value });
+                  if (lightspeedErrors.apiKey) {
+                    setLightspeedErrors({ ...lightspeedErrors, apiKey: undefined });
+                  }
+                }}
+              />
+              <p className="text-sm text-muted-foreground">
+                Your Lightspeed API key
+              </p>
+              {lightspeedErrors.apiKey && (
+                <p className="text-sm text-destructive">{lightspeedErrors.apiKey}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lightspeed-apiSecret">API Secret *</Label>
+              <Input
+                id="lightspeed-apiSecret"
+                type="password"
+                placeholder="Enter your API secret"
+                value={lightspeedFormData.apiSecret}
+                onChange={(e) => {
+                  setLightspeedFormData({ ...lightspeedFormData, apiSecret: e.target.value });
+                  if (lightspeedErrors.apiSecret) {
+                    setLightspeedErrors({ ...lightspeedErrors, apiSecret: undefined });
+                  }
+                }}
+              />
+              <p className="text-sm text-muted-foreground">
+                Your Lightspeed secret key
+              </p>
+              {lightspeedErrors.apiSecret && (
+                <p className="text-sm text-destructive">{lightspeedErrors.apiSecret}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lightspeed-accountId">Account ID *</Label>
+              <Input
+                id="lightspeed-accountId"
+                placeholder="Enter your account ID"
+                value={lightspeedFormData.accountId}
+                onChange={(e) => {
+                  setLightspeedFormData({ ...lightspeedFormData, accountId: e.target.value });
+                  if (lightspeedErrors.accountId) {
+                    setLightspeedErrors({ ...lightspeedErrors, accountId: undefined });
+                  }
+                }}
+              />
+              <p className="text-sm text-muted-foreground">
+                Your Lightspeed account ID
+              </p>
+              {lightspeedErrors.accountId && (
+                <p className="text-sm text-destructive">{lightspeedErrors.accountId}</p>
+              )}
+            </div>
+
+            <a 
+              href="https://retail-support.lightspeedhq.com/hc/en-us/articles/229103948"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+            >
+              How to get my credentials? <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsLightspeedDialogOpen(false);
+                setLightspeedErrors({});
+              }}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleLightspeedConnect}
+              disabled={isLoading}
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Connect
             </Button>
           </DialogFooter>
