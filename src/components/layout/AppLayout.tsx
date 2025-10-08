@@ -1,55 +1,119 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Sparkles, Settings, Store, File } from "lucide-react";
-import { LogoutButton } from "@/components/LogoutButton";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { BarChart3, Settings, Store, ShoppingCart, LogOut } from "lucide-react";
 import { useNotificationsAndOrders } from "@/hooks/useNotificationsAndOrders";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+  useSidebar,
+  SidebarFooter,
+  SidebarHeader,
+} from "@/components/ui/sidebar";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+const menuItems = [
+  { title: "Performance", url: "/kpi", icon: BarChart3 },
+  { title: "Market B2C", url: "/products", icon: ShoppingCart },
+  { title: "Market B2B", url: "/market", icon: Store },
+  { title: "Settings", url: "/configuration", icon: Settings },
+];
+
+function AppSidebar() {
+  const { state } = useSidebar();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentPath = location.pathname;
+  const isCollapsed = state === "collapsed";
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Logged out successfully");
+    navigate("/login");
+  };
+
+  return (
+    <Sidebar collapsible="icon" className="border-r border-gray-100">
+      <SidebarHeader className="border-b border-gray-100 p-4">
+        <div className="flex items-center justify-center">
+          <img 
+            src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" 
+            alt="Main Logo" 
+            className={isCollapsed ? "h-8 w-8 object-contain" : "h-10 w-auto"}
+          />
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton 
+                    asChild 
+                    isActive={currentPath === item.url}
+                    tooltip={item.title}
+                  >
+                    <NavLink to={item.url}>
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.title}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="border-t border-gray-100 p-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
+
 const AppLayout = () => {
   const location = useLocation();
   const isDashboard = location.pathname === "/dashboard";
-  const {
-    notificationCount,
-    orderCount,
-    salesCount
-  } = useNotificationsAndOrders();
-  return <div className="min-h-screen bg-gray-50">
-      <div className="w-full glass-card min-h-screen">
-        <div className={isDashboard ? "" : "md:grid md:grid-cols-[220px_1fr]"}>
-          {/* Sidebar - hide on dashboard to avoid duplication (dashboard already renders its own) */}
-          {!isDashboard && <aside className="hidden md:flex md:flex-col border-r border-gray-100 bg-gray-50/60 p-4 min-h-screen">
-              <div className="mb-6 px-2">
-                <img src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" alt="Main Logo" className="h-10 w-auto" />
-              </div>
-              <nav className="space-y-1">
-                <Link to="/kpi" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <BarChart3 className="w-4 h-4" />
-                  <span>Performance</span>
-                </Link>
-                <Link to="/products" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <ShoppingCart className="w-4 h-4" />
-                  <span>Market B2C
-              </span>
-                </Link>
-                
-                <Link to="/market" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <Store className="w-4 h-4" />
-                  <span>Market B2B</span>
-                </Link>
-                
-                <Link to="/configuration" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
-                  <Settings className="w-4 h-4" />
-                  <span>Settings</span>
-                </Link>
-              </nav>
-              <div className="mt-auto pt-4 border-t border-gray-100">
-                <LogoutButton />
-              </div>
-            </aside>}
 
-          {/* Routed content */}
-          <div>
-            <Outlet />
-          </div>
+  if (isDashboard) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="w-full glass-card min-h-screen">
+          <Outlet />
         </div>
       </div>
-    </div>;
+    );
+  }
+
+  return (
+    <SidebarProvider defaultOpen={true}>
+      <div className="min-h-screen flex w-full bg-gray-50">
+        <AppSidebar />
+        <main className="flex-1 glass-card">
+          <div className="h-12 border-b border-gray-100 flex items-center px-4">
+            <SidebarTrigger />
+          </div>
+          <Outlet />
+        </main>
+      </div>
+    </SidebarProvider>
+  );
 };
+
 export default AppLayout;
