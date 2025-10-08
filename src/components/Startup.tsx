@@ -5,12 +5,6 @@ import { Rocket, Monitor, Server, Globe } from "lucide-react";
 const Startup = () => {
   const startupOptions = [
     {
-      name: "Google",
-      icon: <Globe className="w-8 h-8 text-green-500" />,
-      description: "Search & advertising technology",
-      path: "/google"
-    },
-    {
       name: "Apple",
       icon: <Monitor className="w-8 h-8 text-gray-800" />,
       description: "Hardware & software ecosystem",
