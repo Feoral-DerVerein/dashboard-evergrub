@@ -201,35 +201,58 @@ const MetricCard = ({
 const SustainabilityCard = ({
   label,
   value,
-  subtext
+  subtext,
+  icon,
+  colorScheme = 'blue'
 }: {
   label: string;
   value: string;
   subtext: string;
-}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
-    <div className="flex items-center gap-2 mb-3">
-      <span className="text-emerald-700/80 font-medium">{label}</span>
+  icon?: string;
+  colorScheme?: 'blue' | 'green';
+}) => {
+  const bgColors = {
+    blue: 'bg-gradient-to-br from-blue-500 to-blue-400',
+    green: 'bg-gradient-to-br from-emerald-500 to-emerald-400'
+  };
+  
+  return (
+    <div className={`${bgColors[colorScheme]} rounded-2xl p-6 h-[180px] flex flex-col justify-between shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-1`}>
+      <div className="flex items-start justify-between">
+        <span className="text-3xl">{icon}</span>
+      </div>
+      <div className="flex flex-col mt-auto">
+        <span className="text-white/70 text-xs uppercase tracking-wide mb-2 font-medium">{label}</span>
+        <span className="text-5xl font-bold text-white mb-2">{value}</span>
+        <span className="text-sm text-white/90 font-medium">{subtext}</span>
+      </div>
     </div>
-    <div className="flex flex-col">
-      <span className="text-2xl font-semibold mb-1 text-emerald-900">{value}</span>
-      <span className="text-sm text-emerald-600 font-medium">{subtext}</span>
-    </div>
-  </div>;
+  );
+};
 const InsightCard = ({
   label,
   value,
-  trend
+  trend,
+  icon
 }: {
   label: string;
   value: string;
   trend: string;
-}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
-    <div className="text-purple-700/80 mb-2 font-medium">{label}</div>
-    <div className="flex items-baseline gap-2">
-      <span className="text-2xl font-semibold text-purple-900">{value}</span>
-      <span className="text-emerald-600 text-sm font-medium">+{trend}</span>
+  icon?: string;
+}) => (
+  <div className="bg-gradient-to-br from-purple-500 to-purple-400 rounded-2xl p-6 h-[180px] flex flex-col justify-between shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+    <div className="flex items-start justify-between">
+      <span className="text-3xl">{icon}</span>
     </div>
-  </div>;
+    <div className="flex flex-col mt-auto">
+      <span className="text-white/70 text-xs uppercase tracking-wide mb-2 font-medium">{label}</span>
+      <div className="flex items-baseline gap-3">
+        <span className="text-5xl font-bold text-white">{value}</span>
+        <span className="px-3 py-1 bg-emerald-400/20 text-emerald-100 rounded-full text-sm font-semibold">+{trend}</span>
+      </div>
+    </div>
+  </div>
+);
 const KPI = () => {
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeFilterPeriod>("Week");
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -888,40 +911,65 @@ const KPI = () => {
           <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
             {/* KPI groups in a single row */}
             <section className="md:col-span-4 order-1 md:order-0 mt-6">
-              <div className="grid md:grid-cols-3 gap-6 items-stretch">
-                  <div className="h-full flex flex-col">
-                    <h3 className="text-lg font-semibold mb-4">Sustainability Impact</h3>
-                    <div className="flex-1 grid grid-rows-2 gap-4">
-                      <div className="flex-1">
-                        <SustainabilityCard label="CO₂ Saved" value={realData.co2Saved} subtext={realData.co2Change} />
-                      </div>
-                      <div className="flex-1">
-                        <SustainabilityCard label="Waste Reduced" value={realData.wasteReduced} subtext={`Target: ${realData.wasteTarget}`} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-full flex flex-col">
-                    <h3 className="text-lg font-semibold mb-4">Customer Insights</h3>
-                    <div className="flex-1 grid grid-rows-2 gap-4">
-                      <div className="flex-1">
-                        <InsightCard label="Conversion Rate" value={realData.conversionRate} trend={realData.conversionChange.replace('+', '')} />
-                      </div>
-                      <div className="flex-1">
-                        <InsightCard label="Return Rate" value={realData.returnRate} trend={realData.returnChange.replace('+', '')} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-full flex flex-col">
-                    <h3 className="text-lg font-semibold mb-4">Savings & Food Waste</h3>
-                    <div className="flex-1 grid grid-rows-2 gap-4">
-                      <div className="flex-1">
-                        <SustainabilityCard label="Cost Savings" value={realData.costSavings} subtext={realData.costChange} />
-                      </div>
-                      <div className="flex-1">
-                        <SustainabilityCard label="Food Waste Reduced" value={realData.foodWasteReduced} subtext={realData.foodWasteChange} />
-                      </div>
-                    </div>
-                  </div>
+              {/* Sustainability Impact */}
+              <div className="mb-8">
+                <h3 className="text-2xl font-bold mb-4">Sustainability Impact</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <SustainabilityCard 
+                    label="CO₂ Saved" 
+                    value={realData.co2Saved} 
+                    subtext={`${realData.co2Change} vs last week`}
+                    icon="🌱"
+                    colorScheme="blue"
+                  />
+                  <SustainabilityCard 
+                    label="Waste Reduced" 
+                    value={realData.wasteReduced} 
+                    subtext={`Target: ${realData.wasteTarget}`}
+                    icon="♻️"
+                    colorScheme="blue"
+                  />
+                </div>
+              </div>
+
+              {/* Customer Insights */}
+              <div className="mb-8">
+                <h3 className="text-2xl font-bold mb-4">Customer Insights</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <InsightCard 
+                    label="Conversion Rate" 
+                    value={realData.conversionRate} 
+                    trend={realData.conversionChange.replace('+', '')}
+                    icon="📊"
+                  />
+                  <InsightCard 
+                    label="Return Rate" 
+                    value={realData.returnRate} 
+                    trend={realData.returnChange.replace('+', '')}
+                    icon="🔄"
+                  />
+                </div>
+              </div>
+
+              {/* Savings & Food Waste */}
+              <div className="mb-8">
+                <h3 className="text-2xl font-bold mb-4">Savings & Food Waste</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <SustainabilityCard 
+                    label="Cost Savings" 
+                    value={realData.costSavings} 
+                    subtext={`${realData.costChange} vs last month`}
+                    icon="💰"
+                    colorScheme="green"
+                  />
+                  <SustainabilityCard 
+                    label="Food Waste Reduced" 
+                    value={realData.foodWasteReduced} 
+                    subtext={`${realData.foodWasteChange} vs last month`}
+                    icon="🍽️"
+                    colorScheme="green"
+                  />
+                </div>
               </div>
             </section>
 
