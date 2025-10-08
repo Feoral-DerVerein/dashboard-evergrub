@@ -1,4 +1,4 @@
-import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink, Plug, CreditCard, LogOut } from "lucide-react";
+import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink, Plug, CreditCard, LogOut, ThumbsUp } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Link, useNavigate } from "react-router-dom";
@@ -212,15 +212,20 @@ const SustainabilityCard = ({
   colorScheme?: 'blue' | 'green';
 }) => {
   return (
-    <div className="bg-white/30 rounded-2xl p-4 h-[90px] flex flex-col justify-between shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:shadow-lg transition-all duration-200 hover:-translate-y-1 backdrop-blur-[11.6px] border border-white/20">
-      <div className="flex items-center gap-2">
-        <span className="text-xl">{icon}</span>
-        <span className="text-foreground/70 text-[10px] uppercase tracking-wide font-medium">{label}</span>
+    <div className="bg-white rounded-2xl p-6 h-[180px] flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
+      <div className="flex flex-col gap-2">
+        <h4 className="text-purple-600 text-base font-normal">{label}</h4>
       </div>
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-2xl font-bold text-foreground">{value}</span>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-5xl font-bold text-purple-900">{value}</span>
+          {icon && <span className="text-3xl">{icon}</span>}
+        </div>
+        <div className="flex items-center gap-2">
+          <ThumbsUp className="w-5 h-5 text-emerald-600" />
+          <span className="text-emerald-600 text-base font-normal">{subtext}</span>
+        </div>
       </div>
-      <span className="text-xs text-foreground/80 font-medium">{subtext}</span>
     </div>
   );
 };
@@ -235,14 +240,19 @@ const InsightCard = ({
   trend: string;
   icon?: string;
 }) => (
-  <div className="bg-white/30 rounded-2xl p-4 h-[90px] flex flex-col justify-between shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:shadow-lg transition-all duration-200 hover:-translate-y-1 backdrop-blur-[11.6px] border border-white/20">
-    <div className="flex items-center gap-2">
-      <span className="text-xl">{icon}</span>
-      <span className="text-foreground/70 text-[10px] uppercase tracking-wide font-medium">{label}</span>
+  <div className="bg-white rounded-2xl p-6 h-[180px] flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
+    <div className="flex flex-col gap-2">
+      <h4 className="text-purple-600 text-base font-normal">{label}</h4>
     </div>
-    <div className="flex items-center gap-2">
-      <span className="text-2xl font-bold text-foreground">{value}</span>
-      <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-semibold">+{trend}</span>
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <span className="text-5xl font-bold text-purple-900">{value}</span>
+        {icon && <span className="text-3xl">{icon}</span>}
+      </div>
+      <div className="flex items-center gap-2">
+        <ThumbsUp className="w-5 h-5 text-emerald-600" />
+        <span className="text-emerald-600 text-base font-normal">Looks good</span>
+      </div>
     </div>
   </div>
 );
