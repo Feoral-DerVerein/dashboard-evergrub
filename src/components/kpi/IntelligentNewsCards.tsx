@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Bell, TrendingUp, Package, AlertTriangle, Clock, ArrowRight, Check, X } from "lucide-react";
+import { Bell, TrendingUp, Package, AlertTriangle, Calendar, Clock, ArrowRight, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ interface IntelligentNewsCardsProps {
 
 export const IntelligentNewsCards = ({ products = [], orders = [], insights }: IntelligentNewsCardsProps) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [currentRow, setCurrentRow] = useState(0);
 
   // Generate intelligent news based on real data
   const generateNews = (): NewsItem[] => {
@@ -162,6 +164,18 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
     setNewsItems(generateNews());
   }, [products, orders, insights]);
 
+  // Auto-rotate every 5 seconds
+  useEffect(() => {
+    const rows = Math.ceil(newsItems.length / 4);
+    if (rows <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentRow((prev) => (prev + 1) % rows);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [newsItems]);
+
   const handleComplete = (id: string) => {
     setNewsItems(prev => prev.filter(item => item.id !== id));
     toast.success("Notification marked as completed");
@@ -171,6 +185,19 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
     setNewsItems(prev => prev.filter(item => item.id !== id));
     toast.success("Notification deleted");
   };
+
+  const nextRow = () => {
+    const rows = Math.ceil(newsItems.length / 4);
+    setCurrentRow((prev) => (prev + 1) % rows);
+  };
+
+  const prevRow = () => {
+    const rows = Math.ceil(newsItems.length / 4);
+    setCurrentRow((prev) => (prev - 1 + rows) % rows);
+  };
+
+  const rows = Math.ceil(newsItems.length / 4);
+  const visibleItems = newsItems.slice(currentRow * 4, (currentRow + 1) * 4);
 
   const getIcon = (type: NewsItem['type']) => {
     switch (type) {
@@ -185,103 +212,147 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
     }
   };
 
-  const getGlassStyle = (type: NewsItem['type']) => {
+  const getTypeColor = (type: NewsItem['type']) => {
     switch (type) {
       case 'urgent':
-        return 'bg-red-500/20 backdrop-blur-xl border border-white/20';
+        return 'text-red-600 bg-red-50 border-red-200';
       case 'pending':
-        return 'bg-amber-500/20 backdrop-blur-xl border border-white/20';
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'order':
-        return 'bg-blue-500/20 backdrop-blur-xl border border-white/20';
+        return 'text-blue-600 bg-blue-50 border-blue-200';
       case 'info':
-        return 'bg-emerald-500/20 backdrop-blur-xl border border-white/20';
+        return 'text-green-600 bg-green-50 border-green-200';
     }
   };
 
   const getPriorityBadge = (priority: NewsItem['priority']) => {
     switch (priority) {
       case 'high':
-        return <Badge className="bg-white/30 text-white backdrop-blur-sm border-0 hover:bg-white/40">High Priority</Badge>;
+        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">High Priority</Badge>;
       case 'medium':
-        return <Badge className="bg-white/30 text-white backdrop-blur-sm border-0 hover:bg-white/40">Medium</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Medium</Badge>;
       case 'low':
-        return <Badge className="bg-white/30 text-white backdrop-blur-sm border-0 hover:bg-white/40">Info</Badge>;
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Info</Badge>;
     }
   };
 
   if (newsItems.length === 0) {
     return (
-      <div className="text-center py-12 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20">
-        <Bell className="w-12 h-12 mx-auto mb-2 opacity-50 text-white" />
-        <p className="text-white/80">No notifications at the moment</p>
+      <div className="text-center py-8 text-gray-500">
+        <Bell className="w-12 h-12 mx-auto mb-2 opacity-50" />
+        <p>No notifications at the moment</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {newsItems.map((item) => (
-        <div 
-          key={item.id}
-          className={`${getGlassStyle(item.type)} rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300`}
-        >
-          <div className="p-5">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-2.5 rounded-full bg-white/20 backdrop-blur-sm">
-                {getIcon(item.type)}
-              </div>
-              {getPriorityBadge(item.priority)}
-            </div>
-
-            <h3 className="font-semibold text-base mb-2 text-white line-clamp-1">
-              {item.title}
-            </h3>
-
-            <p className="text-sm text-white/80 mb-4 line-clamp-2 leading-relaxed">
-              {item.description}
-            </p>
-
-            <div className="flex items-center text-xs text-white/70 mb-4">
-              <Clock className="w-3.5 h-3.5 mr-1.5" />
-              {item.timestamp}
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex gap-2 mb-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex-1 h-9 text-sm bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm rounded-xl"
-                onClick={() => handleComplete(item.id)}
-              >
-                <Check className="w-4 h-4 mr-1" />
-                Done
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex-1 h-9 text-sm bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm rounded-xl"
-                onClick={() => handleDelete(item.id)}
-              >
-                <X className="w-4 h-4 mr-1" />
-                Hide
-              </Button>
-            </div>
-
-            {item.actionLabel && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full h-9 text-sm bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm rounded-xl"
-                onClick={item.onAction}
-              >
-                {item.actionLabel}
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </Button>
-            )}
+    <div className="relative">
+      {/* Navigation buttons */}
+      {rows > 1 && (
+        <div className="flex justify-between items-center mb-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={prevRow}
+            className="h-8"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          
+          <div className="flex gap-2">
+            {Array.from({ length: rows }).map((_, idx) => (
+              <div
+                key={idx}
+                className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                  idx === currentRow ? 'bg-blue-600 w-6' : 'bg-gray-300'
+                }`}
+              />
+            ))}
           </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={nextRow}
+            className="h-8"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
         </div>
-      ))}
+      )}
+
+      {/* Cards grid with animation */}
+      <div className="overflow-hidden">
+        <div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-500 ease-in-out animate-fade-in"
+          key={currentRow}
+        >
+          {visibleItems.map((item) => (
+            <Card 
+              key={item.id}
+              className={`hover:shadow-lg transition-all duration-300 border-l-4 ${getTypeColor(item.type)} animate-scale-in`}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div className={`p-2 rounded-lg ${getTypeColor(item.type)}`}>
+                    {getIcon(item.type)}
+                  </div>
+                  {getPriorityBadge(item.priority)}
+                </div>
+
+                <h3 className="font-semibold text-sm mb-2 text-gray-900 line-clamp-1">
+                  {item.title}
+                </h3>
+
+                <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                  {item.description}
+                </p>
+
+                <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
+                  <div className="flex items-center text-xs text-gray-500">
+                    <Clock className="w-3 h-3 mr-1" />
+                    {item.timestamp}
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex gap-2 mt-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 h-8 text-xs hover:bg-green-50 hover:text-green-700 hover:border-green-300"
+                    onClick={() => handleComplete(item.id)}
+                  >
+                    <Check className="w-3 h-3 mr-1" />
+                    Complete
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 h-8 text-xs hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+                    onClick={() => handleDelete(item.id)}
+                  >
+                    <X className="w-3 h-3 mr-1" />
+                    Delete
+                  </Button>
+                </div>
+
+                {item.actionLabel && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full h-7 mt-2 text-xs hover:bg-gray-100"
+                    onClick={item.onAction}
+                  >
+                    {item.actionLabel}
+                    <ArrowRight className="w-3 h-3 ml-1" />
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
