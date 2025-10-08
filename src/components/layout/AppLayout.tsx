@@ -39,8 +39,8 @@ function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-gray-100">
-      <SidebarHeader className="border-b border-gray-100 p-4">
+    <Sidebar collapsible="icon" className="border-r border-gray-100 bg-white">
+      <SidebarHeader className="border-b border-gray-100 p-4 bg-white">
         <div className="flex items-center justify-center">
           <img 
             src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" 
@@ -50,7 +50,7 @@ function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="bg-white">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -73,7 +73,7 @@ function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-gray-100 p-2">
+      <SidebarFooter className="border-t border-gray-100 p-2 bg-white">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
