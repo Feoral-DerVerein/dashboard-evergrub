@@ -914,7 +914,7 @@ const KPI = () => {
               {/* Sustainability Impact */}
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-4">Sustainability Impact</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <SustainabilityCard 
                     label="CO₂ Saved" 
                     value={realData.co2Saved} 
@@ -935,7 +935,7 @@ const KPI = () => {
               {/* Customer Insights */}
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-4">Customer Insights</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <InsightCard 
                     label="Conversion Rate" 
                     value={realData.conversionRate} 
@@ -954,7 +954,7 @@ const KPI = () => {
               {/* Savings & Food Waste */}
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-4">Savings & Food Waste</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <SustainabilityCard 
                     label="Cost Savings" 
                     value={realData.costSavings} 
