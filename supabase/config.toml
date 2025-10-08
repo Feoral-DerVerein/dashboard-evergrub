@@ -33,3 +33,9 @@ verify_jwt = true
 [functions.seed-test-data]
 verify_jwt = true
 
+[functions.publish-to-marketplace]
+verify_jwt = true
+
+[functions.send-to-donation]
+verify_jwt = true
+

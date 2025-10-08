@@ -79,6 +79,48 @@ serve(async (req) => {
 
     console.log(`Database data: ${products?.length || 0} products, ${orders?.length || 0} orders, ${sales?.length || 0} sales`);
 
+    // Check if user is asking about expiring products
+    const lowerMessage = message.toLowerCase();
+    const isAskingForExpiring = lowerMessage.includes('expir') || lowerMessage.includes('surplus') || 
+                                 lowerMessage.includes('venc') || lowerMessage.includes('caduc');
+    
+    let expiringProducts = [];
+    
+    if (isAskingForExpiring && products && products.length > 0) {
+      const now = new Date();
+      const threeDaysFromNow = new Date();
+      threeDaysFromNow.setHours(now.getHours() + 72);
+      
+      expiringProducts = products
+        .filter(product => {
+          if (!product.expirationdate) return false;
+          try {
+            const expDate = new Date(product.expirationdate);
+            return expDate <= threeDaysFromNow && expDate >= now;
+          } catch {
+            return false;
+          }
+        })
+        .map(product => {
+          const expDate = new Date(product.expirationdate);
+          const daysUntilExpiry = Math.ceil((expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+          return {
+            id: product.id,
+            name: product.name,
+            brand: product.brand || 'N/A',
+            price: product.price,
+            image: product.image || '',
+            category: product.category,
+            expirationDate: product.expirationdate,
+            quantity: product.quantity,
+            daysUntilExpiry
+          };
+        })
+        .sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry);
+      
+      console.log(`Found ${expiringProducts.length} products expiring within 72 hours`);
+    }
+
     // Send data to n8n webhook for AI processing
     console.log('Sending data to n8n webhook for AI processing...');
     
@@ -120,14 +162,27 @@ serve(async (req) => {
     console.log('N8N Response received successfully');
 
     // Return the AI-processed response from n8n
+    const responseData: any = {
+      success: true,
+      response: n8nData.response || n8nData.message || 'Procesado por IA',
+      timestamp: new Date().toISOString(),
+      product_cards: n8nData.product_cards || [],
+      data_source: 'n8n_ai_agent'
+    };
+    
+    // Add expiring products if user asked for them
+    if (isAskingForExpiring) {
+      responseData.expiring_products = expiringProducts;
+      // Override response message if we have expiring products data
+      if (expiringProducts.length > 0) {
+        responseData.response = `📦 You have ${expiringProducts.length} products expiring soon (<72 hours). Here are your options to reduce waste:`;
+      } else {
+        responseData.response = '✅ Excellent! You have no products expiring soon (< 72 hours). Your inventory management is working very well.';
+      }
+    }
+    
     return new Response(
-      JSON.stringify({
-        success: true,
-        response: n8nData.response || n8nData.message || 'Procesado por IA',
-        timestamp: new Date().toISOString(),
-        product_cards: n8nData.product_cards || [],
-        data_source: 'n8n_ai_agent'
-      }),
+      JSON.stringify(responseData),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
