@@ -1,4 +1,4 @@
-import POSConnectionForm from "@/components/onboarding/POSConnectionForm";
+import { useEffect } from "react";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { useNavigate } from "react-router-dom";
 
@@ -6,12 +6,13 @@ const Onboarding = () => {
   const { completeOnboarding } = useOnboarding();
   const navigate = useNavigate();
 
-  const handleOnboardingComplete = () => {
+  useEffect(() => {
+    // Complete onboarding automatically and redirect to dashboard
     completeOnboarding();
     navigate("/kpi");
-  };
+  }, [completeOnboarding, navigate]);
 
-  return <POSConnectionForm onComplete={handleOnboardingComplete} />;
+  return null;
 };
 
 export default Onboarding;
