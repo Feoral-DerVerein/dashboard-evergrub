@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
 import Profile from "@/pages/Profile";
-import Products from "@/pages/Products";
 import AddProduct from "@/pages/AddProduct";
 import Sales from "@/pages/Sales";
 import Orders from "@/pages/Orders";
@@ -48,7 +47,6 @@ const MainRoutes = () => {
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route path="/dashboard" element={<Navigate to="/kpi" replace />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/products" element={<Products />} />
         <Route path="/products/add" element={<AddProduct />} />
         <Route path="/products/edit/:id" element={<AddProduct />} />
         <Route path="/sales" element={<Sales />} />
