@@ -95,7 +95,7 @@ const RecentActivityItem = ({
     {amount && <span className="font-medium">{amount}</span>}
   </div>;
 export const BottomNav = () => {
-  return;
+  return null;
 };
 const Dashboard = () => {
   const {
