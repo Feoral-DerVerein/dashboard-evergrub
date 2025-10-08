@@ -119,11 +119,11 @@ const MelbourneWeatherCard = () => {
 
   if (loading) {
     return (
-      <div className="w-48 h-auto bg-black/20 backdrop-blur-xl rounded-2xl p-4 shadow-lg border border-white/10">
+      <div className="bg-white rounded-xl p-6 border border-gray-200">
         <div className="animate-pulse">
-          <div className="h-4 bg-white/20 rounded mb-2"></div>
-          <div className="h-8 bg-white/20 rounded mb-2"></div>
-          <div className="h-4 bg-white/20 rounded"></div>
+          <div className="h-4 bg-gray-200 rounded mb-2"></div>
+          <div className="h-8 bg-gray-200 rounded mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded"></div>
         </div>
       </div>
     );
@@ -132,7 +132,7 @@ const MelbourneWeatherCard = () => {
   if (!weather) return null;
 
   return (
-    <div className="w-auto bg-white/80 backdrop-blur-xl rounded-2xl p-4 shadow-lg border border-blue-200">
+    <div className="bg-white rounded-xl p-6 border border-gray-200">
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         {getWeatherIcon(weather.condition)}
