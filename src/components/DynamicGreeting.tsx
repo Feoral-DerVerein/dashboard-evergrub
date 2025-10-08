@@ -45,6 +45,6 @@ export const DynamicGreeting = () => {
   }, [user]);
   return <div className="text-center">
       <img src={welcomeBanner} alt="Hi Mate, What are we going to make possible today?" className="h-16 object-contain mx-auto mb-2" />
-      <p className="text-muted-foreground text-lg mt-2">I'm Negen. How can I help you today?</p>
+      
     </div>;
 };
