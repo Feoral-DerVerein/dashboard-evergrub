@@ -23,6 +23,7 @@ import { aiInsightsService } from "@/services/aiInsightsService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { IntelligentNewsCards } from "@/components/kpi/IntelligentNewsCards";
+import MelbourneWeatherCard from "@/components/widgets/MelbourneWeatherCard";
 import hiMateBanner from "@/assets/hi-mate-banner.png";
 type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
 const chartDataSamples: Record<TimeFilterPeriod, {
@@ -889,70 +890,7 @@ const KPI = () => {
 
             {/* Weather and Visitor Prediction Cards - Moved below Task List */}
             <div className="grid md:grid-cols-2 gap-6 mt-6">
-              <div className="bg-white rounded-xl p-6 border border-gray-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-blue-500 rounded-full">
-                    <Sun className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-blue-900">Melbourne Weather Live</h3>
-                  <div className="ml-auto">
-                    <button className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors">
-                      <Settings className="w-4 h-4 text-blue-700" />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-3xl font-light text-blue-900 mb-1">16°C</div>
-                    <p className="text-blue-700 text-sm">Demo Weather Data - Add API Key For Real Data</p>
-                    <p className="text-blue-600 text-sm">Feels like 18°C</p>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-blue-400 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs">💧</span>
-                      </div>
-                      <span className="text-blue-700">66%</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Wind className="w-4 h-4 text-blue-600" />
-                      <span className="text-blue-700">19 km/h</span>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-white/50 rounded-lg p-3">
-                    <p className="text-sm text-blue-800 font-medium mb-2">Today's Forecast</p>
-                    <div className="grid grid-cols-4 gap-2 text-xs">
-                      <div className="text-center">
-                        <div className="text-blue-600">12:00</div>
-                        <Sun className="w-4 h-4 text-yellow-500 mx-auto my-1" />
-                        <div className="text-blue-900">18°</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-blue-600">15:00</div>
-                        <Cloud className="w-4 h-4 text-gray-500 mx-auto my-1" />
-                        <div className="text-blue-900">22°</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-blue-600">18:00</div>
-                        <Cloud className="w-4 h-4 text-gray-500 mx-auto my-1" />
-                        <div className="text-blue-900">19°</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-blue-600">21:00</div>
-                        <Cloud className="w-4 h-4 text-gray-500 mx-auto my-1" />
-                        <div className="text-blue-900">16°</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-green-100 rounded-lg p-2">
-                    <p className="text-green-800 text-sm">☕ Perfect for warm drinks</p>
-                  </div>
-                </div>
-              </div>
+              <MelbourneWeatherCard />
 
               <div className="bg-white rounded-xl p-6 border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
