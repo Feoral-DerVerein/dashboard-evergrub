@@ -25,6 +25,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoutes";
 import AppLayout from "@/components/layout/AppLayout";
 import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
+import ConnectPOS from "@/pages/ConnectPOS";
 
 
 const MainRoutes = () => {
@@ -61,6 +62,7 @@ const MainRoutes = () => {
         
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
+        <Route path="/connect-pos" element={<ConnectPOS />} />
         
       </Route>
       
