@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Send, TrendingUp, DollarSign, Zap, ArrowRight, Bell } from 'lucide-react';
 import { BusinessCard, type BusinessCardData } from '@/components/chat/BusinessCards';
@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { IntelligentNewsCards } from '@/components/kpi/IntelligentNewsCards';
 import { supabase } from '@/integrations/supabase/client';
 import { productService, Product } from '@/services/productService';
+import { useIsMobile } from '@/hooks/use-mobile';
 import aiIcon from '@/assets/ai-icon.png';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -23,6 +24,8 @@ const ChatBot = ({
   } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [notificationCount, setNotificationCount] = useState(0);
+  const isMobile = useIsMobile();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Load products for notifications
   useEffect(() => {
@@ -45,6 +48,13 @@ const ChatBot = ({
     };
     loadProducts();
   }, []);
+
+  // Auto-focus input on mobile devices
+  useEffect(() => {
+    if (isMobile && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isMobile]);
   const handleProductAction = (action: 'reserve' | 'cart' | 'details', productId: string) => {
     switch (action) {
       case 'reserve':
@@ -174,7 +184,7 @@ const ChatBot = ({
           {/* Chat Input Section */}
           <div className="max-w-3xl mx-auto mt-4">
             <div className="bg-white border border-[#d9d9e3] rounded-xl px-4 py-3 flex items-center gap-3 shadow-none">
-              <input type="text" value={inputValue} onChange={e => setInputValue(e.target.value)} onKeyPress={e => e.key === 'Enter' && !isLoading && inputValue.trim() && sendMessage()} placeholder="Send a message..." disabled={isLoading} className="flex-1 bg-transparent border-none text-[#202123] text-base outline-none px-2 py-2 placeholder:text-[#6e6e80]" />
+              <input ref={inputRef} type="text" value={inputValue} onChange={e => setInputValue(e.target.value)} onKeyPress={e => e.key === 'Enter' && !isLoading && inputValue.trim() && sendMessage()} placeholder="Send a message..." disabled={isLoading} className="flex-1 bg-transparent border-none text-[#202123] text-base outline-none px-2 py-2 placeholder:text-[#6e6e80]" />
               <button onClick={() => sendMessage()} disabled={isLoading || !inputValue.trim()} className="w-9 h-9 bg-[#10a37f] hover:bg-[#0d8c6d] disabled:bg-[#e5e5e5] disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-colors duration-200 text-white">
                 <Send className="w-5 h-5" />
               </button>
