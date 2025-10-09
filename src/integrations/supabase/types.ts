@@ -430,6 +430,7 @@ export type Database = {
           created_at: string
           id: string
           inventory_data: Json
+          item_count: number | null
           pos_connection_id: string
           pos_type: string
           user_id: string
@@ -438,6 +439,7 @@ export type Database = {
           created_at?: string
           id?: string
           inventory_data: Json
+          item_count?: number | null
           pos_connection_id: string
           pos_type: string
           user_id: string
@@ -446,6 +448,7 @@ export type Database = {
           created_at?: string
           id?: string
           inventory_data?: Json
+          item_count?: number | null
           pos_connection_id?: string
           pos_type?: string
           user_id?: string
