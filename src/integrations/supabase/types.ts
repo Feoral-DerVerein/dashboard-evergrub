@@ -862,6 +862,7 @@ export type Database = {
           business_name: string
           connection_status: string
           created_at: string
+          encrypted_credentials: string | null
           error_message: string | null
           id: string
           last_sync_at: string | null
@@ -874,6 +875,7 @@ export type Database = {
           business_name: string
           connection_status?: string
           created_at?: string
+          encrypted_credentials?: string | null
           error_message?: string | null
           id?: string
           last_sync_at?: string | null
@@ -886,6 +888,7 @@ export type Database = {
           business_name?: string
           connection_status?: string
           created_at?: string
+          encrypted_credentials?: string | null
           error_message?: string | null
           id?: string
           last_sync_at?: string | null
@@ -1646,6 +1649,14 @@ export type Database = {
           product_id: string
           user_id: string
         }[]
+      }
+      decrypt_pos_credentials: {
+        Args: { encrypted_data: string }
+        Returns: Json
+      }
+      encrypt_pos_credentials: {
+        Args: { credentials_json: Json }
+        Returns: string
       }
       get_ai_product_suggestions: {
         Args: {
