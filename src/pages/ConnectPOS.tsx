@@ -175,7 +175,7 @@ const ConnectPOS = () => {
 
       // Call n8n webhook for validation (fire and forget)
       if (data?.id) {
-        fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+        fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/pos-validation', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -237,7 +237,7 @@ const ConnectPOS = () => {
 
       // Call n8n webhook for validation (fire and forget)
       if (data?.id) {
-        fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+        fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/pos-validation', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
