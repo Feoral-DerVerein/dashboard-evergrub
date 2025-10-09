@@ -6,10 +6,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Plug, Square, Zap, Utensils, Sparkles, ExternalLink, Loader2 } from "lucide-react";
+import { Plug, ExternalLink, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import squareLogo from "@/assets/square-logo.png";
+import lightspeedLogo from "@/assets/lightspeed-logo.png";
+import toastLogo from "@/assets/toast-logo.png";
+import cloverLogo from "@/assets/clover-logo.svg";
 
 type POSType = 'square' | 'lightspeed' | 'toast' | 'clover';
 
@@ -32,8 +36,7 @@ const posOptions = [
     title: 'Square',
     description: 'Leading POS system for retail and restaurants',
     badge: 'Popular',
-    icon: Square,
-    color: 'text-blue-600',
+    logo: squareLogo,
     available: true,
   },
   {
@@ -41,8 +44,7 @@ const posOptions = [
     title: 'Lightspeed',
     description: 'Complete POS for stores and restaurants',
     badge: null,
-    icon: Zap,
-    color: 'text-orange-600',
+    logo: lightspeedLogo,
     available: true,
   },
   {
@@ -50,8 +52,7 @@ const posOptions = [
     title: 'Toast',
     description: 'POS specialized for restaurants',
     badge: 'Coming Soon',
-    icon: Utensils,
-    color: 'text-red-600',
+    logo: toastLogo,
     available: false,
   },
   {
@@ -59,8 +60,7 @@ const posOptions = [
     title: 'Clover',
     description: 'Flexible POS for all business types',
     badge: 'Coming Soon',
-    icon: Sparkles,
-    color: 'text-green-600',
+    logo: cloverLogo,
     available: false,
   },
 ];
@@ -280,7 +280,6 @@ const ConnectPOS = () => {
       {/* POS Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {posOptions.map((pos) => {
-          const Icon = pos.icon;
           return (
             <Card 
               key={pos.id}
@@ -289,8 +288,8 @@ const ConnectPOS = () => {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg bg-muted ${pos.color}`}>
-                      <Icon className="h-6 w-6" />
+                    <div className="p-3 rounded-lg bg-white border border-border flex items-center justify-center">
+                      <img src={pos.logo} alt={`${pos.title} logo`} className="h-8 w-8 object-contain" />
                     </div>
                     <div>
                       <CardTitle className="text-xl">{pos.title}</CardTitle>
