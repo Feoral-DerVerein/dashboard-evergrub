@@ -1,6 +1,6 @@
 
-import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
@@ -11,41 +11,40 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   const { hasCompletedOnboarding, isLoading: onboardingLoading } = useOnboarding();
-  const navigate = useNavigate();
   const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);
+  const hasRedirected = useRef(false);
   
   useEffect(() => {
     if (!loading && !onboardingLoading) {
       setIsChecking(false);
-      
-      if (!user && location.pathname !== '/') {
-        console.log("ProtectedRoute: No user, redirecting to /");
-        navigate("/", { replace: true });
-        return;
-      }
-      
-      // If user is logged in but hasn't completed onboarding, and not already on onboarding page
-      if (user && hasCompletedOnboarding === false && location.pathname !== '/onboarding') {
-        console.log("ProtectedRoute: User needs onboarding, redirecting to /onboarding");
-        navigate("/onboarding", { replace: true });
-        return;
-      }
-      
-      // If user completed onboarding but is on onboarding page, redirect to dashboard
-      if (user && hasCompletedOnboarding === true && location.pathname === '/onboarding') {
-        console.log("ProtectedRoute: Onboarding completed, redirecting to /kpi");
-        navigate("/kpi", { replace: true });
-        return;
-      }
     }
-  }, [user, loading, onboardingLoading, hasCompletedOnboarding, navigate, location.pathname]);
+  }, [loading, onboardingLoading]);
   
+  // Show loading state
   if (loading || onboardingLoading || isChecking) {
     return <div className="flex items-center justify-center h-screen">Cargando...</div>;
   }
   
-  return user ? children : null;
+  // If no user, redirect to home
+  if (!user) {
+    console.log("ProtectedRoute: No user, redirecting to /");
+    return <Navigate to="/" replace />;
+  }
+  
+  // If user hasn't completed onboarding and not on onboarding page
+  if (hasCompletedOnboarding === false && location.pathname !== '/onboarding') {
+    console.log("ProtectedRoute: User needs onboarding, redirecting to /onboarding");
+    return <Navigate to="/onboarding" replace />;
+  }
+  
+  // If user completed onboarding but is on onboarding page
+  if (hasCompletedOnboarding === true && location.pathname === '/onboarding') {
+    console.log("ProtectedRoute: Onboarding completed, redirecting to /kpi");
+    return <Navigate to="/kpi" replace />;
+  }
+  
+  return children;
 };
 
 export default ProtectedRoute;
