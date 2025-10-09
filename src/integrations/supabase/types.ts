@@ -425,6 +425,41 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_snapshots: {
+        Row: {
+          created_at: string
+          id: string
+          inventory_data: Json
+          pos_connection_id: string
+          pos_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inventory_data: Json
+          pos_connection_id: string
+          pos_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inventory_data?: Json
+          pos_connection_id?: string
+          pos_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_snapshots_pos_connection_id_fkey"
+            columns: ["pos_connection_id"]
+            isOneToOne: false
+            referencedRelation: "pos_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       n8n_chat_histories: {
         Row: {
           id: number
