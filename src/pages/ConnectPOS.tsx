@@ -167,7 +167,7 @@ const ConnectPOS = () => {
       sessionStorage.setItem('square_oauth_user_id', user.id);
 
       // Build OAuth URL
-      const redirectUri = `${window.location.origin}/api/square/callback`;
+  const redirectUri = `${window.location.origin}/square-callback`;
       const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
 
       // Redirect to Square OAuth

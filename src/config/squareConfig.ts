@@ -8,7 +8,7 @@
 
 export const SQUARE_CONFIG = {
   // Your Square Application ID (Sandbox or Production)
-  // Replace with your actual Application ID from Square Developer Dashboard
+  // Get this from Square Developer Dashboard
   APPLICATION_ID: 'sandbox-sq0idb-KN7kLwnW8eDIo_hkpac...',
   
   // Environment: 'sandbox' for testing, 'production' for live
@@ -31,6 +31,7 @@ export const SQUARE_CONFIG = {
   OAUTH_SCOPES: [
     'MERCHANT_PROFILE_READ',
     'ITEMS_READ',
+    'INVENTORY_READ',
     'ORDERS_READ',
     'PAYMENTS_READ',
   ].join('+'),
