@@ -195,7 +195,7 @@ const ConnectPOS = () => {
       setSquareErrors({});
       
       // Redirect to pos-integrations page
-      navigate('/dashboard/pos-integrations');
+      navigate('/pos-integrations');
     } catch (error) {
       console.error('Error connecting Square:', error);
       toast.error('Failed to connect Square. Please try again.');
@@ -258,7 +258,7 @@ const ConnectPOS = () => {
       setLightspeedErrors({});
       
       // Redirect to pos-integrations page
-      navigate('/dashboard/pos-integrations');
+      navigate('/pos-integrations');
     } catch (error) {
       console.error('Error connecting Lightspeed:', error);
       toast.error('Failed to connect Lightspeed. Please try again.');
