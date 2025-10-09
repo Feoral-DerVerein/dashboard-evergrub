@@ -1,4 +1,4 @@
-import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink, Plug, CreditCard, LogOut, ThumbsUp } from "lucide-react";
+import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink, Plug, CreditCard, LogOut, ThumbsUp, Database } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Link, useNavigate } from "react-router-dom";
@@ -668,9 +668,15 @@ const KPI = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/api-config" className="flex items-center gap-2 w-full">
+                    <Link to="/connect-pos" className="flex items-center gap-2 w-full">
                       <Plug className="h-4 w-4" />
-                      API Config
+                      Connect POS
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/pos-integrations" className="flex items-center gap-2 w-full">
+                      <Database className="h-4 w-4" />
+                      My Integrations
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

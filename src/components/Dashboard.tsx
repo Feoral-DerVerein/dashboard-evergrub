@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store, RefreshCw, Plug, CreditCard, LogOut, TrendingUp, Package, Target } from "lucide-react";
+import { Home, ShoppingCart, Bell, User, Plus, ShoppingBasket, BarChart3, Megaphone, Heart, Coins, Handshake, Search, Filter, Leaf, Recycle, Truck, Clock, Award, Sparkles, MapPin, Timer, Percent, DollarSign, Settings2, Brain, Settings, Store, RefreshCw, Plug, CreditCard, LogOut, TrendingUp, Package, Target, Database } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Link } from "react-router-dom";
@@ -466,9 +466,15 @@ const Dashboard = () => {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/api-config" className="flex items-center gap-2 w-full">
+                        <Link to="/connect-pos" className="flex items-center gap-2 w-full">
                           <Plug className="h-4 w-4" />
-                          API Config
+                          Connect POS
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/pos-integrations" className="flex items-center gap-2 w-full">
+                          <Database className="h-4 w-4" />
+                          My Integrations
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
