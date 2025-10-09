@@ -156,7 +156,7 @@ const ConnectPOS = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('pos_connections')
         .insert({
           user_id: user.id,
@@ -167,9 +167,27 @@ const ConnectPOS = () => {
             location_id: squareFormData.locationId,
           },
           connection_status: 'pending',
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
+
+      // Call n8n webhook for validation (fire and forget)
+      if (data?.id) {
+        fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            connection_id: data.id,
+            pos_type: 'square',
+            credentials: {
+              access_token: squareFormData.accessToken,
+              location_id: squareFormData.locationId,
+            }
+          })
+        }).catch(err => console.error('Webhook error:', err));
+      }
 
       toast.success('✓ Square connected. Validating credentials...');
       setIsSquareDialogOpen(false);
@@ -199,7 +217,7 @@ const ConnectPOS = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('pos_connections')
         .insert({
           user_id: user.id,
@@ -211,9 +229,28 @@ const ConnectPOS = () => {
             account_id: lightspeedFormData.accountId,
           },
           connection_status: 'pending',
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
+
+      // Call n8n webhook for validation (fire and forget)
+      if (data?.id) {
+        fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            connection_id: data.id,
+            pos_type: 'lightspeed',
+            credentials: {
+              api_key: lightspeedFormData.apiKey,
+              api_secret: lightspeedFormData.apiSecret,
+              account_id: lightspeedFormData.accountId,
+            }
+          })
+        }).catch(err => console.error('Webhook error:', err));
+      }
 
       toast.success('✓ Lightspeed connected. Validating credentials...');
       setIsLightspeedDialogOpen(false);
