@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Square, Zap, Utensils, Sparkles, PlugZap, Loader2, Plus, RefreshCw, Unplug, AlertCircle, Database } from "lucide-react";
+import { Square, Zap, Utensils, Sparkles, PlugZap, Loader2, Plus, RefreshCw, Unplug, AlertCircle, Database, X } from "lucide-react";
 import { format } from "date-fns";
 
 interface POSConnection {
@@ -89,6 +89,7 @@ const POSIntegrations = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [syncingId, setSyncingId] = useState<string | null>(null);
   const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState<POSConnection | null>(null);
 
   useEffect(() => {
@@ -184,6 +185,32 @@ const POSIntegrations = () => {
     }
   };
 
+  const handleDeleteClick = (connection: POSConnection) => {
+    setSelectedConnection(connection);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedConnection) return;
+
+    try {
+      const { error } = await supabase
+        .from('pos_connections')
+        .delete()
+        .eq('id', selectedConnection.id);
+
+      if (error) throw error;
+
+      const posName = posConfig[selectedConnection.pos_type].name;
+      toast.success(`✓ ${posName} deleted successfully`);
+      setDeleteDialogOpen(false);
+      setSelectedConnection(null);
+    } catch (error) {
+      console.error('Error deleting:', error);
+      toast.error('Failed to delete POS connection');
+    }
+  };
+
   const getLastSyncText = (lastSyncAt: string | null): string => {
     if (!lastSyncAt) return 'Never synced';
 
@@ -253,8 +280,16 @@ const POSIntegrations = () => {
 
             return (
               <div key={connection.id} className="space-y-2">
-                <Card className="hover:shadow-md transition-shadow">
+                <Card className="hover:shadow-md transition-shadow relative">
                   <CardHeader>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="absolute top-2 right-2 h-6 w-6 text-muted-foreground hover:text-destructive"
+                      onClick={() => handleDeleteClick(connection)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                     <div className="flex items-start justify-between gap-4">
                       {/* Left Section */}
                       <div className="flex items-start gap-4 flex-1">
@@ -343,6 +378,28 @@ const POSIntegrations = () => {
               className="bg-destructive hover:bg-destructive/90"
             >
               Disconnect
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete POS Connection?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to permanently delete{' '}
+              <strong>{selectedConnection?.business_name}</strong>? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete Permanently
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
