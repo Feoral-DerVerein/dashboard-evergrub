@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { BarChart3, LogOut, ShoppingBag, Plug, Database } from "lucide-react";
+import { BarChart3, LogOut, Plug, Database } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -19,7 +19,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 const menuItems = [
   { title: "Performance", url: "/kpi", icon: BarChart3 },
-  { title: "Products", url: "/products", icon: ShoppingBag },
   { title: "Connect POS", url: "/connect-pos", icon: Plug },
   { title: "My Integrations", url: "/pos-integrations", icon: Database },
 ];
