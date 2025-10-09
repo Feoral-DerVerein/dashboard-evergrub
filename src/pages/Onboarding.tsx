@@ -1,18 +1,19 @@
 import { useEffect } from "react";
 import { useOnboarding } from "@/hooks/useOnboarding";
-import { useNavigate } from "react-router-dom";
 
 const Onboarding = () => {
   const { completeOnboarding } = useOnboarding();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    // Complete onboarding automatically and redirect to dashboard
+    // Complete onboarding - ProtectedRoute will handle redirect
     completeOnboarding();
-    navigate("/kpi");
-  }, [completeOnboarding, navigate]);
+  }, [completeOnboarding]);
 
-  return null;
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <p>Completando configuración...</p>
+    </div>
+  );
 };
 
 export default Onboarding;
