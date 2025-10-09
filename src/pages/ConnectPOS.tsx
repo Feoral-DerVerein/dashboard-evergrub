@@ -10,7 +10,6 @@ import { Plug, Square, Zap, Utensils, Sparkles, ExternalLink, Loader2 } from "lu
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import squareLogo from "@/assets/square-logo.png";
 
 type POSType = 'square' | 'lightspeed' | 'toast' | 'clover';
 
@@ -34,7 +33,6 @@ const posOptions = [
     description: 'Leading POS system for retail and restaurants',
     badge: 'Popular',
     icon: Square,
-    logo: squareLogo,
     color: 'text-blue-600',
     available: true,
   },
@@ -291,12 +289,8 @@ const ConnectPOS = () => {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg bg-muted flex items-center justify-center ${!pos.logo && pos.color}`}>
-                      {pos.logo ? (
-                        <img src={pos.logo} alt={`${pos.title} logo`} className="h-6 w-6 object-contain" />
-                      ) : (
-                        <Icon className="h-6 w-6" />
-                      )}
+                    <div className={`p-2 rounded-lg bg-muted ${pos.color}`}>
+                      <Icon className="h-6 w-6" />
                     </div>
                     <div>
                       <CardTitle className="text-xl">{pos.title}</CardTitle>
