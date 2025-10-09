@@ -4,7 +4,6 @@ import { useAuth } from "@/context/AuthContext";
 
 import Profile from "@/pages/Profile";
 import AddProduct from "@/pages/AddProduct";
-import Products from "@/pages/Products";
 import Sales from "@/pages/Sales";
 import Orders from "@/pages/Orders";
 import Notifications from "@/pages/Notifications";
@@ -48,9 +47,6 @@ const MainRoutes = () => {
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route path="/dashboard" element={<Navigate to="/kpi" replace />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/products/add" element={<AddProduct />} />
-        <Route path="/products/edit/:id" element={<AddProduct />} />
         <Route path="/sales" element={<Sales />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/notifications" element={<Notifications />} />
