@@ -11,9 +11,7 @@ export const SQUARE_REDIRECT_URI = 'https://negentropyfood.cloud/square-callback
 
 export const SQUARE_CONFIG = {
   // Your Square Application ID (Sandbox or Production)
-  // TODO: Replace with your complete Application ID from Square Developer Dashboard
-  // Example format: 'sandbox-sq0idb-XXXXXXXXXXXXXXXXXXXXXXXX'
-  APPLICATION_ID: 'sandbox-sq0idb-KN7kLwnW8eDIo_hkpac...',
+  APPLICATION_ID: 'sandbox-sq0idb-KN7kLwnW8eDIo_hkpacHSg',
   
   // Environment: 'sandbox' for testing, 'production' for live
   ENVIRONMENT: 'sandbox' as 'sandbox' | 'production',
