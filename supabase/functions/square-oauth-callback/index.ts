@@ -200,9 +200,11 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         connection_id: connectionData.id,
         pos_type: 'square',
+        environment: squareEnvironment,
         credentials: {
           access_token: tokenData.access_token,
           location_id: activeLocation.id,
+          merchant_id: tokenData.merchant_id,
         },
       }),
     }).catch((err) => console.error('Webhook error:', err));
