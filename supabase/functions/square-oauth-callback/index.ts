@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
 
     console.log('Active location found:', activeLocation.name);
 
-    // Save to database with 'connected' status since we already validated everything
+    // Save to database with 'active' status since we already validated everything
     console.log('Saving connection to database...');
     const { data: connectionData, error: dbError } = await supabaseClient
       .from('pos_connections')
@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
           merchant_id: tokenData.merchant_id,
           expires_at: tokenData.expires_at,
         },
-        connection_status: 'connected', // Already validated successfully
+        connection_status: 'active', // Already validated successfully
       })
       .select('id')
       .single();
