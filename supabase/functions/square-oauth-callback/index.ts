@@ -108,6 +108,7 @@ Deno.serve(async (req) => {
         client_secret: squareAppSecret,
         code: code,
         grant_type: 'authorization_code',
+        redirect_uri: 'https://negentropyfood.cloud/square-callback',
       }),
     });
 
