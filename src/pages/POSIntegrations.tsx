@@ -143,17 +143,41 @@ const POSIntegrations = () => {
     setSyncingId(connection.id);
 
     try {
-      const { error } = await supabase
-        .from('pos_connections')
-        .update({ last_sync_at: new Date().toISOString() })
-        .eq('id', connection.id);
+      console.log('Starting sync for connection:', connection.id);
+      
+      // Call the appropriate sync function based on POS type
+      if (connection.pos_type === 'square') {
+        const { data, error } = await supabase.functions.invoke('sync-square-products');
 
-      if (error) throw error;
+        if (error) {
+          console.error('Sync error:', error);
+          throw error;
+        }
 
-      toast.success('✓ Sync started. Data will update shortly');
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        console.log('Sync response:', data);
+        toast.success(`✓ Successfully synced ${data.synced} products from Square`, {
+          description: data.errors > 0 ? `${data.errors} products had errors` : undefined,
+        });
+      } else {
+        // For other POS types, just update the sync time for now
+        const { error } = await supabase
+          .from('pos_connections')
+          .update({ last_sync_at: new Date().toISOString() })
+          .eq('id', connection.id);
+
+        if (error) throw error;
+
+        toast.success('✓ Sync started. Data will update shortly');
+      }
     } catch (error) {
       console.error('Error syncing:', error);
-      toast.error('Failed to start sync');
+      toast.error('Failed to sync products', {
+        description: error instanceof Error ? error.message : 'Unknown error',
+      });
     } finally {
       setSyncingId(null);
     }
