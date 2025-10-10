@@ -198,16 +198,10 @@ const ConnectPOS = () => {
         fullUrl: oauthUrl
       });
       
-      console.log('=== Opening Square OAuth in new window... ===');
+      console.log('=== Redirecting to Square OAuth... ===');
       
-      // Open OAuth in new window (required for iframe environments)
-      const authWindow = window.open(oauthUrl, '_blank', 'width=600,height=700');
-      
-      if (!authWindow) {
-        toast.error('Por favor permite ventanas emergentes para conectar con Square');
-        console.error('Popup blocked - please allow popups for this site');
-        setIsOAuthRedirecting(false);
-      }
+      // Use full page redirect for OAuth (most reliable method)
+      window.location.href = oauthUrl;
     } catch (error) {
       console.error('OAuth redirect error:', error);
       toast.error('Failed to start OAuth flow. Please try again.');
