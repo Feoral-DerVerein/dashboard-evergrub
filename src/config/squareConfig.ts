@@ -6,9 +6,13 @@
  * The Application Secret is stored securely in Supabase secrets.
  */
 
+// OAuth Redirect URI - must match exactly in Square Developer Dashboard
+export const SQUARE_REDIRECT_URI = 'https://negentropyfood.cloud/square-callback';
+
 export const SQUARE_CONFIG = {
   // Your Square Application ID (Sandbox or Production)
-  // Get this from Square Developer Dashboard
+  // TODO: Replace with your complete Application ID from Square Developer Dashboard
+  // Example format: 'sandbox-sq0idb-XXXXXXXXXXXXXXXXXXXXXXXX'
   APPLICATION_ID: 'sandbox-sq0idb-KN7kLwnW8eDIo_hkpac...',
   
   // Environment: 'sandbox' for testing, 'production' for live
