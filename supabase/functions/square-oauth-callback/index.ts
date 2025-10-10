@@ -192,23 +192,6 @@ Deno.serve(async (req) => {
     }
 
     console.log('Connection saved with ID:', connectionData.id);
-
-    // Notify n8n about successful connection (informational only, not for validation)
-    fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-connected', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        connection_id: connectionData.id,
-        user_id: user.id,
-        pos_type: 'square',
-        business_name: merchantData.merchant.business_name,
-        merchant_id: tokenData.merchant_id,
-        location_id: activeLocation.id,
-        environment: squareEnvironment,
-        connected_at: new Date().toISOString(),
-      }),
-    }).catch((err) => console.error('n8n notification error:', err));
-
     console.log('Square OAuth flow completed successfully');
 
     return new Response(
