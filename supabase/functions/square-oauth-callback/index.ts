@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
 
     console.log('Active location found:', activeLocation.name);
 
-    // Save to database
+    // Save to database with 'connected' status since we already validated everything
     console.log('Saving connection to database...');
     const { data: connectionData, error: dbError } = await supabaseClient
       .from('pos_connections')
@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
           merchant_id: tokenData.merchant_id,
           expires_at: tokenData.expires_at,
         },
-        connection_status: 'pending',
+        connection_status: 'connected', // Already validated successfully
       })
       .select('id')
       .single();
@@ -193,21 +193,21 @@ Deno.serve(async (req) => {
 
     console.log('Connection saved with ID:', connectionData.id);
 
-    // Trigger n8n validation webhook (fire and forget)
-    fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+    // Notify n8n about successful connection (informational only, not for validation)
+    fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-connected', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         connection_id: connectionData.id,
+        user_id: user.id,
         pos_type: 'square',
+        business_name: merchantData.merchant.business_name,
+        merchant_id: tokenData.merchant_id,
+        location_id: activeLocation.id,
         environment: squareEnvironment,
-        credentials: {
-          access_token: tokenData.access_token,
-          location_id: activeLocation.id,
-          merchant_id: tokenData.merchant_id,
-        },
+        connected_at: new Date().toISOString(),
       }),
-    }).catch((err) => console.error('Webhook error:', err));
+    }).catch((err) => console.error('n8n notification error:', err));
 
     console.log('Square OAuth flow completed successfully');
 
