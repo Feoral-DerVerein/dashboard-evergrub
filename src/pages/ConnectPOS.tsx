@@ -149,6 +149,14 @@ const ConnectPOS = () => {
   };
 
   const handleSquareOAuthConnect = () => {
+    console.log('=== START Square OAuth Flow ===');
+    console.log('Config check:', {
+      hasAppId: !!SQUARE_CONFIG.APPLICATION_ID,
+      appId: SQUARE_CONFIG.APPLICATION_ID,
+      environment: SQUARE_CONFIG.ENVIRONMENT,
+      oauthUrl: SQUARE_CONFIG.OAUTH_URL
+    });
+
     if (!SQUARE_CONFIG.APPLICATION_ID || SQUARE_CONFIG.APPLICATION_ID.includes('...')) {
       toast.error('Square integration not configured. Please contact support.');
       return;
@@ -164,18 +172,33 @@ const ConnectPOS = () => {
     try {
       // Generate random state for OAuth security
       const state = crypto.randomUUID();
-      console.log('Storing OAuth state:', state);
+      console.log('Generated state:', state);
+      
+      // Store in sessionStorage
       sessionStorage.setItem('square_oauth_state', state);
       sessionStorage.setItem('square_oauth_user_id', user.id);
       
       // Verify state was stored
       const verifyState = sessionStorage.getItem('square_oauth_state');
-      console.log('Verified stored state:', verifyState);
+      const verifyUserId = sessionStorage.getItem('square_oauth_user_id');
+      console.log('Verification after storage:', { 
+        stateStored: verifyState === state,
+        userIdStored: verifyUserId === user.id,
+        verifyState,
+        verifyUserId
+      });
 
       // Build OAuth URL
       const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&state=${state}`;
 
-      console.log('Redirecting to Square OAuth:', { redirectUri: SQUARE_REDIRECT_URI, state });
+      console.log('OAuth URL details:', { 
+        redirectUri: SQUARE_REDIRECT_URI,
+        currentOrigin: window.location.origin,
+        state,
+        fullUrl: oauthUrl
+      });
+      
+      console.log('=== Redirecting to Square... ===');
       
       // Redirect to Square OAuth
       window.location.href = oauthUrl;
