@@ -104,7 +104,8 @@ const ConnectPOS = () => {
     setSelectedPOS(pos.id);
     
     if (pos.id === 'square') {
-      setIsSquareDialogOpen(true);
+      // Directly initiate OAuth flow for Square
+      handleSquareOAuthConnect();
     } else if (pos.id === 'lightspeed') {
       setIsLightspeedDialogOpen(true);
     }
@@ -347,12 +348,21 @@ const ConnectPOS = () => {
               <CardFooter>
                 <Button
                   onClick={() => handleConnectClick(pos)}
-                  disabled={!pos.available}
+                  disabled={!pos.available || (pos.id === 'square' && isOAuthRedirecting)}
                   className="w-full"
                   variant={pos.available ? 'default' : 'outline'}
                 >
-                  <Plug className="mr-2 h-4 w-4" />
-                  Connect {pos.title}
+                  {pos.id === 'square' && isOAuthRedirecting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Redirecting...
+                    </>
+                  ) : (
+                    <>
+                      <Plug className="mr-2 h-4 w-4" />
+                      Connect {pos.title}
+                    </>
+                  )}
                 </Button>
               </CardFooter>
             </Card>
