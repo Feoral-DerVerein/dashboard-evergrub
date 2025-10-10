@@ -11,7 +11,7 @@ import { Plug, ExternalLink, Loader2, Square } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { SQUARE_CONFIG } from "@/config/squareConfig";
+import { SQUARE_CONFIG, SQUARE_REDIRECT_URI } from "@/config/squareConfig";
 import squareLogo from "@/assets/square-logo.png";
 import lightspeedLogo from "@/assets/lightspeed-logo.png";
 import toastLogo from "@/assets/toast-logo.png";
@@ -164,13 +164,19 @@ const ConnectPOS = () => {
     try {
       // Generate random state for OAuth security
       const state = crypto.randomUUID();
+      console.log('Storing OAuth state:', state);
       sessionStorage.setItem('square_oauth_state', state);
       sessionStorage.setItem('square_oauth_user_id', user.id);
+      
+      // Verify state was stored
+      const verifyState = sessionStorage.getItem('square_oauth_state');
+      console.log('Verified stored state:', verifyState);
 
       // Build OAuth URL
-  const redirectUri = `${window.location.origin}/square-callback`;
-      const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+      const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&state=${state}`;
 
+      console.log('Redirecting to Square OAuth:', { redirectUri: SQUARE_REDIRECT_URI, state });
+      
       // Redirect to Square OAuth
       window.location.href = oauthUrl;
     } catch (error) {

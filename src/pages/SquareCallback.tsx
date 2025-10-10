@@ -32,13 +32,19 @@ const SquareCallback = () => {
           });
           
           setTimeout(() => {
-            navigate('/dashboard/connect-pos');
+            navigate('/connect-pos');
           }, 3000);
           return;
         }
 
         // Validate state parameter
         const storedState = sessionStorage.getItem('square_oauth_state');
+        console.log('State validation:', { 
+          receivedState: state, 
+          storedState: storedState,
+          match: state === storedState 
+        });
+        
         if (!state || !storedState || state !== storedState) {
           console.error('State mismatch - possible CSRF attack');
           setStatus('error');
@@ -46,7 +52,7 @@ const SquareCallback = () => {
           toast.error('Security validation failed');
           
           setTimeout(() => {
-            navigate('/dashboard/connect-pos');
+            navigate('/connect-pos');
           }, 3000);
           return;
         }
@@ -58,7 +64,7 @@ const SquareCallback = () => {
           toast.error('Connection failed');
           
           setTimeout(() => {
-            navigate('/dashboard/connect-pos');
+            navigate('/connect-pos');
           }, 3000);
           return;
         }
@@ -108,7 +114,7 @@ const SquareCallback = () => {
         });
 
         setTimeout(() => {
-          navigate('/dashboard/connect-pos');
+          navigate('/connect-pos');
         }, 3000);
       }
     };
