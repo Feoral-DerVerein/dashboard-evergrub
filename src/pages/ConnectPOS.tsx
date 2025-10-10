@@ -6,8 +6,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { Plug, ExternalLink, Loader2, Square } from "lucide-react";
+import { Plug, ExternalLink, Loader2, Square, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -76,6 +77,7 @@ const ConnectPOS = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSquareAdvanced, setShowSquareAdvanced] = useState(false);
   const [isOAuthRedirecting, setIsOAuthRedirecting] = useState(false);
+  const [isInIframe] = useState(() => window.self !== window.top);
   
   const [squareFormData, setSquareFormData] = useState<SquareFormData>({
     businessName: '',
@@ -149,6 +151,14 @@ const ConnectPOS = () => {
   };
 
   const handleSquareOAuthConnect = () => {
+    // Check if in iframe (Lovable preview)
+    if (isInIframe) {
+      toast.error('OAuth no funciona en el preview', {
+        description: 'Abre la app en nueva ventana usando el botón de arriba'
+      });
+      return;
+    }
+
     console.log('=== START Square OAuth Flow ===');
     console.log('Config check:', {
       hasAppId: !!SQUARE_CONFIG.APPLICATION_ID,
@@ -342,6 +352,26 @@ const ConnectPOS = () => {
           Integrate your point of sale system to automatically sync inventory and sales
         </p>
       </div>
+
+      {/* iframe Warning Alert */}
+      {isInIframe && (
+        <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950/50">
+          <AlertCircle className="h-4 w-4 text-yellow-600" />
+          <AlertTitle>⚠️ OAuth no funciona en el preview</AlertTitle>
+          <AlertDescription className="space-y-2">
+            <p>Estás viendo la app dentro del preview de Lovable. Para conectar Square, necesitas abrir la aplicación en una ventana completa.</p>
+            <Button 
+              onClick={() => window.open(window.location.href, '_blank', 'noopener,noreferrer')}
+              variant="outline"
+              size="sm"
+              className="mt-2"
+            >
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Abrir en nueva ventana
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* POS Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
