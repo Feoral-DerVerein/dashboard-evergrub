@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { IntelligentNewsCards } from "@/components/kpi/IntelligentNewsCards";
 import MelbourneWeatherCard from "@/components/widgets/MelbourneWeatherCard";
 import hiMateBanner from "@/assets/hi-mate-banner.png";
+import { ProductInventoryCard } from "@/components/kpi/ProductInventoryCard";
 type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
 const chartDataSamples: Record<TimeFilterPeriod, {
   label: string;
@@ -884,6 +885,11 @@ const KPI = () => {
                 <RatingInsightCard label="Cancellations" percentage={0} status="Looks good" />
                 <RatingInsightCard label="Refunds" percentage={0} status="Looks good" />
               </div>
+            </section>
+
+            {/* Product Inventory Section */}
+            <section className="md:col-span-4 order-3 mt-6 mb-6">
+              <ProductInventoryCard />
             </section>
 
           </main>
