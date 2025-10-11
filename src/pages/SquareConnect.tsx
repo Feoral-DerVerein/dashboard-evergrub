@@ -10,18 +10,19 @@ import { toast } from 'sonner';
 import squareLogo from '@/assets/square-logo.png';
 
 const SquareConnect = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<'ready' | 'redirecting' | 'error'>('ready');
 
   useEffect(() => {
-    if (!user) {
+    // Solo verificar usuario después de que termine de cargar
+    if (!loading && !user) {
       setError('Debes iniciar sesión para conectar Square');
       setStep('error');
     }
-  }, [user]);
+  }, [user, loading]);
 
   const handleConnect = async () => {
     if (!user) {
@@ -82,6 +83,20 @@ const SquareConnect = () => {
       navigate('/connect-pos');
     }, 100);
   };
+
+  // Mostrar loader mientras carga la autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-6">
+        <Card className="w-full max-w-md">
+          <CardContent className="py-16 flex flex-col items-center justify-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">Cargando...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-6">
