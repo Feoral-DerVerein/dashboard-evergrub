@@ -4,10 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Square, CheckCircle, AlertCircle } from 'lucide-react';
-import { SQUARE_CONFIG, SQUARE_REDIRECT_URI } from '@/config/squareConfig';
+import { SQUARE_REDIRECT_URI } from '@/config/squareConfig';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import squareLogo from '@/assets/square-logo.png';
+
+interface SquareConfig {
+  applicationId: string;
+  environment: string;
+  oauthUrl: string;
+}
 
 const SquareConnect = () => {
   const { user, loading } = useAuth();
@@ -15,26 +22,52 @@ const SquareConnect = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<'ready' | 'redirecting' | 'error'>('ready');
+  const [squareConfig, setSquareConfig] = useState<SquareConfig | null>(null);
+  const [loadingConfig, setLoadingConfig] = useState(true);
 
   useEffect(() => {
-    // Solo verificar usuario después de que termine de cargar
+    const fetchSquareConfig = async () => {
+      if (!user) return;
+
+      try {
+        setLoadingConfig(true);
+        const { data, error } = await supabase.functions.invoke('get-square-config');
+        
+        if (error) throw error;
+        
+        if (data) {
+          setSquareConfig(data);
+          console.log('Square config loaded:', data);
+        }
+      } catch (err) {
+        console.error('Error loading Square config:', err);
+        setError('Error al cargar la configuración de Square');
+        setStep('error');
+      } finally {
+        setLoadingConfig(false);
+      }
+    };
+
     if (!loading && !user) {
       setError('Debes iniciar sesión para conectar Square');
       setStep('error');
+      setLoadingConfig(false);
+    } else if (!loading && user) {
+      fetchSquareConfig();
     }
   }, [user, loading]);
 
   const handleConnect = async () => {
-    if (!user) {
+    if (!user || !squareConfig) {
       toast.error('Debes iniciar sesión para continuar');
       return;
     }
     console.log('=== Iniciando conexión Square ===');
     console.log('Usuario:', user.id);
     console.log('Configuración Square:', {
-      appId: SQUARE_CONFIG.APPLICATION_ID,
-      environment: SQUARE_CONFIG.ENVIRONMENT,
-      oauthUrl: SQUARE_CONFIG.OAUTH_URL,
+      appId: squareConfig.applicationId,
+      environment: squareConfig.environment,
+      oauthUrl: squareConfig.oauthUrl,
       redirectUri: SQUARE_REDIRECT_URI
     });
 
@@ -56,8 +89,17 @@ const SquareConnect = () => {
       sessionStorage.setItem('square_oauth_user_id', user.id);
       console.log('State guardado en sessionStorage');
 
-      // Construir URL OAuth con el prefijo correcto
-      const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&state=${state}`;
+      // OAuth scopes needed
+      const scopes = [
+        'MERCHANT_PROFILE_READ',
+        'ITEMS_READ',
+        'INVENTORY_READ',
+        'ORDERS_READ',
+        'PAYMENTS_READ',
+      ].join('+');
+
+      // Construir URL OAuth usando la configuración del backend
+      const oauthUrl = `${squareConfig.oauthUrl}/oauth2/authorize?client_id=${squareConfig.applicationId}&scope=${scopes}&redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&state=${state}`;
 
       console.log('URL OAuth completa:', oauthUrl);
       console.log('=== Redirigiendo a Square... ===');
@@ -84,14 +126,16 @@ const SquareConnect = () => {
     }, 100);
   };
 
-  // Mostrar loader mientras carga la autenticación
-  if (loading) {
+  // Mostrar loader mientras carga la autenticación o configuración
+  if (loading || loadingConfig) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-6">
         <Card className="w-full max-w-md">
           <CardContent className="py-16 flex flex-col items-center justify-center space-y-4">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">Cargando...</p>
+            <p className="text-sm text-muted-foreground">
+              {loading ? 'Verificando autenticación...' : 'Cargando configuración de Square...'}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -125,7 +169,7 @@ const SquareConnect = () => {
 
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  <strong>Ambiente:</strong> {SQUARE_CONFIG.ENVIRONMENT === 'sandbox' ? 'Sandbox (Pruebas)' : 'Producción'}
+                  <strong>Ambiente:</strong> {squareConfig?.environment === 'sandbox' ? 'Sandbox (Pruebas)' : 'Producción'}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   <strong>Permisos solicitados:</strong>
@@ -142,7 +186,7 @@ const SquareConnect = () => {
               <div className="flex gap-3">
                 <Button
                   onClick={handleConnect}
-                  disabled={isRedirecting || !user}
+                  disabled={isRedirecting || !user || !squareConfig}
                   className="flex-1 h-12"
                   style={{ backgroundColor: '#006AFF' }}
                 >
