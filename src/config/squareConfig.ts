@@ -9,10 +9,6 @@
 // OAuth Redirect URI - uses custom domain
 export const SQUARE_REDIRECT_URI = 'https://negentropyfood.cloud/square-callback';
 
-// IMPORTANT: Square OAuth URLs MUST include "connect." subdomain
-// Sandbox: https://connect.squareupsandbox.com
-// Production: https://connect.squareup.com
-
 export const SQUARE_CONFIG = {
   // Your Square Application ID (Sandbox or Production)
   APPLICATION_ID: 'sandbox-sq0idb-KN7kLwnW8eDIo_hkpacHSg',
@@ -21,7 +17,6 @@ export const SQUARE_CONFIG = {
   ENVIRONMENT: 'sandbox' as 'sandbox' | 'production',
   
   // OAuth URLs based on environment
-  // MUST use connect.squareupsandbox.com (with "connect." prefix)
   get OAUTH_URL() {
     return this.ENVIRONMENT === 'sandbox'
       ? 'https://connect.squareupsandbox.com'
