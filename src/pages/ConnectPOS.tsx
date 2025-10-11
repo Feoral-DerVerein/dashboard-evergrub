@@ -164,16 +164,19 @@ const ConnectPOS = () => {
       hasAppId: !!SQUARE_CONFIG.APPLICATION_ID,
       appId: SQUARE_CONFIG.APPLICATION_ID,
       environment: SQUARE_CONFIG.ENVIRONMENT,
-      oauthUrl: SQUARE_CONFIG.OAUTH_URL
+      oauthUrl: SQUARE_CONFIG.OAUTH_URL,
+      redirectUri: SQUARE_REDIRECT_URI
     });
 
     if (!SQUARE_CONFIG.APPLICATION_ID || SQUARE_CONFIG.APPLICATION_ID.includes('...')) {
-      toast.error('Square integration not configured. Please contact support.');
+      toast.error('Square no está configurado correctamente', {
+        description: 'Revisa SQUARE_SETUP_GUIDE.md para instrucciones'
+      });
       return;
     }
 
     if (!user) {
-      toast.error('You must be logged in to connect a POS system');
+      toast.error('Debes iniciar sesión para conectar Square');
       return;
     }
 
@@ -205,16 +208,26 @@ const ConnectPOS = () => {
         redirectUri: SQUARE_REDIRECT_URI,
         currentOrigin: window.location.origin,
         state,
-        fullUrl: oauthUrl
+        environment: SQUARE_CONFIG.ENVIRONMENT
       });
+
+      console.log('📋 COPIA ESTA URL EN SQUARE DASHBOARD → OAuth → Redirect URLs:');
+      console.log(SQUARE_REDIRECT_URI);
       
       console.log('=== Redirecting to Square OAuth... ===');
+      
+      // Show helpful message
+      toast.info('Redirigiendo a Square...', {
+        description: 'Si no funciona, verifica que la Redirect URL esté configurada en Square'
+      });
       
       // Use full page redirect for OAuth (most reliable method)
       window.location.href = oauthUrl;
     } catch (error) {
       console.error('OAuth redirect error:', error);
-      toast.error('Failed to start OAuth flow. Please try again.');
+      toast.error('Error al iniciar OAuth', {
+        description: 'Revisa la consola para más detalles'
+      });
       setIsOAuthRedirecting(false);
     }
   };
