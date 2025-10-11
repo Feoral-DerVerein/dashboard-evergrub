@@ -17,8 +17,9 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Square, Zap, Utensils, Sparkles, PlugZap, Loader2, Plus, RefreshCw, Unplug, AlertCircle, Database, X } from "lucide-react";
+import { Zap, Utensils, Sparkles, PlugZap, Loader2, Plus, RefreshCw, Unplug, AlertCircle, Database, X } from "lucide-react";
 import { format } from "date-fns";
+import squareLogo from "@/assets/square-logo.png";
 
 interface POSConnection {
   id: string;
@@ -35,7 +36,7 @@ interface POSConnection {
 const posConfig = {
   square: {
     name: 'Square',
-    icon: Square,
+    imgSrc: squareLogo,
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
   },
@@ -300,7 +301,7 @@ const POSIntegrations = () => {
           {connections.map((connection) => {
             const config = posConfig[connection.pos_type];
             const statusCfg = statusConfig[connection.connection_status];
-            const Icon = config.icon;
+            const Icon = 'icon' in config ? config.icon : null;
 
             return (
               <div key={connection.id} className="space-y-2">
@@ -318,7 +319,11 @@ const POSIntegrations = () => {
                       {/* Left Section */}
                       <div className="flex items-start gap-4 flex-1">
                         <div className={`p-3 rounded-lg ${config.bgColor}`}>
-                          <Icon className={`h-6 w-6 ${config.color}`} />
+                          {'imgSrc' in config ? (
+                            <img src={config.imgSrc} alt={config.name} className="h-6 w-6 object-contain" />
+                          ) : Icon ? (
+                            <Icon className={`h-6 w-6 ${config.color}`} />
+                          ) : null}
                         </div>
                         <div className="space-y-1 flex-1">
                           <h3 className="text-lg font-semibold">{config.name}</h3>
