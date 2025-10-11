@@ -39,9 +39,9 @@ const MainRoutes = () => {
       <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
       <Route path="/apple" element={<AuthRoute><Apple /></AuthRoute>} />
       
-      {/* Square OAuth routes - protected routes */}
-      <Route path="/square-callback" element={<ProtectedRoute><SquareCallback /></ProtectedRoute>} />
-      <Route path="/square-connect" element={<ProtectedRoute><SquareConnect /></ProtectedRoute>} />
+      {/* Square OAuth routes - public routes for OAuth flow */}
+      <Route path="/square-callback" element={<SquareCallback />} />
+      <Route path="/square-connect" element={<SquareConnect />} />
       
       {/* Pricing route */}
       <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
