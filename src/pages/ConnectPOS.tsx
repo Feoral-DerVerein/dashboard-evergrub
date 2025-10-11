@@ -257,21 +257,25 @@ const ConnectPOS = () => {
         });
         
         try {
-          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/pos-connected', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               connection_id: data.id,
               pos_type: 'square',
+              business_name: squareFormData.businessName,
               credentials: {
                 access_token: squareFormData.accessToken,
                 location_id: squareFormData.locationId,
-              }
+              },
+              timestamp: new Date().toISOString()
             })
           });
           
           if (n8nResponse.ok) {
             console.log('✓ n8n webhook called successfully');
+            const responseData = await n8nResponse.json();
+            console.log('n8n response:', responseData);
           } else {
             console.error('n8n webhook error:', n8nResponse.status);
           }
@@ -337,22 +341,26 @@ const ConnectPOS = () => {
         });
         
         try {
-          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/pos-connected', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               connection_id: data.id,
               pos_type: 'lightspeed',
+              business_name: lightspeedFormData.businessName,
               credentials: {
                 api_key: lightspeedFormData.apiKey,
                 api_secret: lightspeedFormData.apiSecret,
                 account_id: lightspeedFormData.accountId,
-              }
+              },
+              timestamp: new Date().toISOString()
             })
           });
           
           if (n8nResponse.ok) {
             console.log('✓ n8n webhook called successfully');
+            const responseData = await n8nResponse.json();
+            console.log('n8n response:', responseData);
           } else {
             console.error('n8n webhook error:', n8nResponse.status);
           }
