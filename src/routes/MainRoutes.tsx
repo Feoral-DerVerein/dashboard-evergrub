@@ -27,7 +27,6 @@ import ProductSync from "@/pages/ProductSync";
 import ConnectPOS from "@/pages/ConnectPOS";
 import POSIntegrations from "@/pages/POSIntegrations";
 import SquareCallback from "@/pages/SquareCallback";
-import ProductInventory from "@/pages/ProductInventory";
 
 
 const MainRoutes = () => {
@@ -66,7 +65,6 @@ const MainRoutes = () => {
         <Route path="/sync" element={<ProductSync />} />
         <Route path="/connect-pos" element={<ConnectPOS />} />
         <Route path="/pos-integrations" element={<POSIntegrations />} />
-        <Route path="/product-inventory" element={<ProductInventory />} />
         
       </Route>
       

@@ -12,9 +12,6 @@ verify_jwt = false
 [functions.square-oauth-callback]
 verify_jwt = false
 
-[functions.sync-square-products]
-verify_jwt = true
-
 [functions.ai-train]
 verify_jwt = true
 
