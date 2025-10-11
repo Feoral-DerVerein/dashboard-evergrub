@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { Plug, ExternalLink, Loader2, Square, AlertCircle } from "lucide-react";
+import { Plug, ExternalLink, Loader2, Square, AlertCircle, Settings, ChevronUp, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -435,52 +435,55 @@ const ConnectPOS = () => {
           <DialogHeader>
             <DialogTitle>Connect Square POS</DialogTitle>
             <DialogDescription>
-              One-click secure connection to your Square account
+              Conecta tu sistema Square para sincronizar productos con n8n
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-6 py-4">
-            {/* OAuth Button */}
+            {/* Recommended: Manual Connection with n8n */}
             <div className="space-y-3">
-              <Button
-                onClick={handleSquareOAuthConnect}
-                disabled={isOAuthRedirecting}
-                className="w-full h-12 text-base font-semibold"
-                style={{ backgroundColor: '#006AFF' }}
-              >
-                {isOAuthRedirecting ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Redirecting to Square...
-                  </>
-                ) : (
-                  <>
-                    <Square className="mr-2 h-5 w-5" />
-                    Connect with Square
-                  </>
-                )}
-              </Button>
+              <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg">
+                <p className="text-sm font-medium mb-1">✅ Método Recomendado</p>
+                <p className="text-xs text-muted-foreground">
+                  Conexión manual que funciona con n8n para sincronización confiable
+                </p>
+              </div>
               
-              <p className="text-sm text-muted-foreground text-center">
-                You'll be redirected to Square to authorize the connection. This is secure and takes just a few seconds.
-              </p>
-            </div>
-
-            {/* Advanced Manual Connection */}
-            <Collapsible
-              open={showSquareAdvanced}
-              onOpenChange={setShowSquareAdvanced}
-            >
-              <CollapsibleTrigger className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Manual connection (for developers)
+              <Collapsible
+                open={showSquareAdvanced}
+                onOpenChange={setShowSquareAdvanced}
+                defaultOpen={true}
+              >
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                  <span className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    Configurar Credenciales de Square
+                  </span>
+                  {showSquareAdvanced ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
               </CollapsibleTrigger>
               
               <CollapsibleContent className="space-y-4 pt-4">
+                <div className="bg-muted p-3 rounded text-xs space-y-1">
+                  <p className="font-medium">📋 Cómo obtener tus credenciales:</p>
+                  <ol className="list-decimal list-inside space-y-1 pl-2">
+                    <li>Ve a <a href="https://developer.squareup.com/apps" target="_blank" rel="noopener noreferrer" className="text-primary underline">Square Developer Dashboard</a></li>
+                    <li>Selecciona tu aplicación (Sandbox o Production)</li>
+                    <li>Copia el <b>Access Token</b> de la pestaña "Credentials"</li>
+                    <li>Copia el <b>Location ID</b> de "Locations"</li>
+                  </ol>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="square-businessName">Business Name *</Label>
+                  <Label htmlFor="square-businessName">Nombre del Negocio *</Label>
                   <Input
                     id="square-businessName"
-                    placeholder="Enter your business name"
+                    placeholder="Mi Tienda"
                     value={squareFormData.businessName}
                     onChange={(e) => {
                       setSquareFormData({ ...squareFormData, businessName: e.target.value });
@@ -499,7 +502,7 @@ const ConnectPOS = () => {
                   <Input
                     id="square-accessToken"
                     type="password"
-                    placeholder="Enter your access token"
+                    placeholder="EAAAl..."
                     value={squareFormData.accessToken}
                     onChange={(e) => {
                       setSquareFormData({ ...squareFormData, accessToken: e.target.value });
@@ -508,17 +511,9 @@ const ConnectPOS = () => {
                       }
                     }}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Get your token at: Square Dashboard → Applications → API Tokens
+                  <p className="text-xs text-muted-foreground">
+                    Se guardará de forma segura y será validado por n8n
                   </p>
-                  <a 
-                    href="https://developer.squareup.com/docs/build-basics/access-tokens"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    How to get my token? <ExternalLink className="h-3 w-3" />
-                  </a>
                   {squareErrors.accessToken && (
                     <p className="text-sm text-destructive">{squareErrors.accessToken}</p>
                   )}
@@ -528,7 +523,7 @@ const ConnectPOS = () => {
                   <Label htmlFor="square-locationId">Location ID *</Label>
                   <Input
                     id="square-locationId"
-                    placeholder="Enter your location ID"
+                    placeholder="L..."
                     value={squareFormData.locationId}
                     onChange={(e) => {
                       setSquareFormData({ ...squareFormData, locationId: e.target.value });
@@ -537,9 +532,6 @@ const ConnectPOS = () => {
                       }
                     }}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Your Square main location ID
-                  </p>
                   {squareErrors.locationId && (
                     <p className="text-sm text-destructive">{squareErrors.locationId}</p>
                   )}
@@ -548,13 +540,55 @@ const ConnectPOS = () => {
                 <Button 
                   onClick={handleSquareConnect}
                   disabled={isLoading}
-                  className="w-full"
+                  className="w-full h-11"
                 >
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Connect Manually
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Conectando con n8n...
+                    </>
+                  ) : (
+                    <>
+                      <Square className="mr-2 h-4 w-4" />
+                      Conectar Square
+                    </>
+                  )}
                 </Button>
               </CollapsibleContent>
             </Collapsible>
+
+            {/* OAuth Alternative (Collapsible) */}
+            <div className="pt-2 border-t">
+              <Collapsible>
+                <CollapsibleTrigger className="text-xs text-muted-foreground hover:text-foreground transition-colors w-full text-center">
+                  O intentar conexión OAuth (puede tener problemas) ↓
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-3 pt-3">
+                  <Button
+                    onClick={handleSquareOAuthConnect}
+                    disabled={isOAuthRedirecting}
+                    variant="outline"
+                    className="w-full h-11"
+                  >
+                    {isOAuthRedirecting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Redirigiendo a Square...
+                      </>
+                    ) : (
+                      <>
+                        <Square className="mr-2 h-4 w-4" />
+                        Conectar con OAuth
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Nota: El OAuth puede fallar si el redirect URI no está configurado en Square Developer Dashboard
+                  </p>
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
+            </div>
           </div>
           
           <DialogFooter>
