@@ -1,5 +1,8 @@
 project_id = "jiehjbbdeyngslfpgfnt"
 
+[functions.connect-square-webhook]
+verify_jwt = false
+
 [functions.chatbot-query]
 verify_jwt = false
 
