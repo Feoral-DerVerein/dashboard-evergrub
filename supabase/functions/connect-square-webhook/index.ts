@@ -50,10 +50,13 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         action: body.action || 'connect_square',
-        timestamp: new Date().toISOString(),
+        platform: body.platform || 'square',
+        pos_type: body.pos_type || 'square',
+        provider: body.provider || 'square',
+        timestamp: body.timestamp || new Date().toISOString(),
+        source: body.source || 'lovable',
         user_id: user.id,
-        user_email: user.email,
-        ...body
+        user_email: user.email
       }),
     });
 

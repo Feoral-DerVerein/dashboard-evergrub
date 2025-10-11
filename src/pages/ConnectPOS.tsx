@@ -166,7 +166,11 @@ const ConnectPOS = () => {
       const { data, error } = await supabase.functions.invoke('connect-square-webhook', {
         body: {
           action: 'connect_square',
+          platform: 'square',
+          pos_type: 'square',
+          provider: 'square',
           timestamp: new Date().toISOString(),
+          source: 'lovable',
           user_id: user.id,
           user_email: user.email
         }
