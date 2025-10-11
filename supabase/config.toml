@@ -45,3 +45,6 @@ verify_jwt = true
 [functions.send-to-donation]
 verify_jwt = true
 
+[functions.connect-square-webhook]
+verify_jwt = true
+

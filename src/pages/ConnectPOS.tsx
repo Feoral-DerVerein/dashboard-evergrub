@@ -150,7 +150,7 @@ const ConnectPOS = () => {
   };
 
   const handleSquareOAuthConnect = async () => {
-    console.log('🔵 Connect Square clicked - sending to n8n webhook');
+    console.log('🔵 Connect Square clicked - calling edge function proxy');
     
     if (!user) {
       console.log('❌ User not logged in');
@@ -161,29 +161,22 @@ const ConnectPOS = () => {
     setIsOAuthRedirecting(true);
 
     try {
-      console.log('📤 Sending POST request to n8n webhook...');
+      console.log('📤 Calling edge function proxy...');
       
-      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/connect-pos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('connect-square-webhook', {
+        body: {
           action: 'connect_square',
           timestamp: new Date().toISOString(),
           user_id: user.id,
           user_email: user.email
-        }),
-        signal: AbortSignal.timeout(30000) // 30 second timeout
+        }
       });
 
-      console.log('📥 Response status:', response.status);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (error) {
+        console.error('❌ Edge function error:', error);
+        throw error;
       }
 
-      const data = await response.json();
       console.log('✅ Success response:', data);
 
       toast.success('¡Conectado exitosamente!', {
@@ -199,15 +192,9 @@ const ConnectPOS = () => {
       console.error('❌ Connection error:', error);
       
       if (error instanceof Error) {
-        if (error.name === 'TimeoutError') {
-          toast.error('Tiempo de espera agotado', {
-            description: 'El servidor tardó demasiado en responder. Intenta nuevamente.'
-          });
-        } else {
-          toast.error('Error de conexión', {
-            description: error.message || 'No se pudo conectar con el servidor'
-          });
-        }
+        toast.error('Error de conexión', {
+          description: error.message || 'No se pudo conectar con el servidor'
+        });
       } else {
         toast.error('Error desconocido', {
           description: 'Ocurrió un error inesperado. Intenta nuevamente.'
