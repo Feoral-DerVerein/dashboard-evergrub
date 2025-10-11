@@ -62,6 +62,31 @@ Deno.serve(async (req) => {
     if (!n8nResponse.ok) {
       const errorText = await n8nResponse.text();
       console.error('❌ n8n error response:', errorText);
+      
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { message: errorText };
+      }
+
+      // Special handling for n8n test mode
+      if (n8nResponse.status === 404 && errorData.hint?.includes('test mode')) {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'n8n_test_mode',
+            message: 'El webhook de n8n está en modo prueba',
+            hint: 'En n8n: 1) Haz clic en "Execute workflow" o 2) Activa el workflow para modo producción',
+            details: errorData
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200 // Return 200 so frontend can show friendly message
+          }
+        );
+      }
+
       throw new Error(`n8n webhook failed: ${n8nResponse.status} - ${errorText}`);
     }
 

@@ -177,7 +177,21 @@ const ConnectPOS = () => {
         throw error;
       }
 
-      console.log('✅ Success response:', data);
+      console.log('✅ Response:', data);
+
+      // Check if n8n is in test mode
+      if (data && !data.success && data.error === 'n8n_test_mode') {
+        toast.warning('⚠️ Webhook en modo prueba', {
+          description: data.hint || 'Activa el workflow en n8n',
+          duration: 8000
+        });
+        return;
+      }
+
+      // Check for other non-success responses
+      if (data && !data.success) {
+        throw new Error(data.message || 'Connection failed');
+      }
 
       toast.success('¡Conectado exitosamente!', {
         description: 'Square se ha conectado correctamente con n8n'
