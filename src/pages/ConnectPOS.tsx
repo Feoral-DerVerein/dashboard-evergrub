@@ -151,8 +151,12 @@ const ConnectPOS = () => {
   };
 
   const handleSquareOAuthConnect = () => {
+    console.log('🔵 Button clicked - Starting Square connection');
+    console.log('🔍 Iframe check:', { isInIframe, windowSelf: window.self, windowTop: window.top });
+    
     // Check if in iframe (Lovable preview)
     if (isInIframe) {
+      console.log('⚠️ Detected iframe - showing warning');
       toast.error('OAuth no funciona en el preview', {
         description: 'Abre la app en nueva ventana usando el botón de arriba'
       });
@@ -169,6 +173,7 @@ const ConnectPOS = () => {
     });
 
     if (!SQUARE_CONFIG.APPLICATION_ID || SQUARE_CONFIG.APPLICATION_ID.includes('...')) {
+      console.log('❌ Square not configured');
       toast.error('Square no está configurado correctamente', {
         description: 'Revisa SQUARE_SETUP_GUIDE.md para instrucciones'
       });
@@ -176,10 +181,12 @@ const ConnectPOS = () => {
     }
 
     if (!user) {
+      console.log('❌ User not logged in');
       toast.error('Debes iniciar sesión para conectar Square');
       return;
     }
 
+    console.log('✅ All checks passed, starting OAuth redirect');
     setIsOAuthRedirecting(true);
 
     try {
@@ -213,18 +220,22 @@ const ConnectPOS = () => {
 
       console.log('📋 COPIA ESTA URL EN SQUARE DASHBOARD → OAuth → Redirect URLs:');
       console.log(SQUARE_REDIRECT_URI);
+      console.log('🔗 Full OAuth URL:', oauthUrl);
       
-      console.log('=== Redirecting to Square OAuth... ===');
+      console.log('=== Redirecting to Square OAuth in 1 second... ===');
       
       // Show helpful message
       toast.info('Redirigiendo a Square...', {
         description: 'Si no funciona, verifica que la Redirect URL esté configurada en Square'
       });
       
-      // Use full page redirect for OAuth (most reliable method)
-      window.location.href = oauthUrl;
+      // Add small delay to ensure logs are visible
+      setTimeout(() => {
+        console.log('🚀 REDIRECTING NOW!');
+        window.location.href = oauthUrl;
+      }, 1000);
     } catch (error) {
-      console.error('OAuth redirect error:', error);
+      console.error('❌ OAuth redirect error:', error);
       toast.error('Error al iniciar OAuth', {
         description: 'Revisa la consola para más detalles'
       });
