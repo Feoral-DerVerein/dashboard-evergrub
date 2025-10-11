@@ -151,70 +151,49 @@ const ConnectPOS = () => {
   };
 
   const handleSquareOAuthConnect = () => {
-    // Check if in iframe (Lovable preview)
-    if (isInIframe) {
-      toast.error('OAuth no funciona en el preview', {
-        description: 'Abre la app en nueva ventana usando el botón de arriba'
-      });
-      return;
-    }
-
-    console.log('=== START Square OAuth Flow ===');
-    console.log('Config check:', {
-      hasAppId: !!SQUARE_CONFIG.APPLICATION_ID,
-      appId: SQUARE_CONFIG.APPLICATION_ID,
-      environment: SQUARE_CONFIG.ENVIRONMENT,
-      oauthUrl: SQUARE_CONFIG.OAUTH_URL
-    });
-
-    if (!SQUARE_CONFIG.APPLICATION_ID || SQUARE_CONFIG.APPLICATION_ID.includes('...')) {
-      toast.error('Square integration not configured. Please contact support.');
-      return;
-    }
-
     if (!user) {
-      toast.error('You must be logged in to connect a POS system');
+      toast.error('Debes iniciar sesión para conectar Square');
       return;
     }
 
+    console.log('=== Abriendo página de conexión Square ===');
+    
     setIsOAuthRedirecting(true);
 
     try {
-      // Generate random state for OAuth security
-      const state = crypto.randomUUID();
-      console.log('Generated state:', state);
+      // Abrir la página de conexión Square en una nueva ventana
+      const connectUrl = `${window.location.origin}/square-connect`;
+      console.log('Abriendo URL:', connectUrl);
       
-      // Store in sessionStorage
-      sessionStorage.setItem('square_oauth_state', state);
-      sessionStorage.setItem('square_oauth_user_id', user.id);
+      const width = 600;
+      const height = 700;
+      const left = (window.screen.width - width) / 2;
+      const top = (window.screen.height - height) / 2;
       
-      // Verify state was stored
-      const verifyState = sessionStorage.getItem('square_oauth_state');
-      const verifyUserId = sessionStorage.getItem('square_oauth_user_id');
-      console.log('Verification after storage:', { 
-        stateStored: verifyState === state,
-        userIdStored: verifyUserId === user.id,
-        verifyState,
-        verifyUserId
-      });
+      const connectWindow = window.open(
+        connectUrl,
+        'square-connect',
+        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+      );
 
-      // Build OAuth URL
-      const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&state=${state}`;
+      if (!connectWindow) {
+        toast.error('Por favor permite las ventanas emergentes para conectar Square');
+        setIsOAuthRedirecting(false);
+        return;
+      }
 
-      console.log('OAuth URL details:', { 
-        redirectUri: SQUARE_REDIRECT_URI,
-        currentOrigin: window.location.origin,
-        state,
-        fullUrl: oauthUrl
-      });
-      
-      console.log('=== Redirecting to Square OAuth... ===');
-      
-      // Use full page redirect for OAuth (most reliable method)
-      window.location.href = oauthUrl;
+      // Monitorear cuando se cierre la ventana
+      const checkWindow = setInterval(() => {
+        if (connectWindow.closed) {
+          clearInterval(checkWindow);
+          setIsOAuthRedirecting(false);
+          console.log('Ventana de conexión cerrada');
+        }
+      }, 500);
+
     } catch (error) {
-      console.error('OAuth redirect error:', error);
-      toast.error('Failed to start OAuth flow. Please try again.');
+      console.error('Error al abrir ventana de conexión:', error);
+      toast.error('Error al abrir la ventana de conexión');
       setIsOAuthRedirecting(false);
     }
   };

@@ -27,6 +27,7 @@ import ProductSync from "@/pages/ProductSync";
 import ConnectPOS from "@/pages/ConnectPOS";
 import POSIntegrations from "@/pages/POSIntegrations";
 import SquareCallback from "@/pages/SquareCallback";
+import SquareConnect from "@/pages/SquareConnect";
 import ProductInventory from "@/pages/ProductInventory";
 
 
@@ -39,8 +40,9 @@ const MainRoutes = () => {
       <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
       <Route path="/apple" element={<AuthRoute><Apple /></AuthRoute>} />
       
-      {/* Square OAuth callback - public route */}
+      {/* Square OAuth routes - public routes */}
       <Route path="/square-callback" element={<SquareCallback />} />
+      <Route path="/square-connect" element={<SquareConnect />} />
       
       {/* Onboarding route - accessible only when logged in but onboarding not completed */}
       <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
