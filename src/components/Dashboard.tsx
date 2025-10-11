@@ -400,6 +400,10 @@ const Dashboard = () => {
                 <ShoppingCart className="w-4 h-4" />
                 <span>Products</span>
               </Link>
+              <Link to="/product-inventory" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                <Package className="w-4 h-4" />
+                <span>Product Inventory</span>
+              </Link>
               <Link to="/donate" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
                 <Heart className="w-4 h-4" />
                 <span>Donate</span>
