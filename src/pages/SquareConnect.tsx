@@ -16,20 +16,7 @@ const SquareConnect = () => {
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<'ready' | 'redirecting' | 'error'>('ready');
 
-  useEffect(() => {
-    // Check if user is logged in
-    if (!user) {
-      setError('Debes iniciar sesión para conectar Square');
-      setStep('error');
-    }
-  }, [user]);
-
   const handleConnect = async () => {
-    if (!user) {
-      toast.error('Debes iniciar sesión para continuar');
-      return;
-    }
-
     console.log('=== Iniciando conexión Square ===');
     console.log('Usuario:', user.id);
     console.log('Configuración Square:', {
@@ -124,7 +111,7 @@ const SquareConnect = () => {
               <div className="flex gap-3">
                 <Button
                   onClick={handleConnect}
-                  disabled={isRedirecting || !user}
+                  disabled={isRedirecting}
                   className="flex-1 h-12"
                   style={{ backgroundColor: '#006AFF' }}
                 >
@@ -176,7 +163,6 @@ const SquareConnect = () => {
                 <Button
                   onClick={handleConnect}
                   className="flex-1"
-                  disabled={!user}
                 >
                   Intentar de nuevo
                 </Button>
