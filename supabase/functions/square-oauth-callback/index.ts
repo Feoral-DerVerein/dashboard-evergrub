@@ -96,14 +96,6 @@ Deno.serve(async (req) => {
         ? 'https://connect.squareup.com'
         : 'https://connect.squareupsandbox.com';
 
-    // Determine redirect URI based on request origin
-    const origin = req.headers.get('origin') || '';
-    const redirectUri = origin.includes('lovableproject.com')
-      ? `${origin}/square-callback`
-      : 'https://negentropyfood.cloud/square-callback';
-
-    console.log('Using redirect URI:', redirectUri);
-
     // Exchange authorization code for access token
     const tokenResponse = await fetch(tokenUrl, {
       method: 'POST',
@@ -116,7 +108,7 @@ Deno.serve(async (req) => {
         client_secret: squareAppSecret,
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: redirectUri,
+        redirect_uri: 'https://negentropyfood.cloud/square-callback',
       }),
     });
 
@@ -174,7 +166,7 @@ Deno.serve(async (req) => {
 
     console.log('Active location found:', activeLocation.name);
 
-    // Save to database with 'active' status since we already validated everything
+    // Save to database
     console.log('Saving connection to database...');
     const { data: connectionData, error: dbError } = await supabaseClient
       .from('pos_connections')
@@ -189,7 +181,7 @@ Deno.serve(async (req) => {
           merchant_id: tokenData.merchant_id,
           expires_at: tokenData.expires_at,
         },
-        connection_status: 'active', // Already validated successfully
+        connection_status: 'pending',
       })
       .select('id')
       .single();
@@ -200,6 +192,23 @@ Deno.serve(async (req) => {
     }
 
     console.log('Connection saved with ID:', connectionData.id);
+
+    // Trigger n8n validation webhook (fire and forget)
+    fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        connection_id: connectionData.id,
+        pos_type: 'square',
+        environment: squareEnvironment,
+        credentials: {
+          access_token: tokenData.access_token,
+          location_id: activeLocation.id,
+          merchant_id: tokenData.merchant_id,
+        },
+      }),
+    }).catch((err) => console.error('Webhook error:', err));
+
     console.log('Square OAuth flow completed successfully');
 
     return new Response(

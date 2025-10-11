@@ -77,6 +77,7 @@ const ConnectPOS = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSquareAdvanced, setShowSquareAdvanced] = useState(false);
   const [isOAuthRedirecting, setIsOAuthRedirecting] = useState(false);
+  const [isInIframe] = useState(() => window.self !== window.top);
   
   const [squareFormData, setSquareFormData] = useState<SquareFormData>({
     businessName: '',
@@ -149,76 +150,71 @@ const ConnectPOS = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSquareOAuthConnect = async () => {
-    console.log('🔵 Connect Square clicked - calling edge function proxy');
-    
+  const handleSquareOAuthConnect = () => {
+    // Check if in iframe (Lovable preview)
+    if (isInIframe) {
+      toast.error('OAuth no funciona en el preview', {
+        description: 'Abre la app en nueva ventana usando el botón de arriba'
+      });
+      return;
+    }
+
+    console.log('=== START Square OAuth Flow ===');
+    console.log('Config check:', {
+      hasAppId: !!SQUARE_CONFIG.APPLICATION_ID,
+      appId: SQUARE_CONFIG.APPLICATION_ID,
+      environment: SQUARE_CONFIG.ENVIRONMENT,
+      oauthUrl: SQUARE_CONFIG.OAUTH_URL
+    });
+
+    if (!SQUARE_CONFIG.APPLICATION_ID || SQUARE_CONFIG.APPLICATION_ID.includes('...')) {
+      toast.error('Square integration not configured. Please contact support.');
+      return;
+    }
+
     if (!user) {
-      console.log('❌ User not logged in');
-      toast.error('Debes iniciar sesión para conectar Square');
+      toast.error('You must be logged in to connect a POS system');
       return;
     }
 
     setIsOAuthRedirecting(true);
 
     try {
-      console.log('📤 Calling edge function proxy...');
+      // Generate random state for OAuth security
+      const state = crypto.randomUUID();
+      console.log('Generated state:', state);
       
-      const { data, error } = await supabase.functions.invoke('connect-square-webhook', {
-        body: {
-          action: 'connect_square',
-          platform: 'square',
-          pos_type: 'square',
-          provider: 'square',
-          timestamp: new Date().toISOString(),
-          source: 'lovable',
-          user_id: user.id,
-          user_email: user.email
-        }
+      // Store in sessionStorage
+      sessionStorage.setItem('square_oauth_state', state);
+      sessionStorage.setItem('square_oauth_user_id', user.id);
+      
+      // Verify state was stored
+      const verifyState = sessionStorage.getItem('square_oauth_state');
+      const verifyUserId = sessionStorage.getItem('square_oauth_user_id');
+      console.log('Verification after storage:', { 
+        stateStored: verifyState === state,
+        userIdStored: verifyUserId === user.id,
+        verifyState,
+        verifyUserId
       });
 
-      if (error) {
-        console.error('❌ Edge function error:', error);
-        throw error;
-      }
+      // Build OAuth URL
+      const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&state=${state}`;
 
-      console.log('✅ Response:', data);
-
-      // Check if n8n is in test mode
-      if (data && !data.success && data.error === 'n8n_test_mode') {
-        toast.warning('⚠️ Webhook en modo prueba', {
-          description: data.hint || 'Activa el workflow en n8n',
-          duration: 8000
-        });
-        return;
-      }
-
-      // Check for other non-success responses
-      if (data && !data.success) {
-        throw new Error(data.message || 'Connection failed');
-      }
-
-      toast.success('¡Conectado exitosamente!', {
-        description: 'Square se ha conectado correctamente con n8n'
+      console.log('OAuth URL details:', { 
+        redirectUri: SQUARE_REDIRECT_URI,
+        currentOrigin: window.location.origin,
+        state,
+        fullUrl: oauthUrl
       });
-
-      // Optional: redirect after successful connection
-      setTimeout(() => {
-        navigate('/pos-integrations');
-      }, 1500);
-
+      
+      console.log('=== Redirecting to Square OAuth... ===');
+      
+      // Use full page redirect for OAuth (most reliable method)
+      window.location.href = oauthUrl;
     } catch (error) {
-      console.error('❌ Connection error:', error);
-      
-      if (error instanceof Error) {
-        toast.error('Error de conexión', {
-          description: error.message || 'No se pudo conectar con el servidor'
-        });
-      } else {
-        toast.error('Error desconocido', {
-          description: 'Ocurrió un error inesperado. Intenta nuevamente.'
-        });
-      }
-    } finally {
+      console.error('OAuth redirect error:', error);
+      toast.error('Failed to start OAuth flow. Please try again.');
       setIsOAuthRedirecting(false);
     }
   };
@@ -253,42 +249,20 @@ const ConnectPOS = () => {
 
       if (error) throw error;
 
-      // Call n8n webhook for validation
+      // Call n8n webhook for validation (fire and forget)
       if (data?.id) {
-        console.log('Sending to n8n webhook:', {
-          connection_id: data.id,
-          pos_type: 'square'
-        });
-        
-        try {
-          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/connect-pos', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              connection_id: data.id,
-              pos_type: 'square',
-              business_name: squareFormData.businessName,
-              credentials: {
-                access_token: squareFormData.accessToken,
-                location_id: squareFormData.locationId,
-              },
-              timestamp: new Date().toISOString()
-            })
-          });
-          
-          if (n8nResponse.ok) {
-            console.log('✓ n8n webhook called successfully');
-            const responseData = await n8nResponse.json();
-            console.log('n8n response:', responseData);
-          } else {
-            console.error('n8n webhook error:', n8nResponse.status);
-          }
-        } catch (err) {
-          console.error('n8n webhook connection error:', err);
-          toast.error('Could not connect to validation service', {
-            description: 'Connection will be validated later'
-          });
-        }
+        fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            connection_id: data.id,
+            pos_type: 'square',
+            credentials: {
+              access_token: squareFormData.accessToken,
+              location_id: squareFormData.locationId,
+            }
+          })
+        }).catch(err => console.error('Webhook error:', err));
       }
 
       toast.success('✓ Square connected. Validating credentials...');
@@ -337,43 +311,21 @@ const ConnectPOS = () => {
 
       if (error) throw error;
 
-      // Call n8n webhook for validation
+      // Call n8n webhook for validation (fire and forget)
       if (data?.id) {
-        console.log('Sending to n8n webhook:', {
-          connection_id: data.id,
-          pos_type: 'lightspeed'
-        });
-        
-        try {
-          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/connect-pos', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              connection_id: data.id,
-              pos_type: 'lightspeed',
-              business_name: lightspeedFormData.businessName,
-              credentials: {
-                api_key: lightspeedFormData.apiKey,
-                api_secret: lightspeedFormData.apiSecret,
-                account_id: lightspeedFormData.accountId,
-              },
-              timestamp: new Date().toISOString()
-            })
-          });
-          
-          if (n8nResponse.ok) {
-            console.log('✓ n8n webhook called successfully');
-            const responseData = await n8nResponse.json();
-            console.log('n8n response:', responseData);
-          } else {
-            console.error('n8n webhook error:', n8nResponse.status);
-          }
-        } catch (err) {
-          console.error('n8n webhook connection error:', err);
-          toast.error('Could not connect to validation service', {
-            description: 'Connection will be validated later'
-          });
-        }
+        fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            connection_id: data.id,
+            pos_type: 'lightspeed',
+            credentials: {
+              api_key: lightspeedFormData.apiKey,
+              api_secret: lightspeedFormData.apiSecret,
+              account_id: lightspeedFormData.accountId,
+            }
+          })
+        }).catch(err => console.error('Webhook error:', err));
       }
 
       toast.success('✓ Lightspeed connected. Validating credentials...');
@@ -401,6 +353,25 @@ const ConnectPOS = () => {
         </p>
       </div>
 
+      {/* iframe Warning Alert */}
+      {isInIframe && (
+        <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950/50">
+          <AlertCircle className="h-4 w-4 text-yellow-600" />
+          <AlertTitle>⚠️ OAuth no funciona en el preview</AlertTitle>
+          <AlertDescription className="space-y-2">
+            <p>Estás viendo la app dentro del preview de Lovable. Para conectar Square, necesitas abrir la aplicación en una ventana completa.</p>
+            <Button 
+              onClick={() => window.open(window.location.href, '_blank', 'noopener,noreferrer')}
+              variant="outline"
+              size="sm"
+              className="mt-2"
+            >
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Abrir en nueva ventana
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* POS Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -443,7 +414,7 @@ const ConnectPOS = () => {
                   {pos.id === 'square' && isOAuthRedirecting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Connecting...
+                      Redirecting...
                     </>
                   ) : (
                     <>
