@@ -13,7 +13,6 @@ import CreateAd from "@/pages/CreateAd";
 import Donate from "@/pages/Donate";
 import Users from "@/pages/Users";
 import PaymentPortal from "@/pages/PaymentPortal";
-import Onboarding from "@/pages/Onboarding";
 import Pricing from "@/pages/Pricing";
 
 import Login from "@/pages/Login";
@@ -44,10 +43,7 @@ const MainRoutes = () => {
       <Route path="/square-callback" element={<SquareCallback />} />
       <Route path="/square-connect" element={<SquareConnect />} />
       
-      {/* Onboarding route - accessible only when logged in but onboarding not completed */}
-      <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
-      
-      {/* Pricing route - accessible after onboarding */}
+      {/* Pricing route */}
       <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
       
       {/* Protected routes - only accessible when logged in */}
