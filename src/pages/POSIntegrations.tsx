@@ -193,6 +193,13 @@ const POSIntegrations = () => {
     if (!selectedConnection) return;
 
     try {
+      // Limpiar sessionStorage si es Square
+      if (selectedConnection.pos_type === 'square') {
+        console.log('Limpiando sessionStorage de Square...');
+        sessionStorage.removeItem('square_oauth_state');
+        sessionStorage.removeItem('square_oauth_user_id');
+      }
+
       const { error } = await supabase
         .from('pos_connections')
         .update({ connection_status: 'disconnected' })

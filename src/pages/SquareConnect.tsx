@@ -41,9 +41,14 @@ const SquareConnect = () => {
     setStep('redirecting');
 
     try {
-      // Generar state para seguridad OAuth
+      // Limpiar cualquier dato residual de sesión anterior
+      console.log('Limpiando sessionStorage anterior...');
+      sessionStorage.removeItem('square_oauth_state');
+      sessionStorage.removeItem('square_oauth_user_id');
+      
+      // Generar nuevo state para seguridad OAuth
       const state = crypto.randomUUID();
-      console.log('State generado:', state);
+      console.log('Nuevo state generado:', state);
 
       // Guardar en sessionStorage
       sessionStorage.setItem('square_oauth_state', state);
