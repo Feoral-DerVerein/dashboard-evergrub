@@ -17,19 +17,19 @@ const ConnectPOS = () => {
   const handleConnectSquare = async () => {
     // Check if in iframe (Lovable preview)
     if (isInIframe) {
-      toast.error('OAuth no funciona en el preview', {
-        description: 'Abre la app en nueva ventana usando el botón de arriba'
+      toast.error('OAuth doesn\'t work in preview', {
+        description: 'Open the app in a new window using the button above'
       });
       return;
     }
 
     if (!user) {
-      toast.error('Debes iniciar sesión para conectar Square');
+      toast.error('You must be logged in to connect Square');
       return;
     }
 
     if (!SQUARE_CONFIG.APPLICATION_ID) {
-      toast.error('Configuración de Square no encontrada');
+      toast.error('Square configuration not found');
       return;
     }
 
@@ -76,7 +76,10 @@ const ConnectPOS = () => {
       );
 
       if (!popup) {
-        toast.error('Por favor permite ventanas emergentes para conectar con Square');
+        toast.error('Pop-up blocked! Please enable pop-ups for this site', {
+          description: 'Click the pop-up icon in your browser\'s address bar and select "Always allow pop-ups"',
+          duration: 10000
+        });
         setIsConnecting(false);
         return;
       }
@@ -86,7 +89,7 @@ const ConnectPOS = () => {
         if (event.data.type === 'square-oauth-success') {
           popup?.close();
           
-          toast.success('¡Conexión exitosa con Square!');
+          toast.success('Successfully connected to Square!');
           
           // Notify n8n about successful connection
           await supabase.functions.invoke('connect-square-webhook', {
@@ -107,7 +110,7 @@ const ConnectPOS = () => {
           window.removeEventListener('message', messageHandler);
         } else if (event.data.type === 'square-oauth-error') {
           popup?.close();
-          toast.error('Error al conectar con Square: ' + event.data.error);
+          toast.error('Error connecting to Square: ' + event.data.error);
           setIsConnecting(false);
           window.removeEventListener('message', messageHandler);
         }
@@ -125,7 +128,7 @@ const ConnectPOS = () => {
       }, 500);
     } catch (error) {
       console.error('Error connecting to Square:', error);
-      toast.error('Error al iniciar conexión con Square');
+      toast.error('Failed to start Square connection');
       setIsConnecting(false);
     }
   };
@@ -134,9 +137,9 @@ const ConnectPOS = () => {
     <div className="container mx-auto p-6 max-w-4xl space-y-8">
       {/* Header */}
       <div className="space-y-2 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Conecta tu Sistema POS</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Connect Your POS System</h1>
         <p className="text-lg text-muted-foreground">
-          Sincroniza automáticamente tu inventario y ventas con Square
+          Automatically sync your inventory and sales with Square
         </p>
       </div>
 
@@ -144,9 +147,9 @@ const ConnectPOS = () => {
       {isInIframe && (
         <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950/50">
           <AlertCircle className="h-4 w-4 text-yellow-600" />
-          <AlertTitle>⚠️ OAuth no funciona en el preview</AlertTitle>
+          <AlertTitle>⚠️ OAuth doesn't work in preview</AlertTitle>
           <AlertDescription className="space-y-2">
-            <p>Estás viendo la app dentro del preview de Lovable. Para conectar Square, necesitas abrir la aplicación en una ventana completa.</p>
+            <p>You're viewing the app inside the Lovable preview. To connect Square, you need to open the application in a full window.</p>
             <Button 
               onClick={() => window.open(window.location.href, '_blank', 'noopener,noreferrer')}
               variant="outline"
@@ -154,7 +157,7 @@ const ConnectPOS = () => {
               className="mt-2"
             >
               <ExternalLink className="mr-2 h-4 w-4" />
-              Abrir en nueva ventana
+              Open in New Window
             </Button>
           </AlertDescription>
         </Alert>
@@ -170,7 +173,7 @@ const ConnectPOS = () => {
           </div>
           <CardTitle className="text-2xl">Square POS</CardTitle>
           <CardDescription className="text-base mt-2">
-            Sistema líder de punto de venta para retail y restaurantes
+            Leading point of sale system for retail and restaurants
           </CardDescription>
         </CardHeader>
         
@@ -180,29 +183,29 @@ const ConnectPOS = () => {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium">Sincronización automática</p>
-                <p className="text-sm text-muted-foreground">Actualiza inventario en tiempo real</p>
+                <p className="font-medium">Automatic Sync</p>
+                <p className="text-sm text-muted-foreground">Updates inventory in real-time</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium">Datos de ventas</p>
-                <p className="text-sm text-muted-foreground">Rastrea todas tus transacciones</p>
+                <p className="font-medium">Sales Data</p>
+                <p className="text-sm text-muted-foreground">Track all your transactions</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium">Gestión de productos</p>
-                <p className="text-sm text-muted-foreground">Administra tu catálogo fácilmente</p>
+                <p className="font-medium">Product Management</p>
+                <p className="text-sm text-muted-foreground">Manage your catalog easily</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium">Seguro y confiable</p>
-                <p className="text-sm text-muted-foreground">Conexión OAuth encriptada</p>
+                <p className="font-medium">Secure & Reliable</p>
+                <p className="text-sm text-muted-foreground">Encrypted OAuth connection</p>
               </div>
             </div>
           </div>
@@ -219,20 +222,34 @@ const ConnectPOS = () => {
               {isConnecting ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Conectando con Square...
+                  Connecting to Square...
                 </>
               ) : (
                 <>
                   <Square className="mr-2 h-5 w-5" />
-                  Conectar con Square
+                  Connect with Square
                 </>
               )}
             </Button>
             
             <p className="text-sm text-center text-muted-foreground mt-4">
-              Se abrirá una ventana segura de Square para autorizar la conexión.<br />
-              Tus datos están protegidos y encriptados.
+              A secure Square window will open to authorize the connection.<br />
+              Your data is protected and encrypted.
             </p>
+            
+            {/* Pop-up Help */}
+            <Alert className="mt-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Enable Pop-ups</AlertTitle>
+              <AlertDescription className="text-xs space-y-2">
+                <p>If the Square window doesn't open:</p>
+                <ol className="list-decimal list-inside space-y-1 ml-2">
+                  <li>Look for a blocked pop-up icon in your browser's address bar</li>
+                  <li>Click it and select "Always allow pop-ups from this site"</li>
+                  <li>Click the button again</li>
+                </ol>
+              </AlertDescription>
+            </Alert>
           </div>
         </CardContent>
       </Card>
@@ -240,10 +257,10 @@ const ConnectPOS = () => {
       {/* Info Alert */}
       <Alert>
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>¿Necesitas ayuda?</AlertTitle>
+        <AlertTitle>Need Help?</AlertTitle>
         <AlertDescription>
-          La conexión con Square es segura y toma solo unos segundos. Si tienes problemas,
-          asegúrate de tener habilitadas las ventanas emergentes en tu navegador.
+          The Square connection is secure and takes only a few seconds. If you have issues,
+          make sure pop-up windows are enabled in your browser.
         </AlertDescription>
       </Alert>
     </div>
