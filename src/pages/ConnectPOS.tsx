@@ -5,14 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { Plug, ExternalLink, Loader2, Square, AlertCircle } from "lucide-react";
+import { Plug, ExternalLink, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { SQUARE_CONFIG, SQUARE_REDIRECT_URI } from "@/config/squareConfig";
 import squareLogo from "@/assets/square-logo.png";
 import lightspeedLogo from "@/assets/lightspeed-logo.png";
 import toastLogo from "@/assets/toast-logo.png";
@@ -75,9 +72,6 @@ const ConnectPOS = () => {
   const [isSquareDialogOpen, setIsSquareDialogOpen] = useState(false);
   const [isLightspeedDialogOpen, setIsLightspeedDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showSquareAdvanced, setShowSquareAdvanced] = useState(false);
-  const [isOAuthRedirecting, setIsOAuthRedirecting] = useState(false);
-  const [isInIframe] = useState(() => window.self !== window.top);
   
   const [squareFormData, setSquareFormData] = useState<SquareFormData>({
     businessName: '',
@@ -106,8 +100,7 @@ const ConnectPOS = () => {
     setSelectedPOS(pos.id);
     
     if (pos.id === 'square') {
-      // Directly initiate OAuth flow for Square
-      handleSquareOAuthConnect();
+      setIsSquareDialogOpen(true);
     } else if (pos.id === 'lightspeed') {
       setIsLightspeedDialogOpen(true);
     }
@@ -148,54 +141,6 @@ const ConnectPOS = () => {
     
     setLightspeedErrors(errors);
     return Object.keys(errors).length === 0;
-  };
-
-  const handleSquareOAuthConnect = () => {
-    if (!user) {
-      toast.error('Debes iniciar sesión para conectar Square');
-      return;
-    }
-
-    console.log('=== Abriendo página de conexión Square ===');
-    
-    setIsOAuthRedirecting(true);
-
-    try {
-      // Abrir la página de conexión Square en una nueva ventana
-      const connectUrl = `${window.location.origin}/square-connect`;
-      console.log('Abriendo URL:', connectUrl);
-      
-      const width = 600;
-      const height = 700;
-      const left = (window.screen.width - width) / 2;
-      const top = (window.screen.height - height) / 2;
-      
-      const connectWindow = window.open(
-        connectUrl,
-        'square-connect',
-        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
-      );
-
-      if (!connectWindow) {
-        toast.error('Por favor permite las ventanas emergentes para conectar Square');
-        setIsOAuthRedirecting(false);
-        return;
-      }
-
-      // Monitorear cuando se cierre la ventana
-      const checkWindow = setInterval(() => {
-        if (connectWindow.closed) {
-          clearInterval(checkWindow);
-          setIsOAuthRedirecting(false);
-          console.log('Ventana de conexión cerrada');
-        }
-      }, 500);
-
-    } catch (error) {
-      console.error('Error al abrir ventana de conexión:', error);
-      toast.error('Error al abrir la ventana de conexión');
-      setIsOAuthRedirecting(false);
-    }
   };
 
   const handleSquareConnect = async () => {
@@ -332,26 +277,6 @@ const ConnectPOS = () => {
         </p>
       </div>
 
-      {/* iframe Warning Alert */}
-      {isInIframe && (
-        <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950/50">
-          <AlertCircle className="h-4 w-4 text-yellow-600" />
-          <AlertTitle>⚠️ OAuth no funciona en el preview</AlertTitle>
-          <AlertDescription className="space-y-2">
-            <p>Estás viendo la app dentro del preview de Lovable. Para conectar Square, necesitas abrir la aplicación en una ventana completa.</p>
-            <Button 
-              onClick={() => window.open(window.location.href, '_blank', 'noopener,noreferrer')}
-              variant="outline"
-              size="sm"
-              className="mt-2"
-            >
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Abrir en nueva ventana
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
-
       {/* POS Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {posOptions.map((pos) => {
@@ -386,21 +311,12 @@ const ConnectPOS = () => {
               <CardFooter>
                 <Button
                   onClick={() => handleConnectClick(pos)}
-                  disabled={!pos.available || (pos.id === 'square' && isOAuthRedirecting)}
+                  disabled={!pos.available}
                   className="w-full"
                   variant={pos.available ? 'default' : 'outline'}
                 >
-                  {pos.id === 'square' && isOAuthRedirecting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Redirecting...
-                    </>
-                  ) : (
-                    <>
-                      <Plug className="mr-2 h-4 w-4" />
-                      Connect {pos.title}
-                    </>
-                  )}
+                  <Plug className="mr-2 h-4 w-4" />
+                  Connect {pos.title}
                 </Button>
               </CardFooter>
             </Card>
@@ -414,141 +330,96 @@ const ConnectPOS = () => {
           <DialogHeader>
             <DialogTitle>Connect Square POS</DialogTitle>
             <DialogDescription>
-              One-click secure connection to your Square account
+              Enter your Square credentials to sync your data
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="space-y-6 py-4">
-            {/* OAuth Button */}
-            <div className="space-y-3">
-              <Button
-                onClick={handleSquareOAuthConnect}
-                disabled={isOAuthRedirecting}
-                className="w-full h-12 text-base font-semibold"
-                style={{ backgroundColor: '#006AFF' }}
-              >
-                {isOAuthRedirecting ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Redirecting to Square...
-                  </>
-                ) : (
-                  <>
-                    <Square className="mr-2 h-5 w-5" />
-                    Connect with Square
-                  </>
-                )}
-              </Button>
-              
-              <p className="text-sm text-muted-foreground text-center">
-                You'll be redirected to Square to authorize the connection. This is secure and takes just a few seconds.
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="square-businessName">Business Name *</Label>
+              <Input
+                id="square-businessName"
+                placeholder="Enter your business name"
+                value={squareFormData.businessName}
+                onChange={(e) => {
+                  setSquareFormData({ ...squareFormData, businessName: e.target.value });
+                  if (squareErrors.businessName) {
+                    setSquareErrors({ ...squareErrors, businessName: undefined });
+                  }
+                }}
+              />
+              {squareErrors.businessName && (
+                <p className="text-sm text-destructive">{squareErrors.businessName}</p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="square-accessToken">Square Access Token *</Label>
+              <Input
+                id="square-accessToken"
+                type="password"
+                placeholder="Enter your access token"
+                value={squareFormData.accessToken}
+                onChange={(e) => {
+                  setSquareFormData({ ...squareFormData, accessToken: e.target.value });
+                  if (squareErrors.accessToken) {
+                    setSquareErrors({ ...squareErrors, accessToken: undefined });
+                  }
+                }}
+              />
+              <p className="text-sm text-muted-foreground">
+                Get your token at: Square Dashboard → Applications → API Tokens
               </p>
+              <a 
+                href="https://developer.squareup.com/docs/build-basics/access-tokens"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+              >
+                How to get my token? <ExternalLink className="h-3 w-3" />
+              </a>
+              {squareErrors.accessToken && (
+                <p className="text-sm text-destructive">{squareErrors.accessToken}</p>
+              )}
             </div>
 
-            {/* Advanced Manual Connection */}
-            <Collapsible
-              open={showSquareAdvanced}
-              onOpenChange={setShowSquareAdvanced}
-            >
-              <CollapsibleTrigger className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Manual connection (for developers)
-              </CollapsibleTrigger>
-              
-              <CollapsibleContent className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="square-businessName">Business Name *</Label>
-                  <Input
-                    id="square-businessName"
-                    placeholder="Enter your business name"
-                    value={squareFormData.businessName}
-                    onChange={(e) => {
-                      setSquareFormData({ ...squareFormData, businessName: e.target.value });
-                      if (squareErrors.businessName) {
-                        setSquareErrors({ ...squareErrors, businessName: undefined });
-                      }
-                    }}
-                  />
-                  {squareErrors.businessName && (
-                    <p className="text-sm text-destructive">{squareErrors.businessName}</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="square-accessToken">Square Access Token *</Label>
-                  <Input
-                    id="square-accessToken"
-                    type="password"
-                    placeholder="Enter your access token"
-                    value={squareFormData.accessToken}
-                    onChange={(e) => {
-                      setSquareFormData({ ...squareFormData, accessToken: e.target.value });
-                      if (squareErrors.accessToken) {
-                        setSquareErrors({ ...squareErrors, accessToken: undefined });
-                      }
-                    }}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Get your token at: Square Dashboard → Applications → API Tokens
-                  </p>
-                  <a 
-                    href="https://developer.squareup.com/docs/build-basics/access-tokens"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    How to get my token? <ExternalLink className="h-3 w-3" />
-                  </a>
-                  {squareErrors.accessToken && (
-                    <p className="text-sm text-destructive">{squareErrors.accessToken}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="square-locationId">Location ID *</Label>
-                  <Input
-                    id="square-locationId"
-                    placeholder="Enter your location ID"
-                    value={squareFormData.locationId}
-                    onChange={(e) => {
-                      setSquareFormData({ ...squareFormData, locationId: e.target.value });
-                      if (squareErrors.locationId) {
-                        setSquareErrors({ ...squareErrors, locationId: undefined });
-                      }
-                    }}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Your Square main location ID
-                  </p>
-                  {squareErrors.locationId && (
-                    <p className="text-sm text-destructive">{squareErrors.locationId}</p>
-                  )}
-                </div>
-
-                <Button 
-                  onClick={handleSquareConnect}
-                  disabled={isLoading}
-                  className="w-full"
-                >
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Connect Manually
-                </Button>
-              </CollapsibleContent>
-            </Collapsible>
+            <div className="space-y-2">
+              <Label htmlFor="square-locationId">Location ID *</Label>
+              <Input
+                id="square-locationId"
+                placeholder="Enter your location ID"
+                value={squareFormData.locationId}
+                onChange={(e) => {
+                  setSquareFormData({ ...squareFormData, locationId: e.target.value });
+                  if (squareErrors.locationId) {
+                    setSquareErrors({ ...squareErrors, locationId: undefined });
+                  }
+                }}
+              />
+              <p className="text-sm text-muted-foreground">
+                Your Square main location ID
+              </p>
+              {squareErrors.locationId && (
+                <p className="text-sm text-destructive">{squareErrors.locationId}</p>
+              )}
+            </div>
           </div>
-          
           <DialogFooter>
             <Button 
               variant="outline" 
               onClick={() => {
                 setIsSquareDialogOpen(false);
                 setSquareErrors({});
-                setShowSquareAdvanced(false);
-                setIsOAuthRedirecting(false);
               }}
-              disabled={isOAuthRedirecting}
-              className="w-full"
+              disabled={isLoading}
             >
               Cancel
+            </Button>
+            <Button 
+              onClick={handleSquareConnect}
+              disabled={isLoading}
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Connect
             </Button>
           </DialogFooter>
         </DialogContent>

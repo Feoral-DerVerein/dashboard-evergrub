@@ -17,9 +17,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Zap, Utensils, Sparkles, PlugZap, Loader2, Plus, RefreshCw, Unplug, AlertCircle, Database, X } from "lucide-react";
+import { Square, Zap, Utensils, Sparkles, PlugZap, Loader2, Plus, RefreshCw, Unplug, AlertCircle, Database, X } from "lucide-react";
 import { format } from "date-fns";
-import squareLogo from "@/assets/square-logo.png";
 
 interface POSConnection {
   id: string;
@@ -36,7 +35,7 @@ interface POSConnection {
 const posConfig = {
   square: {
     name: 'Square',
-    imgSrc: squareLogo,
+    icon: Square,
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
   },
@@ -144,41 +143,17 @@ const POSIntegrations = () => {
     setSyncingId(connection.id);
 
     try {
-      console.log('Starting sync for connection:', connection.id);
-      
-      // Call the appropriate sync function based on POS type
-      if (connection.pos_type === 'square') {
-        const { data, error } = await supabase.functions.invoke('sync-square-products');
+      const { error } = await supabase
+        .from('pos_connections')
+        .update({ last_sync_at: new Date().toISOString() })
+        .eq('id', connection.id);
 
-        if (error) {
-          console.error('Sync error:', error);
-          throw error;
-        }
+      if (error) throw error;
 
-        if (data.error) {
-          throw new Error(data.error);
-        }
-
-        console.log('Sync response:', data);
-        toast.success(`✓ Successfully synced ${data.synced} products from Square`, {
-          description: data.errors > 0 ? `${data.errors} products had errors` : undefined,
-        });
-      } else {
-        // For other POS types, just update the sync time for now
-        const { error } = await supabase
-          .from('pos_connections')
-          .update({ last_sync_at: new Date().toISOString() })
-          .eq('id', connection.id);
-
-        if (error) throw error;
-
-        toast.success('✓ Sync started. Data will update shortly');
-      }
+      toast.success('✓ Sync started. Data will update shortly');
     } catch (error) {
       console.error('Error syncing:', error);
-      toast.error('Failed to sync products', {
-        description: error instanceof Error ? error.message : 'Unknown error',
-      });
+      toast.error('Failed to start sync');
     } finally {
       setSyncingId(null);
     }
@@ -193,13 +168,6 @@ const POSIntegrations = () => {
     if (!selectedConnection) return;
 
     try {
-      // Limpiar sessionStorage si es Square
-      if (selectedConnection.pos_type === 'square') {
-        console.log('Limpiando sessionStorage de Square...');
-        sessionStorage.removeItem('square_oauth_state');
-        sessionStorage.removeItem('square_oauth_user_id');
-      }
-
       const { error } = await supabase
         .from('pos_connections')
         .update({ connection_status: 'disconnected' })
@@ -308,7 +276,7 @@ const POSIntegrations = () => {
           {connections.map((connection) => {
             const config = posConfig[connection.pos_type];
             const statusCfg = statusConfig[connection.connection_status];
-            const Icon = 'icon' in config ? config.icon : null;
+            const Icon = config.icon;
 
             return (
               <div key={connection.id} className="space-y-2">
@@ -326,11 +294,7 @@ const POSIntegrations = () => {
                       {/* Left Section */}
                       <div className="flex items-start gap-4 flex-1">
                         <div className={`p-3 rounded-lg ${config.bgColor}`}>
-                          {'imgSrc' in config ? (
-                            <img src={config.imgSrc} alt={config.name} className="h-6 w-6 object-contain" />
-                          ) : Icon ? (
-                            <Icon className={`h-6 w-6 ${config.color}`} />
-                          ) : null}
+                          <Icon className={`h-6 w-6 ${config.color}`} />
                         </div>
                         <div className="space-y-1 flex-1">
                           <h3 className="text-lg font-semibold">{config.name}</h3>

@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { BarChart3, LogOut, Package } from "lucide-react";
+import { BarChart3, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -19,7 +19,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 const menuItems = [
   { title: "Performance", url: "/kpi", icon: BarChart3 },
-  { title: "Product Inventory", url: "/product-inventory", icon: Package },
 ];
 
 function AppSidebar() {

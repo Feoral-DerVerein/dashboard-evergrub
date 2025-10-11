@@ -13,6 +13,7 @@ import CreateAd from "@/pages/CreateAd";
 import Donate from "@/pages/Donate";
 import Users from "@/pages/Users";
 import PaymentPortal from "@/pages/PaymentPortal";
+import Onboarding from "@/pages/Onboarding";
 import Pricing from "@/pages/Pricing";
 
 import Login from "@/pages/Login";
@@ -25,9 +26,6 @@ import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
 import ConnectPOS from "@/pages/ConnectPOS";
 import POSIntegrations from "@/pages/POSIntegrations";
-import SquareCallback from "@/pages/SquareCallback";
-import SquareConnect from "@/pages/SquareConnect";
-import ProductInventory from "@/pages/ProductInventory";
 
 
 const MainRoutes = () => {
@@ -39,11 +37,10 @@ const MainRoutes = () => {
       <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
       <Route path="/apple" element={<AuthRoute><Apple /></AuthRoute>} />
       
-      {/* Square OAuth routes - public routes for OAuth flow */}
-      <Route path="/square-callback" element={<SquareCallback />} />
-      <Route path="/square-connect" element={<SquareConnect />} />
+      {/* Onboarding route - accessible only when logged in but onboarding not completed */}
+      <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
       
-      {/* Pricing route */}
+      {/* Pricing route - accessible after onboarding */}
       <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
       
       {/* Protected routes - only accessible when logged in */}
@@ -64,7 +61,6 @@ const MainRoutes = () => {
         <Route path="/sync" element={<ProductSync />} />
         <Route path="/connect-pos" element={<ConnectPOS />} />
         <Route path="/pos-integrations" element={<POSIntegrations />} />
-        <Route path="/product-inventory" element={<ProductInventory />} />
         
       </Route>
       
