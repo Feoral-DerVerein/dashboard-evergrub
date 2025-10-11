@@ -1,156 +1,20 @@
 import { useState } from "react";
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { Plug, ExternalLink, Loader2, Square, AlertCircle } from "lucide-react";
+import { ExternalLink, Loader2, Square, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { SQUARE_CONFIG, SQUARE_REDIRECT_URI } from "@/config/squareConfig";
 import squareLogo from "@/assets/square-logo.png";
-import lightspeedLogo from "@/assets/lightspeed-logo.png";
-import toastLogo from "@/assets/toast-logo.png";
-import cloverLogo from "@/assets/clover-logo.svg";
-
-type POSType = 'square' | 'lightspeed' | 'toast' | 'clover';
-
-interface SquareFormData {
-  businessName: string;
-  accessToken: string;
-  locationId: string;
-}
-
-interface LightspeedFormData {
-  businessName: string;
-  apiKey: string;
-  apiSecret: string;
-  accountId: string;
-}
-
-const posOptions = [
-  {
-    id: 'square' as POSType,
-    title: 'Square',
-    description: 'Leading POS system for retail and restaurants',
-    badge: 'Popular',
-    logo: squareLogo,
-    available: true,
-  },
-  {
-    id: 'lightspeed' as POSType,
-    title: 'Lightspeed',
-    description: 'Complete POS for stores and restaurants',
-    badge: null,
-    logo: lightspeedLogo,
-    available: true,
-  },
-  {
-    id: 'toast' as POSType,
-    title: 'Toast',
-    description: 'POS specialized for restaurants',
-    badge: 'Coming Soon',
-    logo: toastLogo,
-    available: false,
-  },
-  {
-    id: 'clover' as POSType,
-    title: 'Clover',
-    description: 'Flexible POS for all business types',
-    badge: 'Coming Soon',
-    logo: cloverLogo,
-    available: false,
-  },
-];
 
 const ConnectPOS = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const [selectedPOS, setSelectedPOS] = useState<POSType | null>(null);
-  const [isSquareDialogOpen, setIsSquareDialogOpen] = useState(false);
-  const [isLightspeedDialogOpen, setIsLightspeedDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showSquareAdvanced, setShowSquareAdvanced] = useState(false);
-  const [isOAuthRedirecting, setIsOAuthRedirecting] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [isInIframe] = useState(() => window.self !== window.top);
-  
-  const [squareFormData, setSquareFormData] = useState<SquareFormData>({
-    businessName: '',
-    accessToken: '',
-    locationId: '',
-  });
 
-  const [lightspeedFormData, setLightspeedFormData] = useState<LightspeedFormData>({
-    businessName: '',
-    apiKey: '',
-    apiSecret: '',
-    accountId: '',
-  });
-
-  const [squareErrors, setSquareErrors] = useState<Partial<SquareFormData>>({});
-  const [lightspeedErrors, setLightspeedErrors] = useState<Partial<LightspeedFormData>>({});
-
-  const handleConnectClick = (pos: typeof posOptions[0]) => {
-    if (!pos.available) {
-      toast.info('Coming soon', {
-        description: `${pos.title} integration will be available soon.`,
-      });
-      return;
-    }
-    
-    setSelectedPOS(pos.id);
-    
-    if (pos.id === 'square') {
-      // Directly initiate OAuth flow for Square
-      handleSquareOAuthConnect();
-    } else if (pos.id === 'lightspeed') {
-      setIsLightspeedDialogOpen(true);
-    }
-  };
-
-  const validateSquareForm = (): boolean => {
-    const errors: Partial<SquareFormData> = {};
-    
-    if (!squareFormData.businessName.trim()) {
-      errors.businessName = 'Business name is required';
-    }
-    if (!squareFormData.accessToken.trim()) {
-      errors.accessToken = 'Access token is required';
-    }
-    if (!squareFormData.locationId.trim()) {
-      errors.locationId = 'Location ID is required';
-    }
-    
-    setSquareErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const validateLightspeedForm = (): boolean => {
-    const errors: Partial<LightspeedFormData> = {};
-    
-    if (!lightspeedFormData.businessName.trim()) {
-      errors.businessName = 'Business name is required';
-    }
-    if (!lightspeedFormData.apiKey.trim()) {
-      errors.apiKey = 'API key is required';
-    }
-    if (!lightspeedFormData.apiSecret.trim()) {
-      errors.apiSecret = 'API secret is required';
-    }
-    if (!lightspeedFormData.accountId.trim()) {
-      errors.accountId = 'Account ID is required';
-    }
-    
-    setLightspeedErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSquareOAuthConnect = () => {
+  const handleConnectSquare = async () => {
     // Check if in iframe (Lovable preview)
     if (isInIframe) {
       toast.error('OAuth no funciona en el preview', {
@@ -159,197 +23,120 @@ const ConnectPOS = () => {
       return;
     }
 
-    console.log('=== START Square OAuth Flow ===');
-    console.log('Config check:', {
-      hasAppId: !!SQUARE_CONFIG.APPLICATION_ID,
-      appId: SQUARE_CONFIG.APPLICATION_ID,
-      environment: SQUARE_CONFIG.ENVIRONMENT,
-      oauthUrl: SQUARE_CONFIG.OAUTH_URL
-    });
-
-    if (!SQUARE_CONFIG.APPLICATION_ID || SQUARE_CONFIG.APPLICATION_ID.includes('...')) {
-      toast.error('Square integration not configured. Please contact support.');
-      return;
-    }
-
     if (!user) {
-      toast.error('You must be logged in to connect a POS system');
+      toast.error('Debes iniciar sesión para conectar Square');
       return;
     }
 
-    setIsOAuthRedirecting(true);
+    if (!SQUARE_CONFIG.APPLICATION_ID) {
+      toast.error('Configuración de Square no encontrada');
+      return;
+    }
+
+    setIsConnecting(true);
 
     try {
       // Generate random state for OAuth security
       const state = crypto.randomUUID();
-      console.log('Generated state:', state);
       
       // Store in sessionStorage
       sessionStorage.setItem('square_oauth_state', state);
       sessionStorage.setItem('square_oauth_user_id', user.id);
+      sessionStorage.setItem('square_oauth_email', user.email || '');
       
-      // Verify state was stored
-      const verifyState = sessionStorage.getItem('square_oauth_state');
-      const verifyUserId = sessionStorage.getItem('square_oauth_user_id');
-      console.log('Verification after storage:', { 
-        stateStored: verifyState === state,
-        userIdStored: verifyUserId === user.id,
-        verifyState,
-        verifyUserId
+      // Notify n8n that connection is starting
+      await supabase.functions.invoke('connect-square-webhook', {
+        body: {
+          action: 'connection_started',
+          platform: 'square',
+          pos_type: 'square',
+          provider: 'square',
+          timestamp: new Date().toISOString(),
+          source: 'lovable',
+          user_id: user.id,
+          user_email: user.email
+        }
       });
 
       // Build OAuth URL
       const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&state=${state}`;
 
-      console.log('OAuth URL details:', { 
-        redirectUri: SQUARE_REDIRECT_URI,
-        currentOrigin: window.location.origin,
-        state,
-        fullUrl: oauthUrl
-      });
+      console.log('Redirecting to Square OAuth...');
       
-      console.log('=== Redirecting to Square OAuth... ===');
+      // Open OAuth in popup window
+      const width = 600;
+      const height = 700;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
       
-      // Use full page redirect for OAuth (most reliable method)
-      window.location.href = oauthUrl;
-    } catch (error) {
-      console.error('OAuth redirect error:', error);
-      toast.error('Failed to start OAuth flow. Please try again.');
-      setIsOAuthRedirecting(false);
-    }
-  };
+      const popup = window.open(
+        oauthUrl,
+        'Square OAuth',
+        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+      );
 
-  const handleSquareConnect = async () => {
-    if (!validateSquareForm()) {
-      return;
-    }
-
-    if (!user) {
-      toast.error('You must be logged in to connect a POS system');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const { data, error } = await supabase
-        .from('pos_connections')
-        .insert({
-          user_id: user.id,
-          pos_type: 'square',
-          business_name: squareFormData.businessName,
-          api_credentials: {
-            access_token: squareFormData.accessToken,
-            location_id: squareFormData.locationId,
-          },
-          connection_status: 'pending',
-        })
-        .select('id')
-        .single();
-
-      if (error) throw error;
-
-      // Call n8n webhook for validation (fire and forget)
-      if (data?.id) {
-        fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            connection_id: data.id,
-            pos_type: 'square',
-            credentials: {
-              access_token: squareFormData.accessToken,
-              location_id: squareFormData.locationId,
-            }
-          })
-        }).catch(err => console.error('Webhook error:', err));
+      if (!popup) {
+        toast.error('Por favor permite ventanas emergentes para conectar con Square');
+        setIsConnecting(false);
+        return;
       }
 
-      toast.success('✓ Square connected. Validating credentials...');
-      setIsSquareDialogOpen(false);
-      setSquareFormData({ businessName: '', accessToken: '', locationId: '' });
-      setSquareErrors({});
-      
-      // Redirect to pos-integrations page
-      navigate('/pos-integrations');
-    } catch (error) {
-      console.error('Error connecting Square:', error);
-      toast.error('Failed to connect Square. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLightspeedConnect = async () => {
-    if (!validateLightspeedForm()) {
-      return;
-    }
-
-    if (!user) {
-      toast.error('You must be logged in to connect a POS system');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const { data, error } = await supabase
-        .from('pos_connections')
-        .insert({
-          user_id: user.id,
-          pos_type: 'lightspeed',
-          business_name: lightspeedFormData.businessName,
-          api_credentials: {
-            api_key: lightspeedFormData.apiKey,
-            api_secret: lightspeedFormData.apiSecret,
-            account_id: lightspeedFormData.accountId,
-          },
-          connection_status: 'pending',
-        })
-        .select('id')
-        .single();
-
-      if (error) throw error;
-
-      // Call n8n webhook for validation (fire and forget)
-      if (data?.id) {
-        fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            connection_id: data.id,
-            pos_type: 'lightspeed',
-            credentials: {
-              api_key: lightspeedFormData.apiKey,
-              api_secret: lightspeedFormData.apiSecret,
-              account_id: lightspeedFormData.accountId,
+      // Listen for message from popup
+      const messageHandler = async (event: MessageEvent) => {
+        if (event.data.type === 'square-oauth-success') {
+          popup?.close();
+          
+          toast.success('¡Conexión exitosa con Square!');
+          
+          // Notify n8n about successful connection
+          await supabase.functions.invoke('connect-square-webhook', {
+            body: {
+              action: 'connection_completed',
+              platform: 'square',
+              pos_type: 'square',
+              provider: 'square',
+              timestamp: new Date().toISOString(),
+              source: 'lovable',
+              user_id: user.id,
+              user_email: user.email,
+              status: 'success'
             }
-          })
-        }).catch(err => console.error('Webhook error:', err));
-      }
+          });
+          
+          setIsConnecting(false);
+          window.removeEventListener('message', messageHandler);
+        } else if (event.data.type === 'square-oauth-error') {
+          popup?.close();
+          toast.error('Error al conectar con Square: ' + event.data.error);
+          setIsConnecting(false);
+          window.removeEventListener('message', messageHandler);
+        }
+      };
 
-      toast.success('✓ Lightspeed connected. Validating credentials...');
-      setIsLightspeedDialogOpen(false);
-      setLightspeedFormData({ businessName: '', apiKey: '', apiSecret: '', accountId: '' });
-      setLightspeedErrors({});
-      
-      // Redirect to pos-integrations page
-      navigate('/pos-integrations');
+      window.addEventListener('message', messageHandler);
+
+      // Check if popup was closed manually
+      const checkPopupClosed = setInterval(() => {
+        if (popup?.closed) {
+          clearInterval(checkPopupClosed);
+          window.removeEventListener('message', messageHandler);
+          setIsConnecting(false);
+        }
+      }, 500);
     } catch (error) {
-      console.error('Error connecting Lightspeed:', error);
-      toast.error('Failed to connect Lightspeed. Please try again.');
-    } finally {
-      setIsLoading(false);
+      console.error('Error connecting to Square:', error);
+      toast.error('Error al iniciar conexión con Square');
+      setIsConnecting(false);
     }
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div className="container mx-auto p-6 max-w-4xl space-y-8">
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Connect POS System</h1>
-        <p className="text-muted-foreground">
-          Integrate your point of sale system to automatically sync inventory and sales
+      <div className="space-y-2 text-center">
+        <h1 className="text-4xl font-bold tracking-tight">Conecta tu Sistema POS</h1>
+        <p className="text-lg text-muted-foreground">
+          Sincroniza automáticamente tu inventario y ventas con Square
         </p>
       </div>
 
@@ -373,331 +160,92 @@ const ConnectPOS = () => {
         </Alert>
       )}
 
-      {/* POS Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {posOptions.map((pos) => {
-          return (
-            <Card 
-              key={pos.id}
-              className="relative hover:shadow-lg transition-all duration-300 hover:border-primary/50"
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-lg bg-white border border-border flex items-center justify-center">
-                      <img src={pos.logo} alt={`${pos.title} logo`} className="h-8 w-8 object-contain" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl">{pos.title}</CardTitle>
-                    </div>
-                  </div>
-                  {pos.badge && (
-                    <Badge 
-                      variant={pos.badge === 'Popular' ? 'default' : 'secondary'}
-                      className="ml-2"
-                    >
-                      {pos.badge}
-                    </Badge>
-                  )}
-                </div>
-                <CardDescription className="mt-3">
-                  {pos.description}
-                </CardDescription>
-              </CardHeader>
-              <CardFooter>
-                <Button
-                  onClick={() => handleConnectClick(pos)}
-                  disabled={!pos.available || (pos.id === 'square' && isOAuthRedirecting)}
-                  className="w-full"
-                  variant={pos.available ? 'default' : 'outline'}
-                >
-                  {pos.id === 'square' && isOAuthRedirecting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Redirecting...
-                    </>
-                  ) : (
-                    <>
-                      <Plug className="mr-2 h-4 w-4" />
-                      Connect {pos.title}
-                    </>
-                  )}
-                </Button>
-              </CardFooter>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Square Connection Dialog */}
-      <Dialog open={isSquareDialogOpen} onOpenChange={setIsSquareDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Connect Square POS</DialogTitle>
-            <DialogDescription>
-              One-click secure connection to your Square account
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-6 py-4">
-            {/* OAuth Button */}
-            <div className="space-y-3">
-              <Button
-                onClick={handleSquareOAuthConnect}
-                disabled={isOAuthRedirecting}
-                className="w-full h-12 text-base font-semibold"
-                style={{ backgroundColor: '#006AFF' }}
-              >
-                {isOAuthRedirecting ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Redirecting to Square...
-                  </>
-                ) : (
-                  <>
-                    <Square className="mr-2 h-5 w-5" />
-                    Connect with Square
-                  </>
-                )}
-              </Button>
-              
-              <p className="text-sm text-muted-foreground text-center">
-                You'll be redirected to Square to authorize the connection. This is secure and takes just a few seconds.
-              </p>
+      {/* Square Connection Card */}
+      <Card className="border-2 hover:shadow-xl transition-all duration-300">
+        <CardHeader className="text-center pb-4">
+          <div className="flex justify-center mb-4">
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900">
+              <img src={squareLogo} alt="Square logo" className="h-16 w-16 object-contain" />
             </div>
-
-            {/* Advanced Manual Connection */}
-            <Collapsible
-              open={showSquareAdvanced}
-              onOpenChange={setShowSquareAdvanced}
-            >
-              <CollapsibleTrigger className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Manual connection (for developers)
-              </CollapsibleTrigger>
-              
-              <CollapsibleContent className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="square-businessName">Business Name *</Label>
-                  <Input
-                    id="square-businessName"
-                    placeholder="Enter your business name"
-                    value={squareFormData.businessName}
-                    onChange={(e) => {
-                      setSquareFormData({ ...squareFormData, businessName: e.target.value });
-                      if (squareErrors.businessName) {
-                        setSquareErrors({ ...squareErrors, businessName: undefined });
-                      }
-                    }}
-                  />
-                  {squareErrors.businessName && (
-                    <p className="text-sm text-destructive">{squareErrors.businessName}</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="square-accessToken">Square Access Token *</Label>
-                  <Input
-                    id="square-accessToken"
-                    type="password"
-                    placeholder="Enter your access token"
-                    value={squareFormData.accessToken}
-                    onChange={(e) => {
-                      setSquareFormData({ ...squareFormData, accessToken: e.target.value });
-                      if (squareErrors.accessToken) {
-                        setSquareErrors({ ...squareErrors, accessToken: undefined });
-                      }
-                    }}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Get your token at: Square Dashboard → Applications → API Tokens
-                  </p>
-                  <a 
-                    href="https://developer.squareup.com/docs/build-basics/access-tokens"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    How to get my token? <ExternalLink className="h-3 w-3" />
-                  </a>
-                  {squareErrors.accessToken && (
-                    <p className="text-sm text-destructive">{squareErrors.accessToken}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="square-locationId">Location ID *</Label>
-                  <Input
-                    id="square-locationId"
-                    placeholder="Enter your location ID"
-                    value={squareFormData.locationId}
-                    onChange={(e) => {
-                      setSquareFormData({ ...squareFormData, locationId: e.target.value });
-                      if (squareErrors.locationId) {
-                        setSquareErrors({ ...squareErrors, locationId: undefined });
-                      }
-                    }}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Your Square main location ID
-                  </p>
-                  {squareErrors.locationId && (
-                    <p className="text-sm text-destructive">{squareErrors.locationId}</p>
-                  )}
-                </div>
-
-                <Button 
-                  onClick={handleSquareConnect}
-                  disabled={isLoading}
-                  className="w-full"
-                >
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Connect Manually
-                </Button>
-              </CollapsibleContent>
-            </Collapsible>
           </div>
-          
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setIsSquareDialogOpen(false);
-                setSquareErrors({});
-                setShowSquareAdvanced(false);
-                setIsOAuthRedirecting(false);
-              }}
-              disabled={isOAuthRedirecting}
-              className="w-full"
-            >
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Lightspeed Connection Dialog */}
-      <Dialog open={isLightspeedDialogOpen} onOpenChange={setIsLightspeedDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Connect Lightspeed POS</DialogTitle>
-            <DialogDescription>
-              Enter your Lightspeed credentials to sync your data
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="lightspeed-businessName">Business Name *</Label>
-              <Input
-                id="lightspeed-businessName"
-                placeholder="Enter your business name"
-                value={lightspeedFormData.businessName}
-                onChange={(e) => {
-                  setLightspeedFormData({ ...lightspeedFormData, businessName: e.target.value });
-                  if (lightspeedErrors.businessName) {
-                    setLightspeedErrors({ ...lightspeedErrors, businessName: undefined });
-                  }
-                }}
-              />
-              {lightspeedErrors.businessName && (
-                <p className="text-sm text-destructive">{lightspeedErrors.businessName}</p>
-              )}
+          <CardTitle className="text-2xl">Square POS</CardTitle>
+          <CardDescription className="text-base mt-2">
+            Sistema líder de punto de venta para retail y restaurantes
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          {/* Features List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Sincronización automática</p>
+                <p className="text-sm text-muted-foreground">Actualiza inventario en tiempo real</p>
+              </div>
             </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Datos de ventas</p>
+                <p className="text-sm text-muted-foreground">Rastrea todas tus transacciones</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Gestión de productos</p>
+                <p className="text-sm text-muted-foreground">Administra tu catálogo fácilmente</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Seguro y confiable</p>
+                <p className="text-sm text-muted-foreground">Conexión OAuth encriptada</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Connect Button */}
+          <div className="pt-4">
+            <Button
+              onClick={handleConnectSquare}
+              disabled={isConnecting}
+              className="w-full h-14 text-lg font-semibold"
+              size="lg"
+              style={{ backgroundColor: '#006AFF' }}
+            >
+              {isConnecting ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Conectando con Square...
+                </>
+              ) : (
+                <>
+                  <Square className="mr-2 h-5 w-5" />
+                  Conectar con Square
+                </>
+              )}
+            </Button>
             
-            <div className="space-y-2">
-              <Label htmlFor="lightspeed-apiKey">API Key *</Label>
-              <Input
-                id="lightspeed-apiKey"
-                type="password"
-                placeholder="Enter your API key"
-                value={lightspeedFormData.apiKey}
-                onChange={(e) => {
-                  setLightspeedFormData({ ...lightspeedFormData, apiKey: e.target.value });
-                  if (lightspeedErrors.apiKey) {
-                    setLightspeedErrors({ ...lightspeedErrors, apiKey: undefined });
-                  }
-                }}
-              />
-              <p className="text-sm text-muted-foreground">
-                Your Lightspeed API key
-              </p>
-              {lightspeedErrors.apiKey && (
-                <p className="text-sm text-destructive">{lightspeedErrors.apiKey}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="lightspeed-apiSecret">API Secret *</Label>
-              <Input
-                id="lightspeed-apiSecret"
-                type="password"
-                placeholder="Enter your API secret"
-                value={lightspeedFormData.apiSecret}
-                onChange={(e) => {
-                  setLightspeedFormData({ ...lightspeedFormData, apiSecret: e.target.value });
-                  if (lightspeedErrors.apiSecret) {
-                    setLightspeedErrors({ ...lightspeedErrors, apiSecret: undefined });
-                  }
-                }}
-              />
-              <p className="text-sm text-muted-foreground">
-                Your Lightspeed secret key
-              </p>
-              {lightspeedErrors.apiSecret && (
-                <p className="text-sm text-destructive">{lightspeedErrors.apiSecret}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="lightspeed-accountId">Account ID *</Label>
-              <Input
-                id="lightspeed-accountId"
-                placeholder="Enter your account ID"
-                value={lightspeedFormData.accountId}
-                onChange={(e) => {
-                  setLightspeedFormData({ ...lightspeedFormData, accountId: e.target.value });
-                  if (lightspeedErrors.accountId) {
-                    setLightspeedErrors({ ...lightspeedErrors, accountId: undefined });
-                  }
-                }}
-              />
-              <p className="text-sm text-muted-foreground">
-                Your Lightspeed account ID
-              </p>
-              {lightspeedErrors.accountId && (
-                <p className="text-sm text-destructive">{lightspeedErrors.accountId}</p>
-              )}
-            </div>
-
-            <a 
-              href="https://retail-support.lightspeedhq.com/hc/en-us/articles/229103948"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-            >
-              How to get my credentials? <ExternalLink className="h-3 w-3" />
-            </a>
+            <p className="text-sm text-center text-muted-foreground mt-4">
+              Se abrirá una ventana segura de Square para autorizar la conexión.<br />
+              Tus datos están protegidos y encriptados.
+            </p>
           </div>
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setIsLightspeedDialogOpen(false);
-                setLightspeedErrors({});
-              }}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleLightspeedConnect}
-              disabled={isLoading}
-            >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Connect
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </CardContent>
+      </Card>
+
+      {/* Info Alert */}
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>¿Necesitas ayuda?</AlertTitle>
+        <AlertDescription>
+          La conexión con Square es segura y toma solo unos segundos. Si tienes problemas,
+          asegúrate de tener habilitadas las ventanas emergentes en tu navegador.
+        </AlertDescription>
+      </Alert>
     </div>
   );
 };
