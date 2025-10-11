@@ -83,6 +83,9 @@ Deno.serve(async (req) => {
         ? 'https://connect.squareup.com'
         : 'https://connect.squareupsandbox.com';
 
+    console.log('Square Environment:', squareEnvironment);
+    console.log('API Base URL:', apiBaseUrl);
+    console.log('Location ID:', locationId);
     console.log('Fetching catalog from Square...');
 
     // Fetch catalog items
@@ -97,12 +100,23 @@ Deno.serve(async (req) => {
     if (!catalogResponse.ok) {
       const errorText = await catalogResponse.text();
       console.error('Failed to fetch catalog:', errorText);
+      console.error('Status:', catalogResponse.status);
       throw new Error(`Failed to fetch catalog: ${errorText}`);
     }
 
     const catalogData = await catalogResponse.json();
+    console.log('Catalog Response:', JSON.stringify(catalogData, null, 2));
     const items: SquareCatalogItem[] = catalogData.objects || [];
     console.log(`Found ${items.length} items in Square catalog`);
+    
+    if (items.length === 0) {
+      console.log('⚠️ No items found in Square catalog. Possible reasons:');
+      console.log('1. Products might not be created in Square yet');
+      console.log('2. Products might be in draft status');
+      console.log('3. Products might be archived');
+      console.log('4. Wrong environment (sandbox vs production)');
+      console.log('5. Products not assigned to this location');
+    }
 
     // Fetch inventory counts
     console.log('Fetching inventory counts...');
