@@ -77,7 +77,6 @@ const ConnectPOS = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSquareAdvanced, setShowSquareAdvanced] = useState(false);
   const [isOAuthRedirecting, setIsOAuthRedirecting] = useState(false);
-  const [isInIframe] = useState(() => window.self !== window.top);
   
   const [squareFormData, setSquareFormData] = useState<SquareFormData>({
     businessName: '',
@@ -150,95 +149,71 @@ const ConnectPOS = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSquareOAuthConnect = () => {
-    console.log('🔵 Button clicked - Starting Square connection');
-    console.log('🔍 Iframe check:', { isInIframe, windowSelf: window.self, windowTop: window.top });
+  const handleSquareOAuthConnect = async () => {
+    console.log('🔵 Connect Square clicked - sending to n8n webhook');
     
-    // Check if in iframe (Lovable preview)
-    if (isInIframe) {
-      console.log('⚠️ Detected iframe - showing warning');
-      toast.error('OAuth no funciona en el preview', {
-        description: 'Abre la app en nueva ventana usando el botón de arriba'
-      });
-      return;
-    }
-
-    console.log('=== START Square OAuth Flow ===');
-    console.log('Config check:', {
-      hasAppId: !!SQUARE_CONFIG.APPLICATION_ID,
-      appId: SQUARE_CONFIG.APPLICATION_ID,
-      environment: SQUARE_CONFIG.ENVIRONMENT,
-      oauthUrl: SQUARE_CONFIG.OAUTH_URL,
-      redirectUri: SQUARE_REDIRECT_URI
-    });
-
-    if (!SQUARE_CONFIG.APPLICATION_ID || SQUARE_CONFIG.APPLICATION_ID.includes('...')) {
-      console.log('❌ Square not configured');
-      toast.error('Square no está configurado correctamente', {
-        description: 'Revisa SQUARE_SETUP_GUIDE.md para instrucciones'
-      });
-      return;
-    }
-
     if (!user) {
       console.log('❌ User not logged in');
       toast.error('Debes iniciar sesión para conectar Square');
       return;
     }
 
-    console.log('✅ All checks passed, starting OAuth redirect');
     setIsOAuthRedirecting(true);
 
     try {
-      // Generate random state for OAuth security
-      const state = crypto.randomUUID();
-      console.log('Generated state:', state);
+      console.log('📤 Sending POST request to n8n webhook...');
       
-      // Store in sessionStorage
-      sessionStorage.setItem('square_oauth_state', state);
-      sessionStorage.setItem('square_oauth_user_id', user.id);
-      
-      // Verify state was stored
-      const verifyState = sessionStorage.getItem('square_oauth_state');
-      const verifyUserId = sessionStorage.getItem('square_oauth_user_id');
-      console.log('Verification after storage:', { 
-        stateStored: verifyState === state,
-        userIdStored: verifyUserId === user.id,
-        verifyState,
-        verifyUserId
+      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/connect-pos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'connect_square',
+          timestamp: new Date().toISOString(),
+          user_id: user.id,
+          user_email: user.email
+        }),
+        signal: AbortSignal.timeout(30000) // 30 second timeout
       });
 
-      // Build OAuth URL
-      const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&state=${state}`;
+      console.log('📥 Response status:', response.status);
 
-      console.log('OAuth URL details:', { 
-        redirectUri: SQUARE_REDIRECT_URI,
-        currentOrigin: window.location.origin,
-        state,
-        environment: SQUARE_CONFIG.ENVIRONMENT
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ Success response:', data);
+
+      toast.success('¡Conectado exitosamente!', {
+        description: 'Square se ha conectado correctamente con n8n'
       });
 
-      console.log('📋 COPIA ESTA URL EN SQUARE DASHBOARD → OAuth → Redirect URLs:');
-      console.log(SQUARE_REDIRECT_URI);
-      console.log('🔗 Full OAuth URL:', oauthUrl);
-      
-      console.log('=== Redirecting to Square OAuth in 1 second... ===');
-      
-      // Show helpful message
-      toast.info('Redirigiendo a Square...', {
-        description: 'Si no funciona, verifica que la Redirect URL esté configurada en Square'
-      });
-      
-      // Add small delay to ensure logs are visible
+      // Optional: redirect after successful connection
       setTimeout(() => {
-        console.log('🚀 REDIRECTING NOW!');
-        window.location.href = oauthUrl;
-      }, 1000);
+        navigate('/pos-integrations');
+      }, 1500);
+
     } catch (error) {
-      console.error('❌ OAuth redirect error:', error);
-      toast.error('Error al iniciar OAuth', {
-        description: 'Revisa la consola para más detalles'
-      });
+      console.error('❌ Connection error:', error);
+      
+      if (error instanceof Error) {
+        if (error.name === 'TimeoutError') {
+          toast.error('Tiempo de espera agotado', {
+            description: 'El servidor tardó demasiado en responder. Intenta nuevamente.'
+          });
+        } else {
+          toast.error('Error de conexión', {
+            description: error.message || 'No se pudo conectar con el servidor'
+          });
+        }
+      } else {
+        toast.error('Error desconocido', {
+          description: 'Ocurrió un error inesperado. Intenta nuevamente.'
+        });
+      }
+    } finally {
       setIsOAuthRedirecting(false);
     }
   };
@@ -421,25 +396,6 @@ const ConnectPOS = () => {
         </p>
       </div>
 
-      {/* iframe Warning Alert */}
-      {isInIframe && (
-        <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950/50">
-          <AlertCircle className="h-4 w-4 text-yellow-600" />
-          <AlertTitle>⚠️ OAuth no funciona en el preview</AlertTitle>
-          <AlertDescription className="space-y-2">
-            <p>Estás viendo la app dentro del preview de Lovable. Para conectar Square, necesitas abrir la aplicación en una ventana completa.</p>
-            <Button 
-              onClick={() => window.open(window.location.href, '_blank', 'noopener,noreferrer')}
-              variant="outline"
-              size="sm"
-              className="mt-2"
-            >
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Abrir en nueva ventana
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
 
       {/* POS Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -482,7 +438,7 @@ const ConnectPOS = () => {
                   {pos.id === 'square' && isOAuthRedirecting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Redirecting...
+                      Connecting...
                     </>
                   ) : (
                     <>
