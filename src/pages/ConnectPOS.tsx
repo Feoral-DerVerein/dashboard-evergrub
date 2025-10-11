@@ -249,20 +249,38 @@ const ConnectPOS = () => {
 
       if (error) throw error;
 
-      // Call n8n webhook for validation (fire and forget)
+      // Call n8n webhook for validation
       if (data?.id) {
-        fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            connection_id: data.id,
-            pos_type: 'square',
-            credentials: {
-              access_token: squareFormData.accessToken,
-              location_id: squareFormData.locationId,
-            }
-          })
-        }).catch(err => console.error('Webhook error:', err));
+        console.log('Sending to n8n webhook:', {
+          connection_id: data.id,
+          pos_type: 'square'
+        });
+        
+        try {
+          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              connection_id: data.id,
+              pos_type: 'square',
+              credentials: {
+                access_token: squareFormData.accessToken,
+                location_id: squareFormData.locationId,
+              }
+            })
+          });
+          
+          if (n8nResponse.ok) {
+            console.log('✓ n8n webhook called successfully');
+          } else {
+            console.error('n8n webhook error:', n8nResponse.status);
+          }
+        } catch (err) {
+          console.error('n8n webhook connection error:', err);
+          toast.error('Could not connect to validation service', {
+            description: 'Connection will be validated later'
+          });
+        }
       }
 
       toast.success('✓ Square connected. Validating credentials...');
@@ -311,21 +329,39 @@ const ConnectPOS = () => {
 
       if (error) throw error;
 
-      // Call n8n webhook for validation (fire and forget)
+      // Call n8n webhook for validation
       if (data?.id) {
-        fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            connection_id: data.id,
-            pos_type: 'lightspeed',
-            credentials: {
-              api_key: lightspeedFormData.apiKey,
-              api_secret: lightspeedFormData.apiSecret,
-              account_id: lightspeedFormData.accountId,
-            }
-          })
-        }).catch(err => console.error('Webhook error:', err));
+        console.log('Sending to n8n webhook:', {
+          connection_id: data.id,
+          pos_type: 'lightspeed'
+        });
+        
+        try {
+          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/pos-validation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              connection_id: data.id,
+              pos_type: 'lightspeed',
+              credentials: {
+                api_key: lightspeedFormData.apiKey,
+                api_secret: lightspeedFormData.apiSecret,
+                account_id: lightspeedFormData.accountId,
+              }
+            })
+          });
+          
+          if (n8nResponse.ok) {
+            console.log('✓ n8n webhook called successfully');
+          } else {
+            console.error('n8n webhook error:', n8nResponse.status);
+          }
+        } catch (err) {
+          console.error('n8n webhook connection error:', err);
+          toast.error('Could not connect to validation service', {
+            description: 'Connection will be validated later'
+          });
+        }
       }
 
       toast.success('✓ Lightspeed connected. Validating credentials...');
