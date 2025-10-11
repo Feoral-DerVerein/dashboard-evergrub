@@ -270,7 +270,7 @@ const ConnectPOS = () => {
         });
         
         try {
-          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/pos-connected', {
+          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/connect-pos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -354,7 +354,7 @@ const ConnectPOS = () => {
         });
         
         try {
-          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/pos-connected', {
+          const n8nResponse = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/connect-pos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
