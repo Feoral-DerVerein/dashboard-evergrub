@@ -62,9 +62,14 @@ export default function InventoryProducts() {
     <div className="container mx-auto p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Inventario de Productos</h1>
-        <p className="text-muted-foreground mt-2">
-          {products.length} productos sincronizados desde Square
-        </p>
+        <div className="flex gap-4 mt-2">
+          <p className="text-muted-foreground">
+            {products.length} productos sincronizados desde Square
+          </p>
+          <Badge variant="secondary" className="text-sm">
+            {products.length} productos disponibles
+          </Badge>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

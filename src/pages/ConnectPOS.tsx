@@ -96,6 +96,46 @@ const ConnectPOS = () => {
         
         localStorage.setItem('square_products', JSON.stringify(productos));
         
+        // Verificar si ya existe una conexión activa
+        const { data: existingConnection } = await supabase
+          .from('pos_connections')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('pos_type', 'square')
+          .single();
+        
+        if (existingConnection) {
+          // Actualizar conexión existente
+          await supabase
+            .from('pos_connections')
+            .update({
+              connection_status: 'active',
+              last_sync_at: new Date().toISOString(),
+              business_name: data.merchant?.business_name || 'Mi Negocio Square'
+            })
+            .eq('id', existingConnection.id);
+        } else {
+          // Crear nueva conexión
+          const { error: dbError } = await supabase
+            .from('pos_connections')
+            .insert({
+              user_id: user.id,
+              pos_type: 'square',
+              business_name: data.merchant?.business_name || 'Mi Negocio Square',
+              connection_status: 'active',
+              last_sync_at: new Date().toISOString(),
+              api_credentials: {
+                source: 'n8n_webhook',
+                merchant_id: data.merchant?.id || null,
+                location_id: data.location?.id || null
+              }
+            });
+          
+          if (dbError) {
+            console.error('Error guardando conexión:', dbError);
+          }
+        }
+        
         toast.success(`¡Conectado exitosamente! Se importaron ${productos.length} productos de Square`);
         
         setTimeout(() => {
