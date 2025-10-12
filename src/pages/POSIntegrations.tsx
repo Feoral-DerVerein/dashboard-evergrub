@@ -302,9 +302,9 @@ const POSIntegrations = () => {
             Manage your connected point of sale systems
           </p>
         </div>
-        <Button onClick={() => navigate('/connect-pos')}>
+        <Button onClick={() => window.open('https://developer.squareup.com/apps', '_blank')}>
           <Plus className="mr-2 h-4 w-4" />
-          Connect New POS
+          Configure Square OAuth
         </Button>
       </div>
 
@@ -321,9 +321,9 @@ const POSIntegrations = () => {
                 Connect your first POS system to start syncing inventory and sales data
               </p>
             </div>
-            <Button onClick={() => navigate('/connect-pos')}>
+            <Button onClick={() => window.open('https://developer.squareup.com/apps', '_blank')}>
               <Plus className="mr-2 h-4 w-4" />
-              Connect POS System
+              Configure Square OAuth
             </Button>
           </CardContent>
         </Card>

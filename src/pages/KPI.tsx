@@ -668,9 +668,9 @@ const KPI = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/connect-pos" className="flex items-center gap-2 w-full">
+                    <Link to="/pos-integrations" className="flex items-center gap-2 w-full">
                       <Plug className="h-4 w-4" />
-                      Connect POS
+                      POS Integrations
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

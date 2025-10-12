@@ -45,7 +45,7 @@ const SquareCallback = () => {
           });
           
           setTimeout(() => {
-            navigate('/connect-pos');
+            navigate('/pos-integrations');
           }, 3000);
           return;
         }
@@ -77,7 +77,7 @@ const SquareCallback = () => {
           toast.error('Security validation failed');
           
           setTimeout(() => {
-            navigate('/connect-pos');
+            navigate('/pos-integrations');
           }, 3000);
           return;
         }
@@ -92,7 +92,7 @@ const SquareCallback = () => {
           toast.error('Connection failed');
           
           setTimeout(() => {
-            navigate('/connect-pos');
+            navigate('/pos-integrations');
           }, 3000);
           return;
         }
@@ -157,7 +157,7 @@ const SquareCallback = () => {
         });
 
         setTimeout(() => {
-          navigate('/connect-pos');
+          navigate('/pos-integrations');
         }, 3000);
       }
     };

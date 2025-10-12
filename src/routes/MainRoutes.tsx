@@ -24,7 +24,6 @@ import ProtectedRoute from "@/components/auth/ProtectedRoutes";
 import AppLayout from "@/components/layout/AppLayout";
 import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
-import ConnectPOS from "@/pages/ConnectPOS";
 import POSIntegrations from "@/pages/POSIntegrations";
 import SquareCallback from "@/pages/SquareCallback";
 import InventoryProducts from "@/pages/InventoryProducts";
@@ -64,7 +63,6 @@ const MainRoutes = () => {
         
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
-        <Route path="/connect-pos" element={<ConnectPOS />} />
         <Route path="/pos-integrations" element={<POSIntegrations />} />
         <Route path="/inventory-products" element={<InventoryProducts />} />
         

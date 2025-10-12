@@ -110,8 +110,8 @@ export default function InventoryProducts() {
       {products.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">No hay productos sincronizados.</p>
-          <a href="/connect-pos" className="text-primary hover:underline mt-2 inline-block">
-            Conectar con Square
+          <a href="/pos-integrations" className="text-primary hover:underline mt-2 inline-block">
+            Configurar Integraciones POS
           </a>
         </div>
       )}
