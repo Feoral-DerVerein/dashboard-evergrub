@@ -1,191 +1,115 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { inventoryProductsService, InventoryProduct } from "@/services/inventoryProductsService";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Trash2, Package, RefreshCw } from "lucide-react";
-import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Loader2 } from 'lucide-react';
 
-const InventoryProducts = () => {
-  const { user } = useAuth();
-  const [products, setProducts] = useState<InventoryProduct[]>([]);
+interface Product {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  sku: string;
+  fechaExpiracion: string | null;
+}
+
+export default function InventoryProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-
-  const fetchProducts = async () => {
-    if (!user?.id) return;
-    
-    setLoading(true);
-    try {
-      const data = await inventoryProductsService.getInventoryProducts(user.id);
-      setProducts(data);
-    } catch (error) {
-      console.error("Error loading inventory products:", error);
-      toast.error("Error loading inventory products");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchProducts();
-  }, [user?.id]);
-
-  const handleDelete = async () => {
-    if (!deleteId) return;
-
-    try {
-      await inventoryProductsService.deleteInventoryProduct(deleteId);
-      toast.success("Product deleted successfully");
-      setProducts(products.filter(p => p.id !== deleteId));
-      setDeleteId(null);
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      toast.error("Error deleting product");
+    // Cargar productos de localStorage
+    const stored = localStorage.getItem('square_products');
+    if (stored) {
+      setProducts(JSON.parse(stored));
     }
+    setLoading(false);
+  }, []);
+
+  const getDaysUntilExpiration = (expirationDate: string | null) => {
+    if (!expirationDate) return null;
+    const today = new Date();
+    const expDate = new Date(expirationDate);
+    const diffTime = expDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(value);
+  const getAlertColor = (days: number | null) => {
+    if (days === null) return 'border-border';
+    if (days <= 3) return 'border-destructive bg-destructive/10';
+    if (days <= 7) return 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20';
+    return 'border-green-500 bg-green-50 dark:bg-green-950/20';
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  const getBadgeVariant = (days: number | null) => {
+    if (days === null) return 'secondary';
+    if (days <= 3) return 'destructive';
+    return 'default';
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+          <p className="mt-4 text-muted-foreground">Cargando inventario...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">Inventory Products</h1>
-          <p className="text-muted-foreground">
-            Products imported from your POS system
-          </p>
-        </div>
-        <Button onClick={fetchProducts} variant="outline" size="sm">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
-        </Button>
+    <div className="container mx-auto p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Inventario de Productos</h1>
+        <p className="text-muted-foreground mt-2">
+          {products.length} productos sincronizados desde Square
+        </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            POS Inventory
-          </CardTitle>
-          <CardDescription>
-            {products.length} products synced from your POS system
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : products.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No inventory products found</p>
-              <p className="text-sm">Products will appear here after syncing with your POS</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Product Name</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>SKU</TableHead>
-                    <TableHead className="text-right">Stock</TableHead>
-                    <TableHead className="text-right">Cost</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                    <TableHead>Expiration</TableHead>
-                    <TableHead>Supplier</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {products.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell className="font-medium">{product.product_name}</TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{product.category}</Badge>
-                      </TableCell>
-                      <TableCell className="font-mono text-sm">
-                        {product.product_id || '-'}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant={product.stock_quantity > 10 ? "default" : "destructive"}>
-                          {product.stock_quantity}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatCurrency(product.cost)}
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {formatCurrency(product.price)}
-                      </TableCell>
-                      <TableCell>{formatDate(product.expiration_date)}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {product.supplier || '-'}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setDeleteId(product.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {products.map((product) => {
+          const daysLeft = getDaysUntilExpiration(product.fechaExpiracion);
+          const alertColor = getAlertColor(daysLeft);
+          const badgeVariant = getBadgeVariant(daysLeft);
 
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Product</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this inventory product? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          return (
+            <Card key={product.id} className={`border-2 ${alertColor}`}>
+              <CardHeader>
+                <CardTitle className="text-lg">{product.nombre}</CardTitle>
+                {daysLeft !== null && (
+                  <Badge variant={badgeVariant as any}>
+                    {daysLeft <= 0 ? '¡EXPIRADO!' : `Expira en ${daysLeft} días`}
+                  </Badge>
+                )}
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-2">{product.descripcion}</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    ${product.precio.toFixed(2)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">SKU: {product.sku}</span>
+                </div>
+                {product.fechaExpiracion && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Expira: {product.fechaExpiracion}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {products.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No hay productos sincronizados.</p>
+          <a href="/connect-pos" className="text-primary hover:underline mt-2 inline-block">
+            Conectar con Square
+          </a>
+        </div>
+      )}
     </div>
   );
-};
-
-export default InventoryProducts;
+}
