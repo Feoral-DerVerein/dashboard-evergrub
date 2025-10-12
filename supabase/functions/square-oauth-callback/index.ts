@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { code, error: oauthError } = await req.json();
+    const { code, redirect_uri: clientRedirectUri, error: oauthError } = await req.json();
 
     if (oauthError) {
       console.error('OAuth error:', oauthError);
@@ -96,9 +96,8 @@ Deno.serve(async (req) => {
         ? 'https://connect.squareup.com'
         : 'https://connect.squareupsandbox.com';
 
-    // Get the redirect_uri from request headers (the origin of the callback)
-    const origin = req.headers.get('origin') || req.headers.get('referer')?.split('/square-callback')[0];
-    const redirectUri = origin ? `${origin}/square-callback` : 'https://negentropyfood.cloud/square-callback';
+    // Use the redirect_uri sent from the client (must match the one used in authorization)
+    const redirectUri = clientRedirectUri || 'https://negentropyfood.cloud/square-callback';
     
     console.log('Using redirect_uri for token exchange:', redirectUri);
 

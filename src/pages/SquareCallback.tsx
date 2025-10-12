@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { getSquareRedirectUri } from '@/config/squareConfig';
 
 const SquareCallback = () => {
   const navigate = useNavigate();
@@ -102,10 +103,13 @@ const SquareCallback = () => {
 
         console.log('Calling edge function...');
         // Call edge function to exchange code for token
+        const redirectUri = getSquareRedirectUri();
+        console.log('Using redirect_uri:', redirectUri);
+        
         const { data, error: functionError } = await supabase.functions.invoke(
           'square-oauth-callback',
           {
-            body: { code, state },
+            body: { code, state, redirect_uri: redirectUri },
           }
         );
 
