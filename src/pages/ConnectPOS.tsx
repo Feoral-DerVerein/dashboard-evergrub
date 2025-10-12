@@ -4,177 +4,45 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { ExternalLink, Loader2, Square, CheckCircle2, AlertCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import { SQUARE_CONFIG, SQUARE_REDIRECT_URI } from "@/config/squareConfig";
+import { SQUARE_CONFIG } from "@/config/squareConfig";
 import squareLogo from "@/assets/square-logo.png";
 
 const ConnectPOS = () => {
   const { user } = useAuth();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isInIframe] = useState(() => window.self !== window.top);
-  const [webhookUrl, setWebhookUrl] = useState('');
-  const [businessName, setBusinessName] = useState('');
 
-  // Función auxiliar para extraer fecha de expiración
-  const extractExpiration = (description: string) => {
-    const match = description.match(/Expira:\s*(\d{4}-\d{2}-\d{2})/);
-    return match ? match[1] : null;
-  };
-
-  const handleConnectSquare = async () => {
+  const handleConnectSquare = () => {
     if (!user) {
       toast.error('Debes iniciar sesión para conectar Square');
       return;
     }
 
-    if (!webhookUrl.trim()) {
-      toast.error('Por favor ingresa la URL de tu webhook de n8n');
-      return;
-    }
-
-    if (!businessName.trim()) {
-      toast.error('Por favor ingresa el nombre de tu negocio');
-      return;
-    }
-
-    // Validar que sea una URL válida
-    try {
-      new URL(webhookUrl);
-    } catch (e) {
-      toast.error('URL de webhook inválida. Debe ser una URL completa (ej: https://...)');
-      return;
-    }
-
     setIsConnecting(true);
-    
+
     try {
-      console.log('Llamando al webhook de n8n...');
+      // Construir URL de autorización de Square OAuth
+      const state = crypto.randomUUID();
       
-      // Llamar al webhook específico del usuario
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          user_email: user.email
-        })
-      });
+      // Guardar state en sessionStorage para validación
+      sessionStorage.setItem('square_oauth_state', state);
+      sessionStorage.setItem('square_oauth_user_id', user.id);
       
-      console.log('Status de respuesta:', response.status);
-      console.log('Headers:', Object.fromEntries(response.headers.entries()));
+      const authUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?` + 
+        `client_id=${SQUARE_CONFIG.APPLICATION_ID}&` +
+        `scope=${SQUARE_CONFIG.OAUTH_SCOPES}&` +
+        `session=false&` +
+        `state=${state}`;
+
+      console.log('Redirigiendo a Square OAuth...');
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error del webhook:', errorText);
-        toast.error(`Error del servidor: ${response.status}. Verifica que tu workflow de n8n esté activo.`);
-        return;
-      }
-      
-      const contentType = response.headers.get('content-type');
-      let data;
-      
-      if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        console.log('Respuesta no-JSON:', text);
-        toast.error('El webhook no devolvió datos JSON. Verifica la configuración de n8n.');
-        return;
-      }
-      
-      console.log('Respuesta de n8n:', data);
-      
-      // Verificar diferentes estructuras de respuesta posibles
-      let products = [];
-      
-      if (data && Array.isArray(data) && data[0]?.objects) {
-        // Estructura: [{ objects: [...] }]
-        products = data[0].objects;
-      } else if (data?.objects) {
-        // Estructura: { objects: [...] }
-        products = data.objects;
-      } else if (Array.isArray(data)) {
-        // Estructura: [...]
-        products = data;
-      } else if (data?.data) {
-        // Estructura: { data: [...] }
-        products = data.data;
-      }
-      
-      if (products.length > 0) {
-        const productos = products.map((item: any) => ({
-          id: item.id,
-          nombre: item.item_data?.name || item.name || 'Sin nombre',
-          descripcion: item.item_data?.description_plaintext || item.description || '',
-          precio: (item.item_data?.variations?.[0]?.item_variation_data?.price_money?.amount || item.price || 0) / 100,
-          sku: item.item_data?.variations?.[0]?.item_variation_data?.sku || item.sku || '',
-          fechaExpiracion: extractExpiration(item.item_data?.description_plaintext || item.description || '')
-        }));
-        
-        localStorage.setItem('square_products', JSON.stringify(productos));
-        
-        // Verificar si ya existe una conexión activa
-        const { data: existingConnection } = await supabase
-          .from('pos_connections')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('pos_type', 'square')
-          .single();
-        
-        if (existingConnection) {
-          // Actualizar conexión existente
-          await supabase
-            .from('pos_connections')
-            .update({
-              connection_status: 'active',
-              last_sync_at: new Date().toISOString(),
-              business_name: businessName
-            })
-            .eq('id', existingConnection.id);
-        } else {
-          // Crear nueva conexión
-          const { error: dbError } = await supabase
-            .from('pos_connections')
-            .insert({
-              user_id: user.id,
-              pos_type: 'square',
-              business_name: businessName,
-              connection_status: 'active',
-              last_sync_at: new Date().toISOString(),
-              api_credentials: {
-                source: 'n8n_webhook',
-                webhook_url: webhookUrl,
-                merchant_id: data.merchant?.id || null,
-                location_id: data.location?.id || null
-              }
-            });
-          
-          if (dbError) {
-            console.error('Error guardando conexión:', dbError);
-          }
-        }
-        
-        toast.success(`¡Conectado exitosamente! Se importaron ${productos.length} productos de Square`);
-        
-        setTimeout(() => {
-          window.location.href = '/inventory-products';
-        }, 1500);
-      } else {
-        console.error('Estructura de datos no reconocida:', data);
-        toast.error('No se encontraron productos. Verifica la configuración del webhook de n8n.');
-      }
+      // Redirigir directamente a Square OAuth
+      window.location.href = authUrl;
       
     } catch (error) {
-      console.error('Error conectando con Square:', error);
-      if (error instanceof Error) {
-        toast.error(`Error: ${error.message}`);
-      } else {
-        toast.error('Error al conectar con Square. Verifica que el webhook de n8n esté activo.');
-      }
-    } finally {
+      console.error('Error iniciando OAuth:', error);
+      toast.error('Error al iniciar conexión con Square');
       setIsConnecting(false);
     }
   };
@@ -183,9 +51,9 @@ const ConnectPOS = () => {
     <div className="container mx-auto p-6 max-w-4xl space-y-8">
       {/* Header */}
       <div className="space-y-2 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Connect Your POS System</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Conecta tu Sistema POS</h1>
         <p className="text-lg text-muted-foreground">
-          Automatically sync your inventory and sales with Square
+          Sincroniza automáticamente tu inventario y ventas con Square
         </p>
       </div>
 
@@ -193,9 +61,9 @@ const ConnectPOS = () => {
       {isInIframe && (
         <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950/50">
           <AlertCircle className="h-4 w-4 text-yellow-600" />
-          <AlertTitle>⚠️ OAuth doesn't work in preview</AlertTitle>
+          <AlertTitle>⚠️ OAuth no funciona en preview</AlertTitle>
           <AlertDescription className="space-y-2">
-            <p>You're viewing the app inside the Lovable preview. To connect Square, you need to open the application in a full window.</p>
+            <p>Estás viendo la app dentro del preview de Lovable. Para conectar Square, necesitas abrir la aplicación en una ventana completa.</p>
             <Button 
               onClick={() => window.open(window.location.href, '_blank', 'noopener,noreferrer')}
               variant="outline"
@@ -203,7 +71,7 @@ const ConnectPOS = () => {
               className="mt-2"
             >
               <ExternalLink className="mr-2 h-4 w-4" />
-              Open in New Window
+              Abrir en Nueva Ventana
             </Button>
           </AlertDescription>
         </Alert>
@@ -219,73 +87,39 @@ const ConnectPOS = () => {
           </div>
           <CardTitle className="text-2xl">Square POS</CardTitle>
           <CardDescription className="text-base mt-2">
-            Leading point of sale system for retail and restaurants
+            Sistema de punto de venta líder para retail y restaurantes
           </CardDescription>
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Webhook Configuration Form */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="businessName" className="text-sm font-medium">
-                Nombre de tu negocio
-              </label>
-              <input
-                id="businessName"
-                type="text"
-                value={businessName}
-                onChange={(e) => setBusinessName(e.target.value)}
-                placeholder="Ej: Mi Cafetería"
-                className="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="webhookUrl" className="text-sm font-medium">
-                URL de tu webhook de n8n
-              </label>
-              <input
-                id="webhookUrl"
-                type="url"
-                value={webhookUrl}
-                onChange={(e) => setWebhookUrl(e.target.value)}
-                placeholder="https://n8n.tu-servidor.com/webhook/square-sync"
-                className="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring font-mono text-sm"
-              />
-              <p className="text-xs text-muted-foreground">
-                Esta es la URL única de tu workflow de n8n que conecta con tu cuenta de Square
-              </p>
-            </div>
-          </div>
-
           {/* Features List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
             <div className="flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium">Automatic Sync</p>
-                <p className="text-sm text-muted-foreground">Updates inventory in real-time</p>
+                <p className="font-medium">Sincronización Automática</p>
+                <p className="text-sm text-muted-foreground">Actualiza el inventario en tiempo real</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium">Sales Data</p>
-                <p className="text-sm text-muted-foreground">Track all your transactions</p>
+                <p className="font-medium">Datos de Ventas</p>
+                <p className="text-sm text-muted-foreground">Rastrea todas tus transacciones</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium">Product Management</p>
-                <p className="text-sm text-muted-foreground">Manage your catalog easily</p>
+                <p className="font-medium">Gestión de Productos</p>
+                <p className="text-sm text-muted-foreground">Administra tu catálogo fácilmente</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium">Secure & Reliable</p>
-                <p className="text-sm text-muted-foreground">Encrypted OAuth connection</p>
+                <p className="font-medium">Seguro y Confiable</p>
+                <p className="text-sm text-muted-foreground">Conexión OAuth encriptada</p>
               </div>
             </div>
           </div>
@@ -294,7 +128,7 @@ const ConnectPOS = () => {
           <div className="pt-4">
             <Button
               onClick={handleConnectSquare}
-              disabled={isConnecting || !webhookUrl.trim() || !businessName.trim()}
+              disabled={isConnecting}
               className="w-full h-14 text-lg font-semibold"
               size="lg"
               style={{ backgroundColor: '#006AFF' }}
@@ -307,33 +141,27 @@ const ConnectPOS = () => {
               ) : (
                 <>
                   <Square className="mr-2 h-5 w-5" />
-                  Conectar con Square vía n8n
+                  Conectar con Square
                 </>
               )}
             </Button>
             
             <p className="text-sm text-center text-muted-foreground mt-4">
-              Tu webhook de n8n debe estar configurado con:<br />
-              • Método: POST<br />
-              • CORS habilitado<br />
-              • Conectado a tu cuenta de Square
+              Se abrirá una ventana segura de Square para autorizar la conexión.<br />
+              Tus datos están protegidos y encriptados.
             </p>
             
-            {/* Setup Help */}
+            {/* Pop-up Help */}
             <Alert className="mt-4">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>¿Cómo obtengo mi URL de webhook?</AlertTitle>
+              <AlertTitle>Habilitar ventanas emergentes</AlertTitle>
               <AlertDescription className="text-xs space-y-2">
+                <p>Si la ventana de Square no se abre:</p>
                 <ol className="list-decimal list-inside space-y-1 ml-2">
-                  <li>En n8n, crea un workflow que conecte con tu Square</li>
-                  <li>Agrega un nodo "Webhook" al inicio</li>
-                  <li>Copia la "Production URL" del webhook</li>
-                  <li>Configura CORS y método POST</li>
-                  <li>Pega la URL aquí y conecta</li>
+                  <li>Busca el ícono de ventana bloqueada en la barra de dirección</li>
+                  <li>Haz clic y selecciona "Permitir siempre ventanas emergentes"</li>
+                  <li>Vuelve a hacer clic en el botón</li>
                 </ol>
-                <p className="mt-2 text-muted-foreground">
-                  Cada negocio tendrá su propio webhook conectado a su propia cuenta de Square
-                </p>
               </AlertDescription>
             </Alert>
           </div>
@@ -343,11 +171,10 @@ const ConnectPOS = () => {
       {/* Info Alert */}
       <Alert>
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Conexión Multi-Tenant</AlertTitle>
+        <AlertTitle>¿Necesitas ayuda?</AlertTitle>
         <AlertDescription>
-          Cada usuario puede conectar su propia cuenta de Square a través de su webhook de n8n personalizado.
-          Los datos quedan completamente separados por negocio. Si necesitas ayuda configurando n8n,
-          consulta la documentación oficial de n8n.
+          La conexión con Square es segura y toma solo unos segundos. Si tienes problemas,
+          asegúrate de que las ventanas emergentes estén habilitadas en tu navegador.
         </AlertDescription>
       </Alert>
     </div>
