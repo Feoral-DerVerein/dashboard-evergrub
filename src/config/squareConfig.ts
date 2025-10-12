@@ -16,11 +16,11 @@ export const getSquareRedirectUri = () => {
 };
 
 export const SQUARE_CONFIG = {
-  // Your Square Application ID (Sandbox or Production)
-  APPLICATION_ID: 'sandbox-sq0idb-KN7kLwnW8eDIo_hkpacHSg',
+  // Your Square Application ID (Production)
+  APPLICATION_ID: 'sq0idp-J6cop19KPmtVeD4oFTTAEA',
   
-  // Environment: 'sandbox' for testing, 'production' for live
-  ENVIRONMENT: 'sandbox' as 'sandbox' | 'production',
+  // Environment: 'production' for live
+  ENVIRONMENT: 'production' as 'sandbox' | 'production',
   
   // OAuth URLs based on environment
   get OAUTH_URL() {
