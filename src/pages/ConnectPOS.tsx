@@ -29,45 +29,90 @@ const ConnectPOS = () => {
     setIsConnecting(true);
     
     try {
+      console.log('Llamando al webhook de n8n...');
+      
       // Llamar a tu webhook de n8n
       const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/square-sync', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          user_email: user.email
+        })
       });
       
-      const data = await response.json();
+      console.log('Status de respuesta:', response.status);
+      console.log('Headers:', Object.fromEntries(response.headers.entries()));
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error del webhook:', errorText);
+        toast.error(`Error del servidor: ${response.status}. Verifica que tu workflow de n8n esté activo.`);
+        return;
+      }
+      
+      const contentType = response.headers.get('content-type');
+      let data;
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.log('Respuesta no-JSON:', text);
+        toast.error('El webhook no devolvió datos JSON. Verifica la configuración de n8n.');
+        return;
+      }
+      
       console.log('Respuesta de n8n:', data);
       
-      // Guardar productos
-      if (data && data[0]?.objects) {
-        const productos = data[0].objects.map((item: any) => ({
+      // Verificar diferentes estructuras de respuesta posibles
+      let products = [];
+      
+      if (data && Array.isArray(data) && data[0]?.objects) {
+        // Estructura: [{ objects: [...] }]
+        products = data[0].objects;
+      } else if (data?.objects) {
+        // Estructura: { objects: [...] }
+        products = data.objects;
+      } else if (Array.isArray(data)) {
+        // Estructura: [...]
+        products = data;
+      } else if (data?.data) {
+        // Estructura: { data: [...] }
+        products = data.data;
+      }
+      
+      if (products.length > 0) {
+        const productos = products.map((item: any) => ({
           id: item.id,
-          nombre: item.item_data?.name || 'Sin nombre',
-          descripcion: item.item_data?.description_plaintext || '',
-          precio: item.item_data?.variations?.[0]?.item_variation_data?.price_money?.amount / 100 || 0,
-          sku: item.item_data?.variations?.[0]?.item_variation_data?.sku || '',
-          // Extraer fecha de expiración de la descripción
-          fechaExpiracion: extractExpiration(item.item_data?.description_plaintext || '')
+          nombre: item.item_data?.name || item.name || 'Sin nombre',
+          descripcion: item.item_data?.description_plaintext || item.description || '',
+          precio: (item.item_data?.variations?.[0]?.item_variation_data?.price_money?.amount || item.price || 0) / 100,
+          sku: item.item_data?.variations?.[0]?.item_variation_data?.sku || item.sku || '',
+          fechaExpiracion: extractExpiration(item.item_data?.description_plaintext || item.description || '')
         }));
         
-        // Guardar en localStorage
         localStorage.setItem('square_products', JSON.stringify(productos));
         
         toast.success(`¡Conectado exitosamente! Se importaron ${productos.length} productos de Square`);
         
-        // Redirigir al inventario
         setTimeout(() => {
           window.location.href = '/inventory-products';
         }, 1500);
       } else {
-        toast.error('No se encontraron productos en Square');
+        console.error('Estructura de datos no reconocida:', data);
+        toast.error('No se encontraron productos. Verifica la configuración del webhook de n8n.');
       }
       
     } catch (error) {
       console.error('Error conectando con Square:', error);
-      toast.error('Error al conectar con Square. Por favor intenta de nuevo.');
+      if (error instanceof Error) {
+        toast.error(`Error: ${error.message}`);
+      } else {
+        toast.error('Error al conectar con Square. Verifica que el webhook de n8n esté activo.');
+      }
     } finally {
       setIsConnecting(false);
     }
