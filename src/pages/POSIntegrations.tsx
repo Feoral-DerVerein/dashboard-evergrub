@@ -30,6 +30,12 @@ interface POSConnection {
   error_message: string | null;
   created_at: string;
   updated_at: string;
+  api_credentials?: {
+    webhook_url?: string;
+    merchant_id?: string;
+    location_id?: string;
+    [key: string]: any;
+  };
 }
 
 const posConfig = {
@@ -143,6 +149,55 @@ const POSIntegrations = () => {
     setSyncingId(connection.id);
 
     try {
+      // Si tiene webhook_url en api_credentials, usarlo
+      const webhookUrl = connection.api_credentials?.webhook_url;
+      
+      if (webhookUrl && user) {
+        // Llamar al webhook específico del usuario
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: user.id,
+            user_email: user.email
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Webhook responded with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        // Procesar productos y guardar en localStorage
+        let products = [];
+        if (data && Array.isArray(data) && data[0]?.objects) {
+          products = data[0].objects;
+        } else if (data?.objects) {
+          products = data.objects;
+        } else if (Array.isArray(data)) {
+          products = data;
+        } else if (data?.data) {
+          products = data.data;
+        }
+
+        if (products.length > 0) {
+          const productos = products.map((item: any) => ({
+            id: item.id,
+            nombre: item.item_data?.name || item.name || 'Sin nombre',
+            descripcion: item.item_data?.description_plaintext || item.description || '',
+            precio: (item.item_data?.variations?.[0]?.item_variation_data?.price_money?.amount || item.price || 0) / 100,
+            sku: item.item_data?.variations?.[0]?.item_variation_data?.sku || item.sku || '',
+            fechaExpiracion: null
+          }));
+          
+          localStorage.setItem('square_products', JSON.stringify(productos));
+          toast.success(`✓ Sincronización completa. ${productos.length} productos actualizados`);
+        }
+      }
+
       const { error } = await supabase
         .from('pos_connections')
         .update({ last_sync_at: new Date().toISOString() })
@@ -150,10 +205,12 @@ const POSIntegrations = () => {
 
       if (error) throw error;
 
-      toast.success('✓ Sync started. Data will update shortly');
+      if (!webhookUrl) {
+        toast.success('✓ Sync started. Data will update shortly');
+      }
     } catch (error) {
       console.error('Error syncing:', error);
-      toast.error('Failed to start sync');
+      toast.error('Failed to sync. Check your webhook configuration');
     } finally {
       setSyncingId(null);
     }

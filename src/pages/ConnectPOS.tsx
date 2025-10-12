@@ -13,6 +13,8 @@ const ConnectPOS = () => {
   const { user } = useAuth();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isInIframe] = useState(() => window.self !== window.top);
+  const [webhookUrl, setWebhookUrl] = useState('');
+  const [businessName, setBusinessName] = useState('');
 
   // Función auxiliar para extraer fecha de expiración
   const extractExpiration = (description: string) => {
@@ -26,13 +28,31 @@ const ConnectPOS = () => {
       return;
     }
 
+    if (!webhookUrl.trim()) {
+      toast.error('Por favor ingresa la URL de tu webhook de n8n');
+      return;
+    }
+
+    if (!businessName.trim()) {
+      toast.error('Por favor ingresa el nombre de tu negocio');
+      return;
+    }
+
+    // Validar que sea una URL válida
+    try {
+      new URL(webhookUrl);
+    } catch (e) {
+      toast.error('URL de webhook inválida. Debe ser una URL completa (ej: https://...)');
+      return;
+    }
+
     setIsConnecting(true);
     
     try {
       console.log('Llamando al webhook de n8n...');
       
-      // Llamar a tu webhook de n8n
-      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/square-sync', {
+      // Llamar al webhook específico del usuario
+      const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -111,7 +131,7 @@ const ConnectPOS = () => {
             .update({
               connection_status: 'active',
               last_sync_at: new Date().toISOString(),
-              business_name: data.merchant?.business_name || 'Mi Negocio Square'
+              business_name: businessName
             })
             .eq('id', existingConnection.id);
         } else {
@@ -121,11 +141,12 @@ const ConnectPOS = () => {
             .insert({
               user_id: user.id,
               pos_type: 'square',
-              business_name: data.merchant?.business_name || 'Mi Negocio Square',
+              business_name: businessName,
               connection_status: 'active',
               last_sync_at: new Date().toISOString(),
               api_credentials: {
                 source: 'n8n_webhook',
+                webhook_url: webhookUrl,
                 merchant_id: data.merchant?.id || null,
                 location_id: data.location?.id || null
               }
@@ -203,6 +224,40 @@ const ConnectPOS = () => {
         </CardHeader>
         
         <CardContent className="space-y-6">
+          {/* Webhook Configuration Form */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="businessName" className="text-sm font-medium">
+                Nombre de tu negocio
+              </label>
+              <input
+                id="businessName"
+                type="text"
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+                placeholder="Ej: Mi Cafetería"
+                className="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="webhookUrl" className="text-sm font-medium">
+                URL de tu webhook de n8n
+              </label>
+              <input
+                id="webhookUrl"
+                type="url"
+                value={webhookUrl}
+                onChange={(e) => setWebhookUrl(e.target.value)}
+                placeholder="https://n8n.tu-servidor.com/webhook/square-sync"
+                className="w-full px-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                Esta es la URL única de tu workflow de n8n que conecta con tu cuenta de Square
+              </p>
+            </div>
+          </div>
+
           {/* Features List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
             <div className="flex items-start gap-3">
@@ -239,7 +294,7 @@ const ConnectPOS = () => {
           <div className="pt-4">
             <Button
               onClick={handleConnectSquare}
-              disabled={isConnecting}
+              disabled={isConnecting || !webhookUrl.trim() || !businessName.trim()}
               className="w-full h-14 text-lg font-semibold"
               size="lg"
               style={{ backgroundColor: '#006AFF' }}
@@ -247,32 +302,38 @@ const ConnectPOS = () => {
               {isConnecting ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Connecting to Square...
+                  Conectando con Square...
                 </>
               ) : (
                 <>
                   <Square className="mr-2 h-5 w-5" />
-                  Connect with Square
+                  Conectar con Square vía n8n
                 </>
               )}
             </Button>
             
             <p className="text-sm text-center text-muted-foreground mt-4">
-              A secure Square window will open to authorize the connection.<br />
-              Your data is protected and encrypted.
+              Tu webhook de n8n debe estar configurado con:<br />
+              • Método: POST<br />
+              • CORS habilitado<br />
+              • Conectado a tu cuenta de Square
             </p>
             
-            {/* Pop-up Help */}
+            {/* Setup Help */}
             <Alert className="mt-4">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Enable Pop-ups</AlertTitle>
+              <AlertTitle>¿Cómo obtengo mi URL de webhook?</AlertTitle>
               <AlertDescription className="text-xs space-y-2">
-                <p>If the Square window doesn't open:</p>
                 <ol className="list-decimal list-inside space-y-1 ml-2">
-                  <li>Look for a blocked pop-up icon in your browser's address bar</li>
-                  <li>Click it and select "Always allow pop-ups from this site"</li>
-                  <li>Click the button again</li>
+                  <li>En n8n, crea un workflow que conecte con tu Square</li>
+                  <li>Agrega un nodo "Webhook" al inicio</li>
+                  <li>Copia la "Production URL" del webhook</li>
+                  <li>Configura CORS y método POST</li>
+                  <li>Pega la URL aquí y conecta</li>
                 </ol>
+                <p className="mt-2 text-muted-foreground">
+                  Cada negocio tendrá su propio webhook conectado a su propia cuenta de Square
+                </p>
               </AlertDescription>
             </Alert>
           </div>
@@ -282,10 +343,11 @@ const ConnectPOS = () => {
       {/* Info Alert */}
       <Alert>
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Need Help?</AlertTitle>
+        <AlertTitle>Conexión Multi-Tenant</AlertTitle>
         <AlertDescription>
-          The Square connection is secure and takes only a few seconds. If you have issues,
-          make sure pop-up windows are enabled in your browser.
+          Cada usuario puede conectar su propia cuenta de Square a través de su webhook de n8n personalizado.
+          Los datos quedan completamente separados por negocio. Si necesitas ayuda configurando n8n,
+          consulta la documentación oficial de n8n.
         </AlertDescription>
       </Alert>
     </div>
