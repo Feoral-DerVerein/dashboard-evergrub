@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { ExternalLink, Loader2, Square, CheckCircle2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { SQUARE_CONFIG } from "@/config/squareConfig";
+import { SQUARE_CONFIG, SQUARE_REDIRECT_URI } from "@/config/squareConfig";
 import squareLogo from "@/assets/square-logo.png";
 
 const ConnectPOS = () => {
@@ -33,6 +33,7 @@ const ConnectPOS = () => {
         `client_id=${SQUARE_CONFIG.APPLICATION_ID}&` +
         `scope=${SQUARE_CONFIG.OAUTH_SCOPES}&` +
         `session=false&` +
+        `redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&` +
         `state=${state}`;
 
       console.log('Redirigiendo a Square OAuth...');
