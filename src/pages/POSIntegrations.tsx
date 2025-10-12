@@ -269,6 +269,38 @@ const POSIntegrations = () => {
     }
   };
 
+  const handleConnectSquare = async () => {
+    if (!user) {
+      toast.error('Debes iniciar sesión');
+      return;
+    }
+
+    try {
+      // Generate random state for OAuth security
+      const state = Math.random().toString(36).substring(2, 15);
+      
+      // Store state and user_id in sessionStorage for validation
+      sessionStorage.setItem('square_oauth_state', state);
+      sessionStorage.setItem('square_oauth_user_id', user.id);
+      
+      // Build OAuth URL
+      const redirectUri = getSquareRedirectUri();
+      const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&session=false&state=${state}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+      
+      console.log('Initiating Square OAuth flow:', {
+        redirectUri,
+        state,
+        userId: user.id
+      });
+      
+      // Redirect to Square OAuth
+      window.location.href = oauthUrl;
+    } catch (error) {
+      console.error('Error starting Square OAuth:', error);
+      toast.error('Error al iniciar conexión con Square');
+    }
+  };
+
   const handleSyncSquare = async () => {
     setIsLoading(true);
     try {
@@ -333,14 +365,22 @@ const POSIntegrations = () => {
             Manage your connected point of sale systems
           </p>
         </div>
-        <Button onClick={handleSyncSquare} disabled={isLoading}>
-          {isLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <RefreshCw className="mr-2 h-4 w-4" />
+        <div className="flex gap-2">
+          <Button onClick={handleConnectSquare} variant="default">
+            <Square className="mr-2 h-4 w-4" />
+            Conectar con Square
+          </Button>
+          {connections.some(c => c.pos_type === 'square') && (
+            <Button onClick={handleSyncSquare} disabled={isLoading} variant="outline">
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              )}
+              Sincronizar
+            </Button>
           )}
-          Sincronizar Catálogo Square
-        </Button>
+        </div>
       </div>
 
       {/* Empty State */}
@@ -356,13 +396,9 @@ const POSIntegrations = () => {
                 Connect your first POS system to start syncing inventory and sales data
               </p>
             </div>
-            <Button onClick={handleSyncSquare} disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="mr-2 h-4 w-4" />
-              )}
-              Sincronizar Catálogo Square
+            <Button onClick={handleConnectSquare}>
+              <Square className="mr-2 h-4 w-4" />
+              Conectar con Square
             </Button>
           </CardContent>
         </Card>
