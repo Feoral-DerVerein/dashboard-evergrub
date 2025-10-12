@@ -14,121 +14,61 @@ const ConnectPOS = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isInIframe] = useState(() => window.self !== window.top);
 
+  // Función auxiliar para extraer fecha de expiración
+  const extractExpiration = (description: string) => {
+    const match = description.match(/Expira:\s*(\d{4}-\d{2}-\d{2})/);
+    return match ? match[1] : null;
+  };
+
   const handleConnectSquare = async () => {
-    // Check if in iframe (Lovable preview)
-    if (isInIframe) {
-      toast.error('OAuth doesn\'t work in preview', {
-        description: 'Open the app in a new window using the button above'
-      });
-      return;
-    }
-
     if (!user) {
-      toast.error('You must be logged in to connect Square');
-      return;
-    }
-
-    if (!SQUARE_CONFIG.APPLICATION_ID) {
-      toast.error('Square configuration not found');
+      toast.error('Debes iniciar sesión para conectar Square');
       return;
     }
 
     setIsConnecting(true);
-
+    
     try {
-      // Generate random state for OAuth security
-      const state = crypto.randomUUID();
-      
-      // Store in sessionStorage
-      sessionStorage.setItem('square_oauth_state', state);
-      sessionStorage.setItem('square_oauth_user_id', user.id);
-      sessionStorage.setItem('square_oauth_email', user.email || '');
-      
-      // Notify n8n that connection is starting
-      await supabase.functions.invoke('connect-square-webhook', {
-        body: {
-          action: 'connection_started',
-          platform: 'square',
-          pos_type: 'square',
-          provider: 'square',
-          timestamp: new Date().toISOString(),
-          source: 'lovable',
-          user_id: user.id,
-          user_email: user.email
+      // Llamar a tu webhook de n8n
+      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/square-sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         }
       });
-
-      // Build OAuth URL
-      const oauthUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?client_id=${SQUARE_CONFIG.APPLICATION_ID}&scope=${SQUARE_CONFIG.OAUTH_SCOPES}&redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&state=${state}`;
-
-      console.log('Redirecting to Square OAuth...');
       
-      // Open OAuth in popup window
-      const width = 600;
-      const height = 700;
-      const left = window.screen.width / 2 - width / 2;
-      const top = window.screen.height / 2 - height / 2;
+      const data = await response.json();
+      console.log('Respuesta de n8n:', data);
       
-      const popup = window.open(
-        oauthUrl,
-        'Square OAuth',
-        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
-      );
-
-      if (!popup) {
-        toast.error('Pop-up blocked! Please enable pop-ups for this site', {
-          description: 'Click the pop-up icon in your browser\'s address bar and select "Always allow pop-ups"',
-          duration: 10000
-        });
-        setIsConnecting(false);
-        return;
+      // Guardar productos
+      if (data && data[0]?.objects) {
+        const productos = data[0].objects.map((item: any) => ({
+          id: item.id,
+          nombre: item.item_data?.name || 'Sin nombre',
+          descripcion: item.item_data?.description_plaintext || '',
+          precio: item.item_data?.variations?.[0]?.item_variation_data?.price_money?.amount / 100 || 0,
+          sku: item.item_data?.variations?.[0]?.item_variation_data?.sku || '',
+          // Extraer fecha de expiración de la descripción
+          fechaExpiracion: extractExpiration(item.item_data?.description_plaintext || '')
+        }));
+        
+        // Guardar en localStorage
+        localStorage.setItem('square_products', JSON.stringify(productos));
+        
+        toast.success(`¡Conectado exitosamente! Se importaron ${productos.length} productos de Square`);
+        
+        // Redirigir al inventario
+        setTimeout(() => {
+          window.location.href = '/inventory-products';
+        }, 1500);
+      } else {
+        toast.error('No se encontraron productos en Square');
       }
-
-      // Listen for message from popup
-      const messageHandler = async (event: MessageEvent) => {
-        if (event.data.type === 'square-oauth-success') {
-          popup?.close();
-          
-          toast.success('Successfully connected to Square!');
-          
-          // Notify n8n about successful connection
-          await supabase.functions.invoke('connect-square-webhook', {
-            body: {
-              action: 'connection_completed',
-              platform: 'square',
-              pos_type: 'square',
-              provider: 'square',
-              timestamp: new Date().toISOString(),
-              source: 'lovable',
-              user_id: user.id,
-              user_email: user.email,
-              status: 'success'
-            }
-          });
-          
-          setIsConnecting(false);
-          window.removeEventListener('message', messageHandler);
-        } else if (event.data.type === 'square-oauth-error') {
-          popup?.close();
-          toast.error('Error connecting to Square: ' + event.data.error);
-          setIsConnecting(false);
-          window.removeEventListener('message', messageHandler);
-        }
-      };
-
-      window.addEventListener('message', messageHandler);
-
-      // Check if popup was closed manually
-      const checkPopupClosed = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(checkPopupClosed);
-          window.removeEventListener('message', messageHandler);
-          setIsConnecting(false);
-        }
-      }, 500);
+      
     } catch (error) {
-      console.error('Error connecting to Square:', error);
-      toast.error('Failed to start Square connection');
+      console.error('Error conectando con Square:', error);
+      toast.error('Error al conectar con Square. Por favor intenta de nuevo.');
+    } finally {
       setIsConnecting(false);
     }
   };
