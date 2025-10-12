@@ -36,7 +36,13 @@ const ConnectPOS = () => {
         `redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&` +
         `state=${state}`;
 
-      console.log('Redirigiendo a Square OAuth...');
+      console.log('=== SQUARE OAUTH DEBUG ===');
+      console.log('Base URL:', SQUARE_CONFIG.OAUTH_URL);
+      console.log('Client ID:', SQUARE_CONFIG.APPLICATION_ID);
+      console.log('Scopes:', SQUARE_CONFIG.OAUTH_SCOPES);
+      console.log('Redirect URI:', SQUARE_REDIRECT_URI);
+      console.log('Full Auth URL:', authUrl);
+      console.log('==========================');
       
       // Redirigir directamente a Square OAuth
       window.location.href = authUrl;
