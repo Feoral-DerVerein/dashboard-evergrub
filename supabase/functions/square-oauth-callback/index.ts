@@ -96,6 +96,12 @@ Deno.serve(async (req) => {
         ? 'https://connect.squareup.com'
         : 'https://connect.squareupsandbox.com';
 
+    // Get the redirect_uri from request headers (the origin of the callback)
+    const origin = req.headers.get('origin') || req.headers.get('referer')?.split('/square-callback')[0];
+    const redirectUri = origin ? `${origin}/square-callback` : 'https://negentropyfood.cloud/square-callback';
+    
+    console.log('Using redirect_uri for token exchange:', redirectUri);
+
     // Exchange authorization code for access token
     const tokenResponse = await fetch(tokenUrl, {
       method: 'POST',
@@ -107,7 +113,7 @@ Deno.serve(async (req) => {
         client_id: squareAppId,
         client_secret: squareAppSecret,
         code: code,
-        redirect_uri: 'https://negentropyfood.cloud/square-callback',
+        redirect_uri: redirectUri,
         grant_type: 'authorization_code',
       }),
     });

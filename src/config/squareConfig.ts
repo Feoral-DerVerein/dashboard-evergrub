@@ -6,8 +6,14 @@
  * The Application Secret is stored securely in Supabase secrets.
  */
 
-// OAuth Redirect URI - uses custom domain
-export const SQUARE_REDIRECT_URI = 'https://negentropyfood.cloud/square-callback';
+// OAuth Redirect URI - dynamically constructed from current domain
+export const getSquareRedirectUri = () => {
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}/square-callback`;
+  }
+  // Fallback for server-side rendering
+  return 'https://negentropyfood.cloud/square-callback';
+};
 
 export const SQUARE_CONFIG = {
   // Your Square Application ID (Sandbox or Production)

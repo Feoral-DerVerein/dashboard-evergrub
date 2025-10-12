@@ -19,7 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Square, Zap, Utensils, Sparkles, PlugZap, Loader2, Plus, RefreshCw, Unplug, AlertCircle, Database, X } from "lucide-react";
 import { format } from "date-fns";
-import { SQUARE_CONFIG, SQUARE_REDIRECT_URI } from "@/config/squareConfig";
+import { SQUARE_CONFIG, getSquareRedirectUri } from "@/config/squareConfig";
 
 interface POSConnection {
   id: string;
@@ -273,12 +273,16 @@ const POSIntegrations = () => {
     const state = Math.random().toString(36).substring(7);
     sessionStorage.setItem('square_oauth_state', state);
     
+    const redirectUri = getSquareRedirectUri();
+    console.log('Square OAuth redirect URI:', redirectUri);
+    
     const authUrl = `${SQUARE_CONFIG.OAUTH_URL}/oauth2/authorize?` +
       `client_id=${SQUARE_CONFIG.APPLICATION_ID}&` +
       `scope=${SQUARE_CONFIG.OAUTH_SCOPES}&` +
-      `redirect_uri=${encodeURIComponent(SQUARE_REDIRECT_URI)}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `state=${state}`;
     
+    console.log('Redirecting to Square OAuth:', authUrl);
     window.location.href = authUrl;
   };
 
