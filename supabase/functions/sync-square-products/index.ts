@@ -13,8 +13,12 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const squareAccessToken = Deno.env.get('SQUARE_ACCESS_TOKEN')!;
+    const squareAccessToken = Deno.env.get('SQUARE_ACCESS_TOKEN');
     const squareEnvironment = Deno.env.get('SQUARE_ENVIRONMENT') || 'sandbox';
+    
+    if (!squareAccessToken) {
+      throw new Error('SQUARE_ACCESS_TOKEN no está configurado en los secrets de Supabase');
+    }
     
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -33,6 +37,7 @@ Deno.serve(async (req) => {
     }
 
     console.log('Syncing Square products for user:', user.id);
+    console.log('Using Square environment:', squareEnvironment);
 
     // Call Square Catalog API
     const squareApiUrl = squareEnvironment === 'production'
