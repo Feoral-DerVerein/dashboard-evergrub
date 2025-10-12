@@ -1,5 +1,8 @@
 project_id = "jiehjbbdeyngslfpgfnt"
 
+[functions.receive-n8n-inventory]
+verify_jwt = false
+
 [functions.connect-square-webhook]
 verify_jwt = false
 

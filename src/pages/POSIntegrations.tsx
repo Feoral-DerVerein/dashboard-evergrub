@@ -311,21 +311,41 @@ const POSIntegrations = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('sync-square-products', {
+      // Get Square connection to find n8n webhook URL
+      const squareConnection = connections.find(c => c.pos_type === 'square');
+      const n8nWebhookUrl = squareConnection?.api_credentials?.n8n_webhook_url || 
+        'https://tu-instancia-n8n.app/webhook/square-sync'; // Default URL
+      
+      console.log('🔄 Triggering n8n webhook:', n8nWebhookUrl);
+      
+      // Call n8n webhook (which will then call our receive-n8n-inventory function)
+      const response = await fetch(n8nWebhookUrl, {
+        method: 'POST',
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          userId: session.user.id,
+          timestamp: new Date().toISOString(),
+          trigger: 'manual',
+        }),
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
 
-      toast.success(data.message || 'Productos sincronizados correctamente');
+      const data = await response.json();
+      
+      toast.success(data.estadisticas 
+        ? `✅ Sincronizados ${data.estadisticas.total} productos (${data.estadisticas.criticos} críticos, ${data.estadisticas.urgentes} urgentes)`
+        : 'Productos sincronizados correctamente');
       
       // Refresh connections
       await fetchConnections();
     } catch (error: any) {
       console.error('Error syncing Square:', error);
-      toast.error(error.message || 'Error al sincronizar productos de Square');
+      toast.error(error.message || 'Error al sincronizar productos de Square. Verifica tu URL de n8n.');
     } finally {
       setIsLoading(false);
     }
