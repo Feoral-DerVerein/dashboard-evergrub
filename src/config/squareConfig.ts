@@ -17,7 +17,7 @@ export const getSquareRedirectUri = () => {
 
 export const SQUARE_CONFIG = {
   // Your Square Application ID (Production)
-  APPLICATION_ID: 'sq0idp-J6cop19KPmtVeD4oFTTAEA',
+  APPLICATION_ID: 'sq0idp-9b6YgIks7clp8rEXykWiFA',
   
   // Environment: 'production' for live
   ENVIRONMENT: 'production' as 'sandbox' | 'production',
