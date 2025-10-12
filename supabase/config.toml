@@ -45,3 +45,6 @@ verify_jwt = true
 [functions.send-to-donation]
 verify_jwt = true
 
+[functions.sync-square-products]
+verify_jwt = true
+
