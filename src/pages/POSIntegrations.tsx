@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +19,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Square, Zap, Utensils, Sparkles, PlugZap, Loader2, Plus, RefreshCw, Unplug, AlertCircle, Database, X } from "lucide-react";
+import { Square, Zap, Utensils, Sparkles, PlugZap, Loader2, Plus, RefreshCw, Unplug, AlertCircle, Database, X, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { SQUARE_CONFIG, getSquareRedirectUri } from "@/config/squareConfig";
 
@@ -98,6 +100,8 @@ const POSIntegrations = () => {
   const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState<POSConnection | null>(null);
+  const [webhookConfigOpen, setWebhookConfigOpen] = useState(false);
+  const [webhookUrl, setWebhookUrl] = useState('');
 
   useEffect(() => {
     if (!user) return;
@@ -150,70 +154,91 @@ const POSIntegrations = () => {
     setSyncingId(connection.id);
 
     try {
-      // Si tiene webhook_url en api_credentials, usarlo
-      const webhookUrl = connection.api_credentials?.webhook_url;
+      const webhookUrl = connection.api_credentials?.n8n_webhook_url;
       
-      if (webhookUrl && user) {
-        // Llamar al webhook específico del usuario
-        const response = await fetch(webhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            user_id: user.id,
-            user_email: user.email
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`Webhook responded with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        // Procesar productos y guardar en localStorage
-        let products = [];
-        if (data && Array.isArray(data) && data[0]?.objects) {
-          products = data[0].objects;
-        } else if (data?.objects) {
-          products = data.objects;
-        } else if (Array.isArray(data)) {
-          products = data;
-        } else if (data?.data) {
-          products = data.data;
-        }
-
-        if (products.length > 0) {
-          const productos = products.map((item: any) => ({
-            id: item.id,
-            nombre: item.item_data?.name || item.name || 'Sin nombre',
-            descripcion: item.item_data?.description_plaintext || item.description || '',
-            precio: (item.item_data?.variations?.[0]?.item_variation_data?.price_money?.amount || item.price || 0) / 100,
-            sku: item.item_data?.variations?.[0]?.item_variation_data?.sku || item.sku || '',
-            fechaExpiracion: null
-          }));
-          
-          localStorage.setItem('square_products', JSON.stringify(productos));
-          toast.success(`✓ Sincronización completa. ${productos.length} productos actualizados`);
-        }
+      if (!webhookUrl) {
+        toast.error('Configure el webhook de n8n primero');
+        setSelectedConnection(connection);
+        setWebhookUrl('');
+        setWebhookConfigOpen(true);
+        setSyncingId(null);
+        return;
       }
 
+      toast.info('🔄 Iniciando sincronización con n8n...');
+      
+      // Llamar al webhook de n8n
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: user?.id,
+          user_email: user?.email,
+          timestamp: new Date().toISOString(),
+          trigger: 'manual'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook respondió con status ${response.status}`);
+      }
+
+      // Actualizar última sincronización
       const { error } = await supabase
         .from('pos_connections')
-        .update({ last_sync_at: new Date().toISOString() })
+        .update({ 
+          last_sync_at: new Date().toISOString(),
+          connection_status: 'active'
+        })
         .eq('id', connection.id);
 
       if (error) throw error;
 
-      if (!webhookUrl) {
-        toast.success('✓ Sync started. Data will update shortly');
-      }
+      toast.success('✓ Sincronización completada exitosamente');
+      await fetchConnections();
     } catch (error) {
       console.error('Error syncing:', error);
-      toast.error('Failed to sync. Check your webhook configuration');
+      toast.error('Error al sincronizar. Verifica tu configuración de n8n');
     } finally {
       setSyncingId(null);
+    }
+  };
+
+  const handleWebhookConfigOpen = (connection: POSConnection) => {
+    setSelectedConnection(connection);
+    setWebhookUrl(connection.api_credentials?.n8n_webhook_url || '');
+    setWebhookConfigOpen(true);
+  };
+
+  const handleSaveWebhook = async () => {
+    if (!selectedConnection || !webhookUrl.trim()) {
+      toast.error('Por favor ingresa una URL válida');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('pos_connections')
+        .update({
+          api_credentials: {
+            ...selectedConnection.api_credentials,
+            n8n_webhook_url: webhookUrl.trim()
+          }
+        })
+        .eq('id', selectedConnection.id);
+
+      if (error) throw error;
+
+      toast.success('✓ Webhook configurado correctamente');
+      setWebhookConfigOpen(false);
+      setSelectedConnection(null);
+      setWebhookUrl('');
+      await fetchConnections();
+    } catch (error) {
+      console.error('Error saving webhook:', error);
+      toast.error('Error al guardar el webhook');
     }
   };
 
@@ -301,56 +326,6 @@ const POSIntegrations = () => {
     }
   };
 
-  const handleSyncSquare = async () => {
-    setIsLoading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast.error('Debes iniciar sesión');
-        return;
-      }
-
-      // Get Square connection to find n8n webhook URL
-      const squareConnection = connections.find(c => c.pos_type === 'square');
-      const n8nWebhookUrl = squareConnection?.api_credentials?.n8n_webhook_url || 
-        'https://tu-instancia-n8n.app/webhook/square-sync'; // Default URL
-      
-      console.log('🔄 Triggering n8n webhook:', n8nWebhookUrl);
-      
-      // Call n8n webhook (which will then call our receive-n8n-inventory function)
-      const response = await fetch(n8nWebhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: session.user.id,
-          timestamp: new Date().toISOString(),
-          trigger: 'manual',
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      toast.success(data.estadisticas 
-        ? `✅ Sincronizados ${data.estadisticas.total} productos (${data.estadisticas.criticos} críticos, ${data.estadisticas.urgentes} urgentes)`
-        : 'Productos sincronizados correctamente');
-      
-      // Refresh connections
-      await fetchConnections();
-    } catch (error: any) {
-      console.error('Error syncing Square:', error);
-      toast.error(error.message || 'Error al sincronizar productos de Square. Verifica tu URL de n8n.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const getLastSyncText = (lastSyncAt: string | null): string => {
     if (!lastSyncAt) return 'Never synced';
 
@@ -385,22 +360,10 @@ const POSIntegrations = () => {
             Manage your connected point of sale systems
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={handleConnectSquare} variant="default">
-            <Square className="mr-2 h-4 w-4" />
-            Conectar con Square
-          </Button>
-          {connections.some(c => c.pos_type === 'square') && (
-            <Button onClick={handleSyncSquare} disabled={isLoading} variant="outline">
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="mr-2 h-4 w-4" />
-              )}
-              Sincronizar
-            </Button>
-          )}
-        </div>
+        <Button onClick={handleConnectSquare} variant="default">
+          <Square className="mr-2 h-4 w-4" />
+          Conectar con Square
+        </Button>
       </div>
 
       {/* Empty State */}
@@ -461,17 +424,36 @@ const POSIntegrations = () => {
 
                       {/* Right Section */}
                       <div className="flex flex-col items-end gap-3">
-                        <Badge className={statusCfg.className}>
-                          {statusCfg.label}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge className={statusCfg.className}>
+                            {statusCfg.label}
+                          </Badge>
+                          {connection.api_credentials?.n8n_webhook_url ? (
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                              ✓ Webhook configurado
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                              ⚠ Sin webhook
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground">
                           Last synced: {getLastSyncText(connection.last_sync_at)}
                         </p>
                         <div className="flex gap-2">
-                          {connection.connection_status === 'active' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleWebhookConfigOpen(connection)}
+                          >
+                            <Settings className="mr-2 h-3 w-3" />
+                            Configurar Webhook
+                          </Button>
+                          {connection.api_credentials?.n8n_webhook_url && (
                             <Button
                               size="sm"
-                              variant="outline"
+                              variant="default"
                               onClick={() => handleSyncNow(connection)}
                               disabled={syncingId === connection.id}
                             >
@@ -480,7 +462,7 @@ const POSIntegrations = () => {
                               ) : (
                                 <RefreshCw className="mr-2 h-3 w-3" />
                               )}
-                              Sync Now
+                              Sincronizar
                             </Button>
                           )}
                           <Button
@@ -552,6 +534,45 @@ const POSIntegrations = () => {
               className="bg-destructive hover:bg-destructive/90"
             >
               Delete Permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Webhook Configuration Dialog */}
+      <AlertDialog open={webhookConfigOpen} onOpenChange={setWebhookConfigOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Configurar Webhook de n8n</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ingresa la URL del webhook de n8n que se encargará de sincronizar los productos de Square.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="webhook-url">URL del Webhook</Label>
+              <Input
+                id="webhook-url"
+                type="url"
+                placeholder="https://n8n.srv1024074.hstgr.cloud/webhook/square-sync"
+                value={webhookUrl}
+                onChange={(e) => setWebhookUrl(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Esta URL debe apuntar a tu workflow de n8n configurado para obtener productos de Square
+              </p>
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setWebhookConfigOpen(false);
+              setWebhookUrl('');
+              setSelectedConnection(null);
+            }}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleSaveWebhook}>
+              Guardar Webhook
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
