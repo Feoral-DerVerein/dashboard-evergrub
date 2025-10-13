@@ -30,13 +30,73 @@ const SquareAuth = () => {
   });
   
   const [isLoading, setIsLoading] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
+  const [webhookResponse, setWebhookResponse] = useState<any>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const handleTestWebhook = async () => {
+    // Validate input with zod
+    const validation = squareCredentialsSchema.safeParse(formData);
+    
+    if (!validation.success) {
+      toast({
+        title: 'Validation Error',
+        description: validation.error.errors[0].message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsTesting(true);
+    setWebhookResponse(null);
+
+    try {
+      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/square-api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          application_id: validation.data.application_id,
+          access_token: validation.data.access_token,
+          location_id: validation.data.location_id,
+        }),
+      });
+
+      const data = await response.json();
+      
+      setWebhookResponse(data);
+
+      if (response.ok) {
+        toast({
+          title: '✓ Webhook Test Successful',
+          description: 'Connection to n8n webhook verified!',
+          className: 'bg-green-50 border-green-200',
+        });
+      } else {
+        toast({
+          title: 'Webhook Test Failed',
+          description: `Status: ${response.status}`,
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Webhook Error',
+        description: error instanceof Error ? error.message : 'Failed to connect to webhook',
+        variant: 'destructive',
+      });
+      setWebhookResponse({ error: error instanceof Error ? error.message : 'Connection failed' });
+    } finally {
+      setIsTesting(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -179,20 +239,48 @@ const SquareAuth = () => {
               </div>
             )}
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Connecting...
-                </>
-              ) : (
-                'Connect to Square'
-              )}
-            </Button>
+            {webhookResponse && (
+              <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                <p className="text-sm font-semibold text-gray-700 mb-2">Webhook Response:</p>
+                <pre className="text-xs text-gray-600 whitespace-pre-wrap break-words max-h-40 overflow-y-auto">
+                  {JSON.stringify(webhookResponse, null, 2)}
+                </pre>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={handleTestWebhook}
+                disabled={isTesting || isLoading}
+              >
+                {isTesting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Testing Webhook...
+                  </>
+                ) : (
+                  'Test Connection'
+                )}
+              </Button>
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading || isTesting}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  'Connect to Square'
+                )}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
