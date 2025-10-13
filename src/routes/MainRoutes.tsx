@@ -25,6 +25,9 @@ import AppLayout from "@/components/layout/AppLayout";
 import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
 import InventoryProducts from "@/pages/InventoryProducts";
+import SquareAuth from "@/pages/SquareAuth";
+import SquareDashboard from "@/pages/SquareDashboard";
+import SquareSettings from "@/pages/SquareSettings";
 
 
 const MainRoutes = () => {
@@ -60,6 +63,10 @@ const MainRoutes = () => {
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
         <Route path="/inventory-products" element={<InventoryProducts />} />
+        
+        <Route path="/square-auth" element={<SquareAuth />} />
+        <Route path="/square-dashboard" element={<SquareDashboard />} />
+        <Route path="/square-settings" element={<SquareSettings />} />
         
       </Route>
       

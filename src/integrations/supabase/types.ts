@@ -1268,6 +1268,54 @@ export type Database = {
         }
         Relationships: []
       }
+      square_connections: {
+        Row: {
+          access_token: string
+          application_id: string
+          auto_sync_enabled: boolean | null
+          connection_status: string
+          created_at: string | null
+          id: string
+          last_tested_at: string | null
+          location_id: string
+          location_name: string | null
+          updated_at: string | null
+          user_id: string
+          webhook_enabled: boolean | null
+          webhook_url: string | null
+        }
+        Insert: {
+          access_token: string
+          application_id: string
+          auto_sync_enabled?: boolean | null
+          connection_status?: string
+          created_at?: string | null
+          id?: string
+          last_tested_at?: string | null
+          location_id: string
+          location_name?: string | null
+          updated_at?: string | null
+          user_id: string
+          webhook_enabled?: boolean | null
+          webhook_url?: string | null
+        }
+        Update: {
+          access_token?: string
+          application_id?: string
+          auto_sync_enabled?: boolean | null
+          connection_status?: string
+          created_at?: string | null
+          id?: string
+          last_tested_at?: string | null
+          location_id?: string
+          location_name?: string | null
+          updated_at?: string | null
+          user_id?: string
+          webhook_enabled?: boolean | null
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       store_profiles: {
         Row: {
           businessHours: Json
