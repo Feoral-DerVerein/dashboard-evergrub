@@ -24,8 +24,6 @@ import ProtectedRoute from "@/components/auth/ProtectedRoutes";
 import AppLayout from "@/components/layout/AppLayout";
 import ImportProducts from "@/pages/ImportProducts";
 import ProductSync from "@/pages/ProductSync";
-import POSIntegrations from "@/pages/POSIntegrations";
-import SquareCallback from "@/pages/SquareCallback";
 import InventoryProducts from "@/pages/InventoryProducts";
 
 
@@ -38,8 +36,6 @@ const MainRoutes = () => {
       <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
       <Route path="/apple" element={<AuthRoute><Apple /></AuthRoute>} />
       
-      {/* Square OAuth callback - public route */}
-      <Route path="/square-callback" element={<SquareCallback />} />
       
       {/* Onboarding route - accessible only when logged in but onboarding not completed */}
       <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
@@ -63,7 +59,6 @@ const MainRoutes = () => {
         
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
-        <Route path="/pos-integrations" element={<POSIntegrations />} />
         <Route path="/inventory-products" element={<InventoryProducts />} />
         
       </Route>

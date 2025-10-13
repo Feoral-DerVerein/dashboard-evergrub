@@ -466,18 +466,6 @@ const Dashboard = () => {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/pos-integrations" className="flex items-center gap-2 w-full">
-                          <Plug className="h-4 w-4" />
-                          POS Integrations
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/pos-integrations" className="flex items-center gap-2 w-full">
-                          <Database className="h-4 w-4" />
-                          My Integrations
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
                         <Link to="/pricing" className="flex items-center gap-2 w-full">
                           <CreditCard className="h-4 w-4" />
                           Pricing
