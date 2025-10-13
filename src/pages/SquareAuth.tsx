@@ -8,13 +8,22 @@ import { useToast } from '@/hooks/use-toast';
 import { useSquareConnection } from '@/hooks/useSquareConnection';
 import { testSquareConnection } from '@/services/squareService';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { z } from 'zod';
+
+const squareCredentialsSchema = z.object({
+  application_id: z.string().trim().min(1, 'Application ID is required').max(255),
+  access_token: z.string().trim().min(1, 'Access Token is required').max(1000),
+  location_id: z.string().trim().min(1, 'Location ID is required').max(255),
+});
+
+type SquareCredentialsForm = z.infer<typeof squareCredentialsSchema>;
 
 const SquareAuth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { connection, saveConnection, updateConnectionStatus } = useSquareConnection();
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SquareCredentialsForm>({
     application_id: connection?.application_id || '',
     access_token: connection?.access_token || '',
     location_id: connection?.location_id || '',
@@ -33,21 +42,31 @@ const SquareAuth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.application_id || !formData.access_token || !formData.location_id) {
+    // Validate input with zod
+    const validation = squareCredentialsSchema.safeParse(formData);
+    
+    if (!validation.success) {
       toast({
         title: 'Validation Error',
-        description: 'Please fill in all required fields',
+        description: validation.error.errors[0].message,
         variant: 'destructive',
       });
       return;
     }
+
+    // TypeScript knows validation.data has all required fields after successful parse
+    const validatedCredentials = validation.data as {
+      application_id: string;
+      access_token: string;
+      location_id: string;
+    };
 
     setIsLoading(true);
     setConnectionStatus('testing');
 
     try {
       // Test the connection first
-      const testResult = await testSquareConnection(formData);
+      const testResult = await testSquareConnection(validatedCredentials);
       
       if (!testResult.success) {
         setConnectionStatus('error');
@@ -61,15 +80,16 @@ const SquareAuth = () => {
       }
 
       // Save credentials to database
-      await saveConnection(formData);
+      await saveConnection(validatedCredentials);
       
       // Update connection status
       await updateConnectionStatus('connected', testResult.locationName);
       
       setConnectionStatus('success');
       toast({
-        title: 'Connected Successfully',
-        description: `Connected to ${testResult.locationName}`,
+        title: '✓ Successfully Connected to Square!',
+        description: `Your credentials have been saved. Connected to location: ${testResult.locationName}`,
+        className: 'bg-green-50 border-green-200',
       });
 
       // Redirect to dashboard
