@@ -58,7 +58,7 @@ const SquareAuth = () => {
     setWebhookResponse(null);
 
     try {
-      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/square-api', {
+      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/square-api', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
