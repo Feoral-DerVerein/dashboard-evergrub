@@ -1,4 +1,4 @@
-import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink, Plug, CreditCard, LogOut, ThumbsUp, Database } from "lucide-react";
+import { Bell, Download, Lock, Home, Plus, User, Package, AlertTriangle, Sun, Cloud, Wind, Settings, Settings2, Users, TrendingUp, Clock, Brain, Sparkles, BarChart3, DollarSign, ArrowUp, ArrowDown, ShoppingCart, CheckCircle, X, ExternalLink, Plug, CreditCard, LogOut, ThumbsUp, Database, Truck, Send } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Link, useNavigate } from "react-router-dom";
@@ -721,6 +721,31 @@ const KPI = () => {
               <MetricCard icon={Plus} value={realData.revenue} label="Revenue" trend={realData.revenueTrend} />
               <MetricCard icon={User} value={realData.avgOrderValue} label="Avg Order Value" trend={realData.avgOrderTrend} />
             </div>
+
+            {/* Deliverect Quick Access Button */}
+            <Card className="bg-gradient-to-r from-blue-500 to-indigo-600 border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white/20 rounded-lg backdrop-blur-sm">
+                      <Truck className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-1">Send Products to Delivery</h3>
+                      <p className="text-white/90 text-sm">Manage deliveries with Deliverect integration</p>
+                    </div>
+                  </div>
+                  <Button 
+                    size="lg"
+                    className="bg-white text-blue-600 hover:bg-blue-50 font-semibold"
+                    onClick={() => navigate('/deliverect')}
+                  >
+                    <Send className="mr-2 h-5 w-5" />
+                    Open Dashboard
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
 
 
