@@ -28,6 +28,7 @@ import InventoryProducts from "@/pages/InventoryProducts";
 import SquareAuth from "@/pages/SquareAuth";
 import SquareDashboard from "@/pages/SquareDashboard";
 import SquareSettings from "@/pages/SquareSettings";
+import Api from "@/pages/Api";
 
 
 const MainRoutes = () => {
@@ -67,6 +68,7 @@ const MainRoutes = () => {
         <Route path="/square-auth" element={<SquareAuth />} />
         <Route path="/square-dashboard" element={<SquareDashboard />} />
         <Route path="/square-settings" element={<SquareSettings />} />
+        <Route path="/api" element={<Api />} />
         
       </Route>
       
