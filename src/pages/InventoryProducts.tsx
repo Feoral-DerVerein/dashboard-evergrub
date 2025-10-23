@@ -52,7 +52,7 @@ export default function InventoryProducts() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-          <p className="mt-4 text-muted-foreground">Cargando inventario...</p>
+          <p className="mt-4 text-muted-foreground">Loading inventory...</p>
         </div>
       </div>
     );
@@ -61,13 +61,13 @@ export default function InventoryProducts() {
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Inventario de Productos</h1>
+        <h1 className="text-3xl font-bold">Product Inventory</h1>
         <div className="flex gap-4 mt-2">
           <p className="text-muted-foreground">
-            {products.length} productos sincronizados desde Square
+            {products.length} products synced from Square
           </p>
           <Badge variant="secondary" className="text-sm">
-            {products.length} productos disponibles
+            {products.length} products available
           </Badge>
         </div>
       </div>
@@ -84,7 +84,7 @@ export default function InventoryProducts() {
                 <CardTitle className="text-lg">{product.nombre}</CardTitle>
                 {daysLeft !== null && (
                   <Badge variant={badgeVariant as any}>
-                    {daysLeft <= 0 ? '¡EXPIRADO!' : `Expira en ${daysLeft} días`}
+                    {daysLeft <= 0 ? 'EXPIRED!' : `Expires in ${daysLeft} days`}
                   </Badge>
                 )}
               </CardHeader>
@@ -98,7 +98,7 @@ export default function InventoryProducts() {
                 </div>
                 {product.fechaExpiracion && (
                   <p className="text-xs text-muted-foreground mt-2">
-                    Expira: {product.fechaExpiracion}
+                    Expires: {product.fechaExpiracion}
                   </p>
                 )}
               </CardContent>
@@ -109,7 +109,7 @@ export default function InventoryProducts() {
 
       {products.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No hay productos sincronizados.</p>
+          <p className="text-muted-foreground">No products synced.</p>
         </div>
       )}
     </div>
