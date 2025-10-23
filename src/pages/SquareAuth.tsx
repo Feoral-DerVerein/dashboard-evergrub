@@ -173,7 +173,7 @@ const SquareAuth = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
       <Card className="w-full max-w-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Connect to Square POS</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">Connect with API</CardTitle>
           <CardDescription className="text-center">
             Enter your Square API credentials to get started
           </CardDescription>
