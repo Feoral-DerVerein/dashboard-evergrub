@@ -109,7 +109,7 @@ export default function DeliverectDashboard() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Deliverect Dashboard</h1>
+          <h1 className="text-3xl font-bold">Delivery Dashboard</h1>
           <p className="text-muted-foreground">
             Manage delivery shipments, orders, and courier dispatch
           </p>

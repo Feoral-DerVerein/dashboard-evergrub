@@ -96,7 +96,7 @@ export const DeliverectConfigDialog = ({ open, onOpenChange }: DeliverectConfigD
         connection_status: 'active',
       });
 
-      toast.success("Deliverect connection saved successfully!");
+      toast.success("Delivery connection saved successfully!");
       onOpenChange(false);
     } catch (error) {
       console.error("Error saving connection:", error);
@@ -111,7 +111,7 @@ export const DeliverectConfigDialog = ({ open, onOpenChange }: DeliverectConfigD
 
     try {
       await deliverectService.deleteConnection();
-      toast.success("Deliverect disconnected successfully");
+      toast.success("Delivery platform disconnected successfully");
       setFormData({
         api_key: "",
         location_id: "",
@@ -132,9 +132,9 @@ export const DeliverectConfigDialog = ({ open, onOpenChange }: DeliverectConfigD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Deliverect Configuration</DialogTitle>
+          <DialogTitle>Delivery Platform Configuration</DialogTitle>
           <DialogDescription>
-            Configure your Deliverect API credentials to enable product delivery integration
+            Configure your delivery platform API credentials to enable product delivery integration
           </DialogDescription>
         </DialogHeader>
 
@@ -144,7 +144,7 @@ export const DeliverectConfigDialog = ({ open, onOpenChange }: DeliverectConfigD
             <Input
               id="api_key"
               type="password"
-              placeholder="Enter your Deliverect API key"
+              placeholder="Enter your delivery platform API key"
               value={formData.api_key}
               onChange={(e) => setFormData({ ...formData, api_key: e.target.value })}
             />
@@ -154,7 +154,7 @@ export const DeliverectConfigDialog = ({ open, onOpenChange }: DeliverectConfigD
             <Label htmlFor="location_id">Location ID *</Label>
             <Input
               id="location_id"
-              placeholder="Enter your Deliverect location ID"
+              placeholder="Enter your delivery platform location ID"
               value={formData.location_id}
               onChange={(e) => setFormData({ ...formData, location_id: e.target.value })}
             />
@@ -164,7 +164,7 @@ export const DeliverectConfigDialog = ({ open, onOpenChange }: DeliverectConfigD
             <Label htmlFor="account_id">Account ID (Optional)</Label>
             <Input
               id="account_id"
-              placeholder="Enter your Deliverect account ID"
+              placeholder="Enter your delivery platform account ID"
               value={formData.account_id}
               onChange={(e) => setFormData({ ...formData, account_id: e.target.value })}
             />

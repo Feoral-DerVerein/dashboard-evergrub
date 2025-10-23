@@ -738,7 +738,7 @@ const KPI = () => {
                   <Button 
                     size="lg"
                     className="bg-white text-blue-600 hover:bg-blue-50 font-semibold"
-                    onClick={() => navigate('/deliverect')}
+                    onClick={() => navigate('/delivery')}
                   >
                     <Send className="mr-2 h-5 w-5" />
                     Open Dashboard

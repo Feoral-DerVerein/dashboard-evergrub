@@ -27,7 +27,7 @@ import InventoryProducts from "@/pages/InventoryProducts";
 import SquareAuth from "@/pages/SquareAuth";
 import SquareDashboard from "@/pages/SquareDashboard";
 import SquareSettings from "@/pages/SquareSettings";
-import DeliverectDashboard from "@/pages/DeliverectDashboard";
+import DeliveryDashboard from "@/pages/DeliverectDashboard";
 
 
 const MainRoutes = () => {
@@ -65,7 +65,8 @@ const MainRoutes = () => {
         <Route path="/square-dashboard" element={<SquareDashboard />} />
         <Route path="/square-settings" element={<SquareSettings />} />
         
-        <Route path="/deliverect" element={<DeliverectDashboard />} />
+        <Route path="/delivery" element={<DeliveryDashboard />} />
+        <Route path="/deliverect" element={<DeliveryDashboard />} /> {/* Legacy redirect */}
         
       </Route>
       

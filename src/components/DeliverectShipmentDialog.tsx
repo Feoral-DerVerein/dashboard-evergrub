@@ -93,7 +93,7 @@ export const DeliverectShipmentDialog = ({ open, onOpenChange }: DeliverectShipm
       // Check if connection exists
       const connection = await deliverectService.getConnection();
       if (!connection) {
-        toast.error("Please configure Deliverect connection first");
+        toast.error("Please configure delivery connection first");
         setSending(false);
         return;
       }
@@ -120,12 +120,12 @@ export const DeliverectShipmentDialog = ({ open, onOpenChange }: DeliverectShipm
       // Send to Deliverect via edge function
       await deliverectService.sendToDeliverect(shipment.id!);
 
-      toast.success(`Successfully sent ${totalItems} items to Deliverect!`);
+      toast.success(`Successfully sent ${totalItems} items to delivery platform!`);
       setSelectedProducts(new Map());
       onOpenChange(false);
     } catch (error) {
-      console.error("Error sending to Deliverect:", error);
-      toast.error("Failed to send products to Deliverect");
+      console.error("Error sending to delivery:", error);
+      toast.error("Failed to send products to delivery platform");
     } finally {
       setSending(false);
     }
@@ -145,7 +145,7 @@ export const DeliverectShipmentDialog = ({ open, onOpenChange }: DeliverectShipm
             Send Products for Delivery
           </DialogTitle>
           <DialogDescription>
-            Select products and quantities to send to Deliverect delivery platforms
+            Select products and quantities to send to delivery platforms
           </DialogDescription>
         </DialogHeader>
 
@@ -239,7 +239,7 @@ export const DeliverectShipmentDialog = ({ open, onOpenChange }: DeliverectShipm
                   ) : (
                     <>
                       <Send className="mr-2 h-4 w-4" />
-                      Send to Deliverect
+                      Send to Delivery
                     </>
                   )}
                 </Button>
