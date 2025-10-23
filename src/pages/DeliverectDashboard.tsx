@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { DeliverectConfigDialog } from "@/components/DeliverectConfigDialog";
 import { DeliverectShipmentDialog } from "@/components/DeliverectShipmentDialog";
+import { DeliveryPlatformsDialog } from "@/components/DeliveryPlatformsDialog";
 import deliverectService from "@/services/deliverectService";
 import type { DeliverectOrder, DeliverectDelivery, DeliverectShipment } from "@/services/deliverectService";
 import { format } from "date-fns";
@@ -25,6 +26,7 @@ import { format } from "date-fns";
 export default function DeliverectDashboard() {
   const [configOpen, setConfigOpen] = useState(false);
   const [shipmentOpen, setShipmentOpen] = useState(false);
+  const [platformsOpen, setPlatformsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<DeliverectOrder[]>([]);
   const [deliveries, setDeliveries] = useState<DeliverectDelivery[]>([]);
@@ -113,9 +115,9 @@ export default function DeliverectDashboard() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setConfigOpen(true)}>
-            <Settings className="mr-2 h-4 w-4" />
-            Settings
+          <Button variant="outline" onClick={() => setPlatformsOpen(true)}>
+            <Truck className="mr-2 h-4 w-4" />
+            Connect Platforms
           </Button>
           <Button onClick={() => setShipmentOpen(true)}>
             <Send className="mr-2 h-4 w-4" />
@@ -338,6 +340,7 @@ export default function DeliverectDashboard() {
       {/* Dialogs */}
       <DeliverectConfigDialog open={configOpen} onOpenChange={setConfigOpen} />
       <DeliverectShipmentDialog open={shipmentOpen} onOpenChange={setShipmentOpen} />
+      <DeliveryPlatformsDialog open={platformsOpen} onOpenChange={setPlatformsOpen} />
     </div>
   );
 }
