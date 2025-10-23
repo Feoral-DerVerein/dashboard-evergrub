@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
-import { useOnboarding } from "@/hooks/useOnboarding";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -37,9 +36,6 @@ const POSConnectionForm = ({
 }: POSConnectionFormProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const {
-    completeOnboarding
-  } = useOnboarding();
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -292,9 +288,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
       });
       if (response.ok) {
         setStatus("success");
-        // Store onboarding completion in localStorage
-        localStorage.setItem("posOnboardingCompleted", "true");
-        // Complete onboarding after showing success message
+        // Complete after showing success message
         setTimeout(() => {
           onComplete();
         }, 3000);
