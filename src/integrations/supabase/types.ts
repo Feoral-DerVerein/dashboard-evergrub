@@ -306,6 +306,213 @@ export type Database = {
         }
         Relationships: []
       }
+      deliverect_connections: {
+        Row: {
+          account_id: string | null
+          api_key: string
+          auto_sync_enabled: boolean | null
+          connection_status: string
+          created_at: string
+          id: string
+          location_id: string
+          updated_at: string
+          user_id: string
+          webhook_url: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          api_key: string
+          auto_sync_enabled?: boolean | null
+          connection_status?: string
+          created_at?: string
+          id?: string
+          location_id: string
+          updated_at?: string
+          user_id: string
+          webhook_url?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          api_key?: string
+          auto_sync_enabled?: boolean | null
+          connection_status?: string
+          created_at?: string
+          id?: string
+          location_id?: string
+          updated_at?: string
+          user_id?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      deliverect_deliveries: {
+        Row: {
+          assigned_at: string | null
+          courier_location: Json | null
+          courier_name: string | null
+          courier_phone: string | null
+          created_at: string
+          delivered_at: string | null
+          dispatch_status: string
+          id: string
+          order_id: string | null
+          picked_up_at: string | null
+          tracking_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          courier_location?: Json | null
+          courier_name?: string | null
+          courier_phone?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          dispatch_status?: string
+          id?: string
+          order_id?: string | null
+          picked_up_at?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          courier_location?: Json | null
+          courier_name?: string | null
+          courier_phone?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          dispatch_status?: string
+          id?: string
+          order_id?: string | null
+          picked_up_at?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliverect_deliveries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "deliverect_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deliverect_orders: {
+        Row: {
+          actual_delivery_time: string | null
+          created_at: string
+          customer_name: string | null
+          customer_phone: string | null
+          deliverect_order_id: string
+          delivery_address: string | null
+          estimated_delivery_time: string | null
+          id: string
+          items: Json
+          order_status: string
+          platform: string
+          shipment_id: string | null
+          total_amount: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actual_delivery_time?: string | null
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          deliverect_order_id: string
+          delivery_address?: string | null
+          estimated_delivery_time?: string | null
+          id?: string
+          items?: Json
+          order_status?: string
+          platform: string
+          shipment_id?: string | null
+          total_amount?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actual_delivery_time?: string | null
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          deliverect_order_id?: string
+          delivery_address?: string | null
+          estimated_delivery_time?: string | null
+          id?: string
+          items?: Json
+          order_status?: string
+          platform?: string
+          shipment_id?: string | null
+          total_amount?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliverect_orders_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "deliverect_shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deliverect_shipments: {
+        Row: {
+          connection_id: string | null
+          created_at: string
+          deliverect_order_id: string | null
+          error_message: string | null
+          id: string
+          platform: string | null
+          products: Json
+          status: string
+          total_items: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connection_id?: string | null
+          created_at?: string
+          deliverect_order_id?: string | null
+          error_message?: string | null
+          id?: string
+          platform?: string | null
+          products?: Json
+          status?: string
+          total_items?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connection_id?: string | null
+          created_at?: string
+          deliverect_order_id?: string | null
+          error_message?: string | null
+          id?: string
+          platform?: string | null
+          products?: Json
+          status?: string
+          total_items?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliverect_shipments_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "deliverect_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           content: string | null
@@ -1682,10 +1889,12 @@ export type Database = {
           product_id: string
           user_id: string
         }
-      }
-      binary_quantize: {
-        Args: { "": string } | { "": unknown }
-        Returns: unknown
+        SetofOptions: {
+          from: "*"
+          to: "wishlists"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       check_wishlist_item: {
         Args: { p_product_id: string; p_user_id: string }
@@ -1697,6 +1906,12 @@ export type Database = {
           product_id: string
           user_id: string
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "wishlists"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       decrypt_pos_credentials: {
         Args: { encrypted_data: string }
@@ -1752,7 +1967,7 @@ export type Database = {
         }[]
       }
       get_user_sales_analytics: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avg_selling_price: number
           brand: string
@@ -1804,6 +2019,12 @@ export type Database = {
           product_id: string
           user_id: string
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "wishlists"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       get_wishlist_categories_count: {
         Args: { p_user_id: string }
@@ -1811,58 +2032,6 @@ export type Database = {
           category_id: string
           count: number
         }[]
-      }
-      halfvec_avg: {
-        Args: { "": number[] }
-        Returns: unknown
-      }
-      halfvec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      halfvec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      halfvec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      hnsw_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_sparsevec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnswhandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflathandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      l2_norm: {
-        Args: { "": unknown } | { "": unknown }
-        Returns: number
-      }
-      l2_normalize: {
-        Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: string
       }
       log_company_profile_access: {
         Args: {
@@ -1876,10 +2045,7 @@ export type Database = {
         Args: { access_type: string; profile_id: string }
         Returns: undefined
       }
-      mask_payment_details: {
-        Args: { payment_data: Json }
-        Returns: Json
-      }
+      mask_payment_details: { Args: { payment_data: Json }; Returns: Json }
       match_documents: {
         Args: { filter?: Json; match_count?: number; query_embedding: string }
         Returns: {
@@ -1893,18 +2059,6 @@ export type Database = {
         Args: { p_product_id: string; p_user_id: string }
         Returns: boolean
       }
-      sparsevec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      sparsevec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      sparsevec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
       update_wishlist_category: {
         Args: { p_category_id: string; p_id: string }
         Returns: {
@@ -1915,30 +2069,12 @@ export type Database = {
           product_id: string
           user_id: string
         }
-      }
-      vector_avg: {
-        Args: { "": number[] }
-        Returns: string
-      }
-      vector_dims: {
-        Args: { "": string } | { "": unknown }
-        Returns: number
-      }
-      vector_norm: {
-        Args: { "": string }
-        Returns: number
-      }
-      vector_out: {
-        Args: { "": string }
-        Returns: unknown
-      }
-      vector_send: {
-        Args: { "": string }
-        Returns: string
-      }
-      vector_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
+        SetofOptions: {
+          from: "*"
+          to: "wishlists"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {
