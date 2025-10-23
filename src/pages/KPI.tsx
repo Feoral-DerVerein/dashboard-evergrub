@@ -673,6 +673,12 @@ const KPI = () => {
                       Pricing
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/square-auth" className="flex items-center gap-2 w-full">
+                      <Plug className="h-4 w-4" />
+                      API
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={async () => {
                 try {
                   await signOut();
