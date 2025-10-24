@@ -212,8 +212,7 @@ const SustainabilityCard = ({
   icon?: string;
   colorScheme?: 'blue' | 'green';
 }) => {
-  return (
-    <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
+  return <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-blue-700/80 text-sm font-medium">{label}</span>
       </div>
@@ -221,8 +220,7 @@ const SustainabilityCard = ({
         <span className="text-2xl font-semibold text-blue-900">{value}</span>
         <span className="text-emerald-600 text-sm font-medium">{subtext}</span>
       </div>
-    </div>
-  );
+    </div>;
 };
 const InsightCard = ({
   label,
@@ -234,8 +232,7 @@ const InsightCard = ({
   value: string;
   trend: string;
   icon?: string;
-}) => (
-  <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
+}) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
     <div className="flex items-center gap-2 mb-1">
       <span className="text-blue-700/80 text-sm font-medium">{label}</span>
     </div>
@@ -243,8 +240,7 @@ const InsightCard = ({
       <span className="text-2xl font-semibold text-blue-900">{value}</span>
       <span className="text-emerald-600 text-sm font-medium">+{trend}</span>
     </div>
-  </div>
-);
+  </div>;
 const KPI = () => {
   const [activeTimeFilter, setActiveTimeFilter] = useState<TimeFilterPeriod>("Week");
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -316,7 +312,7 @@ const KPI = () => {
       // TODO: Conectar con datos reales del sistema POS
       // Por ahora, todos los valores están en "0" hasta que se conecte el POS
       console.log('Esperando conexión con sistema POS...');
-      
+
       // Mock suppliers data para que la UI no se rompa
       setSuppliers([{
         id: '1',
@@ -724,27 +720,7 @@ const KPI = () => {
 
             {/* Deliverect Quick Access Button */}
             <Card className="bg-gradient-to-r from-blue-500 to-indigo-600 border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white/20 rounded-lg backdrop-blur-sm">
-                      <Truck className="h-8 w-8 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-white mb-1">Send Products to Delivery</h3>
-                      <p className="text-white/90 text-sm">Manage deliveries with Deliverect integration</p>
-                    </div>
-                  </div>
-                  <Button 
-                    size="lg"
-                    className="bg-white text-blue-600 hover:bg-blue-50 font-semibold"
-                    onClick={() => navigate('/delivery')}
-                  >
-                    <Send className="mr-2 h-5 w-5" />
-                    Open Dashboard
-                  </Button>
-                </div>
-              </CardContent>
+              
             </Card>
 
 
@@ -822,20 +798,8 @@ const KPI = () => {
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-4">Sustainability Impact</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <SustainabilityCard 
-                    label="CO₂ Saved" 
-                    value={realData.co2Saved} 
-                    subtext={`${realData.co2Change} vs last week`}
-                    icon="🌱"
-                    colorScheme="blue"
-                  />
-                  <SustainabilityCard 
-                    label="Waste Reduced" 
-                    value={realData.wasteReduced} 
-                    subtext={`Target: ${realData.wasteTarget}`}
-                    icon="♻️"
-                    colorScheme="blue"
-                  />
+                  <SustainabilityCard label="CO₂ Saved" value={realData.co2Saved} subtext={`${realData.co2Change} vs last week`} icon="🌱" colorScheme="blue" />
+                  <SustainabilityCard label="Waste Reduced" value={realData.wasteReduced} subtext={`Target: ${realData.wasteTarget}`} icon="♻️" colorScheme="blue" />
                 </div>
               </div>
 
@@ -843,18 +807,8 @@ const KPI = () => {
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-4">Customer Insights</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <InsightCard 
-                    label="Conversion Rate" 
-                    value={realData.conversionRate} 
-                    trend={realData.conversionChange.replace('+', '')}
-                    icon="📊"
-                  />
-                  <InsightCard 
-                    label="Return Rate" 
-                    value={realData.returnRate} 
-                    trend={realData.returnChange.replace('+', '')}
-                    icon="🔄"
-                  />
+                  <InsightCard label="Conversion Rate" value={realData.conversionRate} trend={realData.conversionChange.replace('+', '')} icon="📊" />
+                  <InsightCard label="Return Rate" value={realData.returnRate} trend={realData.returnChange.replace('+', '')} icon="🔄" />
                 </div>
               </div>
 
@@ -862,20 +816,8 @@ const KPI = () => {
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-4">Savings & Food Waste</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <SustainabilityCard 
-                    label="Cost Savings" 
-                    value={realData.costSavings} 
-                    subtext={`${realData.costChange} vs last month`}
-                    icon="💰"
-                    colorScheme="green"
-                  />
-                  <SustainabilityCard 
-                    label="Food Waste Reduced" 
-                    value={realData.foodWasteReduced} 
-                    subtext={`${realData.foodWasteChange} vs last month`}
-                    icon="🍽️"
-                    colorScheme="green"
-                  />
+                  <SustainabilityCard label="Cost Savings" value={realData.costSavings} subtext={`${realData.costChange} vs last month`} icon="💰" colorScheme="green" />
+                  <SustainabilityCard label="Food Waste Reduced" value={realData.foodWasteReduced} subtext={`${realData.foodWasteChange} vs last month`} icon="🍽️" colorScheme="green" />
                 </div>
               </div>
             </section>
