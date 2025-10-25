@@ -1,5 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sun, Zap, AlertTriangle, ArrowRight } from 'lucide-react';
+
+// Inline styles for smooth animation
+const smoothSlideAnimation = `
+  @keyframes slideInSmooth {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+`;
 
 interface MenuCategory {
   icon: React.ReactNode;
@@ -45,6 +59,16 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
 
+  // Inject animation styles
+  useEffect(() => {
+    const styleEl = document.createElement('style');
+    styleEl.textContent = smoothSlideAnimation;
+    document.head.appendChild(styleEl);
+    return () => {
+      document.head.removeChild(styleEl);
+    };
+  }, []);
+
   return (
     <div className="relative flex justify-center items-center min-h-[80px]">
       {/* Logo Button */}
@@ -75,10 +99,12 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
             >
               {/* Icon Button */}
               <div
-                className="w-16 h-16 rounded-full bg-[#343541] flex items-center justify-center text-white shadow-lg transition-all duration-300 hover:scale-110 cursor-pointer animate-slide-in-right"
+                className="w-16 h-16 rounded-full bg-[#343541] flex items-center justify-center text-white shadow-lg transition-all duration-500 hover:scale-110 cursor-pointer"
                 style={{ 
-                  animationDelay: `${index * 100}ms`,
-                  animationFillMode: 'backwards'
+                  animation: 'slideInSmooth 0.8s ease-out forwards',
+                  animationDelay: `${index * 200}ms`,
+                  opacity: 0,
+                  transform: 'translateX(-20px)'
                 }}
               >
                 {category.icon}
