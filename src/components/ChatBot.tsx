@@ -120,6 +120,11 @@ const ChatBot = ({
         <div className="w-full px-4 py-4">
           {/* Header */}
           <div className="text-center mb-6 mt-2">
+            {/* Negentropy Logo */}
+            <div className="flex justify-center mb-4">
+              <img src="/lovable-uploads/negentropy-logo.png" alt="Negentropy" className="h-16 w-auto object-contain" />
+            </div>
+            
             {/* AI Greeting with notification badge */}
             <div className="relative inline-block">
               <div className="bg-gray-100 rounded-2xl px-6 py-4 inline-block">
