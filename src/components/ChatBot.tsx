@@ -123,7 +123,7 @@ const ChatBot = ({
             {/* Negentropy Logo */}
             <div className="flex justify-center mb-4">
               <img 
-                src="/lovable-uploads/negentropy-logo.png" 
+                src="/lovable-uploads/negentropy-logo-new.png" 
                 alt="Negentropy Logo" 
                 className="h-16 object-contain"
               />
