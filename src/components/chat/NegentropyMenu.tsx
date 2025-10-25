@@ -46,16 +46,16 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
   const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
 
   return (
-    <div className="relative flex justify-center items-center">
+    <div className="relative flex justify-center items-center min-h-[80px]">
       {/* Logo Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative z-20 transition-transform duration-300 hover:scale-110 active:scale-95"
+        className="relative z-50 transition-transform duration-300 hover:scale-110 active:scale-95 bg-white rounded-lg p-2 shadow-sm"
       >
         <img 
           src="/lovable-uploads/negentropy-logo-new.png" 
           alt="Negentropy Logo" 
-          className="h-16 object-contain"
+          className="h-16 w-auto object-contain"
         />
       </button>
 
