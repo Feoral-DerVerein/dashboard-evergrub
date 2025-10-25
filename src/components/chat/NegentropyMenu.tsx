@@ -95,8 +95,6 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
             <div
               key={index}
               className="relative"
-              onMouseEnter={() => setHoveredCategory(index)}
-              onMouseLeave={() => setHoveredCategory(null)}
             >
               {/* Icon Button */}
               <div
@@ -107,6 +105,15 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
                   opacity: 0,
                   transform: 'translateX(-20px)'
                 }}
+                onMouseEnter={() => setHoveredCategory(index)}
+                onMouseLeave={(e) => {
+                  // Solo cerrar si no está moviendo hacia la tarjeta
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const isMovingDown = e.clientY > rect.bottom;
+                  if (!isMovingDown) {
+                    setHoveredCategory(null);
+                  }
+                }}
               >
                 {category.icon}
               </div>
@@ -115,6 +122,8 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
               {hoveredCategory === index && (
                 <div 
                   className="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-80 bg-[#343541] rounded-lg shadow-2xl p-4 animate-fade-in z-30"
+                  onMouseEnter={() => setHoveredCategory(index)}
+                  onMouseLeave={() => setHoveredCategory(null)}
                 >
                   <h3 className="text-white font-semibold text-sm mb-3">{category.title}</h3>
                   <div className="space-y-2">
@@ -124,6 +133,7 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
                         onClick={() => {
                           onSuggestionClick(suggestion);
                           setIsOpen(false);
+                          setHoveredCategory(null);
                         }}
                         className="w-full text-left bg-[#40414f] hover:bg-[#4a4b5a] text-white/90 text-sm rounded-lg px-4 py-3 transition-all duration-200 flex items-center gap-2 group"
                       >
