@@ -122,7 +122,7 @@ const ChatBot = ({
           <div className="text-center mb-6 mt-2">
             {/* Negentropy Logo */}
             <div className="flex justify-center mb-4">
-              <img src="/lovable-uploads/negentropy-logo.png" alt="Negentropy" className="h-16 w-auto object-contain" />
+              
             </div>
             
             {/* AI Greeting with notification badge */}
@@ -185,8 +185,8 @@ const ChatBot = ({
                       <p className="text-sm font-medium text-gray-700 px-1 mb-4">📦 Products Expiring Soon (&lt;72 hours):</p>
                       <div className="space-y-3">
                         {(message as any).expiring_products.map((product: any) => <ExpiringProductCard key={product.id} product={product} onActionComplete={(productId, action, destination) => {
-                        console.log(`Product ${productId} ${action} to ${destination}`);
-                      }} />)}
+                  console.log(`Product ${productId} ${action} to ${destination}`);
+                }} />)}
                       </div>
                     </div>}
                 </div>)}
