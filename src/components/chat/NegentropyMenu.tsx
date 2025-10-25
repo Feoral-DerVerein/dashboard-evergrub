@@ -77,8 +77,8 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
         className="relative z-50 transition-transform duration-300 hover:scale-110 active:scale-95 bg-white rounded-lg p-2 shadow-sm"
       >
         <img 
-          src="/lovable-uploads/negentropy-logo-new.png" 
-          alt="Negentropy Logo" 
+          src="/lovable-uploads/jni-logo.png" 
+          alt="JNI Logo" 
           className="h-16 w-auto object-contain"
         />
       </button>
