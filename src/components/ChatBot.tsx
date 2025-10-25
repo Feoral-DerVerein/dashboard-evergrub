@@ -13,7 +13,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { productService, Product } from '@/services/productService';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExpiringProductCard } from '@/components/chat/ExpiringProductCard';
+import { NegentropyMenu } from '@/components/chat/NegentropyMenu';
 import aiIcon from '@/assets/ai-icon.png';
+
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
 }
@@ -120,13 +122,12 @@ const ChatBot = ({
         <div className="w-full px-4 py-4">
           {/* Header */}
           <div className="text-center mb-6 mt-2">
-            {/* Negentropy Logo */}
+            {/* Negentropy Logo with Menu */}
             <div className="flex justify-center mb-4">
-              <img 
-                src="/lovable-uploads/negentropy-logo-new.png" 
-                alt="Negentropy Logo" 
-                className="h-16 object-contain"
-              />
+              <NegentropyMenu onSuggestionClick={(suggestion) => {
+                setInputValue(suggestion);
+                sendMessage(suggestion);
+              }} />
             </div>
             
             {/* AI Greeting with notification badge */}
