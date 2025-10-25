@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Sun, Zap, AlertTriangle, ArrowRight } from 'lucide-react';
+import jniLogo from '@/assets/jni-logo.png';
 
 // Inline styles for smooth animation
 const smoothSlideAnimation = `
@@ -77,7 +78,7 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
         className="relative z-50 transition-transform duration-300 hover:scale-110 active:scale-95 bg-white rounded-lg p-2 shadow-sm"
       >
         <img 
-          src="/lovable-uploads/jni-logo.png" 
+          src={jniLogo} 
           alt="JNI Logo" 
           className="h-16 w-auto object-contain"
         />
