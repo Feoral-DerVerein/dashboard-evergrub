@@ -31,27 +31,27 @@ const menuCategories: MenuCategory[] = [
     icon: <Sun className="w-6 h-6" />,
     title: "Examples",
     suggestions: [
-      "Explain quantum computing in simple terms",
-      "Got any creative ideas for a 10 year old's birthday?",
-      "How do I make a HTTP request in Javascript?"
+      "How can Negentropy help reduce waste in my restaurant?",
+      "Can Negentropy connect with my POS system like Square?",
+      "What insights can Negentropy's AI provide about my inventory?"
     ]
   },
   {
     icon: <Zap className="w-6 h-6" />,
     title: "Capabilities",
     suggestions: [
-      "Remembers what user said earlier in the conversation",
-      "Allows user to provide follow-up corrections",
-      "Trained to decline inappropriate requests"
+      "Learns purchasing and waste patterns to predict demand",
+      "Integrates seamlessly with POS systems and dashboards",
+      "Provides real-time AI recommendations through an interactive chat"
     ]
   },
   {
     icon: <AlertTriangle className="w-6 h-6" />,
     title: "Limitations",
     suggestions: [
-      "May occasionally generate incorrect information",
-      "May occasionally produce harmful instructions or biased content",
-      "Limited knowledge of world and events after 2021"
+      "Accuracy depends on the quality of business data provided",
+      "Requires internet connection for live AI processing",
+      "Advanced analytics available only in premium plans"
     ]
   }
 ];
