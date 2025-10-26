@@ -128,7 +128,7 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
               {/* Suggestions Card */}
               {hoveredCategory === index && (
                 <div 
-                  className={`absolute mt-3 w-64 bg-[#343541] rounded-lg shadow-2xl p-3 animate-fade-in z-30 ${
+                  className={`absolute mt-2 w-52 bg-[#343541] rounded-md shadow-2xl p-2 animate-fade-in z-30 ${
                     isMobile 
                       ? 'top-full left-1/2 -translate-x-1/2' 
                       : 'top-full left-1/2 -translate-x-1/2'
@@ -136,8 +136,8 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
                   onMouseEnter={() => setHoveredCategory(index)}
                   onMouseLeave={() => setHoveredCategory(null)}
                 >
-                  <h3 className="text-white font-semibold text-xs mb-2">{category.title}</h3>
-                  <div className="space-y-1.5">
+                  <h3 className="text-white font-semibold text-[10px] mb-1.5">{category.title}</h3>
+                  <div className="space-y-1">
                     {category.suggestions.map((suggestion, suggestionIndex) => (
                       <button
                         key={suggestionIndex}
@@ -146,10 +146,10 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
                           setIsOpen(false);
                           setHoveredCategory(null);
                         }}
-                        className="w-full text-left bg-[#40414f] hover:bg-[#4a4b5a] text-white/90 text-xs rounded-md px-3 py-2 transition-all duration-200 flex items-center gap-2 group"
+                        className="w-full text-left bg-[#40414f] hover:bg-[#4a4b5a] text-white/90 text-[10px] rounded px-2 py-1.5 transition-all duration-200 flex items-center gap-1.5 group"
                       >
-                        <span className="flex-1 leading-tight">{suggestion}</span>
-                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                        <span className="flex-1 leading-snug">{suggestion}</span>
+                        <ArrowRight className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                       </button>
                     ))}
                   </div>
