@@ -15,7 +15,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { ExpiringProductCard } from '@/components/chat/ExpiringProductCard';
 import { NegentropyMenu } from '@/components/chat/NegentropyMenu';
 import aiIcon from '@/assets/ai-icon.png';
-
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
 }
@@ -124,20 +123,15 @@ const ChatBot = ({
           <div className="text-center mb-6 mt-2">
             {/* Negentropy Logo with Menu */}
             <div className="flex justify-center mb-4">
-              <NegentropyMenu onSuggestionClick={(suggestion) => {
-                setInputValue(suggestion);
-                sendMessage(suggestion);
-              }} />
+              <NegentropyMenu onSuggestionClick={suggestion => {
+              setInputValue(suggestion);
+              sendMessage(suggestion);
+            }} />
             </div>
             
             {/* AI Greeting with notification badge */}
             <div className="relative inline-block">
-              <div className="bg-gray-100 rounded-2xl px-6 py-4 inline-block">
-                <div className="flex items-center gap-3">
-                  <img src={aiIcon} alt="AI" className="w-5 h-5 rounded object-contain" />
-                  <div className="text-sm text-gray-900">Hello! I'm your Negentropy assistant. How can I help you today?</div>
-                </div>
-              </div>
+              
               
               {/* Notification Badge */}
               {notificationCount > 0 && <button onClick={handleNotificationClick} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-xs font-bold shadow-lg hover:bg-red-600 transition-all hover:scale-110 animate-pulse">
