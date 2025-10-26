@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Sun, Zap, AlertTriangle, ArrowRight } from 'lucide-react';
 import jniLogo from '@/assets/jni-logo.png';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Inline styles for smooth animation
 const smoothSlideAnimation = `
@@ -59,6 +60,7 @@ const menuCategories: MenuCategory[] = [
 export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
+  const isMobile = useIsMobile();
 
   // Inject animation styles
   useEffect(() => {
@@ -86,9 +88,13 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
 
       {/* Expanded Menu */}
       {isOpen && (
-        <div className="absolute top-1/2 left-1/2 -translate-y-1/2 flex items-center gap-4 z-10">
-          {/* Spacer for logo */}
-          <div className="w-16" />
+        <div className={`absolute z-10 ${
+          isMobile 
+            ? 'top-full mt-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4' 
+            : 'top-1/2 left-1/2 -translate-y-1/2 flex items-center gap-4'
+        }`}>
+          {/* Spacer for logo (only on desktop) */}
+          {!isMobile && <div className="w-16" />}
           
           {/* Menu Categories */}
           {menuCategories.map((category, index) => (
@@ -103,14 +109,15 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
                   animation: 'slideInSmooth 0.8s ease-out forwards',
                   animationDelay: `${index * 200}ms`,
                   opacity: 0,
-                  transform: 'translateX(-20px)'
+                  transform: isMobile ? 'translateY(-20px)' : 'translateX(-20px)'
                 }}
                 onMouseEnter={() => setHoveredCategory(index)}
                 onMouseLeave={(e) => {
-                  // Solo cerrar si no está moviendo hacia la tarjeta
                   const rect = e.currentTarget.getBoundingClientRect();
-                  const isMovingDown = e.clientY > rect.bottom;
-                  if (!isMovingDown) {
+                  const isMovingAway = isMobile 
+                    ? e.clientY < rect.top 
+                    : e.clientY > rect.bottom;
+                  if (!isMovingAway) {
                     setHoveredCategory(null);
                   }
                 }}
@@ -121,7 +128,11 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
               {/* Suggestions Card */}
               {hoveredCategory === index && (
                 <div 
-                  className="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-80 bg-[#343541] rounded-lg shadow-2xl p-4 animate-fade-in z-30"
+                  className={`absolute mt-4 w-80 bg-[#343541] rounded-lg shadow-2xl p-4 animate-fade-in z-30 ${
+                    isMobile 
+                      ? 'top-full left-1/2 -translate-x-1/2' 
+                      : 'top-full left-1/2 -translate-x-1/2'
+                  }`}
                   onMouseEnter={() => setHoveredCategory(index)}
                   onMouseLeave={() => setHoveredCategory(null)}
                 >
