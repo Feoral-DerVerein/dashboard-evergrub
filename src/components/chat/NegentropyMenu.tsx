@@ -128,7 +128,7 @@ export const NegentropyMenu = ({ onSuggestionClick }: NegentropyMenuProps) => {
               {/* Suggestions Card */}
               {hoveredCategory === index && (
                 <div 
-                  className={`absolute mt-2 w-52 bg-[#343541] rounded-md shadow-2xl p-2 animate-fade-in z-30 ${
+                  className={`absolute mt-2 w-52 glass-card rounded-md shadow-2xl p-2 animate-fade-in z-30 ${
                     isMobile 
                       ? 'top-full left-1/2 -translate-x-1/2' 
                       : 'top-full left-1/2 -translate-x-1/2'
