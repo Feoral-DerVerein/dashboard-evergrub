@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useSquareConnection } from '@/hooks/useSquareConnection';
 import { testSquareConnection } from '@/services/squareService';
@@ -170,17 +171,17 @@ const SquareAuth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
-      <div className="glass-card w-full max-w-lg p-8">
-        <div className="space-y-1 mb-6">
-          <h2 className="text-2xl font-bold text-center text-white">Connect with API</h2>
-          <p className="text-center text-white/80">
+      <Card className="w-full max-w-lg">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">Connect with API</CardTitle>
+          <CardDescription className="text-center">
             Enter your Square API credentials to get started
-          </p>
-        </div>
-        <div>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="application_id" className="text-white/90">Application ID</Label>
+              <Label htmlFor="application_id">Application ID</Label>
               <Input
                 id="application_id"
                 name="application_id"
@@ -189,13 +190,12 @@ const SquareAuth = () => {
                 value={formData.application_id}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                className="glass-input text-white placeholder:text-white/50"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="access_token" className="text-white/90">Access Token</Label>
+              <Label htmlFor="access_token">Access Token</Label>
               <Input
                 id="access_token"
                 name="access_token"
@@ -204,13 +204,12 @@ const SquareAuth = () => {
                 value={formData.access_token}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                className="glass-input text-white placeholder:text-white/50"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location_id" className="text-white/90">Location ID</Label>
+              <Label htmlFor="location_id">Location ID</Label>
               <Input
                 id="location_id"
                 name="location_id"
@@ -219,7 +218,6 @@ const SquareAuth = () => {
                 value={formData.location_id}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                className="glass-input text-white placeholder:text-white/50"
                 required
               />
             </div>
@@ -284,8 +282,8 @@ const SquareAuth = () => {
               </Button>
             </div>
           </form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
