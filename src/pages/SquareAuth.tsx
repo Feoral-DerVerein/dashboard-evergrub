@@ -58,7 +58,7 @@ const SquareAuth = () => {
       sessionStorage.setItem('square_oauth_state', state);
       
       // Square OAuth configuration
-      const squareApplicationId = 'sandbox-sq0idb-aP5J-yaSYMD13XRt6GEGQg'; // From your credentials
+      const squareApplicationId = 'sandbox-sq0idb-aP5J-yaSYMD13XRt6GEGQg';
       const redirectUri = `${window.location.origin}/square-callback`;
       const scopes = ['ITEMS_READ', 'MERCHANT_PROFILE_READ'].join('+');
       
@@ -70,9 +70,10 @@ const SquareAuth = () => {
         `&state=${state}` +
         `&redirect_uri=${encodeURIComponent(redirectUri)}`;
       
-      console.log('🔵 Opening Square OAuth popup...');
+      console.log('🔵 OAuth URL:', oauthUrl);
+      console.log('🔵 Redirect URI:', redirectUri);
       
-      // Open popup window
+      // Try popup first
       const width = 600;
       const height = 700;
       const left = (window.screen.width - width) / 2;
@@ -81,12 +82,17 @@ const SquareAuth = () => {
       const popup = window.open(
         oauthUrl,
         'Square OAuth',
-        `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
+        `width=${width},height=${height},left=${left},top=${top}`
       );
       
-      if (!popup) {
-        throw new Error('Popup blocked. Please allow popups for this site.');
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        console.log('⚠️ Popup blocked, using direct redirect');
+        // Fallback to direct redirect if popup is blocked
+        window.location.href = oauthUrl;
+        return;
       }
+      
+      console.log('✅ Popup opened successfully');
       
       // Listen for messages from popup
       const handleMessage = (event: MessageEvent) => {
