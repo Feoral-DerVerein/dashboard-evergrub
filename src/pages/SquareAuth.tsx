@@ -102,10 +102,13 @@ const SquareAuth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🔵 Starting Square connection process...');
+    
     // Validate input with zod
     const validation = squareCredentialsSchema.safeParse(formData);
     
     if (!validation.success) {
+      console.error('❌ Validation failed:', validation.error.errors);
       toast({
         title: 'Validation Error',
         description: validation.error.errors[0].message,
@@ -114,7 +117,6 @@ const SquareAuth = () => {
       return;
     }
 
-    // TypeScript knows validation.data has all required fields after successful parse
     const validatedCredentials = validation.data as {
       application_id: string;
       access_token: string;
@@ -125,10 +127,13 @@ const SquareAuth = () => {
     setConnectionStatus('testing');
 
     try {
+      console.log('🔵 Step 1: Testing Square API connection...');
       // Test the connection first
       const testResult = await testSquareConnection(validatedCredentials);
+      console.log('✅ Square API test result:', testResult);
       
       if (!testResult.success) {
+        console.error('❌ Square API test failed:', testResult.error);
         setConnectionStatus('error');
         toast({
           title: 'Connection Failed',
@@ -139,11 +144,15 @@ const SquareAuth = () => {
         return;
       }
 
+      console.log('🔵 Step 2: Saving credentials to database...');
       // Save credentials to database
       await saveConnection(validatedCredentials);
+      console.log('✅ Credentials saved successfully');
       
+      console.log('🔵 Step 3: Updating connection status...');
       // Update connection status
       await updateConnectionStatus('connected', testResult.locationName);
+      console.log('✅ Connection status updated');
       
       setConnectionStatus('success');
       toast({
@@ -154,16 +163,30 @@ const SquareAuth = () => {
 
       // Redirect to dashboard
       setTimeout(() => {
+        console.log('🔵 Redirecting to Square Dashboard...');
         navigate('/square-dashboard');
       }, 1500);
       
     } catch (error) {
+      console.error('❌ Error during connection process:', error);
       setConnectionStatus('error');
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to save connection',
-        variant: 'destructive',
-      });
+      
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save connection';
+      
+      // Check if it's an authentication error
+      if (errorMessage.includes('authenticated') || errorMessage.includes('User not authenticated')) {
+        toast({
+          title: '🔐 Authentication Required',
+          description: 'You need to be logged in to connect Square. Please log in first.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
