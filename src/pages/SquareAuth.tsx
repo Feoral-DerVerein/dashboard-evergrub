@@ -1,237 +1,143 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useSquareConnection } from '@/hooks/useSquareConnection';
-import { testSquareConnection } from '@/services/squareService';
-import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
 
-const squareCredentialsSchema = z.object({
-  application_id: z.string().trim().min(1, 'Application ID is required').max(255),
-  access_token: z.string().trim().min(1, 'Access Token is required').max(1000),
-  location_id: z.string().trim().min(1, 'Location ID is required').max(255),
-});
-
-type SquareCredentialsForm = z.infer<typeof squareCredentialsSchema>;
+// Generate random state for OAuth security
+const generateState = () => {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
 
 const SquareAuth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { connection, saveConnection, updateConnectionStatus } = useSquareConnection();
+  const { connection } = useSquareConnection();
   
-  const [formData, setFormData] = useState<SquareCredentialsForm>({
-    application_id: connection?.application_id || '',
-    access_token: connection?.access_token || '',
-    location_id: connection?.location_id || '',
-  });
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [isTesting, setIsTesting] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
-  const [webhookResponse, setWebhookResponse] = useState<any>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'connecting' | 'success' | 'error'>('idle');
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleTestWebhook = async () => {
-    // Validate input with zod
-    const validation = squareCredentialsSchema.safeParse(formData);
+  // Check if user is returning from OAuth
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
     
-    if (!validation.success) {
+    if (status === 'success') {
+      setConnectionStatus('success');
       toast({
-        title: 'Validation Error',
-        description: validation.error.errors[0].message,
+        title: '✓ Successfully Connected to Square!',
+        description: 'Your Square account has been connected and catalog synced.',
+        className: 'bg-green-50 border-green-200',
+      });
+      
+      // Redirect to inventory after a moment
+      setTimeout(() => {
+        navigate('/inventory-products');
+      }, 2000);
+    } else if (status === 'error') {
+      const error = params.get('error');
+      setConnectionStatus('error');
+      toast({
+        title: 'Connection Failed',
+        description: error || 'Failed to connect Square account',
         variant: 'destructive',
       });
-      return;
     }
+  }, [navigate, toast]);
 
-    setIsTesting(true);
-    setWebhookResponse(null);
-
+  const handleConnectWithSquare = async () => {
+    setIsConnecting(true);
+    setConnectionStatus('connecting');
+    
     try {
-      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/square-api', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          application_id: validation.data.application_id,
-          access_token: validation.data.access_token,
-          location_id: validation.data.location_id,
-        }),
-      });
-
-      const data = await response.json();
+      // Generate OAuth state for security
+      const state = generateState();
+      sessionStorage.setItem('square_oauth_state', state);
       
-      setWebhookResponse(data);
-
-      if (response.ok) {
-        toast({
-          title: '✓ Webhook Test Successful',
-          description: 'Connection to n8n webhook verified!',
-          className: 'bg-green-50 border-green-200',
-        });
-      } else {
-        toast({
-          title: 'Webhook Test Failed',
-          description: `Status: ${response.status}`,
-          variant: 'destructive',
-        });
+      // Square OAuth configuration
+      const squareApplicationId = 'sandbox-sq0idb-aP5J-yaSYMD13XRt6GEGQg'; // From your credentials
+      const redirectUri = `${window.location.origin}/square-callback`;
+      const scopes = ['ITEMS_READ', 'MERCHANT_PROFILE_READ'].join('+');
+      
+      // Build OAuth URL
+      const oauthUrl = `https://connect.squareupsandbox.com/oauth2/authorize?` +
+        `client_id=${squareApplicationId}` +
+        `&scope=${scopes}` +
+        `&session=false` +
+        `&state=${state}` +
+        `&redirect_uri=${encodeURIComponent(redirectUri)}`;
+      
+      console.log('🔵 Opening Square OAuth popup...');
+      
+      // Open popup window
+      const width = 600;
+      const height = 700;
+      const left = (window.screen.width - width) / 2;
+      const top = (window.screen.height - height) / 2;
+      
+      const popup = window.open(
+        oauthUrl,
+        'Square OAuth',
+        `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
+      );
+      
+      if (!popup) {
+        throw new Error('Popup blocked. Please allow popups for this site.');
       }
-    } catch (error) {
-      toast({
-        title: 'Webhook Error',
-        description: error instanceof Error ? error.message : 'Failed to connect to webhook',
-        variant: 'destructive',
-      });
-      setWebhookResponse({ error: error instanceof Error ? error.message : 'Connection failed' });
-    } finally {
-      setIsTesting(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    console.log('🔵 Starting Square connection process...');
-    
-    // Validate input with zod
-    const validation = squareCredentialsSchema.safeParse(formData);
-    
-    if (!validation.success) {
-      console.error('❌ Validation failed:', validation.error.errors);
-      toast({
-        title: 'Validation Error',
-        description: validation.error.errors[0].message,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const validatedCredentials = validation.data as {
-      application_id: string;
-      access_token: string;
-      location_id: string;
-    };
-
-    setIsLoading(true);
-    setConnectionStatus('testing');
-
-    try {
-      console.log('🔵 Step 1: Testing Square API connection...');
-      // Test the connection first
-      const testResult = await testSquareConnection(validatedCredentials);
-      console.log('✅ Square API test result:', testResult);
       
-      if (!testResult.success) {
-        console.error('❌ Square API test failed:', testResult.error);
-        setConnectionStatus('error');
-        toast({
-          title: 'Connection Failed',
-          description: testResult.error || 'Failed to connect to Square API',
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      console.log('🔵 Step 2: Saving credentials to database...');
-      // Save credentials to database
-      await saveConnection(validatedCredentials);
-      console.log('✅ Credentials saved successfully');
-      
-      console.log('🔵 Step 3: Saving credentials to Supabase and updating status...');
-      // Save credentials and update connection status
-      const savedConnection = await saveConnection(validatedCredentials);
-      await updateConnectionStatus('connected', testResult.locationName);
-      console.log('✅ Connection status updated');
-      
-      // Step 4: Register webhook with n8n
-      console.log('🔵 Step 4: Registering webhook with n8n...');
-      try {
-        const webhookResponse = await fetch(
-          'https://jiehjbbdeyngslfpgfnt.supabase.co/functions/v1/register-square-webhook',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZWhqYmJkZXluZ3NsZnBnZm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA3NDQxNzAsImV4cCI6MjA1NjMyMDE3MH0.s2152q-oy3qBMsJmVQ8-L9whBQDjebEQSo6GVYhXtlg'}`,
-            },
-            body: JSON.stringify({
-              application_id: validatedCredentials.application_id,
-              access_token: validatedCredentials.access_token,
-              location_id: validatedCredentials.location_id,
-              connection_id: savedConnection.id,
-            }),
-          }
-        );
-
-        if (webhookResponse.ok) {
-          const webhookData = await webhookResponse.json();
-          console.log('✅ Webhook registered with n8n:', webhookData);
-          
+      // Listen for messages from popup
+      const handleMessage = (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'square-oauth-success') {
+          window.removeEventListener('message', handleMessage);
           setConnectionStatus('success');
           toast({
-            title: '✓ Successfully Connected to Square!',
-            description: `Connected to ${testResult.locationName}. Webhook automation configured with n8n.`,
+            title: '✓ Successfully Connected!',
+            description: 'Redirecting to inventory...',
             className: 'bg-green-50 border-green-200',
           });
-        } else {
-          console.warn('⚠️ Webhook registration failed, but Square connection is successful');
-          setConnectionStatus('success');
+          setTimeout(() => {
+            navigate('/inventory-products');
+          }, 1500);
+        } else if (event.data.type === 'square-oauth-error') {
+          window.removeEventListener('message', handleMessage);
+          setConnectionStatus('error');
           toast({
-            title: '✓ Connected to Square',
-            description: `Connected to ${testResult.locationName}. Note: Webhook automation setup had issues.`,
-            className: 'bg-yellow-50 border-yellow-200',
+            title: 'Connection Failed',
+            description: event.data.error || 'Failed to connect',
+            variant: 'destructive',
           });
+          setIsConnecting(false);
         }
-      } catch (webhookError) {
-        console.warn('⚠️ Webhook registration error:', webhookError);
-        setConnectionStatus('success');
-        toast({
-          title: '✓ Connected to Square',
-          description: `Connected to ${testResult.locationName}. Webhook will be configured later.`,
-          className: 'bg-yellow-50 border-yellow-200',
-        });
-      }
-
-      // Redirect to dashboard
-      setTimeout(() => {
-        console.log('🔵 Redirecting to Square Dashboard...');
-        navigate('/square-dashboard');
-      }, 2000);
+      };
+      
+      window.addEventListener('message', handleMessage);
+      
+      // Check if popup was closed
+      const checkClosed = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(checkClosed);
+          window.removeEventListener('message', handleMessage);
+          if (connectionStatus === 'connecting') {
+            setConnectionStatus('idle');
+            setIsConnecting(false);
+          }
+        }
+      }, 1000);
       
     } catch (error) {
-      console.error('❌ Error during connection process:', error);
+      console.error('❌ OAuth error:', error);
       setConnectionStatus('error');
-      
-      const errorMessage = error instanceof Error ? error.message : 'Failed to save connection';
-      
-      // Check if it's an authentication error
-      if (errorMessage.includes('authenticated') || errorMessage.includes('User not authenticated')) {
-        toast({
-          title: '🔐 Authentication Required',
-          description: 'You need to be logged in to connect Square. Please log in first.',
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Error',
-          description: errorMessage,
-          variant: 'destructive',
-        });
-      }
-    } finally {
-      setIsLoading(false);
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to start OAuth',
+        variant: 'destructive',
+      });
+      setIsConnecting(false);
     }
   };
 
@@ -239,115 +145,93 @@ const SquareAuth = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
       <Card className="w-full max-w-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Connect with API</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">Connect with Square</CardTitle>
           <CardDescription className="text-center">
-            Enter your Square API credentials to get started
+            Connect your Square account to sync your product catalog
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="application_id">Application ID</Label>
-              <Input
-                id="application_id"
-                name="application_id"
-                type="text"
-                placeholder="sq0idp-..."
-                value={formData.application_id}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="access_token">Access Token</Label>
-              <Input
-                id="access_token"
-                name="access_token"
-                type="password"
-                placeholder="••••••••••••••••"
-                value={formData.access_token}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="location_id">Location ID</Label>
-              <Input
-                id="location_id"
-                name="location_id"
-                type="text"
-                placeholder="L..."
-                value={formData.location_id}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                required
-              />
-            </div>
-
-            {connectionStatus !== 'idle' && (
-              <div className={`flex items-center gap-2 p-3 rounded-lg ${
-                connectionStatus === 'testing' ? 'bg-blue-50 text-blue-700' :
-                connectionStatus === 'success' ? 'bg-green-50 text-green-700' :
-                'bg-red-50 text-red-700'
-              }`}>
-                {connectionStatus === 'testing' && <Loader2 className="h-5 w-5 animate-spin" />}
-                {connectionStatus === 'success' && <CheckCircle2 className="h-5 w-5" />}
-                {connectionStatus === 'error' && <XCircle className="h-5 w-5" />}
-                <span className="text-sm font-medium">
-                  {connectionStatus === 'testing' && 'Testing connection...'}
-                  {connectionStatus === 'success' && 'Connection successful!'}
-                  {connectionStatus === 'error' && 'Connection failed'}
-                </span>
+        <CardContent className="space-y-6">
+          {connection ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 p-4 rounded-lg bg-green-50 border border-green-200">
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                <div>
+                  <p className="text-sm font-medium text-green-900">Already Connected</p>
+                  <p className="text-xs text-green-700">
+                    {connection.location_name || 'Square Location'}
+                  </p>
+                </div>
               </div>
-            )}
-
-            {webhookResponse && (
-              <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                <p className="text-sm font-semibold text-gray-700 mb-2">Webhook Response:</p>
-                <pre className="text-xs text-gray-600 whitespace-pre-wrap break-words max-h-40 overflow-y-auto">
-                  {JSON.stringify(webhookResponse, null, 2)}
-                </pre>
-              </div>
-            )}
-
-            <div className="space-y-2">
               <Button
-                type="button"
-                variant="outline"
+                onClick={() => navigate('/square-dashboard')}
                 className="w-full"
-                onClick={handleTestWebhook}
-                disabled={isTesting || isLoading}
               >
-                {isTesting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Testing Webhook...
-                  </>
-                ) : (
-                  'Test Connection'
-                )}
-              </Button>
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading || isTesting}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Connecting...
-                  </>
-                ) : (
-                  'Connect to Square'
-                )}
+                Go to Dashboard
               </Button>
             </div>
-          </form>
+          ) : (
+            <>
+              {connectionStatus !== 'idle' && (
+                <div className={`flex items-center gap-2 p-4 rounded-lg ${
+                  connectionStatus === 'connecting' ? 'bg-blue-50 border-blue-200' :
+                  connectionStatus === 'success' ? 'bg-green-50 border-green-200' :
+                  'bg-red-50 border-red-200'
+                }`}>
+                  {connectionStatus === 'connecting' && <Loader2 className="h-5 w-5 animate-spin text-blue-600" />}
+                  {connectionStatus === 'success' && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+                  {connectionStatus === 'error' && <AlertCircle className="h-5 w-5 text-red-600" />}
+                  <div>
+                    <p className={`text-sm font-medium ${
+                      connectionStatus === 'connecting' ? 'text-blue-900' :
+                      connectionStatus === 'success' ? 'text-green-900' :
+                      'text-red-900'
+                    }`}>
+                      {connectionStatus === 'connecting' && 'Connecting to Square...'}
+                      {connectionStatus === 'success' && 'Connected Successfully!'}
+                      {connectionStatus === 'error' && 'Connection Failed'}
+                    </p>
+                    <p className={`text-xs ${
+                      connectionStatus === 'connecting' ? 'text-blue-700' :
+                      connectionStatus === 'success' ? 'text-green-700' :
+                      'text-red-700'
+                    }`}>
+                      {connectionStatus === 'connecting' && 'Please authorize in the popup window'}
+                      {connectionStatus === 'success' && 'Redirecting to inventory...'}
+                      {connectionStatus === 'error' && 'Please try again'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-blue-900 mb-2">What happens next?</h3>
+                  <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
+                    <li>Authorize your Square account in a secure popup</li>
+                    <li>Your product catalog will be automatically imported</li>
+                    <li>Products will appear in your inventory</li>
+                    <li>Webhook automation will be configured</li>
+                  </ul>
+                </div>
+
+                <Button
+                  onClick={handleConnectWithSquare}
+                  disabled={isConnecting}
+                  className="w-full"
+                  size="lg"
+                >
+                  {isConnecting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Connecting...
+                    </>
+                  ) : (
+                    'Connect to Square'
+                  )}
+                </Button>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
