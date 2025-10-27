@@ -149,23 +149,66 @@ const SquareAuth = () => {
       await saveConnection(validatedCredentials);
       console.log('✅ Credentials saved successfully');
       
-      console.log('🔵 Step 3: Updating connection status...');
-      // Update connection status
+      console.log('🔵 Step 3: Saving credentials to Supabase and updating status...');
+      // Save credentials and update connection status
+      const savedConnection = await saveConnection(validatedCredentials);
       await updateConnectionStatus('connected', testResult.locationName);
       console.log('✅ Connection status updated');
       
-      setConnectionStatus('success');
-      toast({
-        title: '✓ Successfully Connected to Square!',
-        description: `Your credentials have been saved. Connected to location: ${testResult.locationName}`,
-        className: 'bg-green-50 border-green-200',
-      });
+      // Step 4: Register webhook with n8n
+      console.log('🔵 Step 4: Registering webhook with n8n...');
+      try {
+        const webhookResponse = await fetch(
+          'https://jiehjbbdeyngslfpgfnt.supabase.co/functions/v1/register-square-webhook',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZWhqYmJkZXluZ3NsZnBnZm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA3NDQxNzAsImV4cCI6MjA1NjMyMDE3MH0.s2152q-oy3qBMsJmVQ8-L9whBQDjebEQSo6GVYhXtlg'}`,
+            },
+            body: JSON.stringify({
+              application_id: validatedCredentials.application_id,
+              access_token: validatedCredentials.access_token,
+              location_id: validatedCredentials.location_id,
+              connection_id: savedConnection.id,
+            }),
+          }
+        );
+
+        if (webhookResponse.ok) {
+          const webhookData = await webhookResponse.json();
+          console.log('✅ Webhook registered with n8n:', webhookData);
+          
+          setConnectionStatus('success');
+          toast({
+            title: '✓ Successfully Connected to Square!',
+            description: `Connected to ${testResult.locationName}. Webhook automation configured with n8n.`,
+            className: 'bg-green-50 border-green-200',
+          });
+        } else {
+          console.warn('⚠️ Webhook registration failed, but Square connection is successful');
+          setConnectionStatus('success');
+          toast({
+            title: '✓ Connected to Square',
+            description: `Connected to ${testResult.locationName}. Note: Webhook automation setup had issues.`,
+            className: 'bg-yellow-50 border-yellow-200',
+          });
+        }
+      } catch (webhookError) {
+        console.warn('⚠️ Webhook registration error:', webhookError);
+        setConnectionStatus('success');
+        toast({
+          title: '✓ Connected to Square',
+          description: `Connected to ${testResult.locationName}. Webhook will be configured later.`,
+          className: 'bg-yellow-50 border-yellow-200',
+        });
+      }
 
       // Redirect to dashboard
       setTimeout(() => {
         console.log('🔵 Redirecting to Square Dashboard...');
         navigate('/square-dashboard');
-      }, 1500);
+      }, 2000);
       
     } catch (error) {
       console.error('❌ Error during connection process:', error);
