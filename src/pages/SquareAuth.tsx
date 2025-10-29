@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useSquareConnection } from '@/hooks/useSquareConnection';
-import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { z } from 'zod';
+import { Loader2, CheckCircle2, AlertCircle, Link as LinkIcon, LogOut } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 // Generate random state for OAuth security
 const generateState = () => {
@@ -15,9 +15,10 @@ const generateState = () => {
 const SquareAuth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { connection } = useSquareConnection();
+  const { connection, disconnect } = useSquareConnection();
   
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'connecting' | 'success' | 'error'>('idle');
 
   // Check if user is returning from OAuth
@@ -57,10 +58,17 @@ const SquareAuth = () => {
       const state = generateState();
       sessionStorage.setItem('square_oauth_state', state);
       
-      // Square OAuth configuration
-      const squareApplicationId = 'sandbox-sq0idb-aP5J-yaSYMD13XRt6GEGQg';
+      // Square OAuth configuration - usa tus credenciales de Square Developer Dashboard
+      const squareApplicationId = 'sandbox-sq0idb-aP5J-yaSYMD13XRt6GEGQg'; // CAMBIAR en producción
       const redirectUri = `${window.location.origin}/square-callback`;
-      const scopes = ['ITEMS_READ', 'MERCHANT_PROFILE_READ'].join('+');
+      
+      // Scopes necesarios para Negentropy
+      const scopes = [
+        'ITEMS_READ',           // Leer items del catálogo
+        'INVENTORY_READ',       // Leer inventario
+        'ORDERS_READ',          // Leer órdenes
+        'MERCHANT_PROFILE_READ', // Leer perfil del comerciante
+      ].join('+');
       
       // Build OAuth URL
       const oauthUrl = `https://connect.squareupsandbox.com/oauth2/authorize?` +
@@ -147,94 +155,257 @@ const SquareAuth = () => {
     }
   };
 
+  const handleDisconnect = async () => {
+    setIsDisconnecting(true);
+    try {
+      await disconnect();
+      toast({
+        title: 'Desconectado de Square',
+        description: 'Tu cuenta de Square ha sido desconectada correctamente',
+      });
+      setConnectionStatus('idle');
+    } catch (error) {
+      toast({
+        title: 'Error al desconectar',
+        description: error instanceof Error ? error.message : 'No se pudo desconectar de Square',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDisconnecting(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Connect with Square</CardTitle>
-          <CardDescription className="text-center">
-            Connect your Square account to sync your product catalog
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl shadow-lg">
+        <CardHeader className="space-y-2 text-center pb-6">
+          <div className="flex justify-center mb-2">
+            <div className="bg-primary/10 p-3 rounded-full">
+              <LinkIcon className="h-8 w-8 text-primary" />
+            </div>
+          </div>
+          <CardTitle className="text-3xl font-bold">Integración con Square POS</CardTitle>
+          <CardDescription className="text-base">
+            Conecta tu cuenta de Square para sincronizar productos, órdenes e inventario automáticamente
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {connection ? (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 p-4 rounded-lg bg-green-50 border border-green-200">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="text-sm font-medium text-green-900">Already Connected</p>
-                  <p className="text-xs text-green-700">
-                    {connection.location_name || 'Square Location'}
-                  </p>
+            <div className="space-y-6">
+              {/* Estado conectado */}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg p-6">
+                <div className="flex items-start gap-4">
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <CheckCircle2 className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-green-900 mb-1">
+                      ✅ Square Conectado
+                    </h3>
+                    <p className="text-sm text-green-700 mb-3">
+                      <strong>Cuenta Square:</strong> {connection.location_name || 'Square Location'}
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 text-xs text-green-600 bg-white/50 rounded p-3">
+                      <div>
+                        <span className="font-medium">Location ID:</span>
+                        <p className="font-mono mt-1">{connection.location_id.substring(0, 20)}...</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">Estado:</span>
+                        <p className="mt-1 capitalize">{connection.connection_status}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <Button
-                onClick={() => navigate('/square-dashboard')}
-                className="w-full"
-              >
-                Go to Dashboard
-              </Button>
+
+              {/* Beneficios activos */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-blue-900 mb-2">🎉 Funcionalidades activas:</h4>
+                <ul className="text-xs text-blue-700 space-y-1.5">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Sincronización automática de catálogo de productos
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Lectura de órdenes y ventas en tiempo real
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Actualización de inventario automática
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Webhooks configurados para notificaciones
+                  </li>
+                </ul>
+              </div>
+
+              {/* Botones de acción */}
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => navigate('/square-dashboard')}
+                  className="flex-1"
+                  size="lg"
+                >
+                  Ver Dashboard
+                </Button>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      disabled={isDisconnecting}
+                      className="flex-1"
+                      size="lg"
+                    >
+                      {isDisconnecting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Desconectando...
+                        </>
+                      ) : (
+                        <>
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Desconectar Square
+                        </>
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>¿Desconectar de Square?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esto eliminará la conexión con tu cuenta de Square. Perderás la sincronización automática 
+                        de productos, inventario y órdenes. Podrás reconectar en cualquier momento.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDisconnect}>
+                        Sí, desconectar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
           ) : (
             <>
               {connectionStatus !== 'idle' && (
-                <div className={`flex items-center gap-2 p-4 rounded-lg ${
-                  connectionStatus === 'connecting' ? 'bg-blue-50 border-blue-200' :
-                  connectionStatus === 'success' ? 'bg-green-50 border-green-200' :
-                  'bg-red-50 border-red-200'
+                <div className={`flex items-center gap-3 p-5 rounded-lg border-2 ${
+                  connectionStatus === 'connecting' ? 'bg-blue-50 border-blue-300' :
+                  connectionStatus === 'success' ? 'bg-green-50 border-green-300' :
+                  'bg-red-50 border-red-300'
                 }`}>
-                  {connectionStatus === 'connecting' && <Loader2 className="h-5 w-5 animate-spin text-blue-600" />}
-                  {connectionStatus === 'success' && <CheckCircle2 className="h-5 w-5 text-green-600" />}
-                  {connectionStatus === 'error' && <AlertCircle className="h-5 w-5 text-red-600" />}
+                  {connectionStatus === 'connecting' && <Loader2 className="h-6 w-6 animate-spin text-blue-600" />}
+                  {connectionStatus === 'success' && <CheckCircle2 className="h-6 w-6 text-green-600" />}
+                  {connectionStatus === 'error' && <AlertCircle className="h-6 w-6 text-red-600" />}
                   <div>
-                    <p className={`text-sm font-medium ${
+                    <p className={`text-base font-semibold ${
                       connectionStatus === 'connecting' ? 'text-blue-900' :
                       connectionStatus === 'success' ? 'text-green-900' :
                       'text-red-900'
                     }`}>
-                      {connectionStatus === 'connecting' && 'Connecting to Square...'}
-                      {connectionStatus === 'success' && 'Connected Successfully!'}
-                      {connectionStatus === 'error' && 'Connection Failed'}
+                      {connectionStatus === 'connecting' && 'Conectando con Square...'}
+                      {connectionStatus === 'success' && '¡Conectado exitosamente!'}
+                      {connectionStatus === 'error' && 'Error al conectar con Square'}
                     </p>
-                    <p className={`text-xs ${
+                    <p className={`text-sm mt-1 ${
                       connectionStatus === 'connecting' ? 'text-blue-700' :
                       connectionStatus === 'success' ? 'text-green-700' :
                       'text-red-700'
                     }`}>
-                      {connectionStatus === 'connecting' && 'Please authorize in the popup window'}
-                      {connectionStatus === 'success' && 'Redirecting to inventory...'}
-                      {connectionStatus === 'error' && 'Please try again'}
+                      {connectionStatus === 'connecting' && 'Por favor autoriza en la ventana emergente'}
+                      {connectionStatus === 'success' && 'Redirigiendo al inventario...'}
+                      {connectionStatus === 'error' && 'Intenta nuevamente o verifica tus credenciales'}
                     </p>
                   </div>
                 </div>
               )}
 
-              <div className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-blue-900 mb-2">What happens next?</h3>
-                  <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
-                    <li>Authorize your Square account in a secure popup</li>
-                    <li>Your product catalog will be automatically imported</li>
-                    <li>Products will appear in your inventory</li>
-                    <li>Webhook automation will be configured</li>
+              <div className="space-y-5">
+                {/* Información importante */}
+                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-5">
+                  <h3 className="text-sm font-semibold text-indigo-900 mb-3 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4" />
+                    ¿Qué sucederá al conectar?
+                  </h3>
+                  <ul className="text-sm text-indigo-800 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-indigo-600 mt-0.5">1️⃣</span>
+                      <span>Se abrirá una ventana segura de Square OAuth para autorizar</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-indigo-600 mt-0.5">2️⃣</span>
+                      <span>Negentropy intercambiará el código por un access_token y refresh_token</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-indigo-600 mt-0.5">3️⃣</span>
+                      <span>Tu catálogo de productos se importará automáticamente</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-indigo-600 mt-0.5">4️⃣</span>
+                      <span>Los tokens se guardarán de forma segura en la base de datos</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-indigo-600 mt-0.5">5️⃣</span>
+                      <span>Podrás leer inventario, órdenes, ventas y productos de Square</span>
+                    </li>
                   </ul>
                 </div>
 
+                {/* Scopes que se solicitarán */}
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <h4 className="text-xs font-semibold text-amber-900 mb-2">🔐 Permisos solicitados:</h4>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-amber-800">
+                    <div className="flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      INVENTORY_READ
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      ORDERS_READ
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      CATALOG_READ
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      LOCATIONS_READ
+                    </div>
+                  </div>
+                </div>
+
+                {/* Botón principal de conexión */}
                 <Button
                   onClick={handleConnectWithSquare}
                   disabled={isConnecting}
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                   size="lg"
                 >
                   {isConnecting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Connecting...
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Conectando...
                     </>
                   ) : (
-                    'Connect to Square'
+                    <>
+                      <LinkIcon className="mr-2 h-5 w-5" />
+                      🔗 Conectar con Square
+                    </>
                   )}
                 </Button>
+
+                {/* Nota de configuración */}
+                <p className="text-xs text-center text-gray-500">
+                  Asegúrate de configurar el <strong>Redirect URI</strong> en tu Square Developer Dashboard:<br/>
+                  <code className="bg-gray-100 px-2 py-1 rounded text-xs">
+                    {window.location.origin}/square-callback
+                  </code>
+                </p>
               </div>
             </>
           )}

@@ -56,9 +56,10 @@ serve(async (req) => {
     }
 
     const tokenData = await tokenResponse.json();
-    const { access_token, merchant_id, expires_at } = tokenData;
+    const { access_token, refresh_token, merchant_id, expires_at } = tokenData;
 
     console.log('✅ Access token obtained for merchant:', merchant_id);
+    console.log('✅ Refresh token:', refresh_token ? 'Received' : 'Not received');
 
     // Get merchant locations
     const locationsUrl = squareEnvironment === 'production'
@@ -105,19 +106,29 @@ serve(async (req) => {
       throw new Error('User not authenticated');
     }
 
-    // Save Square connection
+    // Save Square connection with refresh token
     console.log('🔵 Saving Square connection to database...');
+    const connectionData: any = {
+      user_id: user.id,
+      application_id: squareApplicationId,
+      access_token,
+      location_id: primaryLocation.id,
+      location_name: primaryLocation.name,
+      connection_status: 'connected',
+      last_tested_at: new Date().toISOString(),
+    };
+
+    // Guardar refresh_token y expires_at si están disponibles
+    if (refresh_token) {
+      connectionData.refresh_token = refresh_token;
+    }
+    if (expires_at) {
+      connectionData.token_expires_at = expires_at;
+    }
+
     const { data: connection, error: connectionError } = await supabase
       .from('square_connections')
-      .upsert({
-        user_id: user.id,
-        application_id: squareApplicationId,
-        access_token,
-        location_id: primaryLocation.id,
-        location_name: primaryLocation.name,
-        connection_status: 'connected',
-        last_tested_at: new Date().toISOString(),
-      })
+      .upsert(connectionData)
       .select()
       .single();
 
