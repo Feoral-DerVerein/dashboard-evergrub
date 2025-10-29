@@ -46,10 +46,10 @@ export const refreshSquareToken = async (): Promise<{ success: boolean; error?: 
  */
 export const ensureValidSquareToken = async (): Promise<boolean> => {
   try {
-    // Obtener conexión actual
+    // Verificar si existe una conexión
     const { data: connection, error } = await supabase
       .from('square_connections')
-      .select('token_expires_at')
+      .select('id, connection_status')
       .single();
 
     if (error || !connection) {
@@ -57,22 +57,9 @@ export const ensureValidSquareToken = async (): Promise<boolean> => {
       return false;
     }
 
-    // Si no hay fecha de expiración, intentar refrescar por seguridad
-    if (!connection.token_expires_at) {
-      console.log('🔵 No hay fecha de expiración, refrescando token...');
-      const result = await refreshSquareToken();
-      return result.success;
-    }
-
-    // Verificar si el token expira en menos de 1 hora
-    const expiresAt = new Date(connection.token_expires_at);
-    const now = new Date();
-    const oneHour = 60 * 60 * 1000;
-
-    if (expiresAt.getTime() - now.getTime() < oneHour) {
-      console.log('🔵 Token próximo a expirar, refrescando...');
-      const result = await refreshSquareToken();
-      return result.success;
+    if (connection.connection_status !== 'connected') {
+      console.warn('⚠️ Conexión de Square no está activa');
+      return false;
     }
 
     console.log('✅ Token válido');
