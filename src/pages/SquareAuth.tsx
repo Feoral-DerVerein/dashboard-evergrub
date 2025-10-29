@@ -34,9 +34,9 @@ const SquareAuth = () => {
         className: 'bg-green-50 border-green-200',
       });
       
-      // Redirect to inventory after a moment
+      // Redirect to dashboard after a moment
       setTimeout(() => {
-        navigate('/inventory-products');
+        navigate('/kpi');
       }, 2000);
     } else if (status === 'error') {
       const error = params.get('error');
@@ -111,11 +111,11 @@ const SquareAuth = () => {
           setConnectionStatus('success');
           toast({
             title: '✓ Successfully Connected!',
-            description: 'Redirecting to inventory...',
+            description: 'Redirecting to dashboard...',
             className: 'bg-green-50 border-green-200',
           });
           setTimeout(() => {
-            navigate('/inventory-products');
+            navigate('/kpi');
           }, 1500);
         } else if (event.data.type === 'square-oauth-error') {
           window.removeEventListener('message', handleMessage);
@@ -245,11 +245,11 @@ const SquareAuth = () => {
               {/* Botones de acción */}
               <div className="flex gap-3">
                 <Button
-                  onClick={() => navigate('/square-dashboard')}
+                  onClick={() => navigate('/kpi')}
                   className="flex-1"
                   size="lg"
                 >
-                  Ver Dashboard
+                  Continuar al Dashboard
                 </Button>
 
                 <AlertDialog>
@@ -318,7 +318,7 @@ const SquareAuth = () => {
                       'text-red-700'
                     }`}>
                       {connectionStatus === 'connecting' && 'Por favor autoriza en la ventana emergente'}
-                      {connectionStatus === 'success' && 'Redirigiendo al inventario...'}
+                      {connectionStatus === 'success' && 'Redirigiendo al dashboard...'}
                       {connectionStatus === 'error' && 'Intenta nuevamente o verifica tus credenciales'}
                     </p>
                   </div>

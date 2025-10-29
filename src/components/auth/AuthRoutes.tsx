@@ -23,10 +23,10 @@ const AuthRoute = ({ children }: AuthRouteProps) => {
     return <div className="flex items-center justify-center h-screen">Cargando...</div>;
   }
   
-  // If user is authenticated, redirect to dashboard
+  // If user is authenticated, redirect to square-auth first
   if (user) {
-    console.log("AuthRoute: User found, redirecting to /dashboard");
-    return <Navigate to="/dashboard" replace />;
+    console.log("AuthRoute: User found, redirecting to /square-auth");
+    return <Navigate to="/square-auth" replace />;
   }
   
   return children;
