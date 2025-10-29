@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ProductCard } from "./ProductCard";
 import { Send } from "lucide-react";
-import { ChatLoadingIndicator } from "@/components/chat/ChatLoadingIndicator";
 
 export function ChatInterface() {
   const [messages, setMessages] = useState<any[]>([]);
@@ -89,8 +88,6 @@ export function ChatInterface() {
             )}
           </div>
         ))}
-
-        {loading && <ChatLoadingIndicator />}
       </div>
 
       <div className="bg-white rounded-b-lg border border-gray-200 p-4 shadow-sm">

@@ -6,7 +6,6 @@ import { ProductCards } from '@/components/chat/ProductCards';
 import { ProductActionCards } from '@/components/chat/ProductActionCards';
 import { InteractiveProductCard } from '@/components/chat/InteractiveProductCard';
 import { useChatbot } from '@/hooks/useChatbot';
-import { ChatLoadingIndicator } from '@/components/chat/ChatLoadingIndicator';
 import { useToast } from '@/hooks/use-toast';
 import { IntelligentNewsCards } from '@/components/kpi/IntelligentNewsCards';
 import { supabase } from '@/integrations/supabase/client';
@@ -189,9 +188,6 @@ const ChatBot = ({
                       </div>
                     </div>}
                 </div>)}
-              
-              {/* Loading Indicator */}
-              {isLoading && <ChatLoadingIndicator />}
               
               <div ref={messagesEndRef} />
             </div>}
