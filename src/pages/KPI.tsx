@@ -214,7 +214,7 @@ const SustainabilityCard = ({
 }) => {
   return <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-blue-700/80 text-sm font-medium">{label}</span>
+        <span className="text-foreground text-sm font-medium">{label}</span>
       </div>
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-semibold text-blue-900">{value}</span>
@@ -234,7 +234,7 @@ const InsightCard = ({
   icon?: string;
 }) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
     <div className="flex items-center gap-2 mb-1">
-      <span className="text-blue-700/80 text-sm font-medium">{label}</span>
+      <span className="text-foreground text-sm font-medium">{label}</span>
     </div>
     <div className="flex items-baseline gap-2">
       <span className="text-2xl font-semibold text-blue-900">{value}</span>
@@ -760,12 +760,12 @@ const KPI = () => {
             <h4 className="font-semibold text-blue-800 mb-2">Customer Insights</h4>
             <div className="space-y-3">
               <div>
-                <p className="text-blue-700/80 text-sm font-medium">Conversion Rate</p>
+                <p className="text-foreground text-sm font-medium">Conversion Rate</p>
                 <p className="text-2xl font-bold text-blue-900">{aiInsights.customer_insights.conversion_rate}%</p>
                 <p className="text-emerald-600 text-sm font-medium">{aiInsights.customer_insights.conversion_change}</p>
               </div>
               <div>
-                <p className="text-blue-700/80 text-sm font-medium">Return Rate</p>
+                <p className="text-foreground text-sm font-medium">Return Rate</p>
                 <p className="text-2xl font-bold text-blue-900">{aiInsights.customer_insights.return_rate}%</p>
                 <p className="text-orange-600 text-sm font-medium">{aiInsights.customer_insights.return_change}</p>
               </div>
