@@ -191,7 +191,7 @@ export const useChatbot = () => {
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
-        content: `Perfect, here it is:\n\n${responseText}`,
+        content: responseText,
         cards: cards,
         product_cards: transformedProductCards,
         expiring_products: isAskingForExpiring ? data.expiring_products : undefined,

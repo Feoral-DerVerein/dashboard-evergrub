@@ -143,6 +143,16 @@ const ChatBot = ({
           {messages.length > 0 && <div className="max-w-3xl mx-auto mb-4 space-y-4">
               {messages.map((message, index) => <div key={message.id} className={`${message.type === 'user' ? 'text-right' : 'text-left'}`}>
                   
+                  {/* Message Content (User or Bot Text) */}
+                  {message.content && (
+                    <div className={`inline-block max-w-[80%] px-4 py-3 rounded-2xl mb-3 animate-fade-in ${
+                      message.type === 'user' 
+                        ? 'bg-[#10a37f] text-white rounded-br-md' 
+                        : 'bg-[#f7f7f8] text-[#202123] rounded-bl-md border border-[#d9d9e3]'
+                    }`}>
+                      <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                    </div>
+                  )}
                   
                   {/* Business Cards */}
                   {message.type === 'bot' && message.cards && message.cards.length > 0 && <div className="mt-4 space-y-3 text-left">
