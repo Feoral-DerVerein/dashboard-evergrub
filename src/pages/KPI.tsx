@@ -192,7 +192,7 @@ const MetricCard = ({
 }) => <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
     <div className="flex items-center gap-2 mb-1">
       <Icon className="w-4 h-4 text-blue-600" />
-      <span className="text-blue-700/80 text-sm font-medium">{label}</span>
+      <span className="text-foreground text-sm font-medium">{label}</span>
     </div>
     <div className="flex items-baseline gap-2">
       <span className="text-2xl font-semibold text-blue-900">{value}</span>
