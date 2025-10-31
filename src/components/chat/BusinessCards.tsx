@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { 
   Package, 
   AlertTriangle, 
@@ -12,10 +11,8 @@ import {
   Calendar,
   MapPin,
   Tag,
-  Zap,
-  Plus
+  Zap
 } from 'lucide-react';
-import { toast } from 'sonner';
 
 export interface BusinessCardData {
   id: string;
@@ -128,25 +125,6 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                     <span className="font-medium">{new Date(card.data.expiry_date).toLocaleDateString('en-GB')}</span>
                   </div>
                 )}
-
-                {/* Add to task list button */}
-                <div className="mt-3">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs py-1 px-2 h-8 w-full hover:bg-blue-50"
-                    onClick={() => {
-                      if (onAddToTaskList) {
-                        const taskInfo = getTaskInfo(card.type, card.data);
-                        onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                        toast.success('Task added to list');
-                      }
-                    }}
-                  >
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add to task list
-                  </Button>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -189,24 +167,6 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                 <div className="bg-white bg-opacity-60 p-3 rounded-lg border border-white border-opacity-50">
                   <p className="text-sm font-medium text-gray-800 mb-2">💡 Recommendation:</p>
                   <p className="text-sm text-gray-700">{card.data.recommendation}</p>
-                </div>
-
-                <div className="mt-3">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs py-1 px-2 h-8 w-full hover:bg-orange-50"
-                    onClick={() => {
-                      if (onAddToTaskList) {
-                        const taskInfo = getTaskInfo(card.type, card.data);
-                        onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                        toast.success('Task added to list');
-                      }
-                    }}
-                  >
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add to task list
-                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -251,25 +211,6 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                     </div>
                   </div>
                 )}
-
-                {/* Add to task list button */}
-                <div className="mt-3">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs py-1 px-2 h-8 w-full hover:bg-green-50"
-                    onClick={() => {
-                      if (onAddToTaskList) {
-                        const taskInfo = getTaskInfo(card.type, card.data);
-                        onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                        toast.success('Task added to list');
-                      }
-                    }}
-                  >
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add to task list
-                  </Button>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -305,24 +246,6 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                     <p className="text-xs text-green-600 font-medium">Potential Savings</p>
                     <p className="text-lg font-bold text-green-900">{card.data.savings}</p>
                   </div>
-                </div>
-
-                <div className="mt-3">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs py-1 px-2 h-8 w-full hover:bg-purple-50"
-                    onClick={() => {
-                      if (onAddToTaskList) {
-                        const taskInfo = getTaskInfo(card.type, card.data);
-                        onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                        toast.success('Task added to list');
-                      }
-                    }}
-                  >
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add to task list
-                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -360,24 +283,6 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                     <p className="text-sm text-red-700">{card.data.action_required}</p>
                   </div>
                 )}
-
-                <div className="mt-3">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs py-1 px-2 h-8 w-full hover:bg-red-50"
-                    onClick={() => {
-                      if (onAddToTaskList) {
-                        const taskInfo = getTaskInfo(card.type, card.data);
-                        onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                        toast.success('Task added to list');
-                      }
-                    }}
-                  >
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add to task list
-                  </Button>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -408,24 +313,6 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
                   <p className="text-sm text-gray-700">{card.data.insights}</p>
                 </div>
               )}
-
-              <div className="mt-3">
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="text-xs py-1 px-2 h-8 w-full hover:bg-indigo-50"
-                  onClick={() => {
-                    if (onAddToTaskList) {
-                      const taskInfo = getTaskInfo(card.type, card.data);
-                      onAddToTaskList(card, taskInfo.title, taskInfo.description, taskInfo.priority);
-                      toast.success('Task added to list');
-                    }
-                  }}
-                >
-                  <Plus className="w-3 h-3 mr-1" />
-                  Add to task list
-                </Button>
-              </div>
             </CardContent>
           </Card>
         );
