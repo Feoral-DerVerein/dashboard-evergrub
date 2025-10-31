@@ -81,7 +81,7 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
     switch (card.type) {
       case 'inventory':
         return (
-          <Card className="mb-3 border-l-4 border-l-blue-500 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer">
+          <Card className="glass-card-chatbot mb-3 border-l-4 border-l-blue-500 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2 text-blue-700">
                 <Package className="w-4 h-4" />
@@ -135,8 +135,8 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
         const isUrgent = daysLeft <= 2;
         
         return (
-          <Card className={`mb-3 border-l-4 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer ${
-            isUrgent ? 'border-l-red-500 bg-gradient-to-r from-red-50 to-orange-50' : 'border-l-orange-500 bg-gradient-to-r from-orange-50 to-yellow-50'
+          <Card className={`glass-card-chatbot mb-3 border-l-4 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer ${
+            isUrgent ? 'border-l-red-500' : 'border-l-orange-500'
           }`}>
             <CardHeader className="pb-3">
               <CardTitle className={`text-sm flex items-center gap-2 ${isUrgent ? 'text-red-700' : 'text-orange-700'}`}>
@@ -175,7 +175,7 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
 
       case 'sales':
         return (
-          <Card className="mb-3 border-l-4 border-l-green-500 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer">
+          <Card className="glass-card-chatbot mb-3 border-l-4 border-l-green-500 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2 text-green-700">
                 <TrendingUp className="w-4 h-4" />
@@ -218,7 +218,7 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
 
       case 'recommendation':
         return (
-          <Card className="mb-3 border-l-4 border-l-purple-500 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer bg-gradient-to-r from-purple-50 to-indigo-50">
+          <Card className="glass-card-chatbot mb-3 border-l-4 border-l-purple-500 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2 text-purple-700">
                 <Zap className="w-4 h-4" />
@@ -254,7 +254,7 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
 
       case 'alert':
         return (
-          <Card className="mb-3 border-l-4 border-l-red-500 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer bg-gradient-to-r from-red-50 to-pink-50">
+          <Card className="glass-card-chatbot mb-3 border-l-4 border-l-red-500 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2 text-red-700">
                 <AlertTriangle className="w-4 h-4 animate-pulse" />
@@ -290,7 +290,7 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
 
       case 'analytics':
         return (
-          <Card className="mb-3 border-l-4 border-l-indigo-500 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer">
+          <Card className="glass-card-chatbot mb-3 border-l-4 border-l-indigo-500 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2 text-indigo-700">
                 <DollarSign className="w-4 h-4" />
