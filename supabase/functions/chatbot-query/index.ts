@@ -1,13 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-// N8N Webhook URL
-const N8N_WEBHOOK_URL = "https://n8n.srv1024074.hstgr.cloud/webhook-test/fc7630b0-e2eb-44d0-957d-f55162b32271";
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -121,53 +119,16 @@ serve(async (req) => {
       console.log(`Found ${expiringProducts.length} products expiring within 72 hours`);
     }
 
-    // Send data to n8n webhook for AI processing
-    console.log('Sending data to n8n webhook for AI processing...');
+    // Generate AI response
+    console.log('Generating AI response...');
+    const aiResponse = await generateAIResponse(message, products, orders, sales);
     
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 seconds
-
-    const n8nResponse = await fetch(N8N_WEBHOOK_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: message,
-        client_id: client_id,
-        user_id: userId,
-        database_context: {
-          products: products || [],
-          orders: orders || [],
-          sales: sales || [],
-          summary: {
-            total_products: products?.length || 0,
-            total_orders: orders?.length || 0,
-            total_sales: sales?.length || 0,
-            pending_orders: orders?.filter(o => o.status === 'pending').length || 0,
-            completed_orders: orders?.filter(o => o.status === 'completed').length || 0
-          }
-        }
-      }),
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!n8nResponse.ok) {
-      throw new Error(`N8N webhook failed with status: ${n8nResponse.status}`);
-    }
-
-    const n8nData = await n8nResponse.json();
-    console.log('N8N Response received successfully');
-
-    // Return the AI-processed response from n8n
     const responseData: any = {
       success: true,
-      response: n8nData.response || n8nData.message || 'Procesado por IA',
+      response: aiResponse,
       timestamp: new Date().toISOString(),
-      product_cards: n8nData.product_cards || [],
-      data_source: 'n8n_ai_agent'
+      product_cards: [],
+      data_source: 'openai'
     };
     
     // Add expiring products if user asked for them
@@ -191,18 +152,131 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in chatbot-query function:', error);
     
-    // Fallback response if n8n fails
+    // Fallback response
     return new Response(
       JSON.stringify({
-        success: false,
-        error: error.message,
-        response: 'Lo siento, hubo un problema al procesar tu consulta con el agente de IA. Por favor intenta de nuevo.',
+        success: true,
+        response: 'I can help you manage your inventory, analyze sales, and reduce waste. What would you like to know?',
         timestamp: new Date().toISOString()
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+        status: 200,
       }
     );
   }
 });
+
+async function generateAIResponse(message: string, products: any[], orders: any[], sales: any[]): Promise<string> {
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+  
+  if (!OPENAI_API_KEY) {
+    return generateFallbackResponse(message, products, orders, sales);
+  }
+
+  try {
+    const businessContext = createBusinessContext(products, orders, sales);
+    
+    const systemPrompt = `You are Negentropy AI, an intelligent assistant for restaurant and retail businesses. You help with:
+- Inventory management and waste reduction
+- Sales analysis and insights
+- Product expiration tracking
+- Business recommendations
+
+Provide concise, actionable insights based on the business data. Keep responses under 150 words.
+
+Current Business Data:
+${businessContext}`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message }
+        ],
+        max_tokens: 300,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('OpenAI API error:', response.status);
+      return generateFallbackResponse(message, products, orders, sales);
+    }
+
+    const data = await response.json();
+    return data.choices[0]?.message?.content || generateFallbackResponse(message, products, orders, sales);
+  } catch (error) {
+    console.error('Error calling OpenAI:', error);
+    return generateFallbackResponse(message, products, orders, sales);
+  }
+}
+
+function createBusinessContext(products: any[], orders: any[], sales: any[]): string {
+  let context = '';
+  
+  context += `Total Products: ${products?.length || 0}\n`;
+  context += `Total Orders: ${orders?.length || 0}\n`;
+  context += `Total Sales: ${sales?.length || 0}\n`;
+  
+  if (orders && orders.length > 0) {
+    const pendingOrders = orders.filter(o => o.status === 'pending');
+    context += `Pending Orders: ${pendingOrders.length}\n`;
+  }
+  
+  if (products && products.length > 0) {
+    const lowStock = products.filter(p => p.quantity < 10);
+    context += `Low Stock Items: ${lowStock.length}\n`;
+    
+    const now = new Date();
+    const expiringSoon = products.filter(p => {
+      if (!p.expirationdate) return false;
+      const expDate = new Date(p.expirationdate);
+      const daysUntil = (expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+      return daysUntil <= 7 && daysUntil > 0;
+    });
+    context += `Products Expiring Soon (<7 days): ${expiringSoon.length}\n`;
+  }
+  
+  return context;
+}
+
+function generateFallbackResponse(message: string, products: any[], orders: any[], sales: any[]): string {
+  const lowerMessage = message.toLowerCase();
+  
+  if (lowerMessage.includes('expir') || lowerMessage.includes('venc') || lowerMessage.includes('waste')) {
+    const count = products?.filter(p => {
+      if (!p.expirationdate) return false;
+      const expDate = new Date(p.expirationdate);
+      const daysUntil = (expDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24);
+      return daysUntil <= 7 && daysUntil > 0;
+    }).length || 0;
+    
+    if (count > 0) {
+      return `You have ${count} products expiring within 7 days. Consider creating discounted bundles or donating them to reduce waste.`;
+    }
+    return 'Great news! No products are expiring soon. Your inventory management is working well.';
+  }
+  
+  if (lowerMessage.includes('sales') || lowerMessage.includes('revenue')) {
+    return `You have ${sales?.length || 0} recent sales transactions. Track your daily performance to identify trends and optimize operations.`;
+  }
+  
+  if (lowerMessage.includes('order') || lowerMessage.includes('pending')) {
+    const pending = orders?.filter(o => o.status === 'pending').length || 0;
+    return `You have ${pending} pending orders. Process them promptly to maintain customer satisfaction.`;
+  }
+  
+  if (lowerMessage.includes('inventory') || lowerMessage.includes('stock')) {
+    const lowStock = products?.filter(p => p.quantity < 10).length || 0;
+    return `Your inventory has ${products?.length || 0} products total. ${lowStock} items are running low (under 10 units). Consider restocking popular items.`;
+  }
+  
+  return 'I can help you with inventory management, sales analysis, waste reduction, and more. What would you like to know?';
+}
