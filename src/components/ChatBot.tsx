@@ -203,9 +203,7 @@ const ChatBot = ({
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-4 text-[#6e6e80] text-sm px-5 py-1 mb-0">
-            AI Insights Chat - Powered by Advanced Machine Learning. Your data helps us improve.
-          </div>
+          
         </div>
       </div>;
   }
