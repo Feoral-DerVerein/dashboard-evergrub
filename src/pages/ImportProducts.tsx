@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ChatFileUploadCard } from "@/components/chat/ChatFileUploadCard";
 
 const defaultProducts = `[
   {
@@ -75,7 +76,23 @@ const ImportProducts = () => {
         <p className="text-sm text-gray-500">Puedes usar tu sesión; la IMPORT_API_KEY es opcional.</p>
       </header>
 
-      <section className="max-w-2xl space-y-4">
+      <section className="max-w-2xl space-y-6">
+        {/* File Upload Card */}
+        <div>
+          <h2 className="text-lg font-semibold mb-3">Subir archivo Excel o CSV</h2>
+          <ChatFileUploadCard />
+        </div>
+
+        {/* Divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">O usa JSON</span>
+          </div>
+        </div>
+
         <form onSubmit={handleImport} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">IMPORT_API_KEY</label>
