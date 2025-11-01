@@ -184,7 +184,7 @@ export const useChatbot = () => {
       const data = await response.json();
       console.log("Chatbot Response:", data);
       
-      const responseText = data.response || 'I received your message.';
+      const responseText = data.output || data.response || 'I received your message.';
       
       // Simulate typing animation
       await simulateTyping(responseText);
