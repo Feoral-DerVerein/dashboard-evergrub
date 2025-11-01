@@ -13,6 +13,7 @@ import { productService, Product } from '@/services/productService';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExpiringProductCard } from '@/components/chat/ExpiringProductCard';
 import { NegentropyMenu } from '@/components/chat/NegentropyMenu';
+import { ChatFileUploadCard } from '@/components/chat/ChatFileUploadCard';
 import aiIcon from '@/assets/ai-icon.png';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -138,6 +139,13 @@ const ChatBot = ({
                 </button>}
             </div>
           </div>
+
+          {/* File Upload Card - Show when no messages */}
+          {messages.length === 0 && (
+            <div className="max-w-md mx-auto mb-6">
+              <ChatFileUploadCard />
+            </div>
+          )}
 
           {/* Messages Display Area (if there are messages) */}
           {messages.length > 0 && <div className="max-w-3xl mx-auto mb-4 space-y-4">

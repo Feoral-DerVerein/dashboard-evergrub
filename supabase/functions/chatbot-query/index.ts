@@ -75,7 +75,23 @@ serve(async (req) => {
       console.error("Error fetching sales:", salesError);
     }
 
-    console.log(`Database data: ${products?.length || 0} products, ${orders?.length || 0} orders, ${sales?.length || 0} sales`);
+    // Query uploaded data (Excel/CSV files from users)
+    let uploadedDataQuery = supabase
+      .from('uploaded_data')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (userId) {
+      uploadedDataQuery = uploadedDataQuery.eq('user_id', userId);
+    }
+
+    const { data: uploadedData, error: uploadedDataError } = await uploadedDataQuery.limit(10);
+
+    if (uploadedDataError) {
+      console.error("Error fetching uploaded data:", uploadedDataError);
+    }
+
+    console.log(`Database data: ${products?.length || 0} products, ${orders?.length || 0} orders, ${sales?.length || 0} sales, ${uploadedData?.length || 0} uploaded files`);
 
     // Check if user is asking about expiring products
     const lowerMessage = message.toLowerCase();
@@ -119,9 +135,9 @@ serve(async (req) => {
       console.log(`Found ${expiringProducts.length} products expiring within 72 hours`);
     }
 
-    // Generate AI response
+    // Generate AI response with uploaded data context
     console.log('Generating AI response...');
-    const aiResponse = await generateAIResponse(message, products, orders, sales);
+    const aiResponse = await generateAIResponse(message, products, orders, sales, uploadedData);
     
     const responseData: any = {
       success: true,
@@ -167,15 +183,15 @@ serve(async (req) => {
   }
 });
 
-async function generateAIResponse(message: string, products: any[], orders: any[], sales: any[]): Promise<string> {
+async function generateAIResponse(message: string, products: any[], orders: any[], sales: any[], uploadedData: any[]): Promise<string> {
   const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   
   if (!OPENAI_API_KEY) {
-    return generateFallbackResponse(message, products, orders, sales);
+    return generateFallbackResponse(message, products, orders, sales, uploadedData);
   }
 
   try {
-    const businessContext = createBusinessContext(products, orders, sales);
+    const businessContext = createBusinessContext(products, orders, sales, uploadedData);
     
     const systemPrompt = `You are Negentropy AI, an intelligent assistant for restaurant and retail businesses. You help with:
 - Inventory management and waste reduction
@@ -207,23 +223,24 @@ ${businessContext}`;
 
     if (!response.ok) {
       console.error('OpenAI API error:', response.status);
-      return generateFallbackResponse(message, products, orders, sales);
+      return generateFallbackResponse(message, products, orders, sales, uploadedData);
     }
 
     const data = await response.json();
-    return data.choices[0]?.message?.content || generateFallbackResponse(message, products, orders, sales);
+    return data.choices[0]?.message?.content || generateFallbackResponse(message, products, orders, sales, uploadedData);
   } catch (error) {
     console.error('Error calling OpenAI:', error);
-    return generateFallbackResponse(message, products, orders, sales);
+    return generateFallbackResponse(message, products, orders, sales, uploadedData);
   }
 }
 
-function createBusinessContext(products: any[], orders: any[], sales: any[]): string {
+function createBusinessContext(products: any[], orders: any[], sales: any[], uploadedData: any[]): string {
   let context = '';
   
   context += `Total Products: ${products?.length || 0}\n`;
   context += `Total Orders: ${orders?.length || 0}\n`;
   context += `Total Sales: ${sales?.length || 0}\n`;
+  context += `Uploaded Data Files: ${uploadedData?.length || 0}\n`;
   
   if (orders && orders.length > 0) {
     const pendingOrders = orders.filter(o => o.status === 'pending');
@@ -244,10 +261,26 @@ function createBusinessContext(products: any[], orders: any[], sales: any[]): st
     context += `Products Expiring Soon (<7 days): ${expiringSoon.length}\n`;
   }
   
+  // Add uploaded data context
+  if (uploadedData && uploadedData.length > 0) {
+    context += `\nUploaded Custom Data:\n`;
+    uploadedData.forEach((file, index) => {
+      context += `File ${index + 1}: ${file.business_name || 'Unknown'}\n`;
+      if (file.json_data && Array.isArray(file.json_data)) {
+        context += `  - Contains ${file.json_data.length} rows of data\n`;
+        // Include sample of first row keys if available
+        if (file.json_data.length > 0) {
+          const keys = Object.keys(file.json_data[0]);
+          context += `  - Columns: ${keys.slice(0, 5).join(', ')}${keys.length > 5 ? '...' : ''}\n`;
+        }
+      }
+    });
+  }
+  
   return context;
 }
 
-function generateFallbackResponse(message: string, products: any[], orders: any[], sales: any[]): string {
+function generateFallbackResponse(message: string, products: any[], orders: any[], sales: any[], uploadedData: any[]): string {
   const lowerMessage = message.toLowerCase();
   
   if (lowerMessage.includes('expir') || lowerMessage.includes('venc') || lowerMessage.includes('waste')) {
@@ -276,6 +309,14 @@ function generateFallbackResponse(message: string, products: any[], orders: any[
   if (lowerMessage.includes('inventory') || lowerMessage.includes('stock')) {
     const lowStock = products?.filter(p => p.quantity < 10).length || 0;
     return `Your inventory has ${products?.length || 0} products total. ${lowStock} items are running low (under 10 units). Consider restocking popular items.`;
+  }
+
+  if (lowerMessage.includes('archivo') || lowerMessage.includes('datos subidos') || lowerMessage.includes('uploaded')) {
+    if (uploadedData && uploadedData.length > 0) {
+      const totalRows = uploadedData.reduce((sum, file) => sum + (Array.isArray(file.json_data) ? file.json_data.length : 0), 0);
+      return `You have ${uploadedData.length} uploaded data file(s) with ${totalRows} total rows. I can analyze this data for insights. What would you like to know?`;
+    }
+    return 'No uploaded data files found. You can upload Excel or CSV files in the chat to provide custom data for analysis.';
   }
   
   return 'I can help you with inventory management, sales analysis, waste reduction, and more. What would you like to know?';
