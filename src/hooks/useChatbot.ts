@@ -143,7 +143,7 @@ export const useChatbot = () => {
     const isAskingForExpiring = lowerMessage.includes('expir') || lowerMessage.includes('surplus') || 
                                  lowerMessage.includes('venc') || lowerMessage.includes('caduc');
 
-    console.log("Sending to Lovable AI:", messageText);
+    console.log("Sending to n8n webhook:", messageText);
 
     try {
       const controller = new AbortController();
@@ -161,15 +161,16 @@ export const useChatbot = () => {
         content: messageText
       });
 
-      // Call Lovable AI edge function
-      const response = await fetch("https://jiehjbbdeyngslfpgfnt.supabase.co/functions/v1/ai-chatbot", {
+      // Call n8n webhook
+      const response = await fetch("https://n8n.srv1024074.hstgr.cloud/webhook-test/c9b68781-c2af-4ba8-a1ec-a97980463690", {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZWhqYmJkZXluZ3NsZnBnZm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA3NDQxNzAsImV4cCI6MjA1NjMyMDE3MH0.s2152q-oy3qBMsJmVQ8-L9whBQDjebEQSo6GVYhXtlg'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          messages: conversationHistory
+          messages: conversationHistory,
+          message: messageText,
+          client_id: `client_${Date.now()}`
         }),
         signal: controller.signal
       });
@@ -212,7 +213,7 @@ export const useChatbot = () => {
       setMessages(prev => [...prev, botMessage]);
 
     } catch (error) {
-      console.error('Error with n8n webhook:', error);
+      console.error('Error calling n8n webhook:', error);
       
       await simulateTyping('Sorry, there was an error.');
       
