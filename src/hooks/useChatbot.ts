@@ -149,7 +149,18 @@ export const useChatbot = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-      // Call n8n webhook
+      // Call n8n webhook with full conversation history
+      const conversationHistory = messages.map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'assistant',
+        content: msg.content
+      }));
+
+      // Add current message to history
+      conversationHistory.push({
+        role: 'user',
+        content: messageText
+      });
+
       const response = await fetch("https://n8n.srv1024074.hstgr.cloud/webhook-test/c9b68781-c2af-4ba8-a1ec-a97980463690", {
         method: 'POST',
         headers: {
@@ -157,6 +168,7 @@ export const useChatbot = () => {
         },
         body: JSON.stringify({
           message: messageText,
+          messages: conversationHistory,
           client_id: localStorage.getItem("client_id") || "test-client-123"
         }),
         signal: controller.signal
