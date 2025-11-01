@@ -32,7 +32,7 @@ const SquareSettings = () => {
 
   useEffect(() => {
     if (!loading && !connection) {
-      navigate('/square-auth');
+      navigate('/import');
     }
 
     if (connection) {

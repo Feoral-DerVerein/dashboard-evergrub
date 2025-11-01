@@ -30,7 +30,7 @@ const SquareDashboard = () => {
 
   useEffect(() => {
     if (!loading && !connection) {
-      navigate('/square-auth');
+      navigate('/import');
     }
   }, [connection, loading, navigate]);
 
@@ -78,7 +78,7 @@ const SquareDashboard = () => {
         title: 'Disconnected',
         description: 'Successfully disconnected from Square',
       });
-      navigate('/square-auth');
+      navigate('/import');
     } catch (error) {
       toast({
         title: 'Error',

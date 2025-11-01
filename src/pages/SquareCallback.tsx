@@ -83,7 +83,7 @@ const SquareCallback = () => {
           setTimeout(() => window.close(), 3000);
         } else {
           setTimeout(() => {
-            navigate('/square-auth?status=error&error=' + encodeURIComponent(message));
+            navigate('/kpi?status=error&error=' + encodeURIComponent(message));
           }, 3000);
         }
       }
