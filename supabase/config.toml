@@ -1,5 +1,8 @@
 project_id = "jiehjbbdeyngslfpgfnt"
 
+[functions.ai-chatbot]
+verify_jwt = false
+
 [functions.receive-n8n-inventory]
 verify_jwt = false
 

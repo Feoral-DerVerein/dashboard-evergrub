@@ -143,13 +143,13 @@ export const useChatbot = () => {
     const isAskingForExpiring = lowerMessage.includes('expir') || lowerMessage.includes('surplus') || 
                                  lowerMessage.includes('venc') || lowerMessage.includes('caduc');
 
-    console.log("Sending to N8N:", messageText);
+    console.log("Sending to Lovable AI:", messageText);
 
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-      // Call n8n webhook with full conversation history
+      // Prepare conversation history for AI
       const conversationHistory = messages.map(msg => ({
         role: msg.type === 'user' ? 'user' : 'assistant',
         content: msg.content
@@ -161,15 +161,15 @@ export const useChatbot = () => {
         content: messageText
       });
 
-      const response = await fetch("https://n8n.srv1024074.hstgr.cloud/webhook-test/c9b68781-c2af-4ba8-a1ec-a97980463690", {
+      // Call Lovable AI edge function
+      const response = await fetch("https://jiehjbbdeyngslfpgfnt.supabase.co/functions/v1/ai-chatbot", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZWhqYmJkZXluZ3NsZnBnZm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA3NDQxNzAsImV4cCI6MjA1NjMyMDE3MH0.s2152q-oy3qBMsJmVQ8-L9whBQDjebEQSo6GVYhXtlg'
         },
         body: JSON.stringify({
-          message: messageText,
-          messages: conversationHistory,
-          client_id: localStorage.getItem("client_id") || "test-client-123"
+          messages: conversationHistory
         }),
         signal: controller.signal
       });
@@ -181,7 +181,7 @@ export const useChatbot = () => {
       }
 
       const data = await response.json();
-      console.log("Chatbot Response (from Supabase):", data);
+      console.log("Chatbot Response:", data);
       
       const responseText = data.response || 'I received your message.';
       
