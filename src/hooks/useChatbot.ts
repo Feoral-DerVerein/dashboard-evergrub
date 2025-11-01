@@ -150,7 +150,7 @@ export const useChatbot = () => {
       const timeoutId = setTimeout(() => controller.abort(), 45000);
 
       // Call n8n webhook
-      const response = await fetch("https://n8n.srv1024074.hstgr.cloud/webhook-test/c9b68781-c2af-4ba8-a1ec-a97980463690", {
+      const response = await fetch("https://n8n.srv1024074.hstgr.cloud/webhook/c9b68781-c2af-4ba8-a1ec-a97980463690", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
