@@ -143,6 +143,71 @@ const importProducts = async (data: ProductRow[], userId: string): Promise<numbe
   return imported;
 };
 
+// Calculate and update metrics after import
+const updateSalesMetrics = async (userId: string, salesData: SalesRow[]) => {
+  try {
+    // Calculate totals from imported data
+    const totalSales = salesData.reduce((sum, row) => {
+      const amount = parseFloat(String(row.monto || row.amount || row.total || 0));
+      return sum + amount;
+    }, 0);
+
+    const transactions = salesData.length;
+    
+    // Estimate profit as 30% of sales (adjust based on your business)
+    const profit = totalSales * 0.30;
+
+    const today = new Date().toISOString().split('T')[0];
+
+    // Upsert sales metrics
+    const { error: salesMetricsError } = await supabase
+      .from('sales_metrics')
+      .upsert({
+        user_id: userId,
+        date: today,
+        total_sales: totalSales,
+        transactions: transactions,
+        profit: profit
+      }, {
+        onConflict: 'user_id,date'
+      });
+
+    if (salesMetricsError) {
+      console.error('Error updating sales metrics:', salesMetricsError);
+    }
+
+    // Calculate customer metrics
+    const avgOrderValue = transactions > 0 ? totalSales / transactions : 0;
+    const conversionRate = 15.5; // Default estimate
+    const returnRate = 2.3; // Default estimate
+
+    const { error: customerMetricsError } = await supabase
+      .from('customer_metrics')
+      .upsert({
+        user_id: userId,
+        date: today,
+        avg_order_value: avgOrderValue,
+        conversion_rate: conversionRate,
+        return_rate: returnRate
+      }, {
+        onConflict: 'user_id,date'
+      });
+
+    if (customerMetricsError) {
+      console.error('Error updating customer metrics:', customerMetricsError);
+    }
+
+    console.log('✅ Metrics updated:', {
+      totalSales,
+      transactions,
+      profit,
+      avgOrderValue
+    });
+  } catch (error) {
+    console.error('Error updating metrics:', error);
+  }
+};
+
 // Import sales
 const importSales = async (data: SalesRow[], userId: string): Promise<number> => {
   let imported = 0;
@@ -231,6 +296,11 @@ const importSales = async (data: SalesRow[], userId: string): Promise<number> =>
     } catch (error) {
       console.error('Error processing sales group:', error);
     }
+  }
+  
+  // Update metrics tables after import
+  if (imported > 0) {
+    await updateSalesMetrics(userId, data);
   }
   
   return imported;
