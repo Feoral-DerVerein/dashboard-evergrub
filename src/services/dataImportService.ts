@@ -240,14 +240,28 @@ const importSales = async (data: SalesRow[], userId: string): Promise<number> =>
 const importTransactions = async (data: TransactionRow[], userId: string): Promise<number> => {
   let imported = 0;
   
+  // Map Spanish transaction types to database types
+  const mapTransactionType = (tipo: string): 'earned' | 'redeemed' | 'purchased_with' => {
+    const tipoLower = tipo.toLowerCase();
+    if (tipoLower.includes('ingreso') || tipoLower.includes('earn')) {
+      return 'earned';
+    } else if (tipoLower.includes('egreso') || tipoLower.includes('gasto') || tipoLower.includes('redeem')) {
+      return 'redeemed';
+    } else if (tipoLower.includes('compra') || tipoLower.includes('purchase')) {
+      return 'purchased_with';
+    }
+    return 'earned'; // Default
+  };
+  
   for (const row of data) {
     try {
       const amount = parseInt(String(row.monto || row.amount || 0));
       if (!amount) continue;
       
+      const rawType = row.tipo || row.type || 'earned';
       const transactionData = {
         user_id: userId,
-        type: row.tipo || row.type || 'earned',
+        type: mapTransactionType(String(rawType)),
         amount: Math.abs(amount),
         description: row.descripcion || row.description || 'Imported transaction',
         cash_value: 0
