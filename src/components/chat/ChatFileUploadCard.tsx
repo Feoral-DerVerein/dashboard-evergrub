@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Upload, FileSpreadsheet, CheckCircle2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import * as XLSX from 'xlsx';
+import { dataImportService } from '@/services/dataImportService';
 
 export const ChatFileUploadCard = () => {
   const { toast } = useToast();
@@ -65,7 +66,7 @@ export const ChatFileUploadCard = () => {
         .eq('userId', user.id)
         .maybeSingle();
 
-      // Save to database
+      // Save to database for chatbot
       const { error } = await supabase
         .from('uploaded_data')
         .insert([{
@@ -79,11 +80,22 @@ export const ChatFileUploadCard = () => {
 
       if (error) throw error;
 
+      // Process and import data automatically to KPI tables
+      const importResult = await dataImportService.processImportedData(jsonData, user.id);
+
       setUploadedFileName(file.name);
-      toast({
-        title: "✅ File uploaded successfully",
-        description: `${file.name} - ${jsonData.length} rows processed. The chatbot can now access this data.`
-      });
+      
+      if (importResult.success) {
+        toast({
+          title: "✅ File uploaded and processed successfully",
+          description: `${file.name} - ${jsonData.length} rows processed. ${importResult.message}. Data is now visible in KPI dashboard.`
+        });
+      } else {
+        toast({
+          title: "✅ File uploaded successfully",
+          description: `${file.name} - ${jsonData.length} rows processed. Data saved for chatbot analysis. Note: ${importResult.message}`
+        });
+      }
 
     } catch (error) {
       console.error('Error uploading file:', error);
