@@ -1,46 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, FileSpreadsheet, CheckCircle2, Loader2, Webhook } from 'lucide-react';
+import { Upload, FileSpreadsheet, CheckCircle2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import * as XLSX from 'xlsx';
+import { dataImportService } from '@/services/dataImportService';
 
 export const ChatFileUploadCard = () => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
-  const [webhookUrl, setWebhookUrl] = useState<string>('');
-
-  // Load webhook URL from localStorage
-  useEffect(() => {
-    const savedWebhook = localStorage.getItem('n8n_webhook_url');
-    if (savedWebhook) {
-      setWebhookUrl(savedWebhook);
-    }
-  }, []);
-
-  // Save webhook URL to localStorage when it changes
-  const handleWebhookChange = (url: string) => {
-    setWebhookUrl(url);
-    localStorage.setItem('n8n_webhook_url', url);
-  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate webhook URL
-    if (!webhookUrl) {
-      toast({
-        title: "Webhook Required",
-        description: "Please enter your n8n webhook URL first",
-        variant: "destructive"
-      });
-      return;
-    }
 
     // Validate file type
     const validTypes = [
@@ -83,7 +57,7 @@ export const ChatFileUploadCard = () => {
       // Convert to JSON
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      console.log('📤 Sending data to n8n webhook:', jsonData);
+      console.log('Parsed data:', jsonData);
 
       // Get store profile
       const { data: storeProfile } = await supabase
@@ -92,40 +66,36 @@ export const ChatFileUploadCard = () => {
         .eq('userId', user.id)
         .maybeSingle();
 
-      // Prepare payload for n8n
-      const payload = {
-        userId: user.id,
-        fileName: file.name,
-        businessName: storeProfile?.name || 'Unknown',
-        businessType: storeProfile?.categories?.[0] || 'Unknown',
-        rowCount: jsonData.length,
-        data: jsonData,
-        timestamp: new Date().toISOString()
-      };
+      // Save to database for chatbot
+      const { error } = await supabase
+        .from('uploaded_data')
+        .insert([{
+          user_id: user.id,
+          business_name: storeProfile?.name || 'Unknown',
+          business_type: storeProfile?.categories?.[0] || 'Unknown',
+          json_data: jsonData as any,
+          pdf_info: null,
+          google_sheet_url: null
+        }]);
 
-      // Send to n8n webhook
-      console.log('🚀 Sending to webhook:', webhookUrl);
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+      if (error) throw error;
 
-      if (!response.ok) {
-        throw new Error(`Webhook returned status ${response.status}`);
-      }
-
-      const result = await response.json().catch(() => null);
-      console.log('✅ Webhook response:', result);
+      // Process and import data automatically to KPI tables
+      const importResult = await dataImportService.processImportedData(jsonData, user.id);
 
       setUploadedFileName(file.name);
       
-      toast({
-        title: "✅ File sent successfully",
-        description: `${file.name} with ${jsonData.length} rows sent to n8n for processing`,
-      });
+      if (importResult.success) {
+        toast({
+          title: "✅ File uploaded and processed successfully",
+          description: `${file.name} - ${jsonData.length} rows processed. ${importResult.message}. Data is now visible in KPI dashboard.`
+        });
+      } else {
+        toast({
+          title: "✅ File uploaded successfully",
+          description: `${file.name} - ${jsonData.length} rows processed. Data saved for chatbot analysis. Note: ${importResult.message}`
+        });
+      }
 
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -144,38 +114,17 @@ export const ChatFileUploadCard = () => {
   return (
     <Card className="glass-card-chatbot overflow-hidden">
       <CardContent className="p-6">
-        <div className="space-y-6">
-          <div className="text-center space-y-4">
-            <div className="flex justify-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <FileSpreadsheet className="w-8 h-8 text-primary" />
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Upload to n8n</h3>
-              <p className="text-sm text-muted-foreground">
-                Upload Excel or CSV files to send to your n8n webhook
-              </p>
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+              <FileSpreadsheet className="w-8 h-8 text-primary" />
             </div>
           </div>
-
-          {/* Webhook URL Input */}
-          <div className="space-y-2">
-            <Label htmlFor="webhook-url" className="flex items-center gap-2">
-              <Webhook className="w-4 h-4" />
-              n8n Webhook URL
-            </Label>
-            <Input
-              id="webhook-url"
-              type="url"
-              placeholder="https://jiehjbbdeyngslfpgfnt.supabase.co/functions/v1/..."
-              value={webhookUrl}
-              onChange={(e) => handleWebhookChange(e.target.value)}
-              className="font-mono text-sm"
-            />
-            <p className="text-xs text-muted-foreground">
-              Paste your n8n webhook URL that processes and sends data to Supabase
+          
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Upload Database</h3>
+            <p className="text-sm text-muted-foreground">
+              Upload Excel or CSV files for the chatbot to analyze your data
             </p>
           </div>
 
