@@ -19,6 +19,11 @@ export const ChatFileUploadCard = () => {
     const savedWebhook = localStorage.getItem('n8n_webhook_url');
     if (savedWebhook) {
       setWebhookUrl(savedWebhook);
+    } else {
+      // Set default webhook URL
+      const defaultWebhook = 'https://n8n.srv1024074.hstgr.cloud/webhook-test/upload-file';
+      setWebhookUrl(defaultWebhook);
+      localStorage.setItem('n8n_webhook_url', defaultWebhook);
     }
   }, []);
 
@@ -169,7 +174,7 @@ export const ChatFileUploadCard = () => {
             <Input
               id="webhook-url"
               type="url"
-              placeholder="https://jiehjbbdeyngslfpgfnt.supabase.co/functions/v1/..."
+              placeholder="https://n8n.srv1024074.hstgr.cloud/webhook-test/upload-file"
               value={webhookUrl}
               onChange={(e) => handleWebhookChange(e.target.value)}
               className="font-mono text-sm"
