@@ -24,8 +24,8 @@ export const ChatFileUploadCard = () => {
 
     if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls|csv)$/i)) {
       toast({
-        title: "Formato inválido",
-        description: "Por favor selecciona un archivo Excel (.xlsx, .xls) o CSV",
+        title: "Invalid Format",
+        description: "Please select an Excel (.xlsx, .xls) or CSV file",
         variant: "destructive"
       });
       return;
@@ -38,8 +38,8 @@ export const ChatFileUploadCard = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
-          title: "Error de autenticación",
-          description: "Debes iniciar sesión para subir archivos",
+          title: "Authentication Error",
+          description: "You must be logged in to upload files",
           variant: "destructive"
         });
         return;
@@ -81,15 +81,15 @@ export const ChatFileUploadCard = () => {
 
       setUploadedFileName(file.name);
       toast({
-        title: "✅ Archivo cargado exitosamente",
-        description: `${file.name} - ${jsonData.length} filas procesadas. El chatbot ahora puede acceder a estos datos.`
+        title: "✅ File uploaded successfully",
+        description: `${file.name} - ${jsonData.length} rows processed. The chatbot can now access this data.`
       });
 
     } catch (error) {
       console.error('Error uploading file:', error);
       toast({
-        title: "Error al cargar archivo",
-        description: error instanceof Error ? error.message : "Intenta nuevamente",
+        title: "Error uploading file",
+        description: error instanceof Error ? error.message : "Please try again",
         variant: "destructive"
       });
     } finally {
@@ -110,16 +110,16 @@ export const ChatFileUploadCard = () => {
           </div>
           
           <div>
-            <h3 className="font-semibold text-lg mb-2">Cargar Base de Datos</h3>
+            <h3 className="font-semibold text-lg mb-2">Upload Database</h3>
             <p className="text-sm text-muted-foreground">
-              Sube archivos Excel o CSV para que el chatbot analice tus datos
+              Upload Excel or CSV files for the chatbot to analyze your data
             </p>
           </div>
 
           {uploadedFileName && (
             <div className="flex items-center justify-center gap-2 text-sm text-green-600 bg-green-50 p-3 rounded-lg">
               <CheckCircle2 className="w-4 h-4" />
-              <span>Último archivo: {uploadedFileName}</span>
+              <span>Last file: {uploadedFileName}</span>
             </div>
           )}
 
@@ -142,12 +142,12 @@ export const ChatFileUploadCard = () => {
                 {isUploading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Procesando...
+                    Processing...
                   </>
                 ) : (
                   <>
                     <Upload className="w-4 h-4 mr-2" />
-                    Seleccionar Archivo
+                    Select File
                   </>
                 )}
               </Button>
@@ -155,7 +155,7 @@ export const ChatFileUploadCard = () => {
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Formatos soportados: Excel (.xlsx, .xls) y CSV
+            Supported formats: Excel (.xlsx, .xls) and CSV
           </p>
         </div>
       </CardContent>
