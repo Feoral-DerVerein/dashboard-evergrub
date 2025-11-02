@@ -17,18 +17,27 @@ const ImportProducts = () => {
     try {
       const formData = new FormData();
       formData.append('data', file);
+      formData.append('filename', file.name);
+      formData.append('mimeType', file.type);
 
       const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook-test/upload-file', {
         method: 'POST',
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Upload failed');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Upload failed: ${errorText}`);
+      }
+
+      const result = await response.json().catch(() => ({}));
 
       toast({
         title: "File uploaded successfully",
-        description: `${file.name} has been sent to the webhook`,
+        description: `${file.name} has been sent to n8n webhook`,
       });
+
+      console.log('Upload response:', result);
     } catch (error) {
       console.error('Error uploading file:', error);
       toast({
