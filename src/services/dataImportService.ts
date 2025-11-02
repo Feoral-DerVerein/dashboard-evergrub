@@ -78,8 +78,10 @@ const detectDataType = (data: any[]): 'products' | 'sales' | 'transactions' | 'u
   const firstRow = data[0];
   const keys = Object.keys(firstRow).map(k => k.toLowerCase());
   
+  console.log('🔍 Detecting data type. Column headers:', keys);
+  
   // Check for product columns
-  const productIndicators = ['producto', 'product', 'nombre', 'name', 'categoria', 'category', 'stock', 'cantidad', 'quantity', 'precio', 'price', 'expiracion', 'expiration', 'expiry'];
+  const productIndicators = ['producto', 'product', 'nombre', 'name', 'categoria', 'category', 'stock', 'cantidad', 'quantity', 'precio', 'price', 'expiracion', 'expiration', 'expiry', 'item'];
   const productScore = productIndicators.filter(ind => keys.some(k => k.includes(ind))).length;
   
   // Check for sales columns
@@ -90,26 +92,36 @@ const detectDataType = (data: any[]): 'products' | 'sales' | 'transactions' | 'u
   const transactionIndicators = ['transaccion', 'transaction', 'tipo', 'type', 'descripcion', 'description'];
   const transactionScore = transactionIndicators.filter(ind => keys.some(k => k.includes(ind))).length;
   
+  console.log('📊 Scores - Products:', productScore, 'Sales:', salesScore, 'Transactions:', transactionScore);
+  
   // Return the type with highest score
   if (productScore >= salesScore && productScore >= transactionScore && productScore > 2) {
+    console.log('✅ Detected as PRODUCTS');
     return 'products';
   } else if (salesScore >= transactionScore && salesScore > 2) {
+    console.log('✅ Detected as SALES');
     return 'sales';
   } else if (transactionScore > 1) {
+    console.log('✅ Detected as TRANSACTIONS');
     return 'transactions';
   }
   
+  console.log('⚠️ Could not detect data type (unknown)');
   return 'unknown';
 };
 
 // Import products
 const importProducts = async (data: ProductRow[], userId: string): Promise<number> => {
+  console.log(`📦 Starting product import for user ${userId}, ${data.length} rows`);
   let imported = 0;
   
   for (const row of data) {
     try {
-      const productName = row.nombre || row.name || row.producto || '';
-      if (!productName) continue;
+      const productName = row.nombre || row.name || row.producto || row.item || '';
+      if (!productName) {
+        console.log('⚠️ Skipping row without product name:', row);
+        continue;
+      }
       
       const productData = {
         name: productName,
@@ -117,8 +129,8 @@ const importProducts = async (data: ProductRow[], userId: string): Promise<numbe
         price: parseFloat(String(row.precio || row.price || 0)),
         quantity: parseInt(String(row.cantidad || row.quantity || row.stock || 0)),
         expirationdate: row.fecha_expiracion || row.expiration_date || row.expiry_date || '',
-        description: '',
-        brand: row.proveedor || row.supplier || '',
+        description: row.descripcion || row.description || '',
+        brand: row.proveedor || row.supplier || row.marca || row.brand || '',
         image: '',
         userid: userId,
         status: 'active',
@@ -126,20 +138,24 @@ const importProducts = async (data: ProductRow[], userId: string): Promise<numbe
         is_marketplace_visible: true
       };
       
+      console.log('📝 Inserting product:', productData.name);
+      
       const { error } = await supabase
         .from('products')
         .insert([productData]);
       
       if (!error) {
         imported++;
+        console.log(`✅ Product imported: ${productData.name}`);
       } else {
-        console.error('Error importing product:', error);
+        console.error('❌ Error importing product:', productName, error);
       }
     } catch (error) {
-      console.error('Error processing product row:', error);
+      console.error('❌ Error processing product row:', error);
     }
   }
   
+  console.log(`✅ Import complete: ${imported} products imported`);
   return imported;
 };
 
