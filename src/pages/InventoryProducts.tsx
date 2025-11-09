@@ -2,28 +2,41 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
-
-interface Product {
-  id: string;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  sku: string;
-  fechaExpiracion: string | null;
-}
+import { useAuth } from '@/context/AuthContext';
+import { inventoryProductsService, type InventoryProduct } from '@/services/inventoryProductsService';
+import { useToast } from '@/hooks/use-toast';
 
 export default function InventoryProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<InventoryProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Cargar productos de localStorage
-    const stored = localStorage.getItem('square_products');
-    if (stored) {
-      setProducts(JSON.parse(stored));
-    }
-    setLoading(false);
-  }, []);
+    const loadProducts = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const data = await inventoryProductsService.getInventoryProducts(user.id);
+        setProducts(data);
+      } catch (error) {
+        console.error('Error loading inventory products:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load inventory products',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, [user?.id, toast]);
 
   const getDaysUntilExpiration = (expirationDate: string | null) => {
     if (!expirationDate) return null;
@@ -64,7 +77,7 @@ export default function InventoryProducts() {
         <h1 className="text-3xl font-bold">Product Inventory</h1>
         <div className="flex gap-4 mt-2">
           <p className="text-muted-foreground">
-            {products.length} products synced from Square
+            {products.length} products in inventory
           </p>
           <Badge variant="secondary" className="text-sm">
             {products.length} products available
@@ -74,14 +87,14 @@ export default function InventoryProducts() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {products.map((product) => {
-          const daysLeft = getDaysUntilExpiration(product.fechaExpiracion);
+          const daysLeft = getDaysUntilExpiration(product.expiration_date || null);
           const alertColor = getAlertColor(daysLeft);
           const badgeVariant = getBadgeVariant(daysLeft);
 
           return (
             <Card key={product.id} className={`border-2 ${alertColor}`}>
               <CardHeader>
-                <CardTitle className="text-lg">{product.nombre}</CardTitle>
+                <CardTitle className="text-lg">{product.product_name}</CardTitle>
                 {daysLeft !== null && (
                   <Badge variant={badgeVariant as any}>
                     {daysLeft <= 0 ? 'EXPIRED!' : `Expires in ${daysLeft} days`}
@@ -89,16 +102,28 @@ export default function InventoryProducts() {
                 )}
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-2">{product.descripcion}</p>
-                <div className="flex justify-between items-center">
+                <p className="text-sm text-muted-foreground mb-2">{product.category}</p>
+                <div className="flex justify-between items-center mb-2">
                   <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    ${product.precio.toFixed(2)}
+                    ${product.price.toFixed(2)}
                   </span>
-                  <span className="text-sm text-muted-foreground">SKU: {product.sku}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Stock: {product.stock_quantity}
+                  </span>
                 </div>
-                {product.fechaExpiracion && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Expires: {product.fechaExpiracion}
+                {product.barcode && (
+                  <p className="text-xs text-muted-foreground">
+                    Barcode: {product.barcode}
+                  </p>
+                )}
+                {product.expiration_date && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Expires: {product.expiration_date}
+                  </p>
+                )}
+                {product.supplier && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Supplier: {product.supplier}
                   </p>
                 )}
               </CardContent>
@@ -107,9 +132,9 @@ export default function InventoryProducts() {
         })}
       </div>
 
-      {products.length === 0 && (
+      {products.length === 0 && !loading && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No products synced.</p>
+          <p className="text-muted-foreground">No products in inventory.</p>
         </div>
       )}
     </div>
