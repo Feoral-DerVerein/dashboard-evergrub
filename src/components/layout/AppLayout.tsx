@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { BarChart3, LogOut, Package, Truck } from "lucide-react";
+import { BarChart3, LogOut, Package, Truck, Plug } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -21,6 +21,7 @@ const menuItems = [
   { title: "Performance", url: "/kpi", icon: BarChart3 },
   { title: "Inventory Products", url: "/inventory-products", icon: Package },
   { title: "Delivery", url: "/delivery", icon: Truck },
+  { title: "Integrations", url: "/integrations", icon: Plug },
 ];
 
 function AppSidebar() {
