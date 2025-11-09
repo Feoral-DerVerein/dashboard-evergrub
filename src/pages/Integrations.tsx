@@ -39,6 +39,7 @@ const integrations: Integration[] = [
     type: "POS System",
     description: "Complete point of sale solution",
     icon: <CreditCard className="w-8 h-8" />,
+    logoUrl: "/integration-logos/clover-logo.svg",
     connected: false,
     category: "pos"
   },
@@ -48,6 +49,7 @@ const integrations: Integration[] = [
     type: "POS System",
     description: "Restaurant POS and management",
     icon: <CreditCard className="w-8 h-8" />,
+    logoUrl: "/integration-logos/toast-logo.png",
     connected: false,
     category: "pos"
   },
@@ -57,6 +59,7 @@ const integrations: Integration[] = [
     type: "POS System",
     description: "Retail and restaurant POS",
     icon: <CreditCard className="w-8 h-8" />,
+    logoUrl: "/integration-logos/lightspeed-logo.png",
     connected: false,
     category: "pos"
   },
@@ -68,6 +71,7 @@ const integrations: Integration[] = [
     type: "ERP System",
     description: "Enterprise resource planning",
     icon: <Package2 className="w-8 h-8" />,
+    logoUrl: "/integration-logos/sap-logo.png",
     connected: false,
     category: "erp"
   },
@@ -77,6 +81,7 @@ const integrations: Integration[] = [
     type: "ERP System",
     description: "Cloud-based enterprise management",
     icon: <Package2 className="w-8 h-8" />,
+    logoUrl: "/integration-logos/oracle-logo.png",
     connected: false,
     category: "erp"
   },
@@ -86,6 +91,7 @@ const integrations: Integration[] = [
     type: "ERP System",
     description: "Business applications platform",
     icon: <Package2 className="w-8 h-8" />,
+    logoUrl: "/integration-logos/microsoft-dynamics-logo.png",
     connected: false,
     category: "erp"
   },
@@ -97,6 +103,7 @@ const integrations: Integration[] = [
     type: "Delivery Platform",
     description: "Food delivery service",
     icon: <Truck className="w-8 h-8" />,
+    logoUrl: "/integration-logos/uber-eats-logo.png",
     connected: false,
     category: "delivery"
   },
@@ -106,6 +113,7 @@ const integrations: Integration[] = [
     type: "Delivery Platform",
     description: "Multi-category delivery platform",
     icon: <Truck className="w-8 h-8" />,
+    logoUrl: "/integration-logos/rappi-logo.png",
     connected: false,
     category: "delivery"
   },
@@ -115,6 +123,7 @@ const integrations: Integration[] = [
     type: "Delivery Platform",
     description: "Food delivery and logistics",
     icon: <Truck className="w-8 h-8" />,
+    logoUrl: "/integration-logos/doordash-logo.png",
     connected: false,
     category: "delivery"
   },
@@ -124,6 +133,7 @@ const integrations: Integration[] = [
     type: "Delivery Platform",
     description: "On-demand delivery service",
     icon: <Truck className="w-8 h-8" />,
+    logoUrl: "/integration-logos/glovo-logo.png",
     connected: false,
     category: "delivery"
   },
@@ -133,6 +143,7 @@ const integrations: Integration[] = [
     type: "Delivery Platform",
     description: "Integration hub for delivery platforms",
     icon: <Truck className="w-8 h-8" />,
+    logoUrl: "/integration-logos/deliverect-logo.png",
     connected: false,
     category: "delivery"
   }
