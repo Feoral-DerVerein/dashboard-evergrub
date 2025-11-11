@@ -17,6 +17,11 @@ export interface ChatMessage {
   cards?: import('@/components/chat/BusinessCards').BusinessCardData[];
   product_cards?: any[]; // Allow any product card format from different sources
   expiring_products?: any[]; // Expiring products for Negentropy assistant
+  actions?: Array<{
+    label: string;
+    type: "donate" | "create_bag" | "discount" | "inventory" | "report" | "marketplace" | "view_products";
+    description: string;
+  }>;
   timestamp: Date;
   isTyping?: boolean;
 }

@@ -207,6 +207,7 @@ export const useChatbot = () => {
         cards: cards,
         product_cards: transformedProductCards,
         expiring_products: isAskingForExpiring ? data.expiring_products : undefined,
+        actions: data.actions, // Add actions from AI response
         timestamp: new Date()
       };
 

@@ -5,6 +5,7 @@ import { BusinessCard, type BusinessCardData } from '@/components/chat/BusinessC
 import { ProductCards } from '@/components/chat/ProductCards';
 import { ProductActionCards } from '@/components/chat/ProductActionCards';
 import { InteractiveProductCard } from '@/components/chat/InteractiveProductCard';
+import { ActionButtons } from '@/components/chat/ActionButtons';
 import { useChatbot } from '@/hooks/useChatbot';
 import { useToast } from '@/hooks/use-toast';
 import { IntelligentNewsCards } from '@/components/kpi/IntelligentNewsCards';
@@ -153,12 +154,19 @@ const ChatBot = ({
                   
                   {/* Message Content (User or Bot Text) */}
                   {message.content && (
-                    <div className={`inline-block max-w-[80%] px-4 py-3 rounded-2xl mb-3 animate-fade-in ${
-                      message.type === 'user' 
-                        ? 'bg-[#10a37f] text-white rounded-br-md' 
-                        : 'bg-[#f7f7f8] text-[#202123] rounded-bl-md border border-[#d9d9e3]'
-                    }`}>
-                      <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                    <div className="space-y-2">
+                      <div className={`inline-block max-w-[80%] px-4 py-3 rounded-2xl mb-3 animate-fade-in ${
+                        message.type === 'user' 
+                          ? 'bg-[#10a37f] text-white rounded-br-md' 
+                          : 'bg-[#f7f7f8] text-[#202123] rounded-bl-md border border-[#d9d9e3]'
+                      }`}>
+                        <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      </div>
+                      
+                      {/* Action Buttons - Only for bot messages */}
+                      {message.type === 'bot' && (message as any).actions && (
+                        <ActionButtons actions={(message as any).actions} />
+                      )}
                     </div>
                   )}
                   

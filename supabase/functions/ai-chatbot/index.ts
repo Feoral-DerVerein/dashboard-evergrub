@@ -29,8 +29,48 @@ Tus capacidades incluyen:
 - Ayudar con la gestión de inventario
 - Sugerir estrategias de ventas
 - Analizar métricas del negocio
+- Sugerir acciones concretas cuando sea relevante
 
 Responde de manera amigable, profesional y concisa. Usa emojis ocasionalmente para hacer la conversación más amena.`;
+
+    // Define tools for action detection
+    const tools = [
+      {
+        type: "function",
+        function: {
+          name: "suggest_actions",
+          description: "Sugiere acciones concretas que el usuario puede realizar. Solo úsalo cuando la respuesta incluya recomendaciones accionables.",
+          parameters: {
+            type: "object",
+            properties: {
+              actions: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    label: { 
+                      type: "string",
+                      description: "Texto del botón de acción (máx 30 caracteres)"
+                    },
+                    type: {
+                      type: "string",
+                      enum: ["donate", "create_bag", "discount", "inventory", "report", "marketplace", "view_products"],
+                      description: "Tipo de acción a realizar"
+                    },
+                    description: {
+                      type: "string",
+                      description: "Descripción breve de qué hará la acción"
+                    }
+                  },
+                  required: ["label", "type", "description"]
+                }
+              }
+            },
+            required: ["actions"]
+          }
+        }
+      }
+    ];
 
     // Call Lovable AI Gateway
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -45,6 +85,7 @@ Responde de manera amigable, profesional y concisa. Usa emojis ocasionalmente pa
           { role: 'system', content: systemPrompt },
           ...messages
         ],
+        tools: tools,
         temperature: 0.7,
         max_tokens: 1000,
       }),
@@ -87,11 +128,29 @@ Responde de manera amigable, profesional y concisa. Usa emojis ocasionalmente pa
     console.log('AI response received');
 
     const aiResponse = data.choices[0]?.message?.content || 'Lo siento, no pude generar una respuesta.';
+    
+    // Extract actions from tool calls if available
+    let suggestedActions = [];
+    const toolCalls = data.choices[0]?.message?.tool_calls;
+    if (toolCalls && toolCalls.length > 0) {
+      for (const toolCall of toolCalls) {
+        if (toolCall.function.name === 'suggest_actions') {
+          try {
+            const args = JSON.parse(toolCall.function.arguments);
+            suggestedActions = args.actions || [];
+            console.log('Extracted actions:', suggestedActions);
+          } catch (e) {
+            console.error('Error parsing tool call arguments:', e);
+          }
+        }
+      }
+    }
 
     return new Response(
       JSON.stringify({ 
         response: aiResponse,
-        output: aiResponse // Para mantener compatibilidad con formato anterior
+        output: aiResponse, // Para mantener compatibilidad con formato anterior
+        actions: suggestedActions // Acciones sugeridas
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
