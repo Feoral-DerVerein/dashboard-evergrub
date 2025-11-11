@@ -7,7 +7,8 @@ import {
   Truck, 
   Package2,
   CheckCircle2,
-  ExternalLink
+  ExternalLink,
+  Heart
 } from "lucide-react";
 
 interface Integration {
@@ -18,7 +19,7 @@ interface Integration {
   icon: React.ReactNode;
   logoUrl?: string;
   connected: boolean;
-  category: "pos" | "erp" | "delivery";
+  category: "pos" | "erp" | "delivery" | "foodbank";
 }
 
 const integrations: Integration[] = [
@@ -146,6 +147,48 @@ const integrations: Integration[] = [
     logoUrl: "/integration-logos/deliverect-logo.png",
     connected: false,
     category: "delivery"
+  },
+  
+  // Food Banks
+  {
+    id: "banc-aliments-barcelona",
+    name: "Banc dels Aliments",
+    type: "Food Bank",
+    description: "Banco de alimentos de Barcelona",
+    icon: <Heart className="w-8 h-8" />,
+    logoUrl: "/integration-logos/banc-aliments-barcelona-logo.png",
+    connected: false,
+    category: "foodbank"
+  },
+  {
+    id: "fesbal",
+    name: "FESBAL",
+    type: "Food Bank",
+    description: "Federación Española de Bancos de Alimentos",
+    icon: <Heart className="w-8 h-8" />,
+    logoUrl: "/integration-logos/fesbal-logo.png",
+    connected: false,
+    category: "foodbank"
+  },
+  {
+    id: "cruz-roja",
+    name: "Cruz Roja España",
+    type: "Food Bank",
+    description: "Organización humanitaria y banco de alimentos",
+    icon: <Heart className="w-8 h-8" />,
+    logoUrl: "/integration-logos/cruz-roja-logo.png",
+    connected: false,
+    category: "foodbank"
+  },
+  {
+    id: "caritas",
+    name: "Cáritas España",
+    type: "Food Bank",
+    description: "Organización benéfica y distribución de alimentos",
+    icon: <Heart className="w-8 h-8" />,
+    logoUrl: "/integration-logos/caritas-logo.png",
+    connected: false,
+    category: "foodbank"
   }
 ];
 
@@ -158,6 +201,8 @@ const Integrations = () => {
         return "ERP Systems";
       case "delivery":
         return "Delivery Platforms";
+      case "foodbank":
+        return "Bancos de Alimentos";
       default:
         return category;
     }
@@ -171,12 +216,14 @@ const Integrations = () => {
         return <Package2 className="w-5 h-5" />;
       case "delivery":
         return <Truck className="w-5 h-5" />;
+      case "foodbank":
+        return <Heart className="w-5 h-5" />;
       default:
         return <ShoppingCart className="w-5 h-5" />;
     }
   };
 
-  const categories = ["pos", "erp", "delivery"] as const;
+  const categories = ["pos", "erp", "delivery", "foodbank"] as const;
 
   return (
     <div className="p-6 space-y-8">
