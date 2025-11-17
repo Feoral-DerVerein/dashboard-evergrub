@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '@/types/chatbot.types';
 import type { BusinessCardData } from '@/components/chat/BusinessCards';
+import { supabase } from '@/integrations/supabase/client';
 
 // Generate cards based on response content - only when truly relevant
 const generateCardsFromResponse = (responseText: string, userMessage: string): BusinessCardData[] => {
@@ -146,9 +147,6 @@ export const useChatbot = () => {
     console.log("Sending to n8n webhook:", messageText);
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
-
       // Prepare conversation history for AI
       const conversationHistory = messages.map(msg => ({
         role: msg.type === 'user' ? 'user' : 'assistant',
@@ -161,30 +159,17 @@ export const useChatbot = () => {
         content: messageText
       });
 
-      // Call n8n webhook
-      const response = await fetch("https://n8n.srv1024074.hstgr.cloud/webhook-test/c9b68781-c2af-4ba8-a1ec-a97980463690", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          messages: conversationHistory,
-          message: messageText,
-          client_id: `client_${Date.now()}`
-        }),
-        signal: controller.signal
+      // Call ai-chatbot edge function
+      const { data, error } = await supabase.functions.invoke('ai-chatbot', {
+        body: { messages: conversationHistory }
       });
 
-      clearTimeout(timeoutId);
+      if (error) throw error;
 
-      if (!response.ok) {
-        throw new Error(`API call failed: ${response.status}`);
-      }
-
-      const data = await response.json();
       console.log("Chatbot Response:", data);
       
       const responseText = data.output || data.response || 'I received your message.';
+      console.log('Actions received:', data.actions);
       
       // Simulate typing animation
       await simulateTyping(responseText);
