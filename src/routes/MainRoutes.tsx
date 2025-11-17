@@ -29,6 +29,7 @@ import SquareDashboard from "@/pages/SquareDashboard";
 import SquareSettings from "@/pages/SquareSettings";
 import DeliveryDashboard from "@/pages/DeliverectDashboard";
 import Integrations from "@/pages/Integrations";
+import Notes from "@/pages/Notes";
 
 
 const MainRoutes = () => {
@@ -69,6 +70,7 @@ const MainRoutes = () => {
         <Route path="/delivery" element={<DeliveryDashboard />} />
         <Route path="/deliverect" element={<DeliveryDashboard />} /> {/* Legacy redirect */}
         <Route path="/integrations" element={<Integrations />} />
+        <Route path="/notes" element={<Notes />} />
         
       </Route>
       
