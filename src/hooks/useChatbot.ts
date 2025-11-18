@@ -212,6 +212,17 @@ export const useChatbot = () => {
         urgency: card.reason?.includes('expire') ? 'high' : 'medium'
       }));
 
+      // Auto-generate actions if we have products but no actions
+      let finalActions = actions;
+      if (!actions && (transformedProductCards?.length > 0 || data.expiring_products?.length > 0)) {
+        finalActions = [
+          { label: "Ver productos", type: "view_products" as const, description: "Ver productos disponibles" },
+          { label: "Crear bolsa sorpresa", type: "create_bag" as const, description: "Crear nueva bolsa sorpresa" },
+          { label: "Donar", type: "donate" as const, description: "Enviar a donación" },
+          { label: "Marketplace", type: "marketplace" as const, description: "Publicar en marketplace" }
+        ];
+      }
+
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
@@ -219,7 +230,7 @@ export const useChatbot = () => {
         cards: cards,
         product_cards: transformedProductCards,
         expiring_products: isAskingForExpiring ? data.expiring_products : undefined,
-        actions: actions,
+        actions: finalActions,
         buttons: buttons,
         timestamp: new Date()
       };
