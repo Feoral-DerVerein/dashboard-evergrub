@@ -198,6 +198,7 @@ export const useChatbot = () => {
         product_cards: transformedProductCards,
         expiring_products: isAskingForExpiring ? data.expiring_products : undefined,
         actions: data.actions, // Add actions from AI response
+        buttons: data.buttons, // Add interactive buttons from AI response
         timestamp: new Date()
       };
 

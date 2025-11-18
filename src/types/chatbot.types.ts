@@ -22,6 +22,10 @@ export interface ChatMessage {
     type: "donate" | "create_bag" | "discount" | "inventory" | "report" | "marketplace" | "view_products";
     description: string;
   }>;
+  buttons?: Array<{
+    label: string;
+    action: string;
+  }>;
   timestamp: Date;
   isTyping?: boolean;
 }
