@@ -27,6 +27,7 @@ const ChatBot = ({
   } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [clickedButtons, setClickedButtons] = useState<Set<string>>(new Set());
   const isMobile = useIsMobile();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -76,6 +77,11 @@ const ChatBot = ({
         // Details modal is handled in the component
         break;
     }
+  };
+
+  const handleButtonClick = (messageId: string, buttonLabel: string) => {
+    setClickedButtons(prev => new Set(prev).add(messageId));
+    sendMessage(buttonLabel);
   };
 
   // Enhanced chatbot hook with intelligence
@@ -166,6 +172,24 @@ const ChatBot = ({
                       {/* Action Buttons - Only for bot messages */}
                       {message.type === 'bot' && (message as any).actions && (
                         <ActionButtons actions={(message as any).actions} />
+                      )}
+
+                      {/* Interactive Buttons */}
+                      {message.type === 'bot' && message.buttons && !clickedButtons.has(message.id) && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {message.buttons.map((button, btnIndex) => (
+                            <Button
+                              key={btnIndex}
+                              onClick={() => handleButtonClick(message.id, button.label)}
+                              variant="outline"
+                              size="sm"
+                              className="text-sm border-[#10a37f] text-[#10a37f] hover:bg-[#10a37f] hover:text-white transition-colors"
+                            >
+                              {button.label}
+                              <ArrowRight className="w-4 h-4 ml-1" />
+                            </Button>
+                          ))}
+                        </div>
                       )}
                     </div>
                   )}
