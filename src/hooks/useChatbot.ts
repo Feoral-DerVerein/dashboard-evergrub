@@ -159,12 +159,17 @@ export const useChatbot = () => {
         content: messageText
       });
 
-      // Call ai-chatbot edge function
-      const { data, error } = await supabase.functions.invoke('ai-chatbot', {
-        body: { messages: conversationHistory }
+      // Call n8n webhook
+      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/c9b68781-c2af-4ba8-a1ec-a97980463690', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: conversationHistory })
       });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
 
       console.log("Chatbot Response:", data);
       
