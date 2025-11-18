@@ -173,28 +173,30 @@ export const useChatbot = () => {
 
       console.log("Chatbot Response:", data);
       
-      // Parse JSON if response is a string
-      let parsedData = data;
+      // Parse JSON response from n8n
       const rawResponse = data.output || data.response || 'I received your message.';
+      let responseText = '';
+      let buttons = undefined;
+      let actions = undefined;
       
       if (typeof rawResponse === 'string' && rawResponse.trim().startsWith('{')) {
         try {
-          parsedData = JSON.parse(rawResponse);
-          console.log("Parsed JSON response:", parsedData);
+          const parsed = JSON.parse(rawResponse);
+          responseText = parsed.text || rawResponse;
+          buttons = parsed.buttons;
+          actions = parsed.actions;
+          console.log("Parsed JSON - Text:", responseText, "Buttons:", buttons, "Actions:", actions);
         } catch (e) {
           console.error("Failed to parse JSON:", e);
-          parsedData = { text: rawResponse };
+          responseText = rawResponse;
         }
-      } else if (typeof rawResponse === 'string') {
-        parsedData = { text: rawResponse };
+      } else if (typeof rawResponse === 'object') {
+        responseText = rawResponse.text || JSON.stringify(rawResponse);
+        buttons = rawResponse.buttons;
+        actions = rawResponse.actions;
+      } else {
+        responseText = rawResponse;
       }
-      
-      const responseText = parsedData.text || rawResponse;
-      const buttons = parsedData.buttons || data.buttons;
-      const actions = parsedData.actions || data.actions;
-      
-      console.log('Actions received:', actions);
-      console.log('Buttons received:', buttons);
       
       // Simulate typing animation
       await simulateTyping(responseText);
