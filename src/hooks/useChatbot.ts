@@ -3,6 +3,21 @@ import { ChatMessage } from '@/types/chatbot.types';
 import type { BusinessCardData } from '@/components/chat/BusinessCards';
 import { supabase } from '@/integrations/supabase/client';
 
+// Function to get performance data
+const getPerformanceData = async (dataType: 'all' | 'sales_metrics' | 'sustainability_metrics' | 'customer_metrics' | 'surprise_bags_metrics' | 'grain_transactions' = 'all') => {
+  try {
+    const { data, error } = await supabase.functions.invoke('get-performance-data', {
+      body: { dataType }
+    });
+    
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching performance data:', error);
+    return null;
+  }
+};
+
 // Generate cards based on response content - only when truly relevant
 const generateCardsFromResponse = (responseText: string, userMessage: string): BusinessCardData[] => {
   const cards: BusinessCardData[] = [];
@@ -144,6 +159,17 @@ export const useChatbot = () => {
     const isAskingForExpiring = lowerMessage.includes('expir') || lowerMessage.includes('surplus') || 
                                  lowerMessage.includes('venc') || lowerMessage.includes('caduc');
 
+    // Check if asking for performance/metrics data
+    const isAskingForPerformance = lowerMessage.includes('performance') || 
+                                   lowerMessage.includes('metrics') || 
+                                   lowerMessage.includes('recomendation') ||
+                                   lowerMessage.includes('recommendation') ||
+                                   lowerMessage.includes('sales') ||
+                                   lowerMessage.includes('ventas') ||
+                                   lowerMessage.includes('sostenibilidad') ||
+                                   lowerMessage.includes('sustainability') ||
+                                   lowerMessage.includes('analytics');
+
     console.log("Sending to n8n webhook:", messageText);
 
     try {
@@ -159,13 +185,26 @@ export const useChatbot = () => {
         content: messageText
       });
 
-      // Call n8n webhook
+      // Get performance data if needed
+      let performanceContext = null;
+      if (isAskingForPerformance) {
+        console.log("Fetching performance data for context...");
+        performanceContext = await getPerformanceData('all');
+        console.log("Performance data fetched:", performanceContext);
+      }
+
+      // Call n8n webhook with performance context if available
+      const requestBody: any = { messages: conversationHistory };
+      if (performanceContext) {
+        requestBody.performanceData = performanceContext;
+      }
+
       const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/c9b68781-c2af-4ba8-a1ec-a97980463690', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ messages: conversationHistory })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
