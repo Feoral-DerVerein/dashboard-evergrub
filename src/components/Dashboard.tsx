@@ -458,7 +458,7 @@ const Dashboard = () => {
                         <AvatarFallback>O</AvatarFallback>
                       </Avatar>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuContent align="end" className="w-48 z-50">
                       <DropdownMenuItem asChild>
                         <Link to="/configuration" className="flex items-center gap-2 w-full">
                           <Settings className="h-4 w-4" />
@@ -469,6 +469,12 @@ const Dashboard = () => {
                         <Link to="/pricing" className="flex items-center gap-2 w-full">
                           <CreditCard className="h-4 w-4" />
                           Pricing
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/integrations" className="flex items-center gap-2 w-full">
+                          <Plug className="h-4 w-4" />
+                          Integrations
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={async () => {
