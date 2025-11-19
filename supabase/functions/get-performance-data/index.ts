@@ -12,26 +12,16 @@ serve(async (req) => {
   }
 
   try {
-    // Create Supabase client with the auth context from the request
+    // Create Supabase client with the auth context from the request (for RLS)
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+          headers: { Authorization: req.headers.get('Authorization') ?? '' },
         },
       }
     );
-
-    // Get authenticated user
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    
-    if (userError || !user) {
-      console.error('Auth error:', userError);
-      throw new Error('Not authenticated');
-    }
-    
-    console.log('Authenticated user:', user.id);
 
     const { dataType } = await req.json();
 
@@ -42,7 +32,6 @@ serve(async (req) => {
         const { data, error } = await supabaseClient
           .from('sales_metrics')
           .select('*')
-          .eq('user_id', user.id)
           .order('date', { ascending: false })
           .limit(30);
         
@@ -55,7 +44,6 @@ serve(async (req) => {
         const { data, error } = await supabaseClient
           .from('sustainability_metrics')
           .select('*')
-          .eq('user_id', user.id)
           .order('date', { ascending: false })
           .limit(30);
         
@@ -68,7 +56,6 @@ serve(async (req) => {
         const { data, error } = await supabaseClient
           .from('customer_metrics')
           .select('*')
-          .eq('user_id', user.id)
           .order('date', { ascending: false })
           .limit(30);
         
@@ -81,7 +68,6 @@ serve(async (req) => {
         const { data, error } = await supabaseClient
           .from('surprise_bags_metrics')
           .select('*')
-          .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(30);
         
@@ -94,7 +80,6 @@ serve(async (req) => {
         const { data, error } = await supabaseClient
           .from('grain_transactions')
           .select('*')
-          .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(30);
         
@@ -109,31 +94,26 @@ serve(async (req) => {
           supabaseClient
             .from('sales_metrics')
             .select('*')
-            .eq('user_id', user.id)
             .order('date', { ascending: false })
             .limit(30),
           supabaseClient
             .from('sustainability_metrics')
             .select('*')
-            .eq('user_id', user.id)
             .order('date', { ascending: false })
             .limit(30),
           supabaseClient
             .from('customer_metrics')
             .select('*')
-            .eq('user_id', user.id)
             .order('date', { ascending: false })
             .limit(30),
           supabaseClient
             .from('surprise_bags_metrics')
             .select('*')
-            .eq('user_id', user.id)
             .order('created_at', { ascending: false })
             .limit(30),
           supabaseClient
             .from('grain_transactions')
             .select('*')
-            .eq('user_id', user.id)
             .order('created_at', { ascending: false })
             .limit(30)
         ]);
