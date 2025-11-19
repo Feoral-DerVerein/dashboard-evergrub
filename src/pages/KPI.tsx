@@ -17,6 +17,9 @@ import RiskEngineSection from "@/components/kpi/RiskEngineSection";
 import RecommendationEngineCard from "@/components/kpi/RecommendationEngineCard";
 import BusinessHealthCards from "@/components/kpi/BusinessHealthCards";
 import AlertCenterCard from "@/components/kpi/AlertCenterCard";
+import SalesForecastCard from "@/components/kpi/SalesForecastCard";
+import TopProductsForecastCard from "@/components/kpi/TopProductsForecastCard";
+import InfluencingFactorsCard from "@/components/kpi/InfluencingFactorsCard";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AustralianComplianceDialog } from "@/components/AustralianComplianceDialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -804,168 +807,15 @@ const KPI = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                  {/* Sales Forecast Card */}
-                  <Card className="apple-card-hover p-6">
-                    <h3 className="text-lg font-semibold text-foreground mb-4">Sales Forecast – Next 7 Days</h3>
-                    <div className="mb-4">
-                      <div className="text-3xl font-bold text-foreground mb-1">$24,850</div>
-                      <div className="text-sm text-muted-foreground flex items-center gap-1">
-                        <TrendingUp className="h-4 w-4 text-green-600" />
-                        <span className="text-green-600">+12.5%</span>
-                        <span>vs. last week</span>
-                      </div>
-                    </div>
-                    <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={[
-                          { day: 'Mon', actual: 3200, forecast: 3400 },
-                          { day: 'Tue', actual: 3400, forecast: 3500 },
-                          { day: 'Wed', actual: 3100, forecast: 3300 },
-                          { day: 'Thu', actual: 3600, forecast: 3700 },
-                          { day: 'Fri', actual: 3800, forecast: 3950 },
-                          { day: 'Sat', forecast: 4100 },
-                          { day: 'Sun', forecast: 3800 }
-                        ]}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                          <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" />
-                          <YAxis stroke="hsl(var(--muted-foreground))" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: 'hsl(var(--background))',
-                              border: '1px solid hsl(var(--border))',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Line 
-                            type="monotone" 
-                            dataKey="actual" 
-                            stroke="hsl(var(--primary))" 
-                            strokeWidth={2}
-                            dot={{ fill: 'hsl(var(--primary))' }}
-                            name="Actual"
-                          />
-                          <Line 
-                            type="monotone" 
-                            dataKey="forecast" 
-                            stroke="hsl(var(--muted-foreground))" 
-                            strokeWidth={2}
-                            strokeDasharray="5 5"
-                            dot={{ fill: 'hsl(var(--muted-foreground))' }}
-                            name="Forecast"
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </Card>
+                  {/* Sales Forecast Card - Dynamic Data */}
+                  <SalesForecastCard data={dashboardData?.salesForecast} isLoading={isDashboardLoading} />
 
-                  {/* Key Influencing Factors Card */}
-                  <Card className="apple-card-hover p-6">
-                    <h3 className="text-lg font-semibold text-foreground mb-4">Key Influencing Factors</h3>
-                    <div className="space-y-4">
-                      <div className="border-b border-border pb-4">
-                        <div className="font-medium text-foreground mb-1">Weather Conditions</div>
-                        <div className="text-sm text-muted-foreground">Sunny forecast expected to increase foot traffic by 8-10%</div>
-                      </div>
-                      <div className="border-b border-border pb-4">
-                        <div className="font-medium text-foreground mb-1">Local Events</div>
-                        <div className="text-sm text-muted-foreground">3 major events scheduled, potential +15% demand spike</div>
-                      </div>
-                      <div className="border-b border-border pb-4">
-                        <div className="font-medium text-foreground mb-1">Historical Trends</div>
-                        <div className="text-sm text-muted-foreground">Similar period last year showed 18% growth pattern</div>
-                      </div>
-                      <div className="border-b border-border pb-4">
-                        <div className="font-medium text-foreground mb-1">Seasonal Demand</div>
-                        <div className="text-sm text-muted-foreground">Peak season approaching, 12% above baseline expected</div>
-                      </div>
-                      <div>
-                        <div className="font-medium text-foreground mb-1">Competitor Activity</div>
-                        <div className="text-sm text-muted-foreground">Market analysis indicates stable competitive landscape</div>
-                      </div>
-                    </div>
-                  </Card>
+                  {/* Key Influencing Factors Card - Dynamic Data */}
+                  <InfluencingFactorsCard data={dashboardData?.influencingFactors} isLoading={isDashboardLoading} />
                 </div>
 
-                {/* Top Products Forecast Table */}
-                <Card className="apple-card-hover p-6">
-                  <h3 className="text-lg font-semibold text-foreground mb-4">Top Products Forecast</h3>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="border-b border-border">
-                          <TableHead className="text-foreground font-medium">SKU</TableHead>
-                          <TableHead className="text-foreground font-medium">Product</TableHead>
-                          <TableHead className="text-foreground font-medium text-right">Forecast (7 Days)</TableHead>
-                          <TableHead className="text-foreground font-medium text-right">Stock</TableHead>
-                          <TableHead className="text-foreground font-medium">Risk Level</TableHead>
-                          <TableHead className="text-foreground font-medium">Recommendation</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        <TableRow className="border-b border-border/50">
-                          <TableCell className="font-mono text-sm">SKU-001</TableCell>
-                          <TableCell className="font-medium">Organic Avocados</TableCell>
-                          <TableCell className="text-right">240 units</TableCell>
-                          <TableCell className="text-right">180 units</TableCell>
-                          <TableCell>
-                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-50 text-red-700">
-                              High
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">Restock +80 units</TableCell>
-                        </TableRow>
-                        <TableRow className="border-b border-border/50">
-                          <TableCell className="font-mono text-sm">SKU-012</TableCell>
-                          <TableCell className="font-medium">Sourdough Bread</TableCell>
-                          <TableCell className="text-right">185 units</TableCell>
-                          <TableCell className="text-right">220 units</TableCell>
-                          <TableCell>
-                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-50 text-green-700">
-                              Low
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">Stock adequate</TableCell>
-                        </TableRow>
-                        <TableRow className="border-b border-border/50">
-                          <TableCell className="font-mono text-sm">SKU-027</TableCell>
-                          <TableCell className="font-medium">Greek Yogurt 500g</TableCell>
-                          <TableCell className="text-right">320 units</TableCell>
-                          <TableCell className="text-right">280 units</TableCell>
-                          <TableCell>
-                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-yellow-50 text-yellow-700">
-                              Medium
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">Consider +50 units</TableCell>
-                        </TableRow>
-                        <TableRow className="border-b border-border/50">
-                          <TableCell className="font-mono text-sm">SKU-034</TableCell>
-                          <TableCell className="font-medium">Pasta Penne 500g</TableCell>
-                          <TableCell className="text-right">150 units</TableCell>
-                          <TableCell className="text-right">380 units</TableCell>
-                          <TableCell>
-                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-50 text-green-700">
-                              Low
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">Stock adequate</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-mono text-sm">SKU-045</TableCell>
-                          <TableCell className="font-medium">Almond Milk 1L</TableCell>
-                          <TableCell className="text-right">210 units</TableCell>
-                          <TableCell className="text-right">160 units</TableCell>
-                          <TableCell>
-                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-50 text-red-700">
-                              High
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">Restock +60 units</TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </div>
-                </Card>
+                {/* Top Products Forecast Table - Dynamic Data */}
+                <TopProductsForecastCard data={dashboardData?.topProducts} isLoading={isDashboardLoading} />
               </div>
 
               {/* Risk Engine & Advanced Analytics Section */}
