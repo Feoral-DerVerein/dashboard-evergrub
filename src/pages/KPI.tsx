@@ -909,12 +909,7 @@ const KPI = () => {
             {/* NSW EPA Compliance Report */}
             <div className="mt-8 max-w-md mx-auto">
               <Card className="bg-white/80">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-green-600" />
-                    NSW EPA Compliance Report
-                  </CardTitle>
-                </CardHeader>
+                
                 <CardContent>
                   <p className="text-sm text-gray-600 mb-4">
                     Generate comprehensive NSW EPA food waste compliance reports with Negentropy platform impact data.
