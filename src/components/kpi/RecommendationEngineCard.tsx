@@ -30,7 +30,7 @@ const RecommendationEngineCard = ({ data, isLoading }: RecommendationEngineCardP
       <Card className="p-6">
         <h3 className="text-lg font-semibold text-foreground mb-4">Actionable Recommendations</h3>
         <div className="text-center py-8 text-muted-foreground">
-          No hay recomendaciones disponibles en este momento
+          No recommendations available at this time
         </div>
       </Card>
     );
