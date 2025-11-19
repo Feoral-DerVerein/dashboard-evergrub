@@ -917,10 +917,7 @@ const KPI = () => {
             <div className="text-center text-sm text-gray-500 space-y-2 mb-6 mt-8">
               <div className="flex flex-col gap-4">
                 <AustralianComplianceDialog />
-                <p className="text-xs text-muted-foreground px-4 leading-relaxed">
-                  Generate Australian legal compliance reports aligned with DCCEEW Food Waste Baseline & Reporting Framework 
-                  and NSW Waste Regulation 2026. Essential for businesses to meet national food waste strategy requirements.
-                </p>
+                
               </div>
             </div>
           </section>
