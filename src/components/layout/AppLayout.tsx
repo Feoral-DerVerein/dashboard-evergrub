@@ -1,5 +1,5 @@
-import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { BarChart3, LogOut, Package, Truck, Plug, FileText } from "lucide-react";
+import { NavLink, Outlet, useLocation, Link } from "react-router-dom";
+import { BarChart3, LogOut, Package, Truck, Plug, FileText, Settings, CreditCard, User } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,6 +14,14 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -22,7 +30,6 @@ const menuItems = [
   { title: "Inventory Products", url: "/inventory-products", icon: Package },
   { title: "Notas", url: "/notes", icon: FileText },
   { title: "Delivery", url: "/delivery", icon: Truck },
-  { title: "Integrations", url: "/integrations", icon: Plug },
 ];
 
 function AppSidebar() {
@@ -76,10 +83,42 @@ function AppSidebar() {
       <SidebarFooter className="border-t border-gray-100 p-2 bg-white">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
-              <LogOut className="w-4 h-4" />
-              <span>Logout</span>
-            </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton className="w-full" tooltip="Account">
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" />
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                  <span>Account</span>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="flex items-center gap-2 w-full cursor-pointer">
+                    <User className="h-4 w-4" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/integrations" className="flex items-center gap-2 w-full cursor-pointer">
+                    <Plug className="h-4 w-4" />
+                    Integrations
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/pricing" className="flex items-center gap-2 w-full cursor-pointer">
+                    <CreditCard className="h-4 w-4" />
+                    Pricing
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
