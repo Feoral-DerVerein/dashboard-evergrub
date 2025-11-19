@@ -22,6 +22,7 @@ import TopProductsForecastCard from "@/components/kpi/TopProductsForecastCard";
 import InfluencingFactorsCard from "@/components/kpi/InfluencingFactorsCard";
 import ForecastEngineCard from "@/components/kpi/ForecastEngineCard";
 import PricingEngineCard from "@/components/kpi/PricingEngineCard";
+import InventoryOptimizerCard from "@/components/kpi/InventoryOptimizerCard";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AustralianComplianceDialog } from "@/components/AustralianComplianceDialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -834,6 +835,14 @@ const KPI = () => {
                   <h2 className="text-2xl font-semibold text-foreground">Pricing Engine</h2>
                 </div>
                 <PricingEngineCard isLoading={isDashboardLoading} />
+              </div>
+
+              {/* Inventory Optimizer Section */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-foreground">Inventory Optimizer</h2>
+                </div>
+                <InventoryOptimizerCard isLoading={isDashboardLoading} />
               </div>
 
               {/* Risk Engine & Advanced Analytics Section */}
