@@ -93,7 +93,7 @@ function AppSidebar() {
                   <span>Account</span>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-48 z-50">
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center gap-2 w-full cursor-pointer">
                     <User className="h-4 w-4" />
