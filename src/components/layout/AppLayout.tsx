@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation, Link } from "react-router-dom";
-import { BarChart3, LogOut, Package, Truck, Plug, FileText, Settings, CreditCard, User } from "lucide-react";
+import { BarChart3, LogOut, Package, Truck, Plug, FileText, Settings, CreditCard, User, MessageSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 const menuItems = [
+  { title: "Dashboard", url: "/dashboard", icon: MessageSquare },
   { title: "Performance", url: "/kpi", icon: BarChart3 },
   { title: "Inventory Products", url: "/inventory-products", icon: Package },
   { title: "Notas", url: "/notes", icon: FileText },
@@ -128,17 +129,6 @@ function AppSidebar() {
 
 const AppLayout = () => {
   const location = useLocation();
-  const isDashboard = location.pathname === "/dashboard";
-
-  if (isDashboard) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="w-full glass-card min-h-screen">
-          <Outlet />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <SidebarProvider defaultOpen={true}>

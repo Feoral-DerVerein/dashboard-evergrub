@@ -14,6 +14,7 @@ import Donate from "@/pages/Donate";
 import Users from "@/pages/Users";
 import PaymentPortal from "@/pages/PaymentPortal";
 import Pricing from "@/pages/Pricing";
+import Index from "@/pages/Index";
 
 import Login from "@/pages/Login";
 import Apple from "@/pages/Apple";
@@ -47,7 +48,7 @@ const MainRoutes = () => {
       
       {/* Protected routes - only accessible when logged in */}
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-        <Route path="/dashboard" element={<Navigate to="/kpi" replace />} />
+        <Route path="/dashboard" element={<Index />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/sales" element={<Sales />} />
         <Route path="/orders" element={<Orders />} />
@@ -76,7 +77,7 @@ const MainRoutes = () => {
       
       {/* Default redirects */}
       <Route path="/" element={
-        user ? <Navigate to="/kpi" replace /> : <Navigate to="/login" replace />
+        user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
       } />
       
       {/* 404 page */}
