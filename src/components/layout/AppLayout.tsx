@@ -29,7 +29,7 @@ const menuItems = [
   { title: "Chat", url: "/dashboard", icon: MessageSquare },
   { title: "Performance", url: "/kpi", icon: BarChart3 },
   { title: "Inventory Products", url: "/inventory-products", icon: Package },
-  { title: "Notas", url: "/notes", icon: FileText },
+  { title: "Notes", url: "/notes", icon: FileText },
   { title: "Delivery", url: "/delivery", icon: Truck },
 ];
 
