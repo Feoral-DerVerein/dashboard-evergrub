@@ -4,13 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Download, FileText, CheckCircle } from "lucide-react";
-
 import { toast } from "sonner";
-
 export const AustralianComplianceDialog = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
   const handleGenerateReport = async () => {
     try {
       setIsGenerating(true);
@@ -23,14 +20,9 @@ export const AustralianComplianceDialog = () => {
       setIsGenerating(false);
     }
   };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+  return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full flex items-center gap-2">
-          <FileText className="h-4 w-4" />
-          Australian Legal Compliance Report
-        </Button>
+        
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -152,11 +144,7 @@ export const AustralianComplianceDialog = () => {
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
-            <Button 
-              onClick={handleGenerateReport}
-              disabled={isGenerating}
-              className="flex-1 flex items-center gap-2"
-            >
+            <Button onClick={handleGenerateReport} disabled={isGenerating} className="flex-1 flex items-center gap-2">
               <Download className="h-4 w-4" />
               {isGenerating ? "Generating Report..." : "Generate & Download PDF Report"}
             </Button>
@@ -173,6 +161,5 @@ export const AustralianComplianceDialog = () => {
           </div>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
