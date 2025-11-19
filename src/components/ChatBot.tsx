@@ -15,6 +15,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { ExpiringProductCard } from '@/components/chat/ExpiringProductCard';
 import { NegentropyMenu } from '@/components/chat/NegentropyMenu';
 import { ChatFileUploadCard } from '@/components/chat/ChatFileUploadCard';
+import { ChatLoadingIndicator } from '@/components/chat/ChatLoadingIndicator';
 import aiIcon from '@/assets/ai-icon.png';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -249,6 +250,9 @@ const ChatBot = ({
                       )}
                     </div>}
                 </div>)}
+              
+              {/* Loading Indicator */}
+              {isLoading && <ChatLoadingIndicator />}
               
               <div ref={messagesEndRef} />
             </div>}
