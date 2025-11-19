@@ -694,16 +694,6 @@ const KPI = () => {
             </div>
           </header>
 
-          {/* Welcome Banner */}
-          <div className="px-6 mb-6">
-            <DynamicGreeting />
-          </div>
-
-          {/* AI ChatBot - Inline */}
-          <div className="mb-0">
-            <ChatBot variant="inline" />
-          </div>
-
           {/* Main dashboard content and chart - Moved to top */}
           <section className="px-6 mt-0 mb-8 space-y-6">
             {/* Time Filters */}
