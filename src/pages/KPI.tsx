@@ -699,6 +699,9 @@ const KPI = () => {
             {/* Time Filters */}
             
 
+            {/* Performance Title */}
+            <h2 className="text-2xl font-semibold text-gray-900">Performance</h2>
+
             {/* KPI Metrics - Expanded with Profit, Savings, Revenue */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <MetricCard icon={AreaChart} value={realData.totalSales} label="Total Sales" trend={realData.salesTrend} />
