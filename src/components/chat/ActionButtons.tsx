@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   Heart, 
@@ -13,6 +14,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { QuickDonationDialog } from "./QuickDonationDialog";
+import { DeliverectShipmentDialog } from "@/components/DeliverectShipmentDialog";
 
 interface Action {
   label: string;
@@ -27,6 +30,8 @@ interface ActionButtonsProps {
 export const ActionButtons = ({ actions }: ActionButtonsProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [donationDialogOpen, setDonationDialogOpen] = useState(false);
+  const [deliveryDialogOpen, setDeliveryDialogOpen] = useState(false);
 
   const getActionIcon = (type: Action["type"]) => {
     switch (type) {
@@ -56,11 +61,7 @@ export const ActionButtons = ({ actions }: ActionButtonsProps) => {
   const handleAction = (action: Action) => {
     switch (action.type) {
       case "donate":
-        navigate("/donate");
-        toast({
-          title: "Redirigiendo a donaciones",
-          description: "Podrás seleccionar productos para donar.",
-        });
+        setDonationDialogOpen(true);
         break;
       case "create_bag":
         navigate("/sales");
@@ -89,11 +90,7 @@ export const ActionButtons = ({ actions }: ActionButtonsProps) => {
         navigate("/inventory-products");
         break;
       case "delivery":
-        navigate("/deliverect-dashboard");
-        toast({
-          title: "Delivery y logística",
-          description: "Accede a las opciones de delivery.",
-        });
+        setDeliveryDialogOpen(true);
         break;
       case "add_note":
         navigate("/notes");
@@ -115,25 +112,37 @@ export const ActionButtons = ({ actions }: ActionButtonsProps) => {
   }
 
   return (
-    <div className="mt-4 space-y-2">
-      <p className="text-sm font-medium text-muted-foreground px-1">
-        💡 Acciones sugeridas:
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {actions.map((action, index) => (
-          <Button
-            key={index}
-            onClick={() => handleAction(action)}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2 hover:bg-primary hover:text-primary-foreground transition-all"
-            title={action.description}
-          >
-            {getActionIcon(action.type)}
-            {action.label}
-          </Button>
-        ))}
+    <>
+      <div className="mt-4 space-y-2">
+        <p className="text-sm font-medium text-muted-foreground px-1">
+          💡 Acciones sugeridas:
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {actions.map((action, index) => (
+            <Button
+              key={index}
+              onClick={() => handleAction(action)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 hover:bg-primary hover:text-primary-foreground transition-all"
+              title={action.description}
+            >
+              {getActionIcon(action.type)}
+              {action.label}
+            </Button>
+          ))}
+        </div>
       </div>
-    </div>
+
+      <QuickDonationDialog 
+        open={donationDialogOpen}
+        onOpenChange={setDonationDialogOpen}
+      />
+      
+      <DeliverectShipmentDialog
+        open={deliveryDialogOpen}
+        onOpenChange={setDeliveryDialogOpen}
+      />
+    </>
   );
 };
