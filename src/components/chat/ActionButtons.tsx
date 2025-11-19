@@ -7,14 +7,16 @@ import {
   FileText, 
   Store,
   Eye,
-  ArrowRight
+  ArrowRight,
+  Truck,
+  StickyNote
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
 interface Action {
   label: string;
-  type: "donate" | "create_bag" | "discount" | "inventory" | "report" | "marketplace" | "view_products";
+  type: "donate" | "create_bag" | "discount" | "inventory" | "report" | "marketplace" | "view_products" | "delivery" | "add_note";
   description: string;
 }
 
@@ -42,6 +44,10 @@ export const ActionButtons = ({ actions }: ActionButtonsProps) => {
         return <Store className="w-4 h-4" />;
       case "view_products":
         return <Eye className="w-4 h-4" />;
+      case "delivery":
+        return <Truck className="w-4 h-4" />;
+      case "add_note":
+        return <StickyNote className="w-4 h-4" />;
       default:
         return <ArrowRight className="w-4 h-4" />;
     }
@@ -81,6 +87,20 @@ export const ActionButtons = ({ actions }: ActionButtonsProps) => {
         break;
       case "view_products":
         navigate("/inventory-products");
+        break;
+      case "delivery":
+        navigate("/deliverect-dashboard");
+        toast({
+          title: "Delivery y logística",
+          description: "Accede a las opciones de delivery.",
+        });
+        break;
+      case "add_note":
+        navigate("/notes");
+        toast({
+          title: "Agregar nota",
+          description: "Redirigiendo a notas.",
+        });
         break;
       default:
         toast({

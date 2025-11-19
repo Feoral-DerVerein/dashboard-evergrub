@@ -158,7 +158,7 @@ const ChatBot = ({
           {messages.length > 0 && <div className="max-w-3xl mx-auto mb-4 space-y-4">
               {messages.map((message, index) => <div key={message.id} className={`${message.type === 'user' ? 'text-right' : 'text-left'}`}>
                   
-                  {/* Message Content (User or Bot Text) */}
+                   {/* Message Content (User or Bot Text) */}
                   {message.content && (
                     <div className="space-y-2">
                       <div className={`inline-block max-w-[80%] px-4 py-3 rounded-2xl mb-3 animate-fade-in ${
@@ -169,8 +169,9 @@ const ChatBot = ({
                         <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{message.content}</p>
                       </div>
                       
-                      {/* Action Buttons - Only for bot messages */}
-                      {message.type === 'bot' && (message as any).actions && (
+                      {/* Action Buttons - Only for bot messages without product cards */}
+                      {message.type === 'bot' && (message as any).actions && 
+                       !message.product_cards && !(message as any).expiring_products && (
                         <ActionButtons actions={(message as any).actions} />
                       )}
 
@@ -221,6 +222,11 @@ const ChatBot = ({
                   description: product.reason
                 }} onAction={handleProductAction} />)}
                       </div>
+                      
+                      {/* Action Buttons below product cards */}
+                      {(message as any).actions && (
+                        <ActionButtons actions={(message as any).actions} />
+                      )}
                     </div>}
                   
                    {/* Smart Notifications */}
@@ -236,6 +242,11 @@ const ChatBot = ({
                   console.log(`Product ${productId} ${action} to ${destination}`);
                 }} />)}
                       </div>
+                      
+                      {/* Action Buttons below expiring product cards */}
+                      {(message as any).actions && (
+                        <ActionButtons actions={(message as any).actions} />
+                      )}
                     </div>}
                 </div>)}
               
