@@ -212,9 +212,48 @@ export const useChatbot = () => {
         urgency: card.reason?.includes('expire') ? 'high' : 'medium'
       }));
 
+      // If asking for expiring products and n8n didn't return them, fetch from DB
+      let expiringProductsData = data.expiring_products;
+      if (isAskingForExpiring && !expiringProductsData) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { data: products } = await supabase
+              .from('products')
+              .select('*')
+              .eq('userid', user.id)
+              .gt('quantity', 0)
+              .order('expirationdate', { ascending: true });
+
+            if (products) {
+              const now = new Date();
+              const threeDaysFromNow = new Date(now.getTime() + (72 * 60 * 60 * 1000));
+              
+              expiringProductsData = products
+                .filter(p => {
+                  const expDate = new Date(p.expirationdate);
+                  return expDate <= threeDaysFromNow && expDate > now;
+                })
+                .map(p => ({
+                  id: p.id,
+                  name: p.name,
+                  quantity: p.quantity,
+                  expirationDate: p.expirationdate,
+                  image_url: p.image,
+                  category: p.category,
+                  price: p.price,
+                  daysUntilExpiry: Math.ceil((new Date(p.expirationdate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+                }));
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching expiring products:', error);
+        }
+      }
+
       // Auto-generate actions if we have products but no actions
       let finalActions = actions;
-      if (!actions && (transformedProductCards?.length > 0 || data.expiring_products?.length > 0)) {
+      if (!actions && (transformedProductCards?.length > 0 || expiringProductsData?.length > 0)) {
         finalActions = [
           { label: "Ver productos", type: "view_products" as const, description: "Ver productos disponibles" },
           { label: "Crear bolsa sorpresa", type: "create_bag" as const, description: "Crear nueva bolsa sorpresa" },
@@ -231,7 +270,7 @@ export const useChatbot = () => {
         content: responseText,
         cards: cards,
         product_cards: transformedProductCards,
-        expiring_products: isAskingForExpiring ? data.expiring_products : undefined,
+        expiring_products: expiringProductsData,
         actions: finalActions,
         buttons: buttons,
         timestamp: new Date()
