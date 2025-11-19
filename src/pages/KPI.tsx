@@ -910,14 +910,7 @@ const KPI = () => {
             <div className="mt-8 max-w-md mx-auto">
               <Card className="bg-white/80">
                 
-                <CardContent>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Generate comprehensive NSW EPA food waste compliance reports with Negentropy platform impact data.
-                  </p>
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white flex justify-center items-center" onClick={handleDownloadReportWithDetails} disabled={isGeneratingReport}>
-                    {isGeneratingReport ? "Generating EPA Report..." : "Download EPA Compliance Report"}
-                  </Button>
-                </CardContent>
+                
               </Card>
             </div>
 
