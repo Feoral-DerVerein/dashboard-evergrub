@@ -30,7 +30,7 @@ const integrations: Integration[] = [
     type: "POS System",
     description: "Point of sale and payment processing",
     icon: <CreditCard className="w-8 h-8" />,
-    logoUrl: "/lovable-uploads/560fe3d2-8e81-48aa-8f97-9da38ca157e2.png",
+    logoUrl: "/integration-logos/square-logo.png",
     connected: false,
     category: "pos"
   },
@@ -135,6 +135,16 @@ const integrations: Integration[] = [
     description: "On-demand delivery service",
     icon: <Truck className="w-8 h-8" />,
     logoUrl: "/integration-logos/glovo-logo.png",
+    connected: false,
+    category: "delivery"
+  },
+  {
+    id: "toogoodtogo",
+    name: "Too Good To Go",
+    type: "Delivery Platform",
+    description: "Surplus food redistribution platform",
+    icon: <Truck className="w-8 h-8" />,
+    logoUrl: "/integration-logos/toogoodtogo-logo.png",
     connected: false,
     category: "delivery"
   },
