@@ -13,6 +13,11 @@ import { useAuth } from "@/context/AuthContext";
 import { AIRecommendations } from "@/components/AIRecommendations";
 import SuppliersCard from "@/components/kpi/SuppliersCard";
 import RatingInsightCard from "@/components/kpi/RatingInsightCard";
+import RiskEngineSection from "@/components/kpi/RiskEngineSection";
+import RecommendationEngineCard from "@/components/kpi/RecommendationEngineCard";
+import ScenarioSimulatorCard from "@/components/kpi/ScenarioSimulatorCard";
+import BusinessHealthCards from "@/components/kpi/BusinessHealthCards";
+import AlertCenterCard from "@/components/kpi/AlertCenterCard";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AustralianComplianceDialog } from "@/components/AustralianComplianceDialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -957,6 +962,46 @@ const KPI = () => {
                     </Table>
                   </div>
                 </Card>
+              </div>
+
+              {/* Risk Engine & Advanced Analytics Section */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-foreground">Risk Engine</h2>
+                </div>
+                <RiskEngineSection />
+              </div>
+
+              {/* Recommendation Engine */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-foreground">Recommendation Engine</h2>
+                </div>
+                <RecommendationEngineCard />
+              </div>
+
+              {/* Scenario Simulator */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-foreground">Scenario Simulator</h2>
+                </div>
+                <ScenarioSimulatorCard />
+              </div>
+
+              {/* Business Health */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-foreground">Business Health</h2>
+                </div>
+                <BusinessHealthCards />
+              </div>
+
+              {/* Alert Center */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-foreground">Alert Center</h2>
+                </div>
+                <AlertCenterCard />
               </div>
 
               {/* Sustainability Impact */}
