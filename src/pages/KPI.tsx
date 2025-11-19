@@ -15,7 +15,6 @@ import SuppliersCard from "@/components/kpi/SuppliersCard";
 import RatingInsightCard from "@/components/kpi/RatingInsightCard";
 import RiskEngineSection from "@/components/kpi/RiskEngineSection";
 import RecommendationEngineCard from "@/components/kpi/RecommendationEngineCard";
-import ScenarioSimulatorCard from "@/components/kpi/ScenarioSimulatorCard";
 import BusinessHealthCards from "@/components/kpi/BusinessHealthCards";
 import AlertCenterCard from "@/components/kpi/AlertCenterCard";
 import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
@@ -978,14 +977,6 @@ const KPI = () => {
                   <h2 className="text-2xl font-semibold text-foreground">Recommendation Engine</h2>
                 </div>
                 <RecommendationEngineCard />
-              </div>
-
-              {/* Scenario Simulator */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Scenario Simulator</h2>
-                </div>
-                <ScenarioSimulatorCard />
               </div>
 
               {/* Business Health */}
