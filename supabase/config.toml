@@ -57,3 +57,6 @@ verify_jwt = true
 [functions.get-performance-data]
 verify_jwt = true
 
+[functions.calculate-dashboard-analytics]
+verify_jwt = true
+

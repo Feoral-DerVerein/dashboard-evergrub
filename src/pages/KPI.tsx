@@ -30,6 +30,8 @@ import { Badge } from "@/components/ui/badge";
 import { IntelligentNewsCards } from "@/components/kpi/IntelligentNewsCards";
 import MelbourneWeatherCard from "@/components/widgets/MelbourneWeatherCard";
 import hiMateBanner from "@/assets/hi-mate-banner.png";
+import { useDashboardAnalytics } from "@/hooks/useDashboardAnalytics";
+import { RefreshCw } from "lucide-react";
 type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
 const chartDataSamples: Record<TimeFilterPeriod, {
   label: string;
@@ -298,6 +300,9 @@ const KPI = () => {
     avgOrderValue: "$0",
     avgOrderTrend: "0%"
   });
+
+  // Dashboard analytics with real-time data
+  const { data: dashboardData, isLoading: isDashboardLoading, refetch: refetchDashboard } = useDashboardAnalytics();
 
   // AI Predictive Insights state
   const [predictiveData, setPredictiveData] = useState({
@@ -967,8 +972,17 @@ const KPI = () => {
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold text-foreground">Risk Engine</h2>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => refetchDashboard()}
+                    disabled={isDashboardLoading}
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isDashboardLoading ? 'animate-spin' : ''}`} />
+                    Actualizar
+                  </Button>
                 </div>
-                <RiskEngineSection />
+                <RiskEngineSection data={dashboardData?.riskEngine} isLoading={isDashboardLoading} />
               </div>
 
               {/* Recommendation Engine */}
@@ -976,7 +990,7 @@ const KPI = () => {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold text-foreground">Recommendation Engine</h2>
                 </div>
-                <RecommendationEngineCard />
+                <RecommendationEngineCard data={dashboardData?.recommendations} isLoading={isDashboardLoading} />
               </div>
 
               {/* Business Health */}
@@ -984,7 +998,7 @@ const KPI = () => {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold text-foreground">Business Health</h2>
                 </div>
-                <BusinessHealthCards />
+                <BusinessHealthCards data={dashboardData?.businessHealth} isLoading={isDashboardLoading} />
               </div>
 
               {/* Alert Center */}
@@ -992,7 +1006,7 @@ const KPI = () => {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold text-foreground">Alert Center</h2>
                 </div>
-                <AlertCenterCard />
+                <AlertCenterCard data={dashboardData?.alerts} isLoading={isDashboardLoading} />
               </div>
 
               {/* Sustainability Impact */}

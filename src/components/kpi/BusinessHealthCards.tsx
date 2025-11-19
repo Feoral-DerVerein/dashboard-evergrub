@@ -1,31 +1,64 @@
 import { Card } from "@/components/ui/card";
+import { BusinessHealth } from "@/services/dashboardAnalyticsService";
 
-const BusinessHealthCards = () => {
+interface BusinessHealthCardsProps {
+  data?: BusinessHealth;
+  isLoading?: boolean;
+}
+
+const BusinessHealthCards = ({ data, isLoading }: BusinessHealthCardsProps) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        {[1, 2, 3, 4, 5].map(i => (
+          <Card key={i} className="p-4 animate-pulse">
+            <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+            <div className="h-8 bg-muted rounded w-1/2"></div>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-success';
+    if (score >= 60) return 'text-warning';
+    return 'text-destructive';
+  };
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
       <Card className="p-4">
         <div className="text-sm text-muted-foreground mb-2">Rotación del inventario</div>
-        <div className="text-3xl font-semibold text-foreground">8.2x</div>
+        <div className="text-3xl font-semibold text-foreground">{data.inventoryTurnover}x</div>
       </Card>
       
       <Card className="p-4">
         <div className="text-sm text-muted-foreground mb-2">% de merma</div>
-        <div className="text-3xl font-semibold text-foreground">3.4%</div>
+        <div className={`text-3xl font-semibold ${data.wastePercentage > 5 ? 'text-destructive' : 'text-success'}`}>
+          {data.wastePercentage.toFixed(1)}%
+        </div>
       </Card>
       
       <Card className="p-4">
         <div className="text-sm text-muted-foreground mb-2">% de productos agotados</div>
-        <div className="text-3xl font-semibold text-foreground">2.1%</div>
+        <div className={`text-3xl font-semibold ${data.stockoutPercentage > 5 ? 'text-warning' : 'text-success'}`}>
+          {data.stockoutPercentage.toFixed(1)}%
+        </div>
       </Card>
       
       <Card className="p-4">
         <div className="text-sm text-muted-foreground mb-2">Productos más volátiles</div>
-        <div className="text-3xl font-semibold text-foreground">12</div>
+        <div className="text-3xl font-semibold text-foreground">{data.volatileProducts}</div>
       </Card>
       
       <Card className="p-4">
         <div className="text-sm text-muted-foreground mb-2">Score general</div>
-        <div className="text-3xl font-semibold text-foreground">87/100</div>
+        <div className={`text-3xl font-semibold ${getScoreColor(data.overallScore)}`}>
+          {data.overallScore}/100
+        </div>
       </Card>
     </div>
   );
