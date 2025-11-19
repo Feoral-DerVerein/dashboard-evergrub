@@ -26,7 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 const menuItems = [
-  { title: "Dashboard", url: "/dashboard", icon: MessageSquare },
+  { title: "Chat", url: "/dashboard", icon: MessageSquare },
   { title: "Performance", url: "/kpi", icon: BarChart3 },
   { title: "Inventory Products", url: "/inventory-products", icon: Package },
   { title: "Notas", url: "/notes", icon: FileText },
