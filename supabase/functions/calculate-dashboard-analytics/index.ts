@@ -32,8 +32,8 @@ Deno.serve(async (req) => {
       { data: surpriseBags, error: bagsError },
     ] = await Promise.all([
       supabaseClient.from('sales_metrics').select('*').order('date', { ascending: false }).limit(90),
-      supabaseClient.from('products').select('*'),
-      supabaseClient.from('inventory_products').select('*'),
+      supabaseClient.from('products').select('*').or('is_sample_data.is.null,is_sample_data.eq.false'),
+      supabaseClient.from('inventory_products').select('*').eq('is_sample_data', false),
       supabaseClient.from('orders').select('*, order_items(*)').order('created_at', { ascending: false }).limit(100),
       supabaseClient.from('surprise_bags_metrics').select('*').order('created_at', { ascending: false }).limit(30),
     ]);
