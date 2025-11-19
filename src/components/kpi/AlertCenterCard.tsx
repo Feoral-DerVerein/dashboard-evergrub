@@ -53,7 +53,7 @@ const AlertCenterCard = ({ data, isLoading }: AlertCenterCardProps) => {
         <h3 className="text-lg font-semibold text-foreground mb-4">Alerts</h3>
         <div className="text-center py-8 text-muted-foreground flex flex-col items-center gap-2">
           <Info className="w-8 h-8 opacity-50" />
-          <p>No hay alertas activas</p>
+          <p>No active alerts</p>
         </div>
       </Card>
     );
@@ -76,7 +76,7 @@ const AlertCenterCard = ({ data, isLoading }: AlertCenterCardProps) => {
                 </div>
                 <div className="text-sm text-muted-foreground mb-1">{alert.description}</div>
                 <div className="text-xs text-muted-foreground">
-                  {new Date(alert.timestamp).toLocaleString('es-ES')}
+                  {new Date(alert.timestamp).toLocaleString('en-US')}
                 </div>
               </div>
             </div>

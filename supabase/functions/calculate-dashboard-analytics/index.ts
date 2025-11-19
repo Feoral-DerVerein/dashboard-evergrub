@@ -155,20 +155,20 @@ function identifyCriticalProducts(products: any[], inventoryProducts: any[], ord
       const expDate = new Date(product.expirationdate);
       const daysToExpire = (expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
       if (daysToExpire <= 3 && daysToExpire > 0) {
-        reasons.push(`Expira en ${Math.ceil(daysToExpire)} días`);
+        reasons.push(`Expires in ${Math.ceil(daysToExpire)} days`);
         severity = 'high';
       } else if (daysToExpire <= 7 && daysToExpire > 0) {
-        reasons.push(`Expira en ${Math.ceil(daysToExpire)} días`);
+        reasons.push(`Expires in ${Math.ceil(daysToExpire)} days`);
         severity = severity === 'high' ? 'high' : 'medium';
       }
     }
 
     // Check low stock
     if (product.quantity < 10) {
-      reasons.push('Stock crítico');
+      reasons.push('Critical stock');
       severity = 'high';
     } else if (product.quantity < 20) {
-      reasons.push('Stock bajo');
+      reasons.push('Low stock');
       severity = severity === 'high' ? 'high' : 'medium';
     }
 
@@ -178,7 +178,7 @@ function identifyCriticalProducts(products: any[], inventoryProducts: any[], ord
         (today.getTime() - new Date(o.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7
       );
       if (recentOrders.length < 2) {
-        reasons.push('Sobrestock con baja rotación');
+        reasons.push('Overstock with low rotation');
         severity = severity === 'high' ? 'high' : 'medium';
       }
     }
@@ -228,9 +228,9 @@ function generateRecommendations(products: any[], inventoryProducts: any[], orde
     const recommendedQty = Math.ceil(p.demand * 2.5 - p.quantity);
     if (recommendedQty > 0) {
       recommendations.push({
-        action: `Comprar +${recommendedQty} unidades de ${p.name}`,
-        reason: `Alta demanda (${p.demand} ventas en 7 días) con stock bajo`,
-        impact: `Evitar pérdida de $${Math.round(recommendedQty * p.price)} en ventas`,
+        action: `Purchase +${recommendedQty} units of ${p.name}`,
+        reason: `High demand (${p.demand} sales in 7 days) with low stock`,
+        impact: `Avoid loss of $${Math.round(recommendedQty * p.price)} in sales`,
         priority: idx + 1,
       });
     }
@@ -250,9 +250,9 @@ function generateRecommendations(products: any[], inventoryProducts: any[], orde
 
   slowMovingProducts.forEach((p, idx) => {
     recommendations.push({
-      action: `Reducir producción/stock de ${p.name} en 30%`,
-      reason: `Solo ${p.ordersCount} ventas en 14 días con stock de ${p.quantity}`,
-      impact: `Ahorrar $${Math.round(p.quantity * 0.3 * p.price * 0.1)} en costos de almacenaje`,
+      action: `Reduce production/stock of ${p.name} by 30%`,
+      reason: `Only ${p.ordersCount} sales in 14 days with stock of ${p.quantity}`,
+      impact: `Save $${Math.round(p.quantity * 0.3 * p.price * 0.1)} in storage costs`,
       priority: recommendations.length + 1,
     });
   });
@@ -271,9 +271,9 @@ function generateRecommendations(products: any[], inventoryProducts: any[], orde
     const expDate = new Date(p.expirationdate);
     const daysToExpire = Math.ceil((expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     recommendations.push({
-      action: `Activar promoción 20% en ${p.name}`,
-      reason: `Expira en ${daysToExpire} días con ${p.quantity} unidades`,
-      impact: `Recuperar $${Math.round(p.quantity * p.price * 0.7)} vs pérdida total`,
+      action: `Activate 20% promotion on ${p.name}`,
+      reason: `Expires in ${daysToExpire} days with ${p.quantity} units`,
+      impact: `Recover $${Math.round(p.quantity * p.price * 0.7)} vs total loss`,
       priority: recommendations.length + 1,
     });
   });
@@ -281,16 +281,16 @@ function generateRecommendations(products: any[], inventoryProducts: any[], orde
   // Recommendation 4: Trend-based suggestion
   if (salesTrend > 0 && salesTrend > avgOlderSales * 0.1) {
     recommendations.push({
-      action: `Incrementar stock general en 15%`,
-      reason: `Tendencia alcista detectada (+${Math.round((salesTrend / avgOlderSales) * 100)}% vs semana anterior)`,
-      impact: `Capturar demanda creciente estimada en $${Math.round(salesTrend * 7)}`,
+      action: `Increase general stock by 15%`,
+      reason: `Upward trend detected (+${Math.round((salesTrend / avgOlderSales) * 100)}% vs previous week)`,
+      impact: `Capture growing demand estimated at $${Math.round(salesTrend * 7)}`,
       priority: recommendations.length + 1,
     });
   } else if (salesTrend < 0 && Math.abs(salesTrend) > avgOlderSales * 0.1) {
     recommendations.push({
-      action: `Optimizar inventario y reducir compras 10%`,
-      reason: `Tendencia a la baja detectada (${Math.round((salesTrend / avgOlderSales) * 100)}% vs semana anterior)`,
-      impact: `Evitar sobrestock de $${Math.round(Math.abs(salesTrend * 7))}`,
+      action: `Optimize inventory and reduce purchases by 10%`,
+      reason: `Downward trend detected (${Math.round((salesTrend / avgOlderSales) * 100)}% vs previous week)`,
+      impact: `Avoid overstock of $${Math.round(Math.abs(salesTrend * 7))}`,
       priority: recommendations.length + 1,
     });
   }
@@ -404,8 +404,8 @@ function generateAlerts(products: any[], inventoryProducts: any[], orders: any[]
   if (overproductionProducts.length > 0) {
     const product = overproductionProducts[0];
     alerts.push({
-      title: `Sobreproducción detectada en ${product.name}`,
-      description: `Inventario excede demanda proyectada en ${Math.round(product.overstock)}%. Stock actual: ${product.quantity} unidades`,
+      title: `Overproduction detected in ${product.name}`,
+      description: `Inventory exceeds projected demand by ${Math.round(product.overstock)}%. Current stock: ${product.quantity} units`,
       severity: 'warning',
       timestamp: new Date().toISOString(),
     });
@@ -422,8 +422,8 @@ function generateAlerts(products: any[], inventoryProducts: any[], orders: any[]
     
     if (avgRecentSales > avgOlderSales * 1.15) {
       alerts.push({
-        title: `Demanda elevada por temporada de verano`,
-        description: `Incremento del ${Math.round(((avgRecentSales / avgOlderSales) - 1) * 100)}% en ventas. Ajustar inventario para productos de temporada`,
+        title: `High demand due to summer season`,
+        description: `Increase of ${Math.round(((avgRecentSales / avgOlderSales) - 1) * 100)}% in sales. Adjust inventory for seasonal products`,
         severity: 'info',
         timestamp: new Date().toISOString(),
       });
@@ -443,8 +443,8 @@ function generateAlerts(products: any[], inventoryProducts: any[], orders: any[]
     const expDate = new Date(product.expirationdate);
     const hoursToExpire = Math.round((expDate.getTime() - today.getTime()) / (1000 * 60 * 60));
     alerts.push({
-      title: `${product.name} expira en ${hoursToExpire} horas`,
-      description: `${product.quantity} unidades próximas a vencer. Recomendar promoción urgente o donación`,
+      title: `${product.name} expires in ${hoursToExpire} hours`,
+      description: `${product.quantity} units about to expire. Recommend urgent promotion or donation`,
       severity: 'critical',
       timestamp: new Date().toISOString(),
     });
@@ -488,7 +488,7 @@ function calculateSalesForecast(salesData: any[], orders: any[]) {
     cumulativeForecast += forecast;
 
     next7Days.push({
-      day: forecastDate.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }),
+      day: forecastDate.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' }),
       forecast,
       confidence: 0.75 + Math.random() * 0.15, // 75-90% confidence
     });
@@ -520,17 +520,17 @@ function calculateTopProductsForecast(products: any[], inventoryProducts: any[],
       
       // Calculate risk level
       let riskLevel: 'High' | 'Medium' | 'Low' = 'Low';
-      let recommendation = 'Stock óptimo';
+      let recommendation = 'Optimal stock';
       
       if (p.quantity < forecastDemand * 0.5) {
         riskLevel = 'High';
-        recommendation = `Urgente: Comprar ${Math.ceil(forecastDemand * 1.5 - p.quantity)} unidades`;
+        recommendation = `Urgent: Purchase ${Math.ceil(forecastDemand * 1.5 - p.quantity)} units`;
       } else if (p.quantity < forecastDemand) {
         riskLevel = 'Medium';
-        recommendation = `Recomendado: Comprar ${Math.ceil(forecastDemand * 1.2 - p.quantity)} unidades`;
+        recommendation = `Recommended: Purchase ${Math.ceil(forecastDemand * 1.2 - p.quantity)} units`;
       } else if (p.quantity > forecastDemand * 3 && forecastDemand > 0) {
         riskLevel = 'Medium';
-        recommendation = 'Considerar promoción para rotar stock';
+        recommendation = 'Consider promotion to rotate stock';
       }
 
       return {
@@ -567,14 +567,14 @@ function analyzeInfluencingFactors(salesData: any[], orders: any[]) {
     (d.count > 0 && d.sum / d.count > (dayOfWeekSales[max].count > 0 ? dayOfWeekSales[max].sum / dayOfWeekSales[max].count : 0)) ? i : max
   , 0);
   
-  const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const maxDayAvg = dayOfWeekSales[maxDayIndex].count > 0 ? dayOfWeekSales[maxDayIndex].sum / dayOfWeekSales[maxDayIndex].count : 0;
   
   if (maxDayAvg > avgSales * 1.2) {
     factors.push({
-      factor: 'Patrón Día de la Semana',
-      description: `${dayNames[maxDayIndex]} muestra ${Math.round((maxDayAvg / avgSales - 1) * 100)}% más ventas que el promedio`,
-      impact: 'Ajustar inventario y personal para días pico',
+      factor: 'Day of Week Pattern',
+      description: `${dayNames[maxDayIndex]} shows ${Math.round((maxDayAvg / avgSales - 1) * 100)}% more sales than average`,
+      impact: 'Adjust inventory and staff for peak days',
     });
   }
 
@@ -585,12 +585,12 @@ function analyzeInfluencingFactors(salesData: any[], orders: any[]) {
   const avgOlder = olderSales.reduce((sum, s) => sum + s.total_sales, 0) / Math.max(1, olderSales.length);
   
   if (Math.abs(avgRecent - avgOlder) > avgOlder * 0.15) {
-    const trend = avgRecent > avgOlder ? 'Crecimiento' : 'Descenso';
+    const trend = avgRecent > avgOlder ? 'Growth' : 'Decline';
     const percentage = Math.round(Math.abs((avgRecent / avgOlder - 1) * 100));
     factors.push({
-      factor: `Tendencia ${trend}`,
-      description: `${trend} de ${percentage}% en ventas vs semana anterior`,
-      impact: trend === 'Crecimiento' ? 'Aumentar stock para capturar demanda' : 'Optimizar inventario para evitar sobrestock',
+      factor: `${trend} Trend`,
+      description: `${percentage}% ${trend.toLowerCase()} in sales vs previous week`,
+      impact: trend === 'Growth' ? 'Increase stock to capture demand' : 'Optimize inventory to avoid overstock',
     });
   }
 
