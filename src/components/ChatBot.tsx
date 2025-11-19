@@ -16,6 +16,9 @@ import { ExpiringProductCard } from '@/components/chat/ExpiringProductCard';
 import { NegentropyMenu } from '@/components/chat/NegentropyMenu';
 import { ChatFileUploadCard } from '@/components/chat/ChatFileUploadCard';
 import { ChatLoadingIndicator } from '@/components/chat/ChatLoadingIndicator';
+import { ActionCard } from '@/components/chat/ActionCard';
+import { ActionCardDialog } from '@/components/chat/ActionCardDialog';
+import { ActionCardData } from '@/types/chatbot.types';
 import aiIcon from '@/assets/ai-icon.png';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -29,6 +32,8 @@ const ChatBot = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [notificationCount, setNotificationCount] = useState(0);
   const [clickedButtons, setClickedButtons] = useState<Set<string>>(new Set());
+  const [selectedActionCard, setSelectedActionCard] = useState<ActionCardData | null>(null);
+  const [actionDialogOpen, setActionDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -249,6 +254,25 @@ const ChatBot = ({
                         <ActionButtons actions={(message as any).actions} />
                       )}
                     </div>}
+
+                  {/* Action Cards */}
+                  {message.type === 'bot' && message.actionCards && message.actionCards.length > 0 && (
+                    <div className="text-left mt-4">
+                      <p className="text-sm font-medium text-gray-700 px-1 mb-3">⚡ Quick Actions:</p>
+                      <div className="grid gap-2">
+                        {message.actionCards.map((card, idx) => (
+                          <ActionCard
+                            key={idx}
+                            data={card}
+                            onClick={() => {
+                              setSelectedActionCard(card);
+                              setActionDialogOpen(true);
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>)}
               
               {/* Loading Indicator */}
@@ -270,6 +294,15 @@ const ChatBot = ({
           {/* Footer */}
           
         </div>
+
+        {/* Action Card Dialog */}
+        {selectedActionCard && (
+          <ActionCardDialog
+            open={actionDialogOpen}
+            onOpenChange={setActionDialogOpen}
+            data={selectedActionCard}
+          />
+        )}
       </div>;
   }
 
