@@ -656,7 +656,7 @@ const KPI = () => {
                     <AvatarFallback>O</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-white">
+                <DropdownMenuContent align="end" className="w-48 bg-white z-50">
                   <DropdownMenuItem asChild>
                     <Link to="/configuration" className="flex items-center gap-2 w-full">
                       <Settings className="h-4 w-4" />
@@ -670,9 +670,9 @@ const KPI = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/import" className="flex items-center gap-2 w-full">
+                    <Link to="/integrations" className="flex items-center gap-2 w-full">
                       <Plug className="h-4 w-4" />
-                      API
+                      Integrations
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={async () => {
