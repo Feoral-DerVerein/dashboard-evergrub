@@ -19,6 +19,7 @@ import { ChatLoadingIndicator } from '@/components/chat/ChatLoadingIndicator';
 import { ActionCard } from '@/components/chat/ActionCard';
 import { ActionCardDialog } from '@/components/chat/ActionCardDialog';
 import { ActionCardData } from '@/types/chatbot.types';
+import { TextSelectionToolbar } from '@/components/chat/TextSelectionToolbar';
 import aiIcon from '@/assets/ai-icon.png';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -36,6 +37,7 @@ const ChatBot = ({
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   const inputRef = useRef<HTMLInputElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Load products for notifications
   useEffect(() => {
@@ -161,7 +163,8 @@ const ChatBot = ({
           )}
 
           {/* Messages Display Area (if there are messages) */}
-          {messages.length > 0 && <div className="max-w-3xl mx-auto mb-4 space-y-4">
+          {messages.length > 0 && <div ref={chatContainerRef} className="max-w-3xl mx-auto mb-4 space-y-4 relative">
+              <TextSelectionToolbar containerRef={chatContainerRef} />
               {messages.map((message, index) => <div key={message.id} className={`${message.type === 'user' ? 'text-right' : 'text-left'}`}>
                   
                    {/* Message Content (User or Bot Text) */}
