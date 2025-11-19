@@ -10,6 +10,14 @@ export interface ProductCardData {
   quantity?: number;
 }
 
+export interface ActionCardData {
+  type: 'donation' | 'delivery' | 'discount';
+  productId: string;
+  productName: string;
+  action: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
 export interface ChatMessage {
   id: string;
   type: 'user' | 'bot';
@@ -17,6 +25,7 @@ export interface ChatMessage {
   cards?: import('@/components/chat/BusinessCards').BusinessCardData[];
   product_cards?: any[]; // Allow any product card format from different sources
   expiring_products?: any[]; // Expiring products for Negentropy assistant
+  actionCards?: ActionCardData[]; // Quick action cards
   actions?: Array<{
     label: string;
     type: "donate" | "create_bag" | "discount" | "inventory" | "report" | "marketplace" | "view_products" | "delivery" | "add_note";
