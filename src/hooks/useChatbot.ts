@@ -219,6 +219,8 @@ export const useChatbot = () => {
           { label: "Ver productos", type: "view_products" as const, description: "Ver productos disponibles" },
           { label: "Crear bolsa sorpresa", type: "create_bag" as const, description: "Crear nueva bolsa sorpresa" },
           { label: "Donar", type: "donate" as const, description: "Enviar a donación" },
+          { label: "Delivery", type: "delivery" as const, description: "Gestionar entregas" },
+          { label: "Agregar nota", type: "add_note" as const, description: "Agregar una nota" },
           { label: "Marketplace", type: "marketplace" as const, description: "Publicar en marketplace" }
         ];
       }

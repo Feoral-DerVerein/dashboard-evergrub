@@ -19,7 +19,7 @@ export interface ChatMessage {
   expiring_products?: any[]; // Expiring products for Negentropy assistant
   actions?: Array<{
     label: string;
-    type: "donate" | "create_bag" | "discount" | "inventory" | "report" | "marketplace" | "view_products";
+    type: "donate" | "create_bag" | "discount" | "inventory" | "report" | "marketplace" | "view_products" | "delivery" | "add_note";
     description: string;
   }>;
   buttons?: Array<{
