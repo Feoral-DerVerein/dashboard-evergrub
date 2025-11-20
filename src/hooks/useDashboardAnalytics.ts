@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export const useDashboardAnalytics = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
 
   // Set up real-time subscription to products table
   useEffect(() => {
@@ -37,8 +37,8 @@ export const useDashboardAnalytics = () => {
 
   return useQuery<DashboardAnalytics>({
     queryKey: ['dashboard-analytics'],
-    queryFn: () => dashboardAnalyticsService.fetchDashboardAnalytics(),
-    enabled: !!user, // Only run query when user is authenticated
+    queryFn: () => dashboardAnalyticsService.fetchDashboardAnalytics(session?.access_token),
+    enabled: !!user && !!session, // Only run query when user is authenticated
     refetchInterval: 5 * 60 * 1000, // Auto-refresh every 5 minutes
     staleTime: 2 * 60 * 1000, // Consider data stale after 2 minutes
     retry: 2,
