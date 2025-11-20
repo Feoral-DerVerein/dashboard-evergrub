@@ -59,6 +59,53 @@ interface TransactionRow {
   [key: string]: any;
 }
 
+/**
+ * Convert Excel serial number to JavaScript Date
+ * Excel dates are stored as days since 1900-01-01
+ */
+const excelSerialToDate = (serial: number): string => {
+  // Excel's epoch starts at 1899-12-30 (accounting for Excel's 1900 leap year bug)
+  const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  const dateMs = excelEpoch.getTime() + (serial * millisecondsPerDay);
+  const date = new Date(dateMs);
+  
+  // Return in YYYY-MM-DD format
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  
+  return `${year}-${month}-${day}`;
+};
+
+/**
+ * Check if a value is an Excel serial number and convert it
+ */
+const convertExcelDate = (value: any): string => {
+  if (!value) return new Date().toISOString().split('T')[0];
+  
+  // If it's already a proper date string, return it
+  if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
+    return value.split('T')[0];
+  }
+  
+  // Check if it's an Excel serial number (numeric value > 1000)
+  const numValue = typeof value === 'number' ? value : parseFloat(value);
+  if (!isNaN(numValue) && numValue > 1000 && numValue < 100000) {
+    console.log(`🔄 Converting Excel date ${value} to proper date`);
+    return excelSerialToDate(numValue);
+  }
+  
+  // Try to parse as date
+  const parsedDate = new Date(value);
+  if (!isNaN(parsedDate.getTime())) {
+    return parsedDate.toISOString().split('T')[0];
+  }
+  
+  // Default to today
+  return new Date().toISOString().split('T')[0];
+};
+
 // Normalize column names to lowercase for comparison
 const normalizeKeys = (data: any[]): any[] => {
   return data.map(row => {
@@ -123,12 +170,22 @@ const importProducts = async (data: ProductRow[], userId: string): Promise<numbe
         continue;
       }
       
+      // Get expiration date and convert if it's an Excel serial number
+      const rawExpirationDate = row.fecha_expiracion || 
+                                row.expiration_date || 
+                                row.expiry_date || 
+                                row.expirationdate ||
+                                row.expire_date ||
+                                row.best_before_date;
+      
+      const expirationDate = convertExcelDate(rawExpirationDate);
+      
       const productData = {
         name: productName,
         category: row.categoria || row.category || 'General',
         price: parseFloat(String(row.precio || row.price || 0)),
         quantity: parseInt(String(row.cantidad || row.quantity || row.stock || 0)),
-        expirationdate: row.fecha_expiracion || row.expiration_date || row.expiry_date || '',
+        expirationdate: expirationDate,
         description: row.descripcion || row.description || '',
         brand: row.proveedor || row.supplier || row.marca || row.brand || '',
         image: '',

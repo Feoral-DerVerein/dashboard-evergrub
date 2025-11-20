@@ -62,6 +62,40 @@ export const ProductImportCard = () => {
     });
   };
 
+  const convertExcelDate = (value: any): string => {
+    if (!value) return new Date().toISOString().split('T')[0];
+    
+    // If it's already a proper date string, return it
+    if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
+      return value.split('T')[0];
+    }
+    
+    // Check if it's an Excel serial number (numeric value > 1000)
+    const numValue = typeof value === 'number' ? value : parseFloat(value);
+    if (!isNaN(numValue) && numValue > 1000 && numValue < 100000) {
+      // Excel's epoch starts at 1899-12-30 (accounting for Excel's 1900 leap year bug)
+      const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+      const millisecondsPerDay = 24 * 60 * 60 * 1000;
+      const dateMs = excelEpoch.getTime() + (numValue * millisecondsPerDay);
+      const date = new Date(dateMs);
+      
+      const year = date.getUTCFullYear();
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(date.getUTCDate()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}`;
+    }
+    
+    // Try to parse as date
+    const parsedDate = new Date(value);
+    if (!isNaN(parsedDate.getTime())) {
+      return parsedDate.toISOString().split('T')[0];
+    }
+    
+    // Default to today
+    return new Date().toISOString().split('T')[0];
+  };
+
   const normalizeProductData = (row: any) => {
     const normalizeKey = (key: string) => key.toLowerCase().trim().replace(/\s+/g, '_');
     const normalized: any = {};
@@ -71,6 +105,10 @@ export const ProductImportCard = () => {
       normalized[normalizedKey] = row[key];
     });
 
+    const rawExpirationDate = normalized.expiration_date || normalized.fecha_expiracion || 
+                              normalized.expiry_date || normalized.expirationdate || 
+                              normalized.expire_date || normalized.best_before_date;
+
     return {
       name: normalized.name || normalized.nombre || normalized.producto || normalized.product || 'Sin nombre',
       category: normalized.category || normalized.categoria || 'General',
@@ -78,8 +116,7 @@ export const ProductImportCard = () => {
       price: parseFloat(normalized.price || normalized.precio || '0') || 0,
       quantity: parseInt(normalized.quantity || normalized.cantidad || normalized.stock || '0') || 0,
       description: normalized.description || normalized.descripcion || '',
-      expirationdate: normalized.expiration_date || normalized.fecha_expiracion || normalized.expiry_date || 
-                      normalized.expirationdate || new Date().toISOString().split('T')[0],
+      expirationdate: convertExcelDate(rawExpirationDate),
       ean: normalized.ean || normalized.barcode || normalized.codigo_barras || null,
       sku: normalized.sku || normalized.codigo || null,
       original_price: parseFloat(normalized.original_price || normalized.precio_original || '0') || null,
