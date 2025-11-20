@@ -1,7 +1,38 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { dashboardAnalyticsService, DashboardAnalytics } from '@/services/dashboardAnalyticsService';
+import { useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useDashboardAnalytics = () => {
+  const queryClient = useQueryClient();
+
+  // Set up real-time subscription to products table
+  useEffect(() => {
+    console.log('🔄 Setting up real-time sync for dashboard analytics');
+    
+    const channel = supabase
+      .channel('dashboard-analytics-sync')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'products'
+        },
+        (payload) => {
+          console.log('🔄 Product change detected, refreshing dashboard analytics:', payload.eventType);
+          // Invalidate and refetch dashboard analytics when products change
+          queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('🔌 Cleaning up dashboard analytics sync');
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   return useQuery<DashboardAnalytics>({
     queryKey: ['dashboard-analytics'],
     queryFn: () => dashboardAnalyticsService.fetchDashboardAnalytics(),
