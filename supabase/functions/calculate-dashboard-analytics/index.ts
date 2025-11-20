@@ -21,26 +21,40 @@ Deno.serve(async (req) => {
       }
     );
 
-    console.log('Fetching all data for dashboard analytics...');
+    console.log('🔍 Fetching REAL data from Supabase for dashboard analytics...');
 
-    // Fetch all data in parallel (inventory products table is optional and may not exist)
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('❌ Authentication error:', authError);
+      throw new Error('User not authenticated');
+    }
+
+    console.log('✅ Authenticated user:', user.id);
+
+    // Fetch all data in parallel - filtering by user_id where applicable
     const [
       { data: salesData, error: salesError },
       { data: products, error: productsError },
       { data: orders, error: ordersError },
       { data: surpriseBags, error: bagsError },
     ] = await Promise.all([
-      supabaseClient.from('sales_metrics').select('*').order('date', { ascending: false }).limit(90),
-      supabaseClient.from('products').select('*'),
-      supabaseClient.from('orders').select('*, order_items(*)').order('created_at', { ascending: false }).limit(100),
-      supabaseClient.from('surprise_bags_metrics').select('*').order('created_at', { ascending: false }).limit(30),
+      supabaseClient.from('sales_metrics').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(90),
+      supabaseClient.from('products').select('*').eq('userid', user.id),
+      supabaseClient.from('orders').select('*, order_items(*)').eq('user_id', user.id).order('created_at', { ascending: false }).limit(100),
+      supabaseClient.from('surprise_bags_metrics').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(30),
     ]);
+
+    if (salesError) console.warn('⚠️ Sales data error:', salesError.message);
+    if (productsError) console.error('❌ Products error:', productsError.message);
+    if (ordersError) console.warn('⚠️ Orders error:', ordersError.message);
+    if (bagsError) console.warn('⚠️ Surprise bags error:', bagsError.message);
 
     // Use an empty array when the inventory_products table is not available
     const inventoryProducts: any[] = [];
 
-
-    console.log(`Processing data: ${salesData?.length} sales, ${products?.length} products, ${orders?.length} orders`);
+    console.log(`📊 Processing REAL data: ${salesData?.length || 0} sales, ${products?.length || 0} products, ${orders?.length || 0} orders, ${surpriseBags?.length || 0} surprise bags`);
 
     // ========== RISK ENGINE CALCULATIONS ==========
     const riskEngine = calculateRiskEngine(products, inventoryProducts, orders, salesData);
@@ -88,7 +102,24 @@ Deno.serve(async (req) => {
 
 // ========== HELPER FUNCTIONS ==========
 
+// Helper function to get orders for a specific product (checks order_items)
+function getOrdersForProduct(orders: any[], productId: number) {
+  return orders.filter(o => 
+    o.order_items?.some((item: any) => item.product_id === productId)
+  );
+}
+
+// Helper function to get quantity sold for a product from orders
+function getQuantitySoldForProduct(orders: any[], productId: number) {
+  return orders.reduce((sum, o) => {
+    const item = o.order_items?.find((i: any) => i.product_id === productId);
+    return sum + (Number(item?.quantity) || 0);
+  }, 0);
+}
+
 function calculateRiskEngine(products: any[], inventoryProducts: any[], orders: any[], salesData: any[]) {
+  console.log('🎯 Calculating Risk Engine from REAL products data...');
+  
   const today = new Date();
   const last7Days = orders.filter(o => {
     const orderDate = new Date(o.created_at);
@@ -99,9 +130,16 @@ function calculateRiskEngine(products: any[], inventoryProducts: any[], orders: 
   const totalSalesLast7Days = last7Days.reduce((sum, o) => sum + (o.total || 0), 0);
   const avgDailySales = totalSalesLast7Days / 7;
 
-  // Calculate total inventory value
-  const totalInventoryValue = (products || []).reduce((sum, p) => sum + (p.price * p.quantity), 0);
-  const totalInventoryItems = (products || []).reduce((sum, p) => sum + p.quantity, 0);
+  // Calculate total inventory value from REAL products table
+  const totalInventoryValue = (products || []).reduce((sum, p) => {
+    const price = Number(p.price) || 0;
+    const quantity = Number(p.quantity) || 0;
+    return sum + (price * quantity);
+  }, 0);
+  
+  const totalInventoryItems = (products || []).reduce((sum, p) => sum + (Number(p.quantity) || 0), 0);
+  
+  console.log(`📦 Inventory: ${totalInventoryItems} items, $${totalInventoryValue.toFixed(2)} value`);
 
   // Stockout Risk: Based on velocity vs inventory
   let stockoutRisk = 0;
@@ -112,8 +150,9 @@ function calculateRiskEngine(products: any[], inventoryProducts: any[], orders: 
 
   // Overstock Risk: Based on slow-moving products
   const slowMovingProducts = (products || []).filter(p => {
-    const productOrders = last7Days.filter(o => o.product_id === p.id);
-    return p.quantity > 20 && productOrders.length < 2;
+    const quantity = Number(p.quantity) || 0;
+    const productOrders = getOrdersForProduct(last7Days, p.id);
+    return quantity > 20 && productOrders.length < 2;
   });
   const overstockRisk = Math.min(100, (slowMovingProducts.length / Math.max(1, products?.length || 1)) * 100);
 
@@ -139,55 +178,71 @@ function calculateRiskEngine(products: any[], inventoryProducts: any[], orders: 
 }
 
 function identifyCriticalProducts(products: any[], inventoryProducts: any[], orders: any[]) {
+  console.log('⚠️ Identifying critical products from REAL data...');
   const critical: any[] = [];
   const today = new Date();
 
   (products || []).forEach(product => {
     const reasons: string[] = [];
     let severity: 'high' | 'medium' | 'low' = 'low';
+    
+    const quantity = Number(product.quantity) || 0;
 
-    // Check expiration
+    // Check expiration - handle text date format from Supabase
     if (product.expirationdate) {
-      const expDate = new Date(product.expirationdate);
-      const daysToExpire = (expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-      if (daysToExpire <= 3 && daysToExpire > 0) {
-        reasons.push(`Expires in ${Math.ceil(daysToExpire)} days`);
-        severity = 'high';
-      } else if (daysToExpire <= 7 && daysToExpire > 0) {
-        reasons.push(`Expires in ${Math.ceil(daysToExpire)} days`);
-        severity = severity === 'high' ? 'high' : 'medium';
+      try {
+        const expDate = new Date(product.expirationdate);
+        if (!isNaN(expDate.getTime())) {
+          const daysToExpire = (expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+          if (daysToExpire <= 3 && daysToExpire > 0) {
+            reasons.push(`⏰ Expires in ${Math.ceil(daysToExpire)} days`);
+            severity = 'high';
+          } else if (daysToExpire <= 7 && daysToExpire > 0) {
+            reasons.push(`⏰ Expires in ${Math.ceil(daysToExpire)} days`);
+            severity = severity === 'high' ? 'high' : 'medium';
+          } else if (daysToExpire <= 0) {
+            reasons.push('❌ Expired');
+            severity = 'high';
+          }
+        }
+      } catch (e) {
+        console.warn('Invalid expiration date for product:', product.id);
       }
     }
 
     // Check low stock
-    if (product.quantity < 10) {
-      reasons.push('Critical stock');
+    if (quantity > 0 && quantity < 10) {
+      reasons.push('📉 Critical stock level');
       severity = 'high';
-    } else if (product.quantity < 20) {
-      reasons.push('Low stock');
+    } else if (quantity < 20 && quantity >= 10) {
+      reasons.push('⚠️ Low stock');
       severity = severity === 'high' ? 'high' : 'medium';
     }
 
-    // Check overstock
-    if (product.quantity > 50) {
-      const recentOrders = orders.filter(o => o.product_id === product.id && 
-        (today.getTime() - new Date(o.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7
-      );
+    // Check overstock - check order_items within orders
+    if (quantity > 50) {
+      const recentOrders = orders.filter(o => {
+        const hasProduct = o.order_items?.some((item: any) => item.product_id === product.id);
+        const isRecent = (today.getTime() - new Date(o.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7;
+        return hasProduct && isRecent;
+      });
       if (recentOrders.length < 2) {
-        reasons.push('Overstock with low rotation');
+        reasons.push('📦 Overstock with low rotation');
         severity = severity === 'high' ? 'high' : 'medium';
       }
     }
 
     if (reasons.length > 0) {
       critical.push({
-        sku: product.sku || `SKU-${product.id}`,
-        name: product.name,
+        sku: product.sku || product.ean || `P-${product.id}`,
+        name: product.name || 'Unknown Product',
         reason: reasons.join(', '),
         severity,
       });
     }
   });
+
+  console.log(`🎯 Found ${critical.length} critical products`);
 
   return critical.sort((a, b) => {
     const severityOrder = { high: 0, medium: 1, low: 2 };
@@ -209,12 +264,20 @@ function generateRecommendations(products: any[], inventoryProducts: any[], orde
   // Recommendation 1: Stock replenishment for high-demand products
   const highDemandProducts = (products || [])
     .map(p => {
-      const ordersLast7Days = orders.filter(o => 
-        o.product_id === p.id && 
-        (today.getTime() - new Date(o.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7
-      );
-      const demand = ordersLast7Days.reduce((sum, o) => sum + (o.quantity_ordered || 1), 0);
+      // Check order_items within orders for product demand
+      const ordersLast7Days = orders.filter(o => {
+        const hasProduct = o.order_items?.some((item: any) => item.product_id === p.id);
+        const isRecent = (today.getTime() - new Date(o.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7;
+        return hasProduct && isRecent;
+      });
+      const demand = ordersLast7Days.reduce((sum, o) => {
+        const item = o.order_items?.find((i: any) => i.product_id === p.id);
+        return sum + (Number(item?.quantity) || 0);
+      }, 0);
       return { ...p, demand };
+    })
+    .filter(p => p.demand > 0)
+    .sort((a, b) => b.demand - a.demand);
     })
     .filter(p => p.demand > 0 && p.quantity < p.demand * 2)
     .sort((a, b) => b.demand - a.demand)
@@ -235,13 +298,14 @@ function generateRecommendations(products: any[], inventoryProducts: any[], orde
   // Recommendation 2: Reduce production for slow-moving items
   const slowMovingProducts = (products || [])
     .map(p => {
-      const ordersLast14Days = orders.filter(o => 
-        o.product_id === p.id && 
-        (today.getTime() - new Date(o.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 14
-      );
+      const ordersLast14Days = orders.filter(o => {
+        const hasProduct = o.order_items?.some((item: any) => item.product_id === p.id);
+        const isRecent = (today.getTime() - new Date(o.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 14;
+        return hasProduct && isRecent;
+      });
       return { ...p, ordersCount: ordersLast14Days.length };
     })
-    .filter(p => p.quantity > 20 && p.ordersCount < 2)
+    .filter(p => (Number(p.quantity) || 0) > 20 && p.ordersCount < 2)
     .slice(0, 2);
 
   slowMovingProducts.forEach((p, idx) => {
@@ -364,10 +428,12 @@ function generateAlerts(products: any[], inventoryProducts: any[], orders: any[]
   // Alert 1: Critical stockout risk
   const criticalStockProducts = (products || [])
     .map(p => {
-      const ordersLast7Days = last7Days.filter(o => o.product_id === p.id);
-      const avgDailySales = ordersLast7Days.reduce((sum, o) => sum + (o.quantity_ordered || 1), 0) / 7;
-      const daysOfStock = avgDailySales > 0 ? p.quantity / avgDailySales : 999;
-      return { ...p, daysOfStock, avgDailySales };
+      const quantity = Number(p.quantity) || 0;
+      const ordersLast7Days = getOrdersForProduct(last7Days, p.id);
+      const totalSold = getQuantitySoldForProduct(ordersLast7Days, p.id);
+      const avgDailySales = totalSold / 7;
+      const daysOfStock = avgDailySales > 0 ? quantity / avgDailySales : 999;
+      return { ...p, daysOfStock, avgDailySales, quantity };
     })
     .filter(p => p.daysOfStock < 3 && p.avgDailySales > 0)
     .sort((a, b) => a.daysOfStock - b.daysOfStock);
@@ -386,13 +452,16 @@ function generateAlerts(products: any[], inventoryProducts: any[], orders: any[]
   // Alert 2: Overproduction detected
   const overproductionProducts = (products || [])
     .map(p => {
-      const ordersLast14Days = orders.filter(o => 
-        o.product_id === p.id && 
-        (today.getTime() - new Date(o.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 14
-      );
-      const avgDailySales = ordersLast14Days.reduce((sum, o) => sum + (o.quantity_ordered || 1), 0) / 14;
-      const overstock = avgDailySales > 0 ? ((p.quantity / (avgDailySales * 7)) - 1) * 100 : 0;
-      return { ...p, overstock, avgDailySales };
+      const quantity = Number(p.quantity) || 0;
+      const ordersLast14Days = orders.filter(o => {
+        const hasProduct = o.order_items?.some((item: any) => item.product_id === p.id);
+        const isRecent = (today.getTime() - new Date(o.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 14;
+        return hasProduct && isRecent;
+      });
+      const totalSold = getQuantitySoldForProduct(ordersLast14Days, p.id);
+      const avgDailySales = totalSold / 14;
+      const overstock = avgDailySales > 0 ? ((quantity / (avgDailySales * 7)) - 1) * 100 : 0;
+      return { ...p, overstock, avgDailySales, quantity };
     })
     .filter(p => p.overstock > 35 && p.quantity > 20)
     .sort((a, b) => b.overstock - a.overstock);
@@ -501,6 +570,7 @@ function calculateSalesForecast(salesData: any[], orders: any[]) {
 }
 
 function calculateTopProductsForecast(products: any[], inventoryProducts: any[], orders: any[], salesData: any[]) {
+  console.log('📈 Calculating top products forecast from REAL data...');
   const today = new Date();
   const last14Days = orders.filter(o => {
     const orderDate = new Date(o.created_at);
@@ -509,8 +579,9 @@ function calculateTopProductsForecast(products: any[], inventoryProducts: any[],
 
   const productForecast = (products || [])
     .map(p => {
-      const productOrders = last14Days.filter(o => o.product_id === p.id);
-      const totalSold = productOrders.reduce((sum, o) => sum + (o.quantity_ordered || 1), 0);
+      const quantity = Number(p.quantity) || 0;
+      const productOrders = getOrdersForProduct(last14Days, p.id);
+      const totalSold = getQuantitySoldForProduct(productOrders, p.id);
       const avgDailySales = totalSold / 14;
       const forecastDemand = Math.round(avgDailySales * 7); // Next 7 days
       
@@ -518,20 +589,20 @@ function calculateTopProductsForecast(products: any[], inventoryProducts: any[],
       let riskLevel: 'High' | 'Medium' | 'Low' = 'Low';
       let recommendation = 'Optimal stock';
       
-      if (p.quantity < forecastDemand * 0.5) {
+      if (quantity < forecastDemand * 0.5) {
         riskLevel = 'High';
-        recommendation = `Urgent: Purchase ${Math.ceil(forecastDemand * 1.5 - p.quantity)} units`;
-      } else if (p.quantity < forecastDemand) {
+        recommendation = `Urgent: Purchase ${Math.ceil(forecastDemand * 1.5 - quantity)} units`;
+      } else if (quantity < forecastDemand) {
         riskLevel = 'Medium';
-        recommendation = `Recommended: Purchase ${Math.ceil(forecastDemand * 1.2 - p.quantity)} units`;
-      } else if (p.quantity > forecastDemand * 3 && forecastDemand > 0) {
+        recommendation = `Recommended: Purchase ${Math.ceil(forecastDemand * 1.2 - quantity)} units`;
+      } else if (quantity > forecastDemand * 3 && forecastDemand > 0) {
         riskLevel = 'Medium';
         recommendation = 'Consider promotion to rotate stock';
       }
 
       return {
-        name: p.name,
-        currentStock: p.quantity,
+        name: p.name || 'Unknown Product',
+        currentStock: quantity,
         forecastDemand,
         riskLevel,
         recommendation,
@@ -541,6 +612,8 @@ function calculateTopProductsForecast(products: any[], inventoryProducts: any[],
     .filter(p => p.forecastDemand > 0)
     .sort((a, b) => b.forecastDemand - a.forecastDemand)
     .slice(0, 10);
+
+  console.log(`🎯 Top ${productForecast.length} products identified for forecast`);
 
   return productForecast;
 }
