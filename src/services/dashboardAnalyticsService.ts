@@ -73,11 +73,23 @@ export interface DashboardAnalytics {
 }
 
 export const dashboardAnalyticsService = {
-  async fetchDashboardAnalytics(): Promise<DashboardAnalytics> {
+  async fetchDashboardAnalytics(accessToken?: string): Promise<DashboardAnalytics> {
     try {
-      const { data, error } = await supabase.functions.invoke('calculate-dashboard-analytics', {
+      const invokeOptions: {
+        body: Record<string, never>;
+        headers?: { Authorization: string };
+      } = {
         body: {},
-      });
+      };
+
+      // Attach the user's access token explicitly so the Edge Function can authenticate the user
+      if (accessToken) {
+        invokeOptions.headers = {
+          Authorization: `Bearer ${accessToken}`,
+        };
+      }
+
+      const { data, error } = await supabase.functions.invoke('calculate-dashboard-analytics', invokeOptions);
 
       if (error) throw error;
 
