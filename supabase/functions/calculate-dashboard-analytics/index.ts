@@ -277,8 +277,7 @@ function generateRecommendations(products: any[], inventoryProducts: any[], orde
       return { ...p, demand };
     })
     .filter(p => p.demand > 0)
-    .sort((a, b) => b.demand - a.demand);
-    })
+    .sort((a, b) => b.demand - a.demand)
     .filter(p => p.demand > 0 && p.quantity < p.demand * 2)
     .sort((a, b) => b.demand - a.demand)
     .slice(0, 3);
