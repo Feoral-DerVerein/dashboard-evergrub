@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Heart
 } from "lucide-react";
+import { ProductImportCard } from "@/components/ProductImportCard";
 
 interface Integration {
   id: string;
@@ -242,6 +243,11 @@ const Integrations = () => {
         <p className="text-muted-foreground">
           Connect Negentropy with your existing tools and platforms
         </p>
+      </div>
+
+      {/* Product Import Section */}
+      <div className="mb-6">
+        <ProductImportCard />
       </div>
 
       {categories.map((category) => {
