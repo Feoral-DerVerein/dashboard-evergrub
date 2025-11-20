@@ -28,7 +28,10 @@ Deno.serve(async (req) => {
     
     if (authError || !user) {
       console.error('❌ Authentication error:', authError);
-      throw new Error('User not authenticated');
+      return new Response(JSON.stringify({ error: 'User not authenticated' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     console.log('✅ Authenticated user:', user.id);
