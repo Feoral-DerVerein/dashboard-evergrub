@@ -38,6 +38,7 @@ import MelbourneWeatherCard from "@/components/widgets/MelbourneWeatherCard";
 import hiMateBanner from "@/assets/hi-mate-banner.png";
 import { useDashboardAnalytics } from "@/hooks/useDashboardAnalytics";
 import { RefreshCw } from "lucide-react";
+import { FixExcelDatesButton } from "@/components/kpi/FixExcelDatesButton";
 type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
 const chartDataSamples: Record<TimeFilterPeriod, {
   label: string;
@@ -849,15 +850,18 @@ const KPI = () => {
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold text-foreground">Risk Engine</h2>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => refetchDashboard()}
-                    disabled={isDashboardLoading}
-                  >
-                    <RefreshCw className={`h-4 w-4 mr-2 ${isDashboardLoading ? 'animate-spin' : ''}`} />
-                    Actualizar
-                  </Button>
+                  <div className="flex gap-2">
+                    <FixExcelDatesButton />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => refetchDashboard()}
+                      disabled={isDashboardLoading}
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isDashboardLoading ? 'animate-spin' : ''}`} />
+                      Actualizar
+                    </Button>
+                  </div>
                 </div>
                 <RiskEngineSection data={dashboardData?.riskEngine} isLoading={isDashboardLoading} />
               </div>
