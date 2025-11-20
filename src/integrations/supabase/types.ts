@@ -575,63 +575,6 @@ export type Database = {
           },
         ]
       }
-      inventory_products: {
-        Row: {
-          arrival_date: string | null
-          barcode: string | null
-          category: string
-          cost: number
-          created_at: string | null
-          expiration_date: string | null
-          id: string
-          is_sample_data: boolean | null
-          location: Json | null
-          price: number
-          product_id: string
-          product_name: string
-          stock_quantity: number
-          supplier: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          arrival_date?: string | null
-          barcode?: string | null
-          category: string
-          cost: number
-          created_at?: string | null
-          expiration_date?: string | null
-          id: string
-          is_sample_data?: boolean | null
-          location?: Json | null
-          price: number
-          product_id: string
-          product_name: string
-          stock_quantity?: number
-          supplier?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          arrival_date?: string | null
-          barcode?: string | null
-          category?: string
-          cost?: number
-          created_at?: string | null
-          expiration_date?: string | null
-          id?: string
-          is_sample_data?: boolean | null
-          location?: Json | null
-          price?: number
-          product_id?: string
-          product_name?: string
-          stock_quantity?: number
-          supplier?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       inventory_snapshots: {
         Row: {
           created_at: string

@@ -19,75 +19,20 @@ export interface InventoryProduct {
 }
 
 export const inventoryProductsService = {
-  // Get all inventory products for the current user
+  // Placeholder implementation: inventory_products table is not available yet
   async getInventoryProducts(userId: string): Promise<InventoryProduct[]> {
-    try {
-      console.log("Fetching inventory products for user:", userId);
-      
-      if (!userId) {
-        console.warn("No user ID provided for getInventoryProducts");
-        return [];
-      }
-      
-      const { data, error } = await supabase
-        .from('inventory_products')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error("Error fetching inventory products:", error);
-        throw error;
-      }
-      
-      console.log(`Found ${data?.length || 0} inventory products for user ${userId}`);
-      return data || [];
-    } catch (error) {
-      console.error("Error in getInventoryProducts:", error);
-      return [];
-    }
+    console.warn("inventoryProductsService.getInventoryProducts called but 'inventory_products' table does not exist yet. Returning empty list.", { userId });
+    return [];
   },
 
-  // Get a single inventory product by ID
   async getInventoryProductById(id: string): Promise<InventoryProduct | null> {
-    try {
-      const { data, error } = await supabase
-        .from('inventory_products')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
-      
-      if (error) {
-        console.error("Error fetching inventory product:", error);
-        throw error;
-      }
-      
-      return data;
-    } catch (error) {
-      console.error("Error in getInventoryProductById:", error);
-      return null;
-    }
+    console.warn("inventoryProductsService.getInventoryProductById called but 'inventory_products' table does not exist yet. Returning null.", { id });
+    return null;
   },
 
-  // Delete an inventory product
   async deleteInventoryProduct(id: string): Promise<boolean> {
-    try {
-      console.log("Deleting inventory product with ID:", id);
-      const { error } = await supabase
-        .from('inventory_products')
-        .delete()
-        .eq('id', id);
-      
-      if (error) {
-        console.error("Error deleting inventory product:", error);
-        throw error;
-      }
-      
-      console.log("Inventory product deleted successfully");
-      return true;
-    } catch (error) {
-      console.error("Error in deleteInventoryProduct:", error);
-      throw error;
-    }
-  }
+    console.warn("inventoryProductsService.deleteInventoryProduct called but 'inventory_products' table does not exist yet. Returning false.", { id });
+    return false;
+  },
 };
+
