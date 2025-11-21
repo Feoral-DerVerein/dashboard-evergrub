@@ -252,7 +252,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                 </div>
 
                 {/* Action buttons */}
-                <div className="space-y-2 mt-3">
+                <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-gray-100">
                   {item.actionLabel && (
                     <Button
                       variant="default"
@@ -264,7 +264,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                       <ArrowRight className="w-3 h-3 ml-1" />
                     </Button>
                   )}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 w-full">
                     <Button
                       variant="outline"
                       size="sm"
