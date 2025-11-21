@@ -272,7 +272,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                       onClick={() => handleComplete(item.id)}
                     >
                       <Check className="w-3 h-3 mr-1" />
-                      Completar
+                      Complete
                     </Button>
                     <Button
                       variant="outline"
@@ -281,7 +281,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                       onClick={() => handleDelete(item.id)}
                     >
                       <X className="w-3 h-3 mr-1" />
-                      Eliminar
+                      Delete
                     </Button>
                   </div>
                 </div>

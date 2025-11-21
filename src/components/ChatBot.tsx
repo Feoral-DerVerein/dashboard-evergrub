@@ -131,7 +131,7 @@ const ChatBot = ({
     // Create a bot message with smart notifications and pass the products
     addMessage({
       type: 'bot',
-      content: `Tienes ${notificationCount} notificaciones pendientes: ${expiringProducts.length} productos próximos a vencer y ${lowStockProducts.length} con stock bajo.`,
+      content: `You have ${notificationCount} pending notifications: ${expiringProducts.length} products expiring soon and ${lowStockProducts.length} with low stock.`,
       smart_notifications: true
     } as any);
   };
