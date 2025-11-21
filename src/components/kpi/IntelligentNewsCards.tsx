@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, TrendingUp, Package, AlertTriangle, Calendar, Clock, ArrowRight, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bell, TrendingUp, Package, AlertTriangle, Clock, ArrowRight, Check, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,6 @@ interface IntelligentNewsCardsProps {
 
 export const IntelligentNewsCards = ({ products = [], orders = [], insights }: IntelligentNewsCardsProps) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
-  const [currentRow, setCurrentRow] = useState(0);
 
   // Generate intelligent news based on real data
   const generateNews = (): NewsItem[] => {
@@ -164,18 +163,6 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
     setNewsItems(generateNews());
   }, [products, orders, insights]);
 
-  // Auto-rotate every 5 seconds
-  useEffect(() => {
-    const rows = Math.ceil(newsItems.length / 4);
-    if (rows <= 1) return;
-
-    const interval = setInterval(() => {
-      setCurrentRow((prev) => (prev + 1) % rows);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [newsItems]);
-
   const handleComplete = (id: string) => {
     setNewsItems(prev => prev.filter(item => item.id !== id));
     toast.success("Notification marked as completed");
@@ -185,19 +172,6 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
     setNewsItems(prev => prev.filter(item => item.id !== id));
     toast.success("Notification deleted");
   };
-
-  const nextRow = () => {
-    const rows = Math.ceil(newsItems.length / 4);
-    setCurrentRow((prev) => (prev + 1) % rows);
-  };
-
-  const prevRow = () => {
-    const rows = Math.ceil(newsItems.length / 4);
-    setCurrentRow((prev) => (prev - 1 + rows) % rows);
-  };
-
-  const rows = Math.ceil(newsItems.length / 4);
-  const visibleItems = newsItems.slice(currentRow * 4, (currentRow + 1) * 4);
 
   const getIcon = (type: NewsItem['type']) => {
     switch (type) {
@@ -246,48 +220,10 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
   }
 
   return (
-    <div className="relative">
-      {/* Navigation buttons */}
-      {rows > 1 && (
-        <div className="flex justify-between items-center mb-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={prevRow}
-            className="h-8"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          
-          <div className="flex gap-2">
-            {Array.from({ length: rows }).map((_, idx) => (
-              <div
-                key={idx}
-                className={`h-2 w-2 rounded-full transition-all duration-300 ${
-                  idx === currentRow ? 'bg-blue-600 w-6' : 'bg-gray-300'
-                }`}
-              />
-            ))}
-          </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={nextRow}
-            className="h-8"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
-      )}
-
-      {/* Cards grid with animation */}
-      <div className="overflow-hidden">
-        <div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-500 ease-in-out animate-fade-in"
-          key={currentRow}
-        >
-          {visibleItems.map((item) => (
+    <div className="w-full">
+      {/* Cards grid - show all notifications */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-fade-in">
+        {newsItems.map((item) => (
             <Card 
               key={item.id}
               className={`hover:shadow-lg transition-all duration-300 border-l-4 ${getTypeColor(item.type)} animate-scale-in`}
@@ -316,42 +252,42 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex gap-2 mt-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 text-xs hover:bg-green-50 hover:text-green-700 hover:border-green-300"
-                    onClick={() => handleComplete(item.id)}
-                  >
-                    <Check className="w-3 h-3 mr-1" />
-                    Complete
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 text-xs hover:bg-red-50 hover:text-red-700 hover:border-red-300"
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    <X className="w-3 h-3 mr-1" />
-                    Delete
-                  </Button>
+                <div className="space-y-2 mt-3">
+                  {item.actionLabel && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full h-8 text-xs"
+                      onClick={item.onAction}
+                    >
+                      {item.actionLabel}
+                      <ArrowRight className="w-3 h-3 ml-1" />
+                    </Button>
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-8 text-xs"
+                      onClick={() => handleComplete(item.id)}
+                    >
+                      <Check className="w-3 h-3 mr-1" />
+                      Completar
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-8 text-xs"
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      <X className="w-3 h-3 mr-1" />
+                      Eliminar
+                    </Button>
+                  </div>
                 </div>
-
-                {item.actionLabel && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full h-7 mt-2 text-xs hover:bg-gray-100"
-                    onClick={item.onAction}
-                  >
-                    {item.actionLabel}
-                    <ArrowRight className="w-3 h-3 ml-1" />
-                  </Button>
-                )}
               </CardContent>
             </Card>
           ))}
-        </div>
       </div>
     </div>
   );
