@@ -226,9 +226,9 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
         {newsItems.map((item) => (
             <Card 
               key={item.id}
-              className={`h-full hover:shadow-lg transition-all duration-300 border-l-4 ${getTypeColor(item.type)} animate-scale-in`}
+              className={`h-full hover:shadow-lg transition-all duration-300 border-l-4 overflow-hidden ${getTypeColor(item.type)} animate-scale-in`}
             >
-              <CardContent className="flex h-full flex-col p-4">
+              <CardContent className="flex h-full flex-col p-4 overflow-hidden">
                 <div className="flex items-start justify-between mb-3">
                   <div className={`p-2 rounded-lg ${getTypeColor(item.type)}`}>
                     {getIcon(item.type)}
@@ -245,7 +245,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                 </p>
 
                 {/* Timestamp and Action buttons - consolidated */}
-                <div className="flex flex-col gap-3 mt-auto pt-3 border-t border-gray-100">
+                <div className="flex flex-col gap-3 mt-auto pt-3 border-t border-gray-100 w-full max-w-full">
                   <div className="flex items-center text-xs text-gray-500">
                     <Clock className="w-3 h-3 mr-1" />
                     {item.timestamp}
@@ -255,7 +255,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                     <Button
                       variant="default"
                       size="sm"
-                      className="w-full h-8 text-xs"
+                      className="w-full h-8 text-xs shrink-0"
                       onClick={item.onAction}
                     >
                       {item.actionLabel}
@@ -263,11 +263,11 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                     </Button>
                   )}
                   
-                  <div className="flex gap-2 w-full">
+                  <div className="flex gap-2 w-full max-w-full">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 h-8 text-xs"
+                      className="flex-1 h-8 text-xs min-w-0"
                       onClick={() => handleComplete(item.id)}
                     >
                       <Check className="w-3 h-3 mr-1" />
@@ -276,7 +276,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 h-8 text-xs"
+                      className="flex-1 h-8 text-xs min-w-0"
                       onClick={() => handleDelete(item.id)}
                     >
                       <X className="w-3 h-3 mr-1" />
