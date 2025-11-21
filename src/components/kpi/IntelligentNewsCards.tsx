@@ -226,9 +226,9 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
         {newsItems.map((item) => (
             <Card 
               key={item.id}
-              className={`hover:shadow-lg transition-all duration-300 border-l-4 ${getTypeColor(item.type)} animate-scale-in`}
+              className={`h-full hover:shadow-lg transition-all duration-300 border-l-4 ${getTypeColor(item.type)} animate-scale-in`}
             >
-              <CardContent className="p-4">
+              <CardContent className="flex h-full flex-col p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className={`p-2 rounded-lg ${getTypeColor(item.type)}`}>
                     {getIcon(item.type)}
