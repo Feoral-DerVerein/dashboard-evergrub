@@ -98,6 +98,7 @@ const ChatBot = ({
     setInputValue,
     isLoading,
     sendMessage,
+    addMessage,
     messagesEndRef
   } = useChatbot();
   const renderInfoCard = (card: BusinessCardData) => {
@@ -119,16 +120,20 @@ const ChatBot = ({
     suggestions: ["Recommend actions based on my current inventory", "Which products should I put on sale today?", "Optimize my stock for the weekend rush"]
   }];
   const handleNotificationClick = () => {
-    // Create a message with smart notifications
-    const notificationMessage = {
-      id: Date.now().toString(),
-      type: 'bot' as const,
-      content: 'Here are your smart notifications based on current inventory and orders:',
+    // Count the actual notifications
+    const expiringProducts = products.filter(p => {
+      if (!p.expirationDate) return false;
+      const daysUntilExpiry = Math.ceil((new Date(p.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+      return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+    });
+    const lowStockProducts = products.filter(p => p.quantity <= 5 && p.quantity > 0);
+    
+    // Create a bot message with smart notifications and pass the products
+    addMessage({
+      type: 'bot',
+      content: `Tienes ${notificationCount} notificaciones pendientes: ${expiringProducts.length} productos próximos a vencer y ${lowStockProducts.length} con stock bajo.`,
       smart_notifications: true
-    };
-
-    // Add to messages manually to show the cards
-    sendMessage('Show me smart notifications');
+    } as any);
   };
   if (variant === 'inline') {
     return <div className="w-full bg-white">

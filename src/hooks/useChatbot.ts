@@ -345,6 +345,17 @@ export const useChatbot = () => {
     'Anti-waste strategies'
   ];
 
+  // Function to add a message directly without webhook
+  const addMessage = (message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
+    const newMessage: ChatMessage = {
+      ...message,
+      id: Date.now().toString(),
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, newMessage]);
+    scrollToBottom();
+  };
+
   return {
     messages,
     inputValue,
@@ -352,6 +363,7 @@ export const useChatbot = () => {
     isLoading,
     isTyping,
     sendMessage,
+    addMessage,
     quickSuggestions,
     messagesEndRef
   };
