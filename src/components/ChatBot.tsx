@@ -86,7 +86,6 @@ const ChatBot = ({
         break;
     }
   };
-
   const handleButtonClick = (messageId: string, buttonLabel: string) => {
     setClickedButtons(prev => new Set(prev).add(messageId));
     sendMessage(buttonLabel);
@@ -149,18 +148,16 @@ const ChatBot = ({
               
               
               {/* Notification Badge */}
-              {notificationCount > 0 && <button onClick={handleNotificationClick} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-xs font-bold shadow-lg hover:bg-red-600 transition-all hover:scale-110 animate-pulse">
+              {notificationCount > 0 && <button onClick={handleNotificationClick} className="absolute -top-2 -right-2 bg-red-500 text-white w-8 h-8 font-bold hover:bg-red-600 transition-all hover:scale-110 animate-pulse flex items-center justify-center text-xs rounded shadow-none gap-0">
                   {notificationCount}
                 </button>}
             </div>
           </div>
 
           {/* File Upload Card - Show when no messages */}
-          {messages.length === 0 && (
-            <div className="max-w-md mx-auto mb-6">
+          {messages.length === 0 && <div className="max-w-md mx-auto mb-6">
               <ChatFileUploadCard />
-            </div>
-          )}
+            </div>}
 
           {/* Messages Display Area (if there are messages) */}
           {messages.length > 0 && <div ref={chatContainerRef} className="max-w-3xl mx-auto mb-4 space-y-4 relative">
@@ -168,41 +165,22 @@ const ChatBot = ({
               {messages.map((message, index) => <div key={message.id} className={`${message.type === 'user' ? 'text-right' : 'text-left'}`}>
                   
                    {/* Message Content (User or Bot Text) */}
-                  {message.content && (
-                    <div className="space-y-2">
-                      <div className={`inline-block max-w-[80%] px-4 py-3 rounded-2xl mb-3 animate-fade-in ${
-                        message.type === 'user' 
-                          ? 'bg-[#10a37f] text-white rounded-br-md' 
-                          : 'bg-[#f7f7f8] text-[#202123] rounded-bl-md border border-[#d9d9e3]'
-                      }`}>
+                  {message.content && <div className="space-y-2">
+                      <div className={`inline-block max-w-[80%] px-4 py-3 rounded-2xl mb-3 animate-fade-in ${message.type === 'user' ? 'bg-[#10a37f] text-white rounded-br-md' : 'bg-[#f7f7f8] text-[#202123] rounded-bl-md border border-[#d9d9e3]'}`}>
                         <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{message.content}</p>
                       </div>
                       
                       {/* Action Buttons - Only for bot messages without product cards */}
-                      {message.type === 'bot' && (message as any).actions && 
-                       !message.product_cards && !(message as any).expiring_products && (
-                        <ActionButtons actions={(message as any).actions} />
-                      )}
+                      {message.type === 'bot' && (message as any).actions && !message.product_cards && !(message as any).expiring_products && <ActionButtons actions={(message as any).actions} />}
 
                       {/* Interactive Buttons */}
-                      {message.type === 'bot' && message.buttons && !clickedButtons.has(message.id) && (
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {message.buttons.map((button, btnIndex) => (
-                            <Button
-                              key={btnIndex}
-                              onClick={() => handleButtonClick(message.id, button.label)}
-                              variant="outline"
-                              size="sm"
-                              className="text-sm border-[#10a37f] text-[#10a37f] hover:bg-[#10a37f] hover:text-white transition-colors"
-                            >
+                      {message.type === 'bot' && message.buttons && !clickedButtons.has(message.id) && <div className="flex flex-wrap gap-2 mt-3">
+                          {message.buttons.map((button, btnIndex) => <Button key={btnIndex} onClick={() => handleButtonClick(message.id, button.label)} variant="outline" size="sm" className="text-sm border-[#10a37f] text-[#10a37f] hover:bg-[#10a37f] hover:text-white transition-colors">
                               {button.label}
                               <ArrowRight className="w-4 h-4 ml-1" />
-                            </Button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                            </Button>)}
+                        </div>}
+                    </div>}
                   
                   {/* Business Cards */}
                   {message.type === 'bot' && message.cards && message.cards.length > 0 && <div className="mt-4 space-y-3 text-left">
@@ -233,9 +211,7 @@ const ChatBot = ({
                       </div>
                       
                       {/* Action Buttons below product cards */}
-                      {(message as any).actions && (
-                        <ActionButtons actions={(message as any).actions} />
-                      )}
+                      {(message as any).actions && <ActionButtons actions={(message as any).actions} />}
                     </div>}
                   
                    {/* Smart Notifications */}
@@ -253,29 +229,19 @@ const ChatBot = ({
                       </div>
                       
                       {/* Action Buttons below expiring product cards */}
-                      {(message as any).actions && (
-                        <ActionButtons actions={(message as any).actions} />
-                      )}
+                      {(message as any).actions && <ActionButtons actions={(message as any).actions} />}
                     </div>}
 
                   {/* Action Cards */}
-                  {message.type === 'bot' && message.actionCards && message.actionCards.length > 0 && (
-                    <div className="text-left mt-4">
+                  {message.type === 'bot' && message.actionCards && message.actionCards.length > 0 && <div className="text-left mt-4">
                       <p className="text-sm font-medium text-gray-700 px-1 mb-3">⚡ Quick Actions:</p>
                       <div className="grid gap-2">
-                        {message.actionCards.map((card, idx) => (
-                          <ActionCard
-                            key={idx}
-                            data={card}
-                            onClick={() => {
-                              setSelectedActionCard(card);
-                              setActionDialogOpen(true);
-                            }}
-                          />
-                        ))}
+                        {message.actionCards.map((card, idx) => <ActionCard key={idx} data={card} onClick={() => {
+                  setSelectedActionCard(card);
+                  setActionDialogOpen(true);
+                }} />)}
                       </div>
-                    </div>
-                  )}
+                    </div>}
                 </div>)}
               
               {/* Loading Indicator */}
@@ -299,13 +265,7 @@ const ChatBot = ({
         </div>
 
         {/* Action Card Dialog */}
-        {selectedActionCard && (
-          <ActionCardDialog
-            open={actionDialogOpen}
-            onOpenChange={setActionDialogOpen}
-            data={selectedActionCard}
-          />
-        )}
+        {selectedActionCard && <ActionCardDialog open={actionDialogOpen} onOpenChange={setActionDialogOpen} data={selectedActionCard} />}
       </div>;
   }
 
