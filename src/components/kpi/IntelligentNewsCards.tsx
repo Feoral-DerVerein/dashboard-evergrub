@@ -244,15 +244,13 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                   {item.description}
                 </p>
 
-                <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
+                {/* Timestamp and Action buttons - consolidated */}
+                <div className="flex flex-col gap-3 mt-auto pt-3 border-t border-gray-100">
                   <div className="flex items-center text-xs text-gray-500">
                     <Clock className="w-3 h-3 mr-1" />
                     {item.timestamp}
                   </div>
-                </div>
-
-                {/* Action buttons */}
-                <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-gray-100">
+                  
                   {item.actionLabel && (
                     <Button
                       variant="default"
@@ -264,6 +262,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
                       <ArrowRight className="w-3 h-3 ml-1" />
                     </Button>
                   )}
+                  
                   <div className="flex gap-2 w-full">
                     <Button
                       variant="outline"
