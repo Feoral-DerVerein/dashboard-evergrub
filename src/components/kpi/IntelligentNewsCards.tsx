@@ -4,6 +4,7 @@ import { Bell, TrendingUp, Package, AlertTriangle, Clock, ArrowRight, Check, X }
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CreateOfferDialog } from "./CreateOfferDialog";
 import { toast } from "sonner";
 
 interface NewsItem {
@@ -25,6 +26,7 @@ interface IntelligentNewsCardsProps {
 
 export const IntelligentNewsCards = ({ products = [], orders = [], insights }: IntelligentNewsCardsProps) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   // Generate intelligent news based on real data
@@ -127,7 +129,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
       timestamp: '4 hours ago',
       priority: 'low',
       actionLabel: 'Create Offer',
-      onAction: () => navigate('/dashboard')
+      onAction: () => setIsOfferDialogOpen(true)
     });
 
     news.push({
@@ -224,10 +226,16 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
   }
 
   return (
-    <div className="w-full">
-      {/* Cards grid - show all notifications */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-fade-in">
-        {newsItems.map((item) => (
+    <>
+      <CreateOfferDialog 
+        open={isOfferDialogOpen} 
+        onOpenChange={setIsOfferDialogOpen}
+      />
+      
+      <div className="w-full">
+        {/* Cards grid - show all notifications */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-fade-in">
+          {newsItems.map((item) => (
             <Card 
               key={item.id}
               className={`h-full hover:shadow-lg transition-all duration-300 border-l-4 overflow-hidden ${getTypeColor(item.type)} animate-scale-in`}
@@ -291,7 +299,8 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
               </CardContent>
             </Card>
           ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
