@@ -20,6 +20,8 @@ import { ActionCard } from '@/components/chat/ActionCard';
 import { ActionCardDialog } from '@/components/chat/ActionCardDialog';
 import { ActionCardData } from '@/types/chatbot.types';
 import { TextSelectionToolbar } from '@/components/chat/TextSelectionToolbar';
+import { InventoryProductCard } from '@/components/inventory/InventoryProductCard';
+import { ProductDetailsDialog } from '@/components/inventory/ProductDetailsDialog';
 import aiIcon from '@/assets/ai-icon.png';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -35,6 +37,8 @@ const ChatBot = ({
   const [clickedButtons, setClickedButtons] = useState<Set<string>>(new Set());
   const [selectedActionCard, setSelectedActionCard] = useState<ActionCardData | null>(null);
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
+  const [selectedInventoryProduct, setSelectedInventoryProduct] = useState<any | null>(null);
+  const [productDetailsOpen, setProductDetailsOpen] = useState(false);
   const isMobile = useIsMobile();
   const inputRef = useRef<HTMLInputElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -237,7 +241,7 @@ const ChatBot = ({
                       {(message as any).actions && <ActionButtons actions={(message as any).actions} />}
                     </div>}
 
-                  {/* Action Cards */}
+                   {/* Action Cards */}
                   {message.type === 'bot' && message.actionCards && message.actionCards.length > 0 && <div className="text-left mt-4">
                       <p className="text-sm font-medium text-gray-700 px-1 mb-3">⚡ Quick Actions:</p>
                       <div className="grid gap-2">
@@ -245,6 +249,22 @@ const ChatBot = ({
                   setSelectedActionCard(card);
                   setActionDialogOpen(true);
                 }} />)}
+                      </div>
+                    </div>}
+
+                   {/* Inventory Products Cards */}
+                  {message.type === 'bot' && (message as any).inventory_products && (message as any).inventory_products.length > 0 && <div className="text-left mt-4">
+                      <p className="text-sm font-medium text-gray-700 px-1 mb-4">📦 Inventory Products ({(message as any).inventory_products.length}):</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {(message as any).inventory_products.map((product: any) => <InventoryProductCard
+                          key={product.id}
+                          product={product}
+                          daysLeft={product.daysLeft}
+                          onClick={() => {
+                            setSelectedInventoryProduct(product);
+                            setProductDetailsOpen(true);
+                          }}
+                        />)}
                       </div>
                     </div>}
                 </div>)}
@@ -271,6 +291,14 @@ const ChatBot = ({
 
         {/* Action Card Dialog */}
         {selectedActionCard && <ActionCardDialog open={actionDialogOpen} onOpenChange={setActionDialogOpen} data={selectedActionCard} />}
+        
+        {/* Product Details Dialog */}
+        {selectedInventoryProduct && <ProductDetailsDialog
+          open={productDetailsOpen}
+          onOpenChange={setProductDetailsOpen}
+          product={selectedInventoryProduct}
+          daysLeft={selectedInventoryProduct.daysLeft}
+        />}
       </div>;
   }
 

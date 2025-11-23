@@ -159,6 +159,14 @@ export const useChatbot = () => {
     const isAskingForExpiring = lowerMessage.includes('expir') || lowerMessage.includes('surplus') || 
                                  lowerMessage.includes('venc') || lowerMessage.includes('caduc');
 
+    // Check if asking for inventory/products
+    const isAskingForInventory = lowerMessage.includes('product') || 
+                                  lowerMessage.includes('inventory') || 
+                                  lowerMessage.includes('inventario') ||
+                                  lowerMessage.includes('stock') ||
+                                  lowerMessage.includes('catalog') ||
+                                  lowerMessage.includes('catálogo');
+
     // Check if asking for performance/metrics data
     const isAskingForPerformance = lowerMessage.includes('performance') || 
                                    lowerMessage.includes('metrics') || 
@@ -290,6 +298,61 @@ export const useChatbot = () => {
         }
       }
 
+      // If asking for inventory, fetch all products
+      let inventoryProductsData = null;
+      if (isAskingForInventory && !isAskingForExpiring) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { data: products } = await supabase
+              .from('products')
+              .select('*')
+              .eq('userid', user.id)
+              .order('created_at', { ascending: false })
+              .limit(20);
+
+            if (products) {
+              const now = new Date();
+              inventoryProductsData = products.map(p => {
+                let daysLeft = null;
+                if (p.expirationdate) {
+                  try {
+                    const expDate = new Date(p.expirationdate);
+                    if (expDate > now) {
+                      daysLeft = Math.ceil((expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    }
+                  } catch (e) {
+                    console.error('Error parsing expiration date:', e);
+                  }
+                }
+                
+                return {
+                  id: p.id.toString(),
+                  product_id: p.id.toString(),
+                  product_name: p.name,
+                  category: p.category,
+                  price: Number(p.price),
+                  cost: Number(p.original_price || p.price),
+                  stock_quantity: p.quantity,
+                  supplier: p.brand || undefined,
+                  barcode: p.ean || p.sku || undefined,
+                  arrival_date: p.created_at,
+                  expiration_date: p.expirationdate,
+                  location: p.pickup_location || undefined,
+                  user_id: p.userid,
+                  created_at: p.created_at,
+                  updated_at: p.created_at,
+                  image: p.image,
+                  daysLeft
+                };
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching inventory products:', error);
+        }
+      }
+
       // Auto-generate actions if we have products but no actions
       let finalActions = actions;
       if (!actions && (transformedProductCards?.length > 0 || expiringProductsData?.length > 0)) {
@@ -310,6 +373,7 @@ export const useChatbot = () => {
         cards: cards,
         product_cards: transformedProductCards,
         expiring_products: expiringProductsData,
+        inventory_products: inventoryProductsData,
         actions: finalActions,
         buttons: buttons,
         timestamp: new Date()
