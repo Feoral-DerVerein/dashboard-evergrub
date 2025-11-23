@@ -25,6 +25,7 @@ export interface ChatMessage {
   cards?: import('@/components/chat/BusinessCards').BusinessCardData[];
   product_cards?: any[]; // Allow any product card format from different sources
   expiring_products?: any[]; // Expiring products for Negentropy assistant
+  inventory_products?: any[]; // Inventory products from database
   actionCards?: ActionCardData[]; // Quick action cards
   actions?: Array<{
     label: string;
