@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { inventoryProductsService, type InventoryProduct } from '@/services/inventoryProductsService';
 import { useToast } from '@/hooks/use-toast';
+import { InventoryProductCard } from '@/components/inventory/InventoryProductCard';
+import { ProductDetailsDialog } from '@/components/inventory/ProductDetailsDialog';
 
 export default function InventoryProducts() {
   const [products, setProducts] = useState<InventoryProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<InventoryProduct | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -54,10 +57,9 @@ export default function InventoryProducts() {
     return 'border-green-500 bg-green-50 dark:bg-green-950/20';
   };
 
-  const getBadgeVariant = (days: number | null) => {
-    if (days === null) return 'secondary';
-    if (days <= 3) return 'destructive';
-    return 'default';
+  const handleProductClick = (product: InventoryProduct) => {
+    setSelectedProduct(product);
+    setDialogOpen(true);
   };
 
   if (loading) {
@@ -85,52 +87,27 @@ export default function InventoryProducts() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {products.map((product) => {
           const daysLeft = getDaysUntilExpiration(product.expiration_date || null);
-          const alertColor = getAlertColor(daysLeft);
-          const badgeVariant = getBadgeVariant(daysLeft);
 
           return (
-            <Card key={product.id} className={`border-2 ${alertColor}`}>
-              <CardHeader>
-                <CardTitle className="text-lg">{product.product_name}</CardTitle>
-                {daysLeft !== null && (
-                  <Badge variant={badgeVariant as any}>
-                    {daysLeft <= 0 ? 'EXPIRED!' : `Expires in ${daysLeft} days`}
-                  </Badge>
-                )}
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-2">{product.category}</p>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    ${product.price.toFixed(2)}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    Stock: {product.stock_quantity}
-                  </span>
-                </div>
-                {product.barcode && (
-                  <p className="text-xs text-muted-foreground">
-                    Barcode: {product.barcode}
-                  </p>
-                )}
-                {product.expiration_date && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Expires: {product.expiration_date}
-                  </p>
-                )}
-                {product.supplier && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Supplier: {product.supplier}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+            <InventoryProductCard
+              key={product.id}
+              product={product}
+              daysLeft={daysLeft}
+              onClick={() => handleProductClick(product)}
+            />
           );
         })}
       </div>
+
+      <ProductDetailsDialog
+        product={selectedProduct}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        daysLeft={selectedProduct ? getDaysUntilExpiration(selectedProduct.expiration_date || null) : null}
+      />
 
       {products.length === 0 && !loading && (
         <div className="text-center py-12">
