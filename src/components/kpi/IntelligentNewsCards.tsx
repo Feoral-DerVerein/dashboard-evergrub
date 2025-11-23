@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell, TrendingUp, Package, AlertTriangle, Clock, ArrowRight, Check, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,7 @@ interface IntelligentNewsCardsProps {
 
 export const IntelligentNewsCards = ({ products = [], orders = [], insights }: IntelligentNewsCardsProps) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const navigate = useNavigate();
 
   // Generate intelligent news based on real data
   const generateNews = (): NewsItem[] => {
@@ -54,7 +56,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
         timestamp: 'Just now',
         priority: urgentCount > 0 ? 'high' : 'medium',
         actionLabel: 'View Products',
-        onAction: () => window.location.href = '/products'
+        onAction: () => navigate('/inventory-products')
       });
     }
 
@@ -69,7 +71,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
         timestamp: '15 min ago',
         priority: 'medium',
         actionLabel: 'Manage Inventory',
-        onAction: () => window.location.href = '/products'
+        onAction: () => navigate('/inventory-products')
       });
     }
 
@@ -89,7 +91,7 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
         timestamp: '1 hour ago',
         priority: 'high',
         actionLabel: 'View Orders',
-        onAction: () => window.location.href = '/orders'
+        onAction: () => navigate('/orders')
       });
     }
 
@@ -124,7 +126,8 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
       description: 'Weekend approaching! Consider creating special offers for high-margin products.',
       timestamp: '4 hours ago',
       priority: 'low',
-      actionLabel: 'Create Offer'
+      actionLabel: 'Create Offer',
+      onAction: () => navigate('/dashboard')
     });
 
     news.push({
@@ -143,7 +146,8 @@ export const IntelligentNewsCards = ({ products = [], orders = [], insights }: I
       description: 'Multiple orders scheduled for delivery today. Confirm logistics arrangements.',
       timestamp: '6 hours ago',
       priority: 'high',
-      actionLabel: 'View Deliveries'
+      actionLabel: 'View Deliveries',
+      onAction: () => navigate('/delivery')
     });
 
     news.push({
