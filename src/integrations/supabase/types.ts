@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      action_logs: {
+        Row: {
+          action_type: string
+          created_at: string
+          description: string
+          id: string
+          metadata: Json
+          module: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          description: string
+          id?: string
+          metadata?: Json
+          module: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json
+          module?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ad_analytics: {
         Row: {
           ad_id: string
@@ -164,6 +197,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      autopilot_settings: {
+        Row: {
+          config: Json
+          created_at: string
+          execution_frequency: string
+          id: string
+          is_active: boolean
+          last_execution: string | null
+          module_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          execution_frequency?: string
+          id?: string
+          is_active?: boolean
+          last_execution?: string | null
+          module_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          execution_frequency?: string
+          id?: string
+          is_active?: boolean
+          last_execution?: string | null
+          module_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       company_profile_audit_log: {
         Row: {
@@ -1081,6 +1150,45 @@ export type Database = {
         }
         Relationships: []
       }
+      pos_integrations: {
+        Row: {
+          api_endpoint: string
+          api_key: string
+          created_at: string
+          id: string
+          is_connected: boolean
+          last_sync: string | null
+          location_id: string | null
+          pos_system: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_endpoint: string
+          api_key: string
+          created_at?: string
+          id?: string
+          is_connected?: boolean
+          last_sync?: string | null
+          location_id?: string | null
+          pos_system: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_endpoint?: string
+          api_key?: string
+          created_at?: string
+          id?: string
+          is_connected?: boolean
+          last_sync?: string | null
+          location_id?: string | null
+          pos_system?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       price_history: {
         Row: {
           changed_at: string
@@ -1122,6 +1230,63 @@ export type Database = {
           },
           {
             foreignKeyName: "price_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      price_sync_queue: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          new_price: number
+          old_price: number
+          product_id: number
+          sync_attempts: number
+          sync_status: string
+          synced_at: string | null
+          target_system: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          new_price: number
+          old_price: number
+          product_id: number
+          sync_attempts?: number
+          sync_status?: string
+          synced_at?: string | null
+          target_system: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          new_price?: number
+          old_price?: number
+          product_id?: number
+          sync_attempts?: number
+          sync_status?: string
+          synced_at?: string | null
+          target_system?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_sync_queue_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_sync_queue_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "sales_analytics"
@@ -1224,6 +1389,63 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      production_recommendations: {
+        Row: {
+          applied_at: string | null
+          confidence_score: number
+          created_at: string
+          current_planned_quantity: number
+          date: string
+          factors: Json
+          id: string
+          product_id: number
+          recommended_quantity: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          applied_at?: string | null
+          confidence_score: number
+          created_at?: string
+          current_planned_quantity?: number
+          date: string
+          factors?: Json
+          id?: string
+          product_id: number
+          recommended_quantity: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          applied_at?: string | null
+          confidence_score?: number
+          created_at?: string
+          current_planned_quantity?: number
+          date?: string
+          factors?: Json
+          id?: string
+          product_id?: number
+          recommended_quantity?: number
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_recommendations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_recommendations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -1374,6 +1596,204 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      promotions: {
+        Row: {
+          channels: Json
+          conversion_count: number
+          created_at: string
+          created_by: string
+          discount_percentage: number
+          end_time: string
+          id: string
+          message: string
+          product_id: number | null
+          promotion_type: string
+          sent_count: number
+          start_time: string
+          status: string
+          target_audience: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          channels?: Json
+          conversion_count?: number
+          created_at?: string
+          created_by?: string
+          discount_percentage: number
+          end_time: string
+          id?: string
+          message: string
+          product_id?: number | null
+          promotion_type: string
+          sent_count?: number
+          start_time: string
+          status?: string
+          target_audience?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          channels?: Json
+          conversion_count?: number
+          created_at?: string
+          created_by?: string
+          discount_percentage?: number
+          end_time?: string
+          id?: string
+          message?: string
+          product_id?: number | null
+          promotion_type?: string
+          sent_count?: number
+          start_time?: string
+          status?: string
+          target_audience?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promotions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      purchase_orders: {
+        Row: {
+          approval_required: boolean
+          approved_by: string | null
+          created_at: string
+          created_by: string
+          expected_delivery: string | null
+          id: string
+          items: Json
+          order_date: string
+          order_number: string
+          status: string
+          supplier_id: string | null
+          supplier_name: string
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approval_required?: boolean
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string
+          expected_delivery?: string | null
+          id?: string
+          items?: Json
+          order_date?: string
+          order_number: string
+          status?: string
+          supplier_id?: string | null
+          supplier_name: string
+          total_amount?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approval_required?: boolean
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string
+          expected_delivery?: string | null
+          id?: string
+          items?: Json
+          order_date?: string
+          order_number?: string
+          status?: string
+          supplier_id?: string | null
+          supplier_name?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_orders_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reorder_rules: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          last_order_date: string | null
+          lead_time_days: number
+          min_stock_level: number
+          product_id: number
+          reorder_quantity: number
+          supplier_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_order_date?: string | null
+          lead_time_days?: number
+          min_stock_level: number
+          product_id: number
+          reorder_quantity: number
+          supplier_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_order_date?: string | null
+          lead_time_days?: number
+          min_stock_level?: number
+          product_id?: number
+          reorder_quantity?: number
+          supplier_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reorder_rules_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reorder_rules_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "reorder_rules_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sales: {
         Row: {
