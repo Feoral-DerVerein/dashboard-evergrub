@@ -30,14 +30,14 @@ const PriceSyncQueueCard = () => {
     setIsProcessing(true);
     try {
       const result = await autopilotService.processPriceSyncQueue();
-      toast.success(`${result.processed} precios sincronizados correctamente`);
+      toast.success(`${result.processed} prices synchronized successfully`);
       if (result.failed > 0) {
-        toast.error(`${result.failed} sincronizaciones fallaron`);
+        toast.error(`${result.failed} synchronizations failed`);
       }
       loadQueue();
     } catch (error) {
       console.error('Error processing queue:', error);
-      toast.error('Error al procesar cola de sincronización');
+      toast.error('Error processing sync queue');
     } finally {
       setIsProcessing(false);
     }
@@ -53,10 +53,10 @@ const PriceSyncQueueCard = () => {
           <div>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-primary" />
-              Cola de Sincronización de Precios
+              Price Sync Queue
             </CardTitle>
             <CardDescription>
-              Sincronización automática con POS y otros sistemas
+              Automatic synchronization with POS and other systems
             </CardDescription>
           </div>
           <Button
@@ -65,7 +65,7 @@ const PriceSyncQueueCard = () => {
             className="gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
-            Procesar Cola
+            Process Queue
           </Button>
         </div>
       </CardHeader>
@@ -75,17 +75,17 @@ const PriceSyncQueueCard = () => {
           <div className="grid grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
             <div className="text-center">
               <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
-              <p className="text-xs text-muted-foreground">Pendientes</p>
+              <p className="text-xs text-muted-foreground">Pending</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-green-600">
                 {queue.filter(item => item.sync_status === 'completed').length}
               </p>
-              <p className="text-xs text-muted-foreground">Completados</p>
+              <p className="text-xs text-muted-foreground">Completed</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-red-600">{failedCount}</p>
-              <p className="text-xs text-muted-foreground">Fallidos</p>
+              <p className="text-xs text-muted-foreground">Failed</p>
             </div>
           </div>
 
@@ -98,7 +98,7 @@ const PriceSyncQueueCard = () => {
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-medium">Producto #{item.product_id}</p>
+                    <p className="text-sm font-medium">Product #{item.product_id}</p>
                     {item.sync_status === 'completed' && (
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     )}
@@ -124,10 +124,10 @@ const PriceSyncQueueCard = () => {
                       : 'secondary'
                   }
                 >
-                  {item.sync_status === 'completed' && 'Completado'}
-                  {item.sync_status === 'pending' && 'Pendiente'}
-                  {item.sync_status === 'failed' && 'Fallido'}
-                  {item.sync_status === 'syncing' && 'Sincronizando...'}
+                  {item.sync_status === 'completed' && 'Completed'}
+                  {item.sync_status === 'pending' && 'Pending'}
+                  {item.sync_status === 'failed' && 'Failed'}
+                  {item.sync_status === 'syncing' && 'Syncing...'}
                 </Badge>
               </div>
             ))}
@@ -136,7 +136,7 @@ const PriceSyncQueueCard = () => {
           {queue.length === 0 && !isLoading && (
             <div className="text-center py-8 text-muted-foreground">
               <CheckCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No hay elementos en la cola</p>
+              <p className="text-sm">No items in queue</p>
             </div>
           )}
         </div>

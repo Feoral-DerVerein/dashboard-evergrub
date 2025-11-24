@@ -53,11 +53,11 @@ const ActionLogsCard = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'success':
-        return <Badge variant="default">Exitoso</Badge>;
+        return <Badge variant="default">Success</Badge>;
       case 'failed':
-        return <Badge variant="destructive">Fallido</Badge>;
+        return <Badge variant="destructive">Failed</Badge>;
       case 'in_progress':
-        return <Badge variant="secondary">En Progreso</Badge>;
+        return <Badge variant="secondary">In Progress</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -68,10 +68,10 @@ const ActionLogsCard = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Activity className="h-5 w-5 text-primary" />
-          Registro de Acciones Automáticas
+          Automatic Actions Log
         </CardTitle>
         <CardDescription>
-          Últimas 20 acciones ejecutadas por el auto-piloto
+          Last 20 actions executed by auto-pilot
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -91,7 +91,7 @@ const ActionLogsCard = () => {
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span className="font-medium capitalize">{log.module}</span>
                     <span>•</span>
-                    <span>{new Date(log.created_at).toLocaleString('es-MX')}</span>
+                    <span>{new Date(log.created_at).toLocaleString('en-US')}</span>
                   </div>
                 </div>
               </div>
@@ -100,7 +100,7 @@ const ActionLogsCard = () => {
             {logs.length === 0 && !isLoading && (
               <div className="text-center py-8 text-muted-foreground">
                 <Activity className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No hay acciones registradas</p>
+                <p className="text-sm">No actions recorded</p>
               </div>
             )}
           </div>

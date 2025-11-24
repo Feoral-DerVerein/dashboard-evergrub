@@ -54,7 +54,7 @@ const SalesPredictionChart = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
-            <CardTitle>Predicción de Ventas</CardTitle>
+            <CardTitle>Sales Prediction</CardTitle>
           </div>
           <div className="flex gap-2">
             <Select value={timeRange} onValueChange={(value: any) => setTimeRange(value)}>
@@ -62,10 +62,10 @@ const SalesPredictionChart = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="hour">Por Hora</SelectItem>
-                <SelectItem value="day">Por Día</SelectItem>
-                <SelectItem value="week">Por Semana</SelectItem>
-                <SelectItem value="month">Por Mes</SelectItem>
+                <SelectItem value="hour">Hourly</SelectItem>
+                <SelectItem value="day">Daily</SelectItem>
+                <SelectItem value="week">Weekly</SelectItem>
+                <SelectItem value="month">Monthly</SelectItem>
               </SelectContent>
             </Select>
             <Select value={productFilter} onValueChange={setProductFilter}>
@@ -73,16 +73,16 @@ const SalesPredictionChart = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos los productos</SelectItem>
-                <SelectItem value="bakery">Panadería</SelectItem>
-                <SelectItem value="drinks">Bebidas</SelectItem>
-                <SelectItem value="food">Comida</SelectItem>
+                <SelectItem value="all">All products</SelectItem>
+                <SelectItem value="bakery">Bakery</SelectItem>
+                <SelectItem value="drinks">Drinks</SelectItem>
+                <SelectItem value="food">Food</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
         <CardDescription>
-          Predicciones basadas en históricos, clima, eventos y estacionalidad
+          Predictions based on history, weather, events and seasonality
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -107,7 +107,7 @@ const SalesPredictionChart = () => {
                 dataKey="actual"
                 stroke="hsl(var(--primary))"
                 strokeWidth={2}
-                name="Ventas Reales"
+                name="Actual Sales"
                 dot={{ r: 4 }}
               />
               <Line
@@ -116,7 +116,7 @@ const SalesPredictionChart = () => {
                 stroke="hsl(var(--chart-2))"
                 strokeWidth={2}
                 strokeDasharray="5 5"
-                name="Predicción"
+                name="Prediction"
                 dot={{ r: 4 }}
               />
             </LineChart>

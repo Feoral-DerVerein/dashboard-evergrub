@@ -24,7 +24,7 @@ const RealtimeMonitoringCard = () => {
       setLastUpdate(new Date());
     } catch (error) {
       console.error('Error fetching products:', error);
-      toast.error('Error al cargar productos');
+      toast.error('Error loading products');
     } finally {
       setIsLoading(false);
     }

@@ -50,10 +50,10 @@ const CorrelatedProductsMatrix = () => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Network className="h-5 w-5 text-primary" />
-          <CardTitle>Productos Correlacionados</CardTitle>
+          <CardTitle>Correlated Products</CardTitle>
         </div>
         <CardDescription>
-          Productos frecuentemente comprados juntos - Crea combos inteligentes
+          Products frequently purchased together - Create smart combos
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -79,11 +79,11 @@ const CorrelatedProductsMatrix = () => {
 
               <div className="flex items-center justify-between text-xs">
                 <div className="space-y-1">
-                  <p className="text-muted-foreground">Frecuencia de compra</p>
-                  <p className="font-semibold text-foreground">{item.frequency} veces</p>
+                  <p className="text-muted-foreground">Purchase frequency</p>
+                  <p className="font-semibold text-foreground">{item.frequency} times</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-muted-foreground">Correlación</p>
+                  <p className="text-muted-foreground">Correlation</p>
                   <p className={`font-bold ${getCorrelationColor(item.correlation)}`}>
                     {item.correlation.toFixed(2)}
                   </p>
@@ -92,7 +92,7 @@ const CorrelatedProductsMatrix = () => {
 
               <div className="pt-2 border-t border-border">
                 <p className="text-xs text-primary font-medium">
-                  💡 Sugerencia: Crear combo "{item.productA} + {item.productB}"
+                  💡 Suggestion: Create combo "{item.productA} + {item.productB}"
                 </p>
               </div>
             </div>
@@ -102,7 +102,7 @@ const CorrelatedProductsMatrix = () => {
         {products.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             <Network className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No hay correlaciones detectadas aún</p>
+            <p className="text-sm">No correlations detected yet</p>
           </div>
         )}
       </CardContent>
