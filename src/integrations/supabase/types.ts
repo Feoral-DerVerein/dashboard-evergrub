@@ -1081,6 +1081,90 @@ export type Database = {
         }
         Relationships: []
       }
+      price_history: {
+        Row: {
+          changed_at: string
+          changed_by: string
+          id: string
+          new_price: number
+          old_price: number
+          product_id: number
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by: string
+          id?: string
+          new_price: number
+          old_price: number
+          product_id: number
+          reason: string
+          user_id: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string
+          id?: string
+          new_price?: number
+          old_price?: number
+          product_id?: number
+          reason?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
+      pricing_rules: {
+        Row: {
+          conditions: Json
+          created_at: string
+          discount_percentage: number
+          id: string
+          is_active: boolean
+          rule_name: string
+          rule_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          conditions?: Json
+          created_at?: string
+          discount_percentage?: number
+          id?: string
+          is_active?: boolean
+          rule_name: string
+          rule_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          conditions?: Json
+          created_at?: string
+          discount_percentage?: number
+          id?: string
+          is_active?: boolean
+          rule_name?: string
+          rule_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       product_donation_actions: {
         Row: {
           action: string
@@ -1143,11 +1227,14 @@ export type Database = {
       }
       products: {
         Row: {
+          base_price: number | null
           bbd_end: string | null
           bbd_start: string | null
           brand: string
           category: string
+          cost: number | null
           created_at: string
+          current_price: number | null
           description: string
           discount: number
           ean: string | null
@@ -1157,6 +1244,8 @@ export type Database = {
           image_urls: Json | null
           is_marketplace_visible: boolean
           is_surprise_bag: boolean | null
+          last_price_update: string | null
+          location_zone: string | null
           name: string
           original_price: number | null
           pickup_location: string | null
@@ -1174,11 +1263,14 @@ export type Database = {
           userid: string
         }
         Insert: {
+          base_price?: number | null
           bbd_end?: string | null
           bbd_start?: string | null
           brand?: string
           category?: string
+          cost?: number | null
           created_at?: string
+          current_price?: number | null
           description?: string
           discount?: number
           ean?: string | null
@@ -1188,6 +1280,8 @@ export type Database = {
           image_urls?: Json | null
           is_marketplace_visible?: boolean
           is_surprise_bag?: boolean | null
+          last_price_update?: string | null
+          location_zone?: string | null
           name: string
           original_price?: number | null
           pickup_location?: string | null
@@ -1205,11 +1299,14 @@ export type Database = {
           userid: string
         }
         Update: {
+          base_price?: number | null
           bbd_end?: string | null
           bbd_start?: string | null
           brand?: string
           category?: string
+          cost?: number | null
           created_at?: string
+          current_price?: number | null
           description?: string
           discount?: number
           ean?: string | null
@@ -1219,6 +1316,8 @@ export type Database = {
           image_urls?: Json | null
           is_marketplace_visible?: boolean
           is_surprise_bag?: boolean | null
+          last_price_update?: string | null
+          location_zone?: string | null
           name?: string
           original_price?: number | null
           pickup_location?: string | null
@@ -1823,6 +1922,39 @@ export type Database = {
           product_data?: Json
           product_id?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      zone_multipliers: {
+        Row: {
+          created_at: string
+          demand_level: string
+          id: string
+          price_multiplier: number
+          updated_at: string
+          user_id: string
+          zone_code: string
+          zone_name: string
+        }
+        Insert: {
+          created_at?: string
+          demand_level: string
+          id?: string
+          price_multiplier?: number
+          updated_at?: string
+          user_id: string
+          zone_code: string
+          zone_name: string
+        }
+        Update: {
+          created_at?: string
+          demand_level?: string
+          id?: string
+          price_multiplier?: number
+          updated_at?: string
+          user_id?: string
+          zone_code?: string
+          zone_name?: string
         }
         Relationships: []
       }
