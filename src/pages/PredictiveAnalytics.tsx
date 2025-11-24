@@ -6,7 +6,12 @@ import ClimateFactorsCard from '@/components/analytics/ClimateFactorsCard';
 import EventsCalendar from '@/components/analytics/EventsCalendar';
 import CorrelatedProductsMatrix from '@/components/analytics/CorrelatedProductsMatrix';
 import WastePredictionCard from '@/components/analytics/WastePredictionCard';
-import { Brain, TrendingUp } from 'lucide-react';
+import RealtimeMonitoringCard from '@/components/pricing/RealtimeMonitoringCard';
+import ExpirationAutomationCard from '@/components/pricing/ExpirationAutomationCard';
+import ZonePricingCard from '@/components/pricing/ZonePricingCard';
+import PriceHistoryCard from '@/components/pricing/PriceHistoryCard';
+import PriceSimulatorCard from '@/components/pricing/PriceSimulatorCard';
+import { Brain, TrendingUp, DollarSign } from 'lucide-react';
 
 const PredictiveAnalytics = () => {
   return (
@@ -22,23 +27,43 @@ const PredictiveAnalytics = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="grid gap-6">
-        {/* Sales Prediction */}
-        <SalesPredictionChart />
+      {/* Tabs for different sections */}
+      <Tabs defaultValue="predictive" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="predictive" className="gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Analítica Predictiva
+          </TabsTrigger>
+          <TabsTrigger value="pricing" className="gap-2">
+            <DollarSign className="h-4 w-4" />
+            Pricing Engine
+          </TabsTrigger>
+        </TabsList>
 
-        {/* Climate and Events Row */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <ClimateFactorsCard />
-          <EventsCalendar />
-        </div>
+        {/* Predictive Analytics Tab */}
+        <TabsContent value="predictive" className="space-y-6">
+          <SalesPredictionChart />
+          <div className="grid md:grid-cols-2 gap-6">
+            <ClimateFactorsCard />
+            <EventsCalendar />
+          </div>
+          <CorrelatedProductsMatrix />
+          <WastePredictionCard />
+        </TabsContent>
 
-        {/* Correlated Products */}
-        <CorrelatedProductsMatrix />
-
-        {/* Waste Prediction */}
-        <WastePredictionCard />
-      </div>
+        {/* Pricing Engine Tab */}
+        <TabsContent value="pricing" className="space-y-6">
+          <RealtimeMonitoringCard />
+          <div className="grid md:grid-cols-2 gap-6">
+            <ExpirationAutomationCard />
+            <ZonePricingCard />
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <PriceHistoryCard />
+            <PriceSimulatorCard />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
