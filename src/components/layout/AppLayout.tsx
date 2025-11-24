@@ -28,8 +28,8 @@ import { toast } from "sonner";
 const menuItems = [
   { title: "Chat", url: "/dashboard", icon: MessageSquare },
   { title: "Performance", url: "/kpi", icon: BarChart3 },
-  { title: "Negentropy AI", url: "/predictive-analytics", icon: Brain },
-  { title: "Auto-Piloto", url: "/autopilot", icon: Bot },
+  { title: "Predictive Analytics", url: "/predictive-analytics", icon: Brain },
+  { title: "Auto-Pilot", url: "/autopilot", icon: Bot },
   { title: "Inventory Products", url: "/inventory-products", icon: Package },
   { title: "Notes", url: "/notes", icon: FileText },
   { title: "Delivery", url: "/delivery", icon: Truck },
