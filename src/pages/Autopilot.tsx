@@ -12,8 +12,8 @@ const Autopilot = () => {
           <Bot className="h-8 w-8 text-primary" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Auto-Piloto Negentropy AI</h1>
-          <p className="text-muted-foreground">Sistema de automatización en tiempo real</p>
+          <h1 className="text-3xl font-bold text-foreground">Negentropy AI Auto-Pilot</h1>
+          <p className="text-muted-foreground">Real-time automation system</p>
         </div>
       </div>
 

@@ -44,9 +44,9 @@ const EventsCalendar = () => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-primary" />
-          <CardTitle>Calendario de Eventos</CardTitle>
+          <CardTitle>Events Calendar</CardTitle>
         </div>
-        <CardDescription>Festivos y eventos que afectan la demanda</CardDescription>
+        <CardDescription>Holidays and events that affect demand</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
@@ -59,7 +59,7 @@ const EventsCalendar = () => {
                 <div className="space-y-1">
                   <p className="font-semibold text-foreground">{event.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(event.date).toLocaleDateString('es-MX', {
+                    {new Date(event.date).toLocaleDateString('en-US', {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',
@@ -68,7 +68,7 @@ const EventsCalendar = () => {
                   </p>
                 </div>
                 <Badge variant={getImpactColor(event.impact)}>
-                  +{event.impact}% demanda
+                  +{event.impact}% demand
                 </Badge>
               </div>
 
@@ -76,7 +76,7 @@ const EventsCalendar = () => {
                 <Package className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                 <div className="space-y-1">
                   <p className="text-xs font-medium text-foreground">
-                    Stock Sugerido
+                    Suggested Stock
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {event.suggestedStock}
@@ -89,7 +89,7 @@ const EventsCalendar = () => {
           {events.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
               <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No hay eventos próximos registrados</p>
+              <p className="text-sm">No upcoming events registered</p>
             </div>
           )}
         </div>

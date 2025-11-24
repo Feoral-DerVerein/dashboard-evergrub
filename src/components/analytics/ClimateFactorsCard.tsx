@@ -44,9 +44,9 @@ const ClimateFactorsCard = () => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Cloud className="h-5 w-5 text-primary" />
-          <CardTitle>Factores Climáticos</CardTitle>
+          <CardTitle>Climate Factors</CardTitle>
         </div>
-        <CardDescription>Cómo el clima afecta tus ventas</CardDescription>
+        <CardDescription>How weather affects your sales</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Current Temperature */}
@@ -54,7 +54,7 @@ const ClimateFactorsCard = () => {
           <div className="flex items-center gap-3">
             <Thermometer className="h-8 w-8 text-primary" />
             <div>
-              <p className="text-sm text-muted-foreground">Temperatura Actual</p>
+              <p className="text-sm text-muted-foreground">Current Temperature</p>
               <p className="text-2xl font-bold">{Math.round(data.temperature)}°C</p>
             </div>
           </div>
@@ -86,7 +86,7 @@ const ClimateFactorsCard = () => {
         {/* Recommended Products */}
         <div className="space-y-2">
           <p className="text-sm font-semibold text-foreground">
-            Productos Recomendados por Clima
+            Climate-Recommended Products
           </p>
           <div className="space-y-2">
             {data.recommendedProducts.map((product, index) => (

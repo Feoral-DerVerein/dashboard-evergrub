@@ -15,10 +15,10 @@ const moduleIcons = {
 };
 
 const moduleLabels = {
-  pricing: 'Motor de Precios',
-  promotions: 'Promociones Automáticas',
-  production: 'Recomendaciones de Producción',
-  inventory: 'Reabastecimiento Inteligente',
+  pricing: 'Pricing Engine',
+  promotions: 'Automatic Promotions',
+  production: 'Production Recommendations',
+  inventory: 'Smart Reordering',
 };
 
 const AutopilotControlCard = () => {
@@ -43,22 +43,22 @@ const AutopilotControlCard = () => {
   const handleToggleModule = async (moduleName: string, isActive: boolean) => {
     try {
       await autopilotService.updateSettings(moduleName, { is_active: isActive });
-      toast.success(isActive ? `${moduleLabels[moduleName as keyof typeof moduleLabels]} activado` : `${moduleLabels[moduleName as keyof typeof moduleLabels]} desactivado`);
+      toast.success(isActive ? `${moduleLabels[moduleName as keyof typeof moduleLabels]} enabled` : `${moduleLabels[moduleName as keyof typeof moduleLabels]} disabled`);
       loadSettings();
     } catch (error) {
       console.error('Error updating settings:', error);
-      toast.error('Error al actualizar configuración');
+      toast.error('Error updating configuration');
     }
   };
 
   const handleFrequencyChange = async (moduleName: string, frequency: string) => {
     try {
       await autopilotService.updateSettings(moduleName, { execution_frequency: frequency as any });
-      toast.success('Frecuencia actualizada');
+      toast.success('Frequency updated');
       loadSettings();
     } catch (error) {
       console.error('Error updating frequency:', error);
-      toast.error('Error al actualizar frecuencia');
+      toast.error('Error updating frequency');
     }
   };
 
@@ -74,9 +74,9 @@ const AutopilotControlCard = () => {
             <Bot className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <CardTitle>Control de Auto-Piloto</CardTitle>
+            <CardTitle>Auto-Pilot Control</CardTitle>
             <CardDescription>
-              Configura los módulos de automatización en tiempo real
+              Configure real-time automation modules
             </CardDescription>
           </div>
         </div>
@@ -98,14 +98,14 @@ const AutopilotControlCard = () => {
                     <p className="font-medium">{label}</p>
                     {setting?.is_active && (
                       <Badge variant="default" className="text-xs">
-                        Activo
+                        Active
                       </Badge>
                     )}
                   </div>
                   {setting?.last_execution && (
                     <p className="text-xs text-muted-foreground">
-                      Última ejecución:{' '}
-                      {new Date(setting.last_execution).toLocaleString('es-MX')}
+                      Last execution:{' '}
+                      {new Date(setting.last_execution).toLocaleString('en-US')}
                     </p>
                   )}
                 </div>
@@ -121,9 +121,9 @@ const AutopilotControlCard = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="realtime">Tiempo Real</SelectItem>
-                    <SelectItem value="hourly">Cada Hora</SelectItem>
-                    <SelectItem value="daily">Diario</SelectItem>
+                    <SelectItem value="realtime">Real-time</SelectItem>
+                    <SelectItem value="hourly">Hourly</SelectItem>
+                    <SelectItem value="daily">Daily</SelectItem>
                   </SelectContent>
                 </Select>
 

@@ -23,7 +23,7 @@ const PredictiveAnalytics = () => {
         </div>
         <div>
           <h1 className="text-3xl font-bold text-foreground">Negentropy AI</h1>
-          <p className="text-muted-foreground">Dashboard de Analítica Predictiva</p>
+          <p className="text-muted-foreground">Predictive Analytics Dashboard</p>
         </div>
       </div>
 
@@ -32,7 +32,7 @@ const PredictiveAnalytics = () => {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="predictive" className="gap-2">
             <TrendingUp className="h-4 w-4" />
-            Analítica Predictiva
+            Predictive Analytics
           </TabsTrigger>
           <TabsTrigger value="pricing" className="gap-2">
             <DollarSign className="h-4 w-4" />

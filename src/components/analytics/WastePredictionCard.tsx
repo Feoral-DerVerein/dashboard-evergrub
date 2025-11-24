@@ -57,10 +57,10 @@ const WastePredictionCard = () => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-destructive" />
-          <CardTitle>Predicción de Merma</CardTitle>
+          <CardTitle>Waste Prediction</CardTitle>
         </div>
         <CardDescription>
-          Estimación de pérdidas para esta semana si no tomas acción
+          Estimated losses for this week if no action is taken
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -68,7 +68,7 @@ const WastePredictionCard = () => {
         <div className="p-6 bg-destructive/10 border-2 border-destructive/20 rounded-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Merma Predicha</p>
+              <p className="text-sm text-muted-foreground mb-1">Predicted Waste</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-4xl font-bold text-destructive">
                   ${totalValue.toLocaleString('es-MX')}
