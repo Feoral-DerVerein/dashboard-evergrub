@@ -18,24 +18,18 @@ serve(async (req) => {
       throw new Error('Missing authorization header');
     }
 
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-    );
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
-    
-    if (userError || !user) {
-      console.error('Auth error:', userError);
-      throw new Error('Unauthorized');
-    }
-
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       { global: { headers: { Authorization: authHeader } } }
     );
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.error('Auth error:', userError);
+      throw new Error('Unauthorized');
+    }
 
     console.log('Calculating correlations for user:', user.id);
 
@@ -51,7 +45,6 @@ serve(async (req) => {
         orders!inner(user_id, created_at)
       `)
       .eq('orders.user_id', user.id)
-      .order('orders.created_at', { ascending: false })
       .limit(1000);
 
     if (itemsError) throw itemsError;
