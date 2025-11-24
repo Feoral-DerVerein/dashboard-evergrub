@@ -31,6 +31,7 @@ import SquareSettings from "@/pages/SquareSettings";
 import DeliveryDashboard from "@/pages/DeliverectDashboard";
 import Integrations from "@/pages/Integrations";
 import Notes from "@/pages/Notes";
+import PredictiveAnalytics from "@/pages/PredictiveAnalytics";
 
 
 const MainRoutes = () => {
@@ -72,6 +73,7 @@ const MainRoutes = () => {
         <Route path="/deliverect" element={<DeliveryDashboard />} /> {/* Legacy redirect */}
         <Route path="/integrations" element={<Integrations />} />
         <Route path="/notes" element={<Notes />} />
+        <Route path="/predictive-analytics" element={<PredictiveAnalytics />} />
         
       </Route>
       
