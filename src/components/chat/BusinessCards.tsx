@@ -16,7 +16,7 @@ import {
 
 export interface BusinessCardData {
   id: string;
-  type: 'inventory' | 'expiry' | 'sales' | 'recommendation' | 'alert' | 'analytics';
+  type: 'inventory' | 'expiry' | 'sales' | 'recommendation' | 'alert' | 'analytics' | 'predictive_analytics' | 'autopilot' | 'performance';
   title: string;
   data: any;
 }
@@ -316,6 +316,12 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
             </CardContent>
           </Card>
         );
+
+      case 'predictive_analytics':
+      case 'autopilot':
+      case 'performance':
+        // These cards will be rendered using their dedicated components
+        return null;
 
       default:
         return null;

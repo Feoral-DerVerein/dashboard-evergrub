@@ -18,59 +18,80 @@ const getPerformanceData = async (dataType: 'all' | 'sales_metrics' | 'sustainab
   }
 };
 
-// Generate cards based on response content - only when truly relevant
+// Generate cards based on response content - detecting specific features
 const generateCardsFromResponse = (responseText: string, userMessage: string): BusinessCardData[] => {
   const cards: BusinessCardData[] = [];
   const lowerResponse = responseText.toLowerCase();
   const lowerMessage = userMessage.toLowerCase();
 
-  // Check if user is asking about products/inventory specifically
-  const isProductQuery = lowerMessage.includes('product') || 
-                        lowerMessage.includes('inventory') || 
-                        lowerMessage.includes('stock') ||
-                        lowerMessage.includes('expir') ||
-                        lowerMessage.includes('waste');
-
-  // Only generate cards for product-related queries
-  if (!isProductQuery) {
-    return cards;
-  }
-
-  // Sales analysis card - only if explicitly about sales
-  if (lowerMessage.includes('sales') && (lowerResponse.includes('sales') || lowerResponse.includes('revenue'))) {
+  // Predictive Analytics card
+  if (lowerMessage.includes('predictive') || lowerMessage.includes('analytics') || 
+      lowerMessage.includes('forecast') || lowerMessage.includes('prediction')) {
     cards.push({
-      id: 'sales-card',
-      type: 'sales',
-      title: 'Sales Analysis',
+      id: 'predictive-analytics-card',
+      type: 'predictive_analytics',
+      title: 'Predictive Analytics',
       data: {
-        totalSales: extractNumber(responseText, ['revenue', 'sales']) || 84213,
-        growth: extractPercentage(responseText) || 12,
-        topProducts: ['Organic Produce', 'Dairy', 'Bakery']
+        salesTrend: 12,
+        wasteAlert: 23,
+        upcomingEvents: 3
       }
     });
   }
 
-  // Business metrics card - only for analytics/metrics queries
-  if ((lowerMessage.includes('analytics') || lowerMessage.includes('metrics') || lowerMessage.includes('performance')) &&
-      (lowerResponse.includes('metrics') || lowerResponse.includes('performance'))) {
+  // Auto-Pilot card
+  if (lowerMessage.includes('autopilot') || lowerMessage.includes('auto-pilot') || 
+      lowerMessage.includes('automation') || lowerMessage.includes('automatic')) {
     cards.push({
-      id: 'metrics-card',
-      type: 'analytics',
-      title: 'Business Analytics', 
+      id: 'autopilot-card',
+      type: 'autopilot',
+      title: 'Auto-Pilot',
       data: {
-        metrics: {
-          totalProducts: 1250,
-          activeUsers: 12348,
-          conversionRate: 32.4
-        },
-        insights: 'Organic growth +8%, AOV +3%, Waste -1.2%'
+        activeModules: ['pricing', 'promotions', 'inventory'],
+        lastActions: 127,
+        status: 'active' as const
+      }
+    });
+  }
+
+  // Performance/KPI card
+  if (lowerMessage.includes('performance') || lowerMessage.includes('kpi') || 
+      lowerMessage.includes('metrics') || lowerMessage.includes('dashboard')) {
+    cards.push({
+      id: 'performance-card',
+      type: 'performance',
+      title: 'Performance Dashboard',
+      data: {
+        revenue: 84213,
+        revenueGrowth: 12,
+        orders: 1247,
+        ordersGrowth: 8,
+        customers: 856,
+        products: 1250
+      }
+    });
+  }
+
+  // Inventory card
+  if (lowerMessage.includes('inventory') || lowerMessage.includes('stock') ||
+      lowerMessage.includes('inventario')) {
+    cards.push({
+      id: 'inventory-card',
+      type: 'inventory',
+      title: 'Inventory Overview',
+      data: {
+        totalProducts: 1250,
+        lowStock: 34,
+        expiringSoon: 23,
+        outOfStock: 5
       }
     });
   }
 
   // Expiring products card - only if specifically asking about expiring products
-  if ((lowerMessage.includes('expir') || lowerMessage.includes('waste')) && 
-      (lowerResponse.includes('expir') || lowerResponse.includes('days'))) {
+  if ((lowerMessage.includes('expir') || lowerMessage.includes('waste') || 
+       lowerMessage.includes('venc') || lowerMessage.includes('caduc')) && 
+      !lowerMessage.includes('inventory')) {
     cards.push({
       id: 'expiry-card',
       type: 'expiry',
@@ -107,7 +128,7 @@ export const useChatbot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([{
     id: '1',
     type: 'bot',
-    content: 'Hello! I\'m your Negentropy assistant. How can I help you today?',
+    content: 'Hello! I\'m your Negentropy assistant. How can I help you today?\n\nTry asking me: "Show me predictive analytics" or "What about auto-pilot?"',
     timestamp: new Date()
   }]);
   

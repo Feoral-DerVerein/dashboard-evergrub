@@ -22,6 +22,10 @@ import { ActionCardData } from '@/types/chatbot.types';
 import { TextSelectionToolbar } from '@/components/chat/TextSelectionToolbar';
 import { InventoryProductCard } from '@/components/inventory/InventoryProductCard';
 import { ProductDetailsDialog } from '@/components/inventory/ProductDetailsDialog';
+import { PredictiveAnalyticsCard } from '@/components/chat/PredictiveAnalyticsCard';
+import { AutoPilotCard } from '@/components/chat/AutoPilotCard';
+import { PerformanceCard } from '@/components/chat/PerformanceCard';
+import { InventoryCard } from '@/components/chat/InventoryCard';
 import aiIcon from '@/assets/ai-icon.png';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -106,7 +110,19 @@ const ChatBot = ({
     messagesEndRef
   } = useChatbot();
   const renderInfoCard = (card: BusinessCardData) => {
-    return <BusinessCard key={card.id} card={card} />;
+    // Render specialized cards for new types
+    switch (card.type) {
+      case 'predictive_analytics':
+        return <PredictiveAnalyticsCard key={card.id} data={card.data} />;
+      case 'autopilot':
+        return <AutoPilotCard key={card.id} data={card.data} />;
+      case 'performance':
+        return <PerformanceCard key={card.id} data={card.data} />;
+      case 'inventory':
+        return <InventoryCard key={card.id} data={card.data} />;
+      default:
+        return <BusinessCard key={card.id} card={card} />;
+    }
   };
 
   // Three column suggestions organized by category
