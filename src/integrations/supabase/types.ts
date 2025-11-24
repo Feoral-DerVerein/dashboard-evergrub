@@ -603,6 +603,51 @@ export type Database = {
         }
         Relationships: []
       }
+      events_calendar: {
+        Row: {
+          affected_categories: string[] | null
+          created_at: string | null
+          event_date: string
+          event_name: string
+          event_type: string
+          expected_increase_percent: number | null
+          id: string
+          impact_level: string
+          is_recurring: boolean | null
+          notes: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          affected_categories?: string[] | null
+          created_at?: string | null
+          event_date: string
+          event_name: string
+          event_type: string
+          expected_increase_percent?: number | null
+          id?: string
+          impact_level?: string
+          is_recurring?: boolean | null
+          notes?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          affected_categories?: string[] | null
+          created_at?: string | null
+          event_date?: string
+          event_name?: string
+          event_type?: string
+          expected_increase_percent?: number | null
+          id?: string
+          impact_level?: string
+          is_recurring?: boolean | null
+          notes?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       grain_transactions: {
         Row: {
           amount: number
@@ -1189,6 +1234,51 @@ export type Database = {
         }
         Relationships: []
       }
+      predictive_models: {
+        Row: {
+          accuracy_score: number | null
+          created_at: string | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          last_trained_at: string | null
+          model_name: string
+          model_type: string
+          parameters: Json | null
+          training_data_count: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          accuracy_score?: number | null
+          created_at?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          last_trained_at?: string | null
+          model_name: string
+          model_type: string
+          parameters?: Json | null
+          training_data_count?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          accuracy_score?: number | null
+          created_at?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          last_trained_at?: string | null
+          model_name?: string
+          model_type?: string
+          parameters?: Json | null
+          training_data_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       price_history: {
         Row: {
           changed_at: string
@@ -1329,6 +1419,77 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      product_correlations: {
+        Row: {
+          confidence: number
+          correlation_score: number
+          created_at: string | null
+          frequency: number
+          id: string
+          last_calculated_at: string | null
+          product_a_id: number | null
+          product_a_name: string
+          product_b_id: number | null
+          product_b_name: string
+          user_id: string
+        }
+        Insert: {
+          confidence?: number
+          correlation_score: number
+          created_at?: string | null
+          frequency?: number
+          id?: string
+          last_calculated_at?: string | null
+          product_a_id?: number | null
+          product_a_name: string
+          product_b_id?: number | null
+          product_b_name: string
+          user_id: string
+        }
+        Update: {
+          confidence?: number
+          correlation_score?: number
+          created_at?: string | null
+          frequency?: number
+          id?: string
+          last_calculated_at?: string | null
+          product_a_id?: number | null
+          product_a_name?: string
+          product_b_id?: number | null
+          product_b_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_correlations_product_a_id_fkey"
+            columns: ["product_a_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_correlations_product_a_id_fkey"
+            columns: ["product_a_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_correlations_product_b_id_fkey"
+            columns: ["product_b_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_correlations_product_b_id_fkey"
+            columns: ["product_b_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+        ]
       }
       product_donation_actions: {
         Row: {
@@ -1836,6 +1997,72 @@ export type Database = {
           },
         ]
       }
+      sales_history: {
+        Row: {
+          category: string
+          created_at: string | null
+          day_of_week: number
+          hour_of_day: number
+          id: string
+          product_id: number | null
+          product_name: string
+          quantity: number
+          sale_date: string
+          temperature: number | null
+          total_amount: number
+          unit_price: number
+          user_id: string
+          weather_condition: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          day_of_week: number
+          hour_of_day: number
+          id?: string
+          product_id?: number | null
+          product_name: string
+          quantity?: number
+          sale_date: string
+          temperature?: number | null
+          total_amount?: number
+          unit_price?: number
+          user_id: string
+          weather_condition?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          day_of_week?: number
+          hour_of_day?: number
+          id?: string
+          product_id?: number | null
+          product_name?: string
+          quantity?: number
+          sale_date?: string
+          temperature?: number | null
+          total_amount?: number
+          unit_price?: number
+          user_id?: string
+          weather_condition?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       sales_metrics: {
         Row: {
           created_at: string | null
@@ -1868,6 +2095,70 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      sales_predictions: {
+        Row: {
+          confidence_score: number
+          created_at: string | null
+          factors: Json | null
+          id: string
+          model_id: string | null
+          predicted_quantity: number
+          predicted_revenue: number
+          prediction_date: string
+          product_id: number | null
+          product_name: string
+          user_id: string
+        }
+        Insert: {
+          confidence_score: number
+          created_at?: string | null
+          factors?: Json | null
+          id?: string
+          model_id?: string | null
+          predicted_quantity: number
+          predicted_revenue: number
+          prediction_date: string
+          product_id?: number | null
+          product_name: string
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number
+          created_at?: string | null
+          factors?: Json | null
+          id?: string
+          model_id?: string | null
+          predicted_quantity?: number
+          predicted_revenue?: number
+          prediction_date?: string
+          product_id?: number | null
+          product_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_predictions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "predictive_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_predictions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_predictions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+        ]
       }
       smart_bag_analytics: {
         Row: {
@@ -2272,6 +2563,63 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      waste_predictions: {
+        Row: {
+          confidence_score: number
+          created_at: string | null
+          id: string
+          predicted_waste_quantity: number
+          predicted_waste_value: number
+          prediction_date: string
+          product_id: number | null
+          product_name: string
+          recommendation: string | null
+          user_id: string
+          waste_cause: string
+        }
+        Insert: {
+          confidence_score: number
+          created_at?: string | null
+          id?: string
+          predicted_waste_quantity: number
+          predicted_waste_value: number
+          prediction_date: string
+          product_id?: number | null
+          product_name: string
+          recommendation?: string | null
+          user_id: string
+          waste_cause: string
+        }
+        Update: {
+          confidence_score?: number
+          created_at?: string | null
+          id?: string
+          predicted_waste_quantity?: number
+          predicted_waste_value?: number
+          prediction_date?: string
+          product_id?: number | null
+          product_name?: string
+          recommendation?: string | null
+          user_id?: string
+          waste_cause?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waste_predictions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "waste_predictions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+        ]
       }
       "Wisebite-data": {
         Row: {
