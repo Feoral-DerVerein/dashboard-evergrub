@@ -17,14 +17,9 @@ const PredictiveAnalytics = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="p-3 bg-primary/10 rounded-lg">
-          <Brain className="h-8 w-8 text-primary" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Negentropy AI</h1>
-          <p className="text-muted-foreground">Predictive Analytics Dashboard</p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Predictive Analytics</h1>
+        <p className="text-muted-foreground">AI-Powered Analytics Dashboard</p>
       </div>
 
       {/* Tabs for different sections */}
