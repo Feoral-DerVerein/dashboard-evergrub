@@ -234,6 +234,30 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_memory: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          embedding: string | null
+          id: number
+          metadata: Json | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          embedding?: string | null
+          id?: number
+          metadata?: Json | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          embedding?: string | null
+          id?: number
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       company_profile_audit_log: {
         Row: {
           accessed_fields: string[] | null
@@ -1518,6 +1542,30 @@ export type Database = {
           product_data?: Json | null
           product_id?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      product_insights: {
+        Row: {
+          created_at: string | null
+          id: number
+          insight: Json | null
+          insight_type: string | null
+          product_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          insight?: Json | null
+          insight_type?: string | null
+          product_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          insight?: Json | null
+          insight_type?: string | null
+          product_id?: string | null
         }
         Relationships: []
       }
