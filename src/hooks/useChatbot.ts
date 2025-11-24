@@ -281,14 +281,14 @@ export const useChatbot = () => {
       }
 
       console.log("📤 Sending to n8n webhook:", {
-        url: 'https://n8n.srv1024074.hstgr.cloud/webhook/c9b68781-c2af-4ba8-a1ec-a9798046369o',
+        url: 'https://n8n.srv1024074.hstgr.cloud/webhook/c9b68781-c2af-4ba8-a1ec-a97980463690',
         messagesCount: conversationHistory.length,
         productsCount: productsContext?.length || 0,
         hasPerformanceData: !!performanceContext,
         bodyPreview: JSON.stringify(requestBody).substring(0, 500)
       });
 
-      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/c9b68781-c2af-4ba8-a1ec-a9798046369o', {
+      const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/c9b68781-c2af-4ba8-a1ec-a97980463690', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
