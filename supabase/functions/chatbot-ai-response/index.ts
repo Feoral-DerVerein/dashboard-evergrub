@@ -194,7 +194,7 @@ async function fetchBusinessData(userId: string | null) {
       const { data: productsData, error: productsError } = await supabase
         .from("products")
         .select("*")
-        // .eq('userid', userId)
+        // // .eq('userid', userId)
         .limit(50);
 
       if (!productsError) {
