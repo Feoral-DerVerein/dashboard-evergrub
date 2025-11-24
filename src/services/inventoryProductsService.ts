@@ -22,17 +22,17 @@ export const inventoryProductsService = {
   async getInventoryProducts(userId: string): Promise<InventoryProduct[]> {
     try {
       const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('userid', userId)
-        .order('created_at', { ascending: false });
+        .from("products")
+        .select("*")
+        //         .eq('userid', userId)
+        .order("created_at", { ascending: false });
 
       if (error) {
-        console.error('Error fetching inventory products:', error);
+        console.error("Error fetching inventory products:", error);
         throw error;
       }
 
-      return (data || []).map(product => ({
+      return (data || []).map((product) => ({
         id: product.id.toString(),
         product_id: product.id.toString(),
         product_name: product.name,
@@ -50,21 +50,17 @@ export const inventoryProductsService = {
         updated_at: product.created_at,
       }));
     } catch (error) {
-      console.error('Error in getInventoryProducts:', error);
+      console.error("Error in getInventoryProducts:", error);
       return [];
     }
   },
 
   async getInventoryProductById(id: string): Promise<InventoryProduct | null> {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', parseInt(id))
-        .single();
+      const { data, error } = await supabase.from("products").select("*").eq("id", parseInt(id)).single();
 
       if (error) {
-        console.error('Error fetching inventory product:', error);
+        console.error("Error fetching inventory product:", error);
         return null;
       }
 
@@ -88,28 +84,24 @@ export const inventoryProductsService = {
         updated_at: data.created_at,
       };
     } catch (error) {
-      console.error('Error in getInventoryProductById:', error);
+      console.error("Error in getInventoryProductById:", error);
       return null;
     }
   },
 
   async deleteInventoryProduct(id: string): Promise<boolean> {
     try {
-      const { error } = await supabase
-        .from('products')
-        .delete()
-        .eq('id', parseInt(id));
+      const { error } = await supabase.from("products").delete().eq("id", parseInt(id));
 
       if (error) {
-        console.error('Error deleting inventory product:', error);
+        console.error("Error deleting inventory product:", error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error in deleteInventoryProduct:', error);
+      console.error("Error in deleteInventoryProduct:", error);
       return false;
     }
   },
 };
-
