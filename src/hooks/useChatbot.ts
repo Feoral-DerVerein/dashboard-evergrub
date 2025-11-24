@@ -280,6 +280,14 @@ export const useChatbot = () => {
         requestBody.performanceData = performanceContext;
       }
 
+      console.log("📤 Sending to n8n webhook:", {
+        url: 'https://n8n.srv1024074.hstgr.cloud/webhook/c9b68781-c2af-4ba8-a1ec-a9798046369o',
+        messagesCount: conversationHistory.length,
+        productsCount: productsContext?.length || 0,
+        hasPerformanceData: !!performanceContext,
+        bodyPreview: JSON.stringify(requestBody).substring(0, 500)
+      });
+
       const response = await fetch('https://n8n.srv1024074.hstgr.cloud/webhook/c9b68781-c2af-4ba8-a1ec-a9798046369o', {
         method: 'POST',
         headers: {
@@ -288,10 +296,20 @@ export const useChatbot = () => {
         body: JSON.stringify(requestBody)
       });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const data = await response.json();
+      console.log("📥 Webhook response status:", response.status, response.statusText);
 
-      console.log("Chatbot Response:", data);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ Webhook error response:", {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText
+        });
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log("✅ Webhook response data:", data);
       
       // Parse JSON response from n8n
       const rawResponse = data.output || data.response || 'I received your message.';
@@ -455,7 +473,11 @@ export const useChatbot = () => {
       setMessages(prev => [...prev, botMessage]);
 
     } catch (error) {
-      console.error('Error calling n8n webhook:', error);
+      console.error('❌ Error calling n8n webhook:', {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
       
       await simulateTyping('Sorry, there was an error.');
       
