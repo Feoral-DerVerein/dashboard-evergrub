@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation, Link } from "react-router-dom";
-import { BarChart3, LogOut, Package, Truck, Plug, FileText, Settings, CreditCard, User, MessageSquare, Brain } from "lucide-react";
+import { BarChart3, LogOut, Package, Truck, Plug, FileText, Settings, CreditCard, User, MessageSquare, Brain, Bot } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +29,7 @@ const menuItems = [
   { title: "Chat", url: "/dashboard", icon: MessageSquare },
   { title: "Performance", url: "/kpi", icon: BarChart3 },
   { title: "Negentropy AI", url: "/predictive-analytics", icon: Brain },
+  { title: "Auto-Piloto", url: "/autopilot", icon: Bot },
   { title: "Inventory Products", url: "/inventory-products", icon: Package },
   { title: "Notes", url: "/notes", icon: FileText },
   { title: "Delivery", url: "/delivery", icon: Truck },

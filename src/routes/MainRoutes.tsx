@@ -32,7 +32,8 @@ import DeliveryDashboard from "@/pages/DeliverectDashboard";
 import Integrations from "@/pages/Integrations";
 import Notes from "@/pages/Notes";
 import PredictiveAnalytics from "@/pages/PredictiveAnalytics";
-
+import Wishlist from "@/pages/Wishlist";
+import Autopilot from "@/pages/Autopilot";
 
 const MainRoutes = () => {
   const { user } = useAuth();
@@ -74,6 +75,8 @@ const MainRoutes = () => {
         <Route path="/integrations" element={<Integrations />} />
         <Route path="/notes" element={<Notes />} />
         <Route path="/predictive-analytics" element={<PredictiveAnalytics />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/autopilot" element={<Autopilot />} />
         
       </Route>
       
