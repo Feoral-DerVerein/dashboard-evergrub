@@ -214,6 +214,55 @@ export const useChatbot = () => {
         content: messageText
       });
 
+      // ALWAYS fetch products data from Supabase to provide context to n8n
+      let productsContext = null;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: products } = await supabase
+            .from('products')
+            .select('*')
+            .eq('userid', user.id)
+            .order('created_at', { ascending: false })
+            .limit(50); // Get latest 50 products
+
+          if (products && products.length > 0) {
+            const now = new Date();
+            productsContext = products.map(p => {
+              let daysUntilExpiry = null;
+              if (p.expirationdate) {
+                try {
+                  const expDate = new Date(p.expirationdate);
+                  if (expDate > now) {
+                    daysUntilExpiry = Math.ceil((expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                  }
+                } catch (e) {
+                  console.error('Error parsing expiration date:', e);
+                }
+              }
+              
+              return {
+                id: p.id,
+                name: p.name,
+                category: p.category,
+                brand: p.brand,
+                price: p.price,
+                original_price: p.original_price,
+                quantity: p.quantity,
+                expirationdate: p.expirationdate,
+                daysUntilExpiry,
+                description: p.description,
+                image: p.image,
+                status: p.status,
+                discount: p.discount
+              };
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching products context:', error);
+      }
+
       // Get performance data if needed
       let performanceContext = null;
       if (isAskingForPerformance) {
@@ -222,8 +271,11 @@ export const useChatbot = () => {
         console.log("Performance data fetched:", performanceContext);
       }
 
-      // Call n8n webhook with performance context if available
-      const requestBody: any = { messages: conversationHistory };
+      // Call n8n webhook with all context
+      const requestBody: any = { 
+        messages: conversationHistory,
+        productsData: productsContext // Always include products data
+      };
       if (performanceContext) {
         requestBody.performanceData = performanceContext;
       }
