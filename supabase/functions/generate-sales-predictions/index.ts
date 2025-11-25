@@ -13,10 +13,13 @@ serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Missing authorization header');
+    const authHeader = req.headers.get('Authorization') || '';
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('Missing or invalid Authorization header:', authHeader);
+      throw new Error('Unauthorized');
     }
+
+    const accessToken = authHeader.replace('Bearer ', '').trim();
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -24,10 +27,10 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken);
     
     if (userError || !user) {
-      console.error('Auth error:', userError);
+      console.error('Auth error in generate-sales-predictions, userError:', userError);
       throw new Error('Unauthorized');
     }
 
