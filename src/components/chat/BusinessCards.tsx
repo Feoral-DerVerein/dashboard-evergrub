@@ -131,47 +131,98 @@ export const BusinessCard = ({ card, onAddToTaskList }: BusinessCardProps) => {
         );
 
       case 'expiry':
-        const daysLeft = Math.ceil((new Date(card.data.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-        const isUrgent = daysLeft <= 2;
-        
-        return (
-          <Card className={`glass-card-chatbot mb-3 border-l-4 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer ${
-            isUrgent ? 'border-l-red-500' : 'border-l-orange-500'
-          }`}>
-            <CardHeader className="pb-3">
-              <CardTitle className={`text-sm flex items-center gap-2 ${isUrgent ? 'text-red-700' : 'text-orange-700'}`}>
-                <AlertTriangle className="w-4 h-4" />
-                {card.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-semibold text-gray-900">{card.data.product}</h4>
-                  <Badge variant={isUrgent ? 'destructive' : 'outline'} className="animate-pulse">
-                    {daysLeft} day{daysLeft !== 1 ? 's' : ''}
-                  </Badge>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">{card.data.quantity}</div>
-                    <div className="text-xs text-gray-600">units</div>
+        // Handle two formats: single product or summary
+        if (card.data.expiry_date) {
+          // Single product format
+          const daysLeft = Math.ceil((new Date(card.data.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+          const isUrgent = daysLeft <= 2;
+          
+          return (
+            <Card className={`glass-card-chatbot mb-3 border-l-4 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer ${
+              isUrgent ? 'border-l-red-500' : 'border-l-orange-500'
+            }`}>
+              <CardHeader className="pb-3">
+                <CardTitle className={`text-sm flex items-center gap-2 ${isUrgent ? 'text-red-700' : 'text-orange-700'}`}>
+                  <AlertTriangle className="w-4 h-4" />
+                  {card.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold text-gray-900">{card.data.product}</h4>
+                    <Badge variant={isUrgent ? 'destructive' : 'outline'} className="animate-pulse">
+                      {daysLeft} day{daysLeft !== 1 ? 's' : ''}
+                    </Badge>
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-green-600">${(card.data.quantity * card.data.sell_price).toFixed(2)}</div>
-                    <div className="text-xs text-gray-600">total value</div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-gray-900">{card.data.quantity}</div>
+                      <div className="text-xs text-gray-600">units</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-green-600">${(card.data.quantity * card.data.sell_price).toFixed(2)}</div>
+                      <div className="text-xs text-gray-600">total value</div>
+                    </div>
                   </div>
-                </div>
 
-                <div className="bg-white bg-opacity-60 p-3 rounded-lg border border-white border-opacity-50">
-                  <p className="text-sm font-medium text-gray-800 mb-2">💡 Recommendation:</p>
-                  <p className="text-sm text-gray-700">{card.data.recommendation}</p>
+                  <div className="bg-white bg-opacity-60 p-3 rounded-lg border border-white border-opacity-50">
+                    <p className="text-sm font-medium text-gray-800 mb-2">💡 Recommendation:</p>
+                    <p className="text-sm text-gray-700">{card.data.recommendation}</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
+              </CardContent>
+            </Card>
+          );
+        } else {
+          // Summary format (expiringCount, totalValue)
+          const expiringCount = card.data.expiringCount || 0;
+          const totalValue = card.data.totalValue || 0;
+          const isUrgent = expiringCount > 20;
+          
+          return (
+            <Card className={`glass-card-chatbot mb-3 border-l-4 animate-fade-in hover:shadow-xl hover:scale-102 transition-all duration-300 cursor-pointer ${
+              isUrgent ? 'border-l-red-500' : 'border-l-orange-500'
+            }`}>
+              <CardHeader className="pb-3">
+                <CardTitle className={`text-sm flex items-center gap-2 ${isUrgent ? 'text-red-700' : 'text-orange-700'}`}>
+                  <AlertTriangle className="w-4 h-4" />
+                  {card.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <Badge variant={isUrgent ? 'destructive' : 'outline'} className={isUrgent ? 'animate-pulse' : ''}>
+                      {expiringCount > 0 ? `${expiringCount} products` : 'No urgent items'}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-gray-900">{expiringCount}</div>
+                      <div className="text-xs text-gray-600">units</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-green-600">${totalValue.toFixed(2)}</div>
+                      <div className="text-xs text-gray-600">total value</div>
+                    </div>
+                  </div>
+
+                  {card.data.urgentItems && card.data.urgentItems.length > 0 && (
+                    <div className="bg-white bg-opacity-60 p-3 rounded-lg border border-white border-opacity-50">
+                      <p className="text-sm font-medium text-gray-800 mb-2">💡 Recommendation:</p>
+                      <p className="text-sm text-gray-700">
+                        Priority items: {card.data.urgentItems.join(', ')}. Consider discounting or donating these products.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        }
 
       case 'sales':
         return (
