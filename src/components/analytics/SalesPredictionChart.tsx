@@ -89,38 +89,71 @@ const SalesPredictionChart = () => {
         {isLoading ? (
           <Skeleton className="h-[400px] w-full" />
         ) : (
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="date" className="text-xs" />
-              <YAxis className="text-xs" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '6px',
-                }}
-              />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="actual"
-                stroke="hsl(var(--primary))"
-                strokeWidth={2}
-                name="Actual Sales"
-                dot={{ r: 4 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="predicted"
-                stroke="hsl(var(--chart-2))"
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                name="Prediction"
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="p-4 bg-card border border-border rounded-lg">
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={chartData} margin={{ top: 10, right: 20, left: -20, bottom: 10 }}>
+                <defs>
+                  <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.1} />
+                  </linearGradient>
+                  <linearGradient id="predictedGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity={0.6} />
+                    <stop offset="100%" stopColor="hsl(var(--chart-2))" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  tickLine={{ stroke: 'hsl(var(--border))' }}
+                  className="text-xs"
+                />
+                <YAxis 
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  tickLine={{ stroke: 'hsl(var(--border))' }}
+                  className="text-xs"
+                  tickFormatter={(value) => `€${value}`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--popover))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  }}
+                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600, marginBottom: '8px' }}
+                  formatter={(value: number, name: string) => [
+                    `€${value.toFixed(0)} / $${(value * 1.1).toFixed(0)}`,
+                    name
+                  ]}
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '20px' }}
+                  iconType="line"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="actual"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={3}
+                  name="Actual Sales"
+                  dot={{ r: 5, fill: 'hsl(var(--primary))', strokeWidth: 2, stroke: 'hsl(var(--background))' }}
+                  activeDot={{ r: 7 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="predicted"
+                  stroke="hsl(var(--chart-2))"
+                  strokeWidth={3}
+                  strokeDasharray="8 4"
+                  name="Prediction"
+                  dot={{ r: 5, fill: 'hsl(var(--chart-2))', strokeWidth: 2, stroke: 'hsl(var(--background))' }}
+                  activeDot={{ r: 7 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </CardContent>
     </Card>
