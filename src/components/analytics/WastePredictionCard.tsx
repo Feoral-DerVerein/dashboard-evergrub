@@ -89,28 +89,52 @@ const WastePredictionCard = () => {
         </div>
 
         {/* Trend Chart */}
-        <div className="space-y-2">
-          <p className="text-sm font-semibold text-foreground">Tendencia de Merma</p>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={trend}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="week" className="text-xs" />
-              <YAxis className="text-xs" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '6px',
-                }}
-                formatter={(value: number) => `$${value.toLocaleString('es-MX')}`}
-              />
-              <Bar
-                dataKey="value"
-                fill="hsl(var(--destructive))"
-                radius={[8, 8, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-foreground">Waste Trend</p>
+            <TrendingDown className="h-4 w-4 text-destructive" />
+          </div>
+          <div className="p-4 bg-card border border-border rounded-lg">
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={trend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="wasteGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(var(--destructive))" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="hsl(var(--destructive))" stopOpacity={0.3} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                <XAxis 
+                  dataKey="week" 
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  tickLine={{ stroke: 'hsl(var(--border))' }}
+                  className="text-xs"
+                />
+                <YAxis 
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  tickLine={{ stroke: 'hsl(var(--border))' }}
+                  className="text-xs"
+                  tickFormatter={(value) => `€${value}`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--popover))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  }}
+                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }}
+                  formatter={(value: number) => [`€${value.toFixed(0)} / $${(value * 1.1).toFixed(0)}`, 'Waste']}
+                />
+                <Bar
+                  dataKey="value"
+                  fill="url(#wasteGradient)"
+                  radius={[8, 8, 0, 0]}
+                  maxBarSize={60}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Items Breakdown */}
@@ -143,16 +167,28 @@ const WastePredictionCard = () => {
         </div>
 
         {/* Recommendations */}
-        <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-2">
+        <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-3">
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <TrendingDown className="h-4 w-4 text-primary" />
-            Recomendaciones
+            Recommendations
           </p>
-          <ul className="space-y-1 text-xs text-muted-foreground">
-            <li>• Reducir orden de Pan Francés en 30% la próxima semana</li>
-            <li>• Crear promoción 2x1 en productos lácteos que vencen pronto</li>
-            <li>• Donar productos de baja rotación antes del vencimiento</li>
-            <li>• Ajustar inventario de verduras según demanda real</li>
+          <ul className="space-y-2 text-xs text-muted-foreground">
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Reduce French Bread orders by 30% next week</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Create 2-for-1 promotion on dairy products expiring soon</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Donate slow-moving products before expiration date</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Adjust vegetable inventory according to actual demand</span>
+            </li>
           </ul>
         </div>
       </CardContent>
