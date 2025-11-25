@@ -67,13 +67,21 @@ const WastePredictionCard = () => {
         {/* Total Value Alert */}
         <div className="p-6 bg-destructive/10 border-2 border-destructive/20 rounded-lg">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="space-y-2">
               <p className="text-sm text-muted-foreground mb-1">Predicted Waste</p>
-              <div className="flex items-baseline gap-2">
-                <p className="text-4xl font-bold text-destructive">
-                  ${totalValue.toLocaleString('es-MX')}
-                </p>
-                <p className="text-sm text-muted-foreground">MXN</p>
+              <div className="flex items-baseline gap-3">
+                <div>
+                  <p className="text-4xl font-bold text-destructive">
+                    €{(totalValue * 0.051).toLocaleString('en-EU', { maximumFractionDigits: 0 })}
+                  </p>
+                  <p className="text-xs text-muted-foreground">EUR</p>
+                </div>
+                <div className="border-l border-border pl-3">
+                  <p className="text-4xl font-bold text-destructive">
+                    ${(totalValue * 0.056).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                  </p>
+                  <p className="text-xs text-muted-foreground">USD</p>
+                </div>
               </div>
             </div>
             <DollarSign className="h-12 w-12 text-destructive opacity-50" />
@@ -121,7 +129,7 @@ const WastePredictionCard = () => {
                       <span>{item.quantity} unidades</span>
                       <span>•</span>
                       <span className="font-semibold text-destructive">
-                        ${item.value.toLocaleString('es-MX')} MXN
+                        €{(item.value * 0.051).toFixed(2)} / ${(item.value * 0.056).toFixed(2)}
                       </span>
                     </div>
                   </div>
