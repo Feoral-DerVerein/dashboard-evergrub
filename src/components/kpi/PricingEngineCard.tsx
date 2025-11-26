@@ -3,55 +3,38 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { performanceEngineService, PricingItem } from "@/services/performanceEngineService";
+import { useAuth } from "@/context/AuthContext";
 
 interface PricingEngineCardProps {
   isLoading?: boolean;
 }
 
-const PricingEngineCard = ({ isLoading }: PricingEngineCardProps) => {
-  // Fake data for optimal pricing
-  const pricingData = [
-    { 
-      sku: "PROD-001", 
-      currentPrice: 12.50, 
-      recommendedPrice: 13.80, 
-      marginImpact: "+8%", 
-      demandImpact: "-3%",
-      direction: "up" as const
-    },
-    { 
-      sku: "PROD-002", 
-      currentPrice: 8.90, 
-      recommendedPrice: 8.90, 
-      marginImpact: "0%", 
-      demandImpact: "0%",
-      direction: "neutral" as const
-    },
-    { 
-      sku: "PROD-003", 
-      currentPrice: 15.00, 
-      recommendedPrice: 13.50, 
-      marginImpact: "-5%", 
-      demandImpact: "+12%",
-      direction: "down" as const
-    },
-    { 
-      sku: "PROD-004", 
-      currentPrice: 22.00, 
-      recommendedPrice: 23.50, 
-      marginImpact: "+6%", 
-      demandImpact: "-2%",
-      direction: "up" as const
-    },
-    { 
-      sku: "PROD-005", 
-      currentPrice: 9.50, 
-      recommendedPrice: 8.20, 
-      marginImpact: "-8%", 
-      demandImpact: "+15%",
-      direction: "down" as const
-    },
-  ];
+const PricingEngineCard = ({ isLoading: externalLoading }: PricingEngineCardProps) => {
+  const { user } = useAuth();
+  const [pricingData, setPricingData] = useState<PricingItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (!user?.id) return;
+      
+      setLoading(true);
+      try {
+        const data = await performanceEngineService.getPricingData(user.id);
+        setPricingData(data);
+      } catch (error) {
+        console.error("Error loading pricing data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [user?.id]);
+
+  const isLoading = externalLoading || loading;
 
   const getPriceIcon = (direction: "up" | "down" | "neutral") => {
     if (direction === "up") return <ArrowUp className="h-3 w-3 text-green-600" />;
@@ -97,24 +80,37 @@ const PricingEngineCard = ({ isLoading }: PricingEngineCardProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pricingData.map((item) => (
-                <TableRow key={item.sku}>
-                  <TableCell className="font-medium">{item.sku}</TableCell>
-                  <TableCell className="text-right">${item.currentPrice.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      {getPriceIcon(item.direction)}
-                      <span className="font-medium">${item.recommendedPrice.toFixed(2)}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className={`text-right font-medium ${getImpactColor(item.marginImpact)}`}>
-                    {item.marginImpact}
-                  </TableCell>
-                  <TableCell className={`text-right font-medium ${getImpactColor(item.demandImpact)}`}>
-                    {item.demandImpact}
+              {pricingData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    No hay productos disponibles para analizar
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                pricingData.map((item) => (
+                  <TableRow key={item.sku}>
+                    <TableCell className="font-medium">
+                      <div className="flex flex-col">
+                        <span>{item.sku}</span>
+                        <span className="text-xs text-muted-foreground">{item.productName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">${item.currentPrice.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {getPriceIcon(item.direction)}
+                        <span className="font-medium">${item.recommendedPrice.toFixed(2)}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className={`text-right font-medium ${getImpactColor(item.marginImpact)}`}>
+                      {item.marginImpact}
+                    </TableCell>
+                    <TableCell className={`text-right font-medium ${getImpactColor(item.demandImpact)}`}>
+                      {item.demandImpact}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
