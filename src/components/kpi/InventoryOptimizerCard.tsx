@@ -3,50 +3,38 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, CheckCircle, AlertCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { performanceEngineService, InventoryItem } from "@/services/performanceEngineService";
+import { useAuth } from "@/context/AuthContext";
 
 interface InventoryOptimizerCardProps {
   isLoading?: boolean;
 }
 
-const InventoryOptimizerCard = ({ isLoading }: InventoryOptimizerCardProps) => {
-  // Fake data for inventory optimization
-  const inventoryData = [
-    { 
-      sku: "PROD-001", 
-      currentStock: 45, 
-      recommendedStock: 85, 
-      riskLevel: "High" as const,
-      orderSuggestion: "Order 40 units"
-    },
-    { 
-      sku: "PROD-002", 
-      currentStock: 120, 
-      recommendedStock: 115, 
-      riskLevel: "Low" as const,
-      orderSuggestion: "Optimal level"
-    },
-    { 
-      sku: "PROD-003", 
-      currentStock: 65, 
-      recommendedStock: 90, 
-      riskLevel: "Medium" as const,
-      orderSuggestion: "Order 25 units"
-    },
-    { 
-      sku: "PROD-004", 
-      currentStock: 200, 
-      recommendedStock: 150, 
-      riskLevel: "Medium" as const,
-      orderSuggestion: "Reduce stock"
-    },
-    { 
-      sku: "PROD-005", 
-      currentStock: 30, 
-      recommendedStock: 100, 
-      riskLevel: "High" as const,
-      orderSuggestion: "Order 70 units"
-    },
-  ];
+const InventoryOptimizerCard = ({ isLoading: externalLoading }: InventoryOptimizerCardProps) => {
+  const { user } = useAuth();
+  const [inventoryData, setInventoryData] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (!user?.id) return;
+      
+      setLoading(true);
+      try {
+        const data = await performanceEngineService.getInventoryData(user.id);
+        setInventoryData(data);
+      } catch (error) {
+        console.error("Error loading inventory data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [user?.id]);
+
+  const isLoading = externalLoading || loading;
 
   const getRiskBadgeVariant = (risk: "High" | "Medium" | "Low") => {
     if (risk === "High") return "destructive";
@@ -99,28 +87,41 @@ const InventoryOptimizerCard = ({ isLoading }: InventoryOptimizerCardProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {inventoryData.map((item) => (
-                <TableRow key={item.sku}>
-                  <TableCell className="font-medium">{item.sku}</TableCell>
-                  <TableCell className={`text-right font-medium ${getStockComparison(item.currentStock, item.recommendedStock)}`}>
-                    {item.currentStock} units
-                  </TableCell>
-                  <TableCell className="text-right text-muted-foreground">
-                    {item.recommendedStock} units
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getRiskIcon(item.riskLevel)}
-                      <Badge variant={getRiskBadgeVariant(item.riskLevel)}>
-                        {item.riskLevel}
-                      </Badge>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {item.orderSuggestion}
+              {inventoryData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    No hay productos disponibles para analizar
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                inventoryData.map((item) => (
+                  <TableRow key={item.sku}>
+                    <TableCell className="font-medium">
+                      <div className="flex flex-col">
+                        <span>{item.sku}</span>
+                        <span className="text-xs text-muted-foreground">{item.productName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className={`text-right font-medium ${getStockComparison(item.currentStock, item.recommendedStock)}`}>
+                      {item.currentStock} units
+                    </TableCell>
+                    <TableCell className="text-right text-muted-foreground">
+                      {item.recommendedStock} units
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {getRiskIcon(item.riskLevel)}
+                        <Badge variant={getRiskBadgeVariant(item.riskLevel)}>
+                          {item.riskLevel}
+                        </Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {item.orderSuggestion}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

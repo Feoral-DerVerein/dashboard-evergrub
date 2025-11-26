@@ -3,31 +3,40 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState } from "react";
+import { performanceEngineService, ForecastItem, ForecastChartData } from "@/services/performanceEngineService";
+import { useAuth } from "@/context/AuthContext";
 
 interface ForecastEngineCardProps {
   isLoading?: boolean;
 }
 
-const ForecastEngineCard = ({ isLoading }: ForecastEngineCardProps) => {
-  // Fake data for demand forecast
-  const forecastData = [
-    { sku: "PROD-001", demandForecast: 245, confidence: 89, drivers: "Seasonal trend, Weather" },
-    { sku: "PROD-002", demandForecast: 180, confidence: 92, drivers: "Historical pattern" },
-    { sku: "PROD-003", demandForecast: 320, confidence: 78, drivers: "Promotion impact" },
-    { sku: "PROD-004", demandForecast: 156, confidence: 85, drivers: "Day of week" },
-    { sku: "PROD-005", demandForecast: 290, confidence: 81, drivers: "Supply constraints" },
-  ];
+const ForecastEngineCard = ({ isLoading: externalLoading }: ForecastEngineCardProps) => {
+  const { user } = useAuth();
+  const [forecastData, setForecastData] = useState<ForecastItem[]>([]);
+  const [chartData, setChartData] = useState<ForecastChartData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Chart data for weekly trend
-  const chartData = [
-    { day: "Mon", demand: 180 },
-    { day: "Tue", demand: 210 },
-    { day: "Wed", demand: 245 },
-    { day: "Thu", demand: 220 },
-    { day: "Fri", demand: 280 },
-    { day: "Sat", demand: 310 },
-    { day: "Sun", demand: 290 },
-  ];
+  useEffect(() => {
+    const loadData = async () => {
+      if (!user?.id) return;
+      
+      setLoading(true);
+      try {
+        const data = await performanceEngineService.getForecastData(user.id);
+        setForecastData(data.forecastData);
+        setChartData(data.chartData);
+      } catch (error) {
+        console.error("Error loading forecast data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [user?.id]);
+
+  const isLoading = externalLoading || loading;
 
   const getConfidenceBadgeVariant = (confidence: number) => {
     if (confidence >= 85) return "default";
@@ -98,18 +107,31 @@ const ForecastEngineCard = ({ isLoading }: ForecastEngineCardProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {forecastData.map((item) => (
-                <TableRow key={item.sku}>
-                  <TableCell className="font-medium">{item.sku}</TableCell>
-                  <TableCell className="text-right">{item.demandForecast} units</TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant={getConfidenceBadgeVariant(item.confidence)}>
-                      {item.confidence}%
-                    </Badge>
+              {forecastData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    No hay productos disponibles para analizar
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{item.drivers}</TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                forecastData.map((item) => (
+                  <TableRow key={item.sku}>
+                    <TableCell className="font-medium">
+                      <div className="flex flex-col">
+                        <span>{item.sku}</span>
+                        <span className="text-xs text-muted-foreground">{item.productName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">{item.demandForecast} units</TableCell>
+                    <TableCell className="text-right">
+                      <Badge variant={getConfidenceBadgeVariant(item.confidence)}>
+                        {item.confidence}%
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{item.drivers}</TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
