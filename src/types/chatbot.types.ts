@@ -27,6 +27,20 @@ export interface ChatMessage {
   expiring_products?: any[]; // Expiring products for Negentropy assistant
   inventory_products?: any[]; // Inventory products from database
   actionCards?: ActionCardData[]; // Quick action cards
+  // Performance dashboard cards
+  businessHealth?: any; // BusinessHealthCards data
+  salesForecast?: any; // SalesForecastCard data
+  influencingFactors?: any[]; // InfluencingFactorsCard data
+  // Predictive Analytics cards
+  showPredictiveAnalytics?: boolean; // PredictiveAnalyticsCard
+  salesPrediction?: boolean; // SalesPredictionChart
+  climateFactors?: boolean; // ClimateFactorsCard
+  eventsCalendar?: boolean; // EventsCalendar
+  correlatedProducts?: boolean; // CorrelatedProductsMatrix
+  wastePrediction?: boolean; // WastePredictionCard
+  // Auto-Pilot cards
+  priceSyncQueue?: boolean; // PriceSyncQueueCard
+  actionLogs?: boolean; // ActionLogsCard
   actions?: Array<{
     label: string;
     type: "donate" | "create_bag" | "discount" | "inventory" | "report" | "marketplace" | "view_products" | "delivery" | "add_note";
@@ -48,7 +62,19 @@ export type ChatIntent =
   | 'general_help'
   | 'business_metrics'
   | 'product_recommendations'
-  | 'waste_reduction';
+  | 'waste_reduction'
+  | 'performance_metrics'
+  | 'sales_forecast'
+  | 'influencing_factors'
+  | 'predictive_analytics'
+  | 'sales_prediction'
+  | 'climate_data'
+  | 'events_calendar'
+  | 'correlated_products'
+  | 'waste_prediction'
+  | 'autopilot_status'
+  | 'price_sync'
+  | 'action_logs';
 
 export interface ChatAnalytics {
   totalProducts: number;

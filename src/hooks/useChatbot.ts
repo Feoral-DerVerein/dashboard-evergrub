@@ -137,6 +137,53 @@ export const useChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Helper function to detect card intents from message
+  const detectCardIntents = (message: string): any => {
+    const lowerMessage = message.toLowerCase();
+    const cardFlags: any = {};
+
+    // Performance metrics
+    if (lowerMessage.match(/performance|metrics|total sales|transactions|profit|revenue|operational savings|avg.*order/i)) {
+      cardFlags.businessHealth = {};
+    }
+    if (lowerMessage.match(/forecast|próximos.*días|next.*days|sales.*forecast|predicción.*ventas/i)) {
+      cardFlags.salesForecast = {};
+    }
+    if (lowerMessage.match(/factor|influenc|affect|impact|key.*factor/i)) {
+      cardFlags.influencingFactors = [];
+    }
+
+    // Predictive Analytics
+    if (lowerMessage.match(/predictive.*analytics|analítica.*predictiva/i)) {
+      cardFlags.showPredictiveAnalytics = true;
+    }
+    if (lowerMessage.match(/sales.*prediction|predicción.*ventas|demand.*forecast/i)) {
+      cardFlags.salesPrediction = true;
+    }
+    if (lowerMessage.match(/climate|weather|clima|temperatura|temperature/i)) {
+      cardFlags.climateFactors = true;
+    }
+    if (lowerMessage.match(/event|holiday|calendario|festivo|valentine|mother|christmas/i)) {
+      cardFlags.eventsCalendar = true;
+    }
+    if (lowerMessage.match(/correlat|together|combo|juntos|productos.*relacionados/i)) {
+      cardFlags.correlatedProducts = true;
+    }
+    if (lowerMessage.match(/waste|desperdicio|pérdida|merma|predicción.*desperdicio/i)) {
+      cardFlags.wastePrediction = true;
+    }
+
+    // Auto-Pilot
+    if (lowerMessage.match(/price.*sync|sincronización.*precio|autopilot|auto.*pilot|price.*queue/i)) {
+      cardFlags.priceSyncQueue = true;
+    }
+    if (lowerMessage.match(/action.*log|registro.*accion|historial.*acciones|automatic.*actions/i)) {
+      cardFlags.actionLogs = true;
+    }
+
+    return cardFlags;
+  };
+
   // Scroll to bottom function (manual use only)
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
@@ -457,6 +504,9 @@ export const useChatbot = () => {
         ];
       }
 
+      // Detect card intents from both user message and bot response
+      const cardFlags = detectCardIntents(messageText + ' ' + responseText);
+
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
@@ -467,6 +517,7 @@ export const useChatbot = () => {
         inventory_products: inventoryProductsData,
         actions: finalActions,
         buttons: buttons,
+        ...cardFlags, // Include detected card flags
         timestamp: new Date()
       };
 

@@ -26,6 +26,16 @@ import { PredictiveAnalyticsCard } from '@/components/chat/PredictiveAnalyticsCa
 import { AutoPilotCard } from '@/components/chat/AutoPilotCard';
 import { PerformanceCard } from '@/components/chat/PerformanceCard';
 import { InventoryCard } from '@/components/chat/InventoryCard';
+import BusinessHealthCards from '@/components/kpi/BusinessHealthCards';
+import SalesForecastCard from '@/components/kpi/SalesForecastCard';
+import InfluencingFactorsCard from '@/components/kpi/InfluencingFactorsCard';
+import SalesPredictionChart from '@/components/analytics/SalesPredictionChart';
+import ClimateFactorsCard from '@/components/analytics/ClimateFactorsCard';
+import EventsCalendar from '@/components/analytics/EventsCalendar';
+import CorrelatedProductsMatrix from '@/components/analytics/CorrelatedProductsMatrix';
+import WastePredictionCard from '@/components/analytics/WastePredictionCard';
+import PriceSyncQueueCard from '@/components/autopilot/PriceSyncQueueCard';
+import ActionLogsCard from '@/components/autopilot/ActionLogsCard';
 import aiIcon from '@/assets/ai-icon.png';
 interface ChatBotProps {
   variant?: 'floating' | 'inline';
@@ -282,6 +292,45 @@ const ChatBot = ({
                           }}
                         />)}
                       </div>
+                    </div>}
+
+                   {/* Performance Dashboard Cards */}
+                  {message.type === 'bot' && (message as any).businessHealth && <div className="text-left mt-4">
+                      <BusinessHealthCards data={(message as any).businessHealth} />
+                    </div>}
+                  {message.type === 'bot' && (message as any).salesForecast && <div className="text-left mt-4">
+                      <SalesForecastCard data={(message as any).salesForecast} />
+                    </div>}
+                  {message.type === 'bot' && (message as any).influencingFactors && <div className="text-left mt-4">
+                      <InfluencingFactorsCard data={(message as any).influencingFactors} />
+                    </div>}
+
+                   {/* Predictive Analytics Cards */}
+                  {message.type === 'bot' && (message as any).showPredictiveAnalytics && <div className="text-left mt-4">
+                      <PredictiveAnalyticsCard data={(message as any).showPredictiveAnalytics} />
+                    </div>}
+                  {message.type === 'bot' && (message as any).salesPrediction && <div className="text-left mt-4">
+                      <SalesPredictionChart />
+                    </div>}
+                  {message.type === 'bot' && (message as any).climateFactors && <div className="text-left mt-4">
+                      <ClimateFactorsCard />
+                    </div>}
+                  {message.type === 'bot' && (message as any).eventsCalendar && <div className="text-left mt-4">
+                      <EventsCalendar />
+                    </div>}
+                  {message.type === 'bot' && (message as any).correlatedProducts && <div className="text-left mt-4">
+                      <CorrelatedProductsMatrix />
+                    </div>}
+                  {message.type === 'bot' && (message as any).wastePrediction && <div className="text-left mt-4">
+                      <WastePredictionCard />
+                    </div>}
+
+                   {/* Auto-Pilot Cards */}
+                  {message.type === 'bot' && (message as any).priceSyncQueue && <div className="text-left mt-4">
+                      <PriceSyncQueueCard />
+                    </div>}
+                  {message.type === 'bot' && (message as any).actionLogs && <div className="text-left mt-4">
+                      <ActionLogsCard />
                     </div>}
                 </div>)}
               
