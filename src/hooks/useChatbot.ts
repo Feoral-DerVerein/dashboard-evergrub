@@ -128,7 +128,7 @@ export const useChatbot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([{
     id: '1',
     type: 'bot',
-    content: 'Hello! I\'m your Negentropy assistant. How can I help you today?\n\nTry asking me: "Show me predictive analytics" or "What about auto-pilot?"',
+    content: 'Hello! I\'m your Negentropy assistant. How can I help you today? ',
     timestamp: new Date()
   }]);
   
