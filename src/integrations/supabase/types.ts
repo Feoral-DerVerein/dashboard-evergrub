@@ -751,6 +751,36 @@ export type Database = {
           },
         ]
       }
+      macro_data: {
+        Row: {
+          country: string | null
+          ds: string | null
+          holiday: boolean | null
+          id: string
+          inflation: number | null
+          notes: string | null
+          weather: string | null
+        }
+        Insert: {
+          country?: string | null
+          ds?: string | null
+          holiday?: boolean | null
+          id?: string
+          inflation?: number | null
+          notes?: string | null
+          weather?: string | null
+        }
+        Update: {
+          country?: string | null
+          ds?: string | null
+          holiday?: boolean | null
+          id?: string
+          inflation?: number | null
+          notes?: string | null
+          weather?: string | null
+        }
+        Relationships: []
+      }
       n8n_chat_histories: {
         Row: {
           id: number
@@ -1255,6 +1285,42 @@ export type Database = {
           pos_system?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      predictions: {
+        Row: {
+          created_at: string | null
+          ds: string
+          id: string
+          model_version: string | null
+          sku: string
+          store_id: string | null
+          yhat: number | null
+          yhat_lower: number | null
+          yhat_upper: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          ds: string
+          id?: string
+          model_version?: string | null
+          sku: string
+          store_id?: string | null
+          yhat?: number | null
+          yhat_lower?: number | null
+          yhat_upper?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          ds?: string
+          id?: string
+          model_version?: string | null
+          sku?: string
+          store_id?: string | null
+          yhat?: number | null
+          yhat_lower?: number | null
+          yhat_upper?: number | null
         }
         Relationships: []
       }
