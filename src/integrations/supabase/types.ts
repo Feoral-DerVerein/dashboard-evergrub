@@ -1691,7 +1691,7 @@ export type Database = {
           surprise_bag_contents: string | null
           total_value: number | null
           unit_type: string | null
-          userid: string
+          userid: string | null
         }
         Insert: {
           base_price?: number | null
@@ -1727,7 +1727,7 @@ export type Database = {
           surprise_bag_contents?: string | null
           total_value?: number | null
           unit_type?: string | null
-          userid: string
+          userid?: string | null
         }
         Update: {
           base_price?: number | null
@@ -1763,7 +1763,7 @@ export type Database = {
           surprise_bag_contents?: string | null
           total_value?: number | null
           unit_type?: string | null
-          userid?: string
+          userid?: string | null
         }
         Relationships: []
       }
