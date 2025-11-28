@@ -166,7 +166,7 @@ const ChatBot = ({
     } as any);
   };
   if (variant === 'inline') {
-    return <div className="w-full bg-white">
+    return <div className="w-full glass-card">
         <div className="w-full px-4 py-4">
           {/* Header */}
           <div className="text-center mb-6 mt-2">
