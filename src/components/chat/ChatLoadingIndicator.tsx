@@ -7,7 +7,7 @@ export const ChatLoadingIndicator = () => {
         <img 
           src={thinkingLight} 
           alt="Thinking" 
-          className="w-12 h-12 object-contain"
+          className="w-9 h-9 object-contain"
         />
         <span className="text-sm font-medium text-foreground">
           Thinking...
