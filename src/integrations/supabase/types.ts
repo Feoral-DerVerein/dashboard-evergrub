@@ -198,6 +198,33 @@ export type Database = {
           },
         ]
       }
+      alerts: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          status: string | null
+          tenant_id: string
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          status?: string | null
+          tenant_id: string
+          type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          status?: string | null
+          tenant_id?: string
+          type?: string
+        }
+        Relationships: []
+      }
       autopilot_settings: {
         Row: {
           config: Json
@@ -627,6 +654,57 @@ export type Database = {
         }
         Relationships: []
       }
+      donations: {
+        Row: {
+          created_at: string | null
+          id: string
+          ngo: string | null
+          pickup_time: string | null
+          product_id: number | null
+          quantity: number | null
+          status: string | null
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          ngo?: string | null
+          pickup_time?: string | null
+          product_id?: number | null
+          quantity?: number | null
+          status?: string | null
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          ngo?: string | null
+          pickup_time?: string | null
+          product_id?: number | null
+          quantity?: number | null
+          status?: string | null
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       events_calendar: {
         Row: {
           affected_categories: string[] | null
@@ -713,6 +791,51 @@ export type Database = {
           },
         ]
       }
+      inventory: {
+        Row: {
+          current_stock: number | null
+          id: string
+          max_stock: number | null
+          min_stock: number | null
+          product_id: number | null
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          current_stock?: number | null
+          id?: string
+          max_stock?: number | null
+          min_stock?: number | null
+          product_id?: number | null
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          current_stock?: number | null
+          id?: string
+          max_stock?: number | null
+          min_stock?: number | null
+          product_id?: number | null
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       inventory_snapshots: {
         Row: {
           created_at: string
@@ -751,6 +874,39 @@ export type Database = {
           },
         ]
       }
+      legal_documents: {
+        Row: {
+          document_type: string
+          file_url: string | null
+          generated_at: string | null
+          id: string
+          period_end: string | null
+          period_start: string | null
+          status: string | null
+          tenant_id: string
+        }
+        Insert: {
+          document_type: string
+          file_url?: string | null
+          generated_at?: string | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          status?: string | null
+          tenant_id: string
+        }
+        Update: {
+          document_type?: string
+          file_url?: string | null
+          generated_at?: string | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          status?: string | null
+          tenant_id?: string
+        }
+        Relationships: []
+      }
       macro_data: {
         Row: {
           country: string | null
@@ -778,6 +934,45 @@ export type Database = {
           inflation?: number | null
           notes?: string | null
           weather?: string | null
+        }
+        Relationships: []
+      }
+      macro_indicators: {
+        Row: {
+          created_at: string | null
+          date: string
+          frequency: string | null
+          id: string
+          indicator: string
+          provider: string | null
+          region: string | null
+          tenant_id: string
+          unit: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          frequency?: string | null
+          id?: string
+          indicator: string
+          provider?: string | null
+          region?: string | null
+          tenant_id: string
+          unit?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          frequency?: string | null
+          id?: string
+          indicator?: string
+          provider?: string | null
+          region?: string | null
+          tenant_id?: string
+          unit?: string | null
+          value?: number
         }
         Relationships: []
       }
@@ -1735,6 +1930,7 @@ export type Database = {
           description: string
           discount: number
           ean: string | null
+          expiration_date: string | null
           expirationdate: string
           id: number
           image: string
@@ -1753,10 +1949,14 @@ export type Database = {
           quantity: number
           sku: string | null
           status: string | null
+          stock: number | null
           storeid: string | null
+          supplier: string | null
           surprise_bag_contents: string | null
+          tenant_id: string | null
           total_value: number | null
           unit_type: string | null
+          updated_at: string | null
           userid: string | null
         }
         Insert: {
@@ -1771,6 +1971,7 @@ export type Database = {
           description?: string
           discount?: number
           ean?: string | null
+          expiration_date?: string | null
           expirationdate: string
           id?: number
           image?: string
@@ -1789,10 +1990,14 @@ export type Database = {
           quantity?: number
           sku?: string | null
           status?: string | null
+          stock?: number | null
           storeid?: string | null
+          supplier?: string | null
           surprise_bag_contents?: string | null
+          tenant_id?: string | null
           total_value?: number | null
           unit_type?: string | null
+          updated_at?: string | null
           userid?: string | null
         }
         Update: {
@@ -1807,6 +2012,7 @@ export type Database = {
           description?: string
           discount?: number
           ean?: string | null
+          expiration_date?: string | null
           expirationdate?: string
           id?: number
           image?: string
@@ -1825,13 +2031,25 @@ export type Database = {
           quantity?: number
           sku?: string | null
           status?: string | null
+          stock?: number | null
           storeid?: string | null
+          supplier?: string | null
           surprise_bag_contents?: string | null
+          tenant_id?: string | null
           total_value?: number | null
           unit_type?: string | null
+          updated_at?: string | null
           userid?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -1844,6 +2062,7 @@ export type Database = {
           id: string
           last_name: string | null
           phone: string | null
+          tenant_id: string | null
           updated_at: string
         }
         Insert: {
@@ -1856,6 +2075,7 @@ export type Database = {
           id: string
           last_name?: string | null
           phone?: string | null
+          tenant_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -1868,9 +2088,18 @@ export type Database = {
           id?: string
           last_name?: string | null
           phone?: string | null
+          tenant_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promotions: {
         Row: {
@@ -2070,6 +2299,39 @@ export type Database = {
           },
         ]
       }
+      rules: {
+        Row: {
+          action: Json
+          condition: Json
+          created_at: string | null
+          enabled: boolean | null
+          id: string
+          rule_name: string
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          action: Json
+          condition: Json
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          rule_name: string
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          action?: Json
+          condition?: Json
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          rule_name?: string
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       sales: {
         Row: {
           amount: number
@@ -2078,8 +2340,12 @@ export type Database = {
           id: string
           order_id: string | null
           payment_method: string | null
+          pos_reference: string | null
+          product_id: number | null
           products: Json | null
+          quantity: number | null
           sale_date: string | null
+          tenant_id: string | null
         }
         Insert: {
           amount: number
@@ -2088,8 +2354,12 @@ export type Database = {
           id?: string
           order_id?: string | null
           payment_method?: string | null
+          pos_reference?: string | null
+          product_id?: number | null
           products?: Json | null
+          quantity?: number | null
           sale_date?: string | null
+          tenant_id?: string | null
         }
         Update: {
           amount?: number
@@ -2098,8 +2368,12 @@ export type Database = {
           id?: string
           order_id?: string | null
           payment_method?: string | null
+          pos_reference?: string | null
+          product_id?: number | null
           products?: Json | null
+          quantity?: number | null
           sale_date?: string | null
+          tenant_id?: string | null
         }
         Relationships: [
           {
@@ -2107,6 +2381,27 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_analytics"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "sales_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2734,6 +3029,36 @@ export type Database = {
             referencedColumns: ["product_id"]
           },
         ]
+      }
+      weather_cache: {
+        Row: {
+          created_at: string | null
+          date: string
+          humidity: number | null
+          id: string
+          temperature: number | null
+          tenant_id: string
+          weather_code: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          humidity?: number | null
+          id?: string
+          temperature?: number | null
+          tenant_id: string
+          weather_code?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          humidity?: number | null
+          id?: string
+          temperature?: number | null
+          tenant_id?: string
+          weather_code?: string | null
+        }
+        Relationships: []
       }
       "Wisebite-data": {
         Row: {
