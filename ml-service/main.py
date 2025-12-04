@@ -149,7 +149,7 @@ async def recommend_purchase(request: PurchaseRecommendationRequest):
     Generate purchase recommendation based on stock policies and forecast
     """
         
-        recommended_qty = round(deficit + fill_to_max)
+    recommended_qty = round(deficit + fill_to_max)
         reason = f"Projected stock ({round(projected_stock)}) below min ({request.min_stock})"
     
     return {
