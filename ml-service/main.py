@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 import uvicorn
 import logging
+import os
 from forecasting import Forecaster
 
 # Configure logging
@@ -160,4 +161,5 @@ async def recommend_purchase(request: PurchaseRequest):
     }
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
