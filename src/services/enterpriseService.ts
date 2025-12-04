@@ -68,6 +68,15 @@ export const enterpriseService = {
         });
     },
 
+    async getScenarioForecast(productId: string, days: number = 7, scenario: 'base' | 'optimistic' | 'crisis' = 'base', regressors?: any[]) {
+        return this.callFunction('forecasting-engine/forecast-scenario', 'POST', {
+            product_id: productId,
+            days,
+            scenario,
+            regressors
+        });
+    },
+
     async getExpirationRisk() {
         return this.callFunction('forecasting-engine/forecast-expiration-risk', 'POST', {});
     },

@@ -64,7 +64,7 @@ class Forecaster:
                 df = pd.merge(df, regressor_df, on='ds', how='left')
                 
                 # Fill missing values if any (Prophet doesn't like NaNs in regressors)
-                df = df.fillna(method='ffill').fillna(0)
+                df = df.ffill().fillna(0)
 
             m.fit(df)
             
@@ -80,7 +80,7 @@ class Forecaster:
                 future = pd.merge(future, regressor_df, on='ds', how='left')
                 
                 # Fill missing future regressor values (e.g. with last known value)
-                future = future.fillna(method='ffill').fillna(0)
+                future = future.ffill().fillna(0)
 
             # Predict
             forecast = m.predict(future)
@@ -171,3 +171,47 @@ class Forecaster:
             'waste_risk_score': round(waste_risk, 2),
             'days_of_inventory': round(days_of_inventory, 1)
         }
+    
+    def calculate_expiration_risk(self, stock: float, days_to_expiry: int, avg_daily_sales: float) -> float:
+        """
+        Calculate expiration risk score (0-1) based on stock levels and expiry date
+        
+        Args:
+            stock: Current stock quantity
+            days_to_expiry: Days until product expires
+            avg_daily_sales: Average daily sales rate
+            
+        Returns:
+            float: Risk score between 0 and 1
+        """
+        if avg_daily_sales <= 0:
+            avg_daily_sales = 0.1  # Avoid division by zero
+        
+        days_of_inventory = stock / avg_daily_sales
+        
+        if days_to_expiry <= 0:
+            return 1.0  # Already expired
+        elif days_of_inventory > days_to_expiry:
+            # We have more stock than we can sell in time
+            return min(1.0, (days_of_inventory - days_to_expiry) / days_of_inventory + 0.5)
+        elif days_to_expiry < 3:
+            return 0.7  # Close to expiry
+        else:
+            return 0.1  # Safe
+    
+    def calculate_waste_risk(self, risk_score: float, product_cost: float) -> float:
+        """
+        Calculate waste risk considering the value at risk
+        
+        Args:
+            risk_score: Expiration risk score
+            product_cost: Cost per unit of product
+            
+        Returns:
+            float: Waste risk score weighted by cost
+        """
+        # Weight risk by cost (higher cost items get higher waste risk scores)
+        cost_multiplier = min(2.0, 1 + (product_cost / 100))  # Cap at 2x
+        waste_risk = risk_score * cost_multiplier
+        
+        return min(1.0, round(waste_risk, 2))  # Cap at 1.0

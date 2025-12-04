@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 import uvicorn
 import logging
+import os
 from forecasting import Forecaster
 
 # Configure logging
@@ -144,13 +145,31 @@ async def predict_risk(request: RiskRequest):
     }
 
 @app.post("/recommend/purchase")
-async def recommend_purchase(request: PurchaseRecommendationRequest):
+async def recommend_purchase(request: PurchaseRequest):
     """
     Generate purchase recommendation based on stock policies and forecast
     """
-        
-        recommended_qty = round(deficit + fill_to_max)
+    logger.info(f"Calculating purchase recommendation for product {request.product_id}")
+    
+    # Calculate projected stock after 7 days
+    projected_stock = request.current_stock - request.predicted_demand_next_7d
+    
+    # If projected stock falls below minimum, calculate deficit
+    deficit = 0
+    if projected_stock < request.min_stock:
+        deficit = request.min_stock - projected_stock
+    
+    # Optionally fill to max stock level
+    fill_to_max = 0
+    if deficit > 0:
+        fill_to_max = (request.max_stock - request.min_stock) * 0.5  # Fill halfway to max
+    
+    recommended_qty = round(deficit + fill_to_max)
+    
+    if recommended_qty > 0:
         reason = f"Projected stock ({round(projected_stock)}) below min ({request.min_stock})"
+    else:
+        reason = "Stock levels are adequate"
     
     return {
         "product_id": request.product_id,
@@ -160,4 +179,5 @@ async def recommend_purchase(request: PurchaseRecommendationRequest):
     }
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

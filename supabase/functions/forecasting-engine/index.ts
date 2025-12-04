@@ -110,6 +110,88 @@ serve(async (req) => {
             return new Response(JSON.stringify({ product_id, forecast, source: 'mock' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 
+        // POST /forecasting-engine/forecast-scenario
+        if (req.method === 'POST' && path === 'forecast-scenario') {
+            const { product_id, days = 7, scenario = 'base', regressors = null } = await req.json()
+
+            const mlServiceUrl = Deno.env.get('ML_SERVICE_URL')
+
+            // If ML service is configured, use it
+            if (mlServiceUrl) {
+                try {
+                    // Fetch historical sales data
+                    const { data: salesHistory } = await supabase
+                        .from('sales')
+                        .select('sale_date, quantity')
+                        .eq('product_id', product_id)
+                        .eq('tenant_id', user!.id)
+                        .order('sale_date', { ascending: true })
+
+                    // Transform for ML service
+                    const history = salesHistory?.map(s => ({
+                        date: s.sale_date.split('T')[0],
+                        value: s.quantity
+                    })) || []
+
+                    // Call ML Service with scenario
+                    const response = await fetch(`${mlServiceUrl}/predict/scenario`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sales_history: history,
+                            days_to_forecast: days,
+                            scenario,
+                            regressors
+                        })
+                    })
+
+                    if (!response.ok) throw new Error(`ML Service error: ${response.statusText}`)
+
+                    const result = await response.json()
+
+                    // Save forecast to DB
+                    if (result.forecast && Array.isArray(result.forecast)) {
+                        const forecastsToUpsert = result.forecast.map((f: any) => ({
+                            product_id: product_id,
+                            forecast_date: f.date,
+                            predicted_demand: f.predicted_demand,
+                            confidence_lower: f.confidence_lower || 0,
+                            confidence_upper: f.confidence_upper || 0,
+                            scenario: scenario,
+                            model_version: 'prophet-v1-scenario'
+                        }))
+
+                        await supabase
+                            .from('demand_forecasts')
+                            .upsert(forecastsToUpsert, { onConflict: 'product_id,forecast_date,scenario' })
+                    }
+
+                    return new Response(JSON.stringify(result), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+
+                } catch (err) {
+                    console.error('ML Service failed for scenario, falling back to mock:', err)
+                    // Fallthrough to mock logic below
+                }
+            }
+
+            // Fallback / Mock Logic
+            const multiplier = scenario === 'optimistic' ? 1.25 : scenario === 'crisis' ? 0.65 : 1.0
+            const forecast = Array.from({ length: days }, (_, i) => {
+                const date = new Date()
+                date.setDate(date.getDate() + i + 1)
+                const baseDemand = Math.floor(Math.random() * 20) + 5
+                return {
+                    date: date.toISOString().split('T')[0],
+                    predicted_demand: Math.round(baseDemand * multiplier),
+                    confidence_lower: 0,
+                    confidence_upper: 0,
+                    scenario
+                }
+            })
+
+            return new Response(JSON.stringify({ scenario, forecast, source: 'mock' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        }
+
         // POST /forecasting-engine/forecast-expiration-risk
         if (req.method === 'POST' && path === 'forecast-expiration-risk') {
             // Calculate risk based on stock vs avg daily sales vs days to expiration

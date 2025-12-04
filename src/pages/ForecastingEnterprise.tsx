@@ -43,20 +43,10 @@ const ForecastingEnterprise = () => {
     const loadForecast = async (productId: string) => {
         setLoading(true);
         try {
-            const data = await enterpriseService.getDemandForecast(productId, 30);
+            // Use the new scenario-based forecast endpoint
+            const data = await enterpriseService.getScenarioForecast(productId, 30, scenario);
             if (data && data.forecast) {
-                // Apply scenario modifiers
-                const modifiedForecast = data.forecast.map((point: any) => {
-                    let modifier = 1;
-                    if (scenario === 'optimistic') modifier = 1.25; // +25%
-                    if (scenario === 'crisis') modifier = 0.65; // -35%
-
-                    return {
-                        ...point,
-                        predicted_demand: Math.round(point.predicted_demand * modifier)
-                    };
-                });
-                setForecast(modifiedForecast);
+                setForecast(data.forecast);
             }
         } catch (error) {
             console.error("Error loading forecast:", error);
