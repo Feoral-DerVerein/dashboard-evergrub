@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation, Link } from "react-router-dom";
-import { BarChart3, LogOut, Package, Truck, Plug, FileText, Settings, CreditCard, User, MessageSquare, Brain, Bot } from "lucide-react";
+import { BarChart3, LogOut, Package, Truck, Plug, FileText, Settings, CreditCard, User, MessageSquare, Brain, Bot, Scale, Heart } from "lucide-react";
+import { KPIHeader } from "./KPIHeader";
 import {
   Sidebar,
   SidebarContent,
@@ -33,6 +34,8 @@ const menuItems = [
   { title: "Inventory Products", url: "/inventory-products", icon: Package },
   { title: "Notes", url: "/notes", icon: FileText },
   { title: "Delivery", url: "/delivery", icon: Truck },
+  { title: "Legal Compliance", url: "/legal", icon: Scale },
+  { title: "Donate", url: "/donate", icon: Heart },
 ];
 
 function AppSidebar() {
@@ -52,9 +55,9 @@ function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r border-gray-100 bg-white">
       <SidebarHeader className="border-b border-gray-100 p-4 bg-white">
         <div className="flex items-center justify-center">
-          <img 
-            src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" 
-            alt="Main Logo" 
+          <img
+            src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png"
+            alt="Main Logo"
             className={isCollapsed ? "h-8 w-8 object-contain" : "h-10 w-auto"}
           />
         </div>
@@ -66,8 +69,8 @@ function AppSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
+                  <SidebarMenuButton
+                    asChild
                     isActive={currentPath === item.url}
                     tooltip={item.title}
                   >
@@ -137,8 +140,9 @@ const AppLayout = () => {
       <div className="min-h-screen flex w-full bg-gray-50">
         <AppSidebar />
         <main className="flex-1 glass-card">
-          <div className="h-12 border-b border-gray-100 flex items-center px-4">
+          <div className="h-14 border-b border-gray-100 flex items-center px-4 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
             <SidebarTrigger />
+            <KPIHeader />
           </div>
           <Outlet />
         </main>

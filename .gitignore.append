@@ -1,0 +1,7 @@
+# Add this to .gitignore to prevent committing sensitive keys
+.env.local
+.env.*.local
+
+# Supabase CLI generated files
+.branches
+supabase/.temp

@@ -112,7 +112,7 @@ const charitiesByState = {
 
 const australianStates = [
   "All States",
-  "New South Wales", 
+  "New South Wales",
   "Victoria",
   "Queensland",
   "Western Australia",
@@ -127,7 +127,7 @@ const CharityCard = ({
   charity: CharityProps;
 }) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  
+
   const handleOpenForm = () => {
     setIsFormOpen(true);
   };
@@ -148,13 +148,13 @@ const CharityCard = ({
           </Button>
         </CardFooter>
       </Card>
-      
+
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Donate to {charity.name}</DialogTitle>
           </DialogHeader>
-          <DonationForm onClose={() => setIsFormOpen(false)} />
+          <DonationForm onClose={() => setIsFormOpen(false)} ngoName={charity.name} />
         </DialogContent>
       </Dialog>
     </>
@@ -164,25 +164,52 @@ const CharityCard = ({
 const Donate = () => {
   const [selectedState, setSelectedState] = useState("All States");
   const charities = charitiesByState[selectedState as keyof typeof charitiesByState];
+  const { user } = useAuth();
+  const [donations, setDonations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchDonations();
+    }
+  }, [user]);
+
+  const fetchDonations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('donations')
+        .select('*')
+        .eq('tenant_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setDonations(data || []);
+    } catch (error) {
+      console.error("Error fetching donations:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:flex md:items-center md:justify-center">
-      <div className="max-w-md md:max-w-7xl mx-auto bg-white min-h-screen md:min-h-0 md:rounded-xl md:shadow-sm md:my-0">
-        <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
-          <div className="flex items-center mb-1">
-            <Link to="/dashboard" className="mr-2">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-            <h1 className="text-xl font-semibold">Donate</h1>
-          </div>
-        </header>
+    <div className="max-w-md md:max-w-7xl mx-auto bg-white min-h-screen md:min-h-0 md:rounded-xl md:shadow-sm md:my-0 w-full">
+      <header className="px-6 pt-8 pb-6 sticky top-0 bg-white z-10 border-b">
+        <div className="flex items-center mb-1">
+          <Link to="/dashboard" className="mr-2">
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <h1 className="text-xl font-semibold">Donate</h1>
+        </div>
+      </header>
 
-        <main className="px-6 py-4">
+      <main className="px-6 py-4 space-y-8">
+        <section>
           <div className="mb-6">
             <h2 className="text-lg font-medium mb-2">Support Food Charity</h2>
             <p className="text-gray-600 text-sm mb-4">
               Help those in need by donating to food banks making a difference.
             </p>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium mb-2">Select your state:</label>
               <Select value={selectedState} onValueChange={setSelectedState}>
@@ -205,11 +232,54 @@ const Donate = () => {
               <CharityCard key={charity.name} charity={charity} />
             ))}
           </div>
-        </main>
+        </section>
 
-        <BottomNav />
-      </div>
-    </div>;
+        <section>
+          <h2 className="text-lg font-medium mb-4">Your Donations</h2>
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>NGO</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-4">Loading...</TableCell>
+                    </TableRow>
+                  ) : donations.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-4 text-gray-500">No donations yet.</TableCell>
+                    </TableRow>
+                  ) : (
+                    donations.map((donation) => (
+                      <TableRow key={donation.id}>
+                        <TableCell className="font-medium">{donation.ngo}</TableCell>
+                        <TableCell>{donation.quantity}</TableCell>
+                        <TableCell>
+                          <Badge variant={donation.status === 'delivered' ? 'default' : 'secondary'}>
+                            {donation.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(donation.created_at).toLocaleDateString()}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </section>
+      </main>
+
+      <BottomNav />
+    </div>
+  </div>;
 };
 
 export default Donate;

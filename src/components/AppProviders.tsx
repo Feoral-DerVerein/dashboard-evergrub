@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { OrderProvider } from "@/context/OrderContext";
+import { TenantProvider } from "@/context/TenantContext";
 
 const queryClient = new QueryClient();
 
@@ -19,11 +20,13 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
       <TooltipProvider>
         <BrowserRouter>
           <AuthProvider>
-            <OrderProvider>
-              {children}
-              <Toaster />
-              <Sonner />
-            </OrderProvider>
+            <TenantProvider>
+              <OrderProvider>
+                {children}
+                <Toaster />
+                <Sonner />
+              </OrderProvider>
+            </TenantProvider>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

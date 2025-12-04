@@ -10,7 +10,7 @@ import Notifications from "@/pages/Notifications";
 import KPI from "@/pages/KPI";
 import Ads from "@/pages/Ads";
 import CreateAd from "@/pages/CreateAd";
-import Donate from "@/pages/Donate";
+import DonationsPage from "@/pages/DonationsPage";
 import Users from "@/pages/Users";
 import PaymentPortal from "@/pages/PaymentPortal";
 import Pricing from "@/pages/Pricing";
@@ -34,20 +34,26 @@ import Notes from "@/pages/Notes";
 import PredictiveAnalytics from "@/pages/PredictiveAnalytics";
 import Wishlist from "@/pages/Wishlist";
 import Autopilot from "@/pages/Autopilot";
+import TestDataInjector from "@/pages/TestDataInjector";
+import Dashboard from "@/pages/Dashboard";
+import InventoryEnterprise from "@/pages/InventoryEnterprise";
+import ForecastingEnterprise from "@/pages/ForecastingEnterprise";
+import LegalCompliance from "@/pages/LegalCompliance";
+import AladdinAI from "@/pages/AladdinAI";
 
 const MainRoutes = () => {
   const { user } = useAuth();
-  
+
   return (
     <Routes>
       {/* Auth routes - only accessible when not logged in */}
       <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
       <Route path="/apple" element={<AuthRoute><Apple /></AuthRoute>} />
-      
-      
+
+
       {/* Pricing route */}
       <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
-      
+
       {/* Protected routes - only accessible when logged in */}
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route path="/dashboard" element={<Index />} />
@@ -58,18 +64,18 @@ const MainRoutes = () => {
         <Route path="/kpi" element={<KPI />} />
         <Route path="/ads" element={<Ads />} />
         <Route path="/ads/create" element={<CreateAd />} />
-        <Route path="/donate" element={<Donate />} />
+        <Route path="/donate" element={<DonationsPage />} />
         <Route path="/users" element={<Users />} />
         <Route path="/payment" element={<PaymentPortal />} />
-        
+
         <Route path="/import" element={<ImportProducts />} />
         <Route path="/sync" element={<ProductSync />} />
         <Route path="/inventory-products" element={<InventoryProducts />} />
-        
+
         <Route path="/square-callback" element={<SquareCallback />} />
         <Route path="/square-dashboard" element={<SquareDashboard />} />
         <Route path="/square-settings" element={<SquareSettings />} />
-        
+
         <Route path="/delivery" element={<DeliveryDashboard />} />
         <Route path="/deliverect" element={<DeliveryDashboard />} /> {/* Legacy redirect */}
         <Route path="/integrations" element={<Integrations />} />
@@ -77,14 +83,21 @@ const MainRoutes = () => {
         <Route path="/predictive-analytics" element={<PredictiveAnalytics />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/autopilot" element={<Autopilot />} />
-        
+        <Route path="/test-data" element={<TestDataInjector />} />
+        <Route path="/dashboard-new" element={<Dashboard />} />
+        <Route path="/inventory-enterprise" element={<InventoryEnterprise />} />
+        <Route path="/forecasting" element={<ForecastingEnterprise />} />
+        <Route path="/legal" element={<LegalCompliance />} />
+        {/* Redirect /aladdin to main dashboard - AI is now integrated there */}
+        <Route path="/aladdin" element={<Navigate to="/dashboard" replace />} />
+
       </Route>
-      
+
       {/* Default redirects */}
       <Route path="/" element={
         user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
       } />
-      
+
       {/* 404 page */}
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -9,6 +9,8 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { toast } from "sonner";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name is required" }),
@@ -23,6 +25,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface DonationFormProps {
   onClose: () => void;
+  ngoName?: string;
   product?: {
     id: number;
     name: string;
@@ -34,12 +37,13 @@ interface DonationFormProps {
   } | null;
 }
 
-export function DonationForm({ onClose, product }: DonationFormProps) {
+export function DonationForm({ onClose, ngoName, product }: DonationFormProps) {
+  const { user } = useAuth();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      email: "",
+      name: user?.user_metadata?.full_name || "",
+      email: user?.email || "",
       phone: "",
       amount: product ? product.quantity.toString() : "",
       foodType: product ? product.name : "",
@@ -47,12 +51,35 @@ export function DonationForm({ onClose, product }: DonationFormProps) {
     },
   });
 
-  function onSubmit(data: FormValues) {
-    toast.success("Thank you for your donation!", {
-      description: `We will contact you soon about your donation of ${data.amount} of ${data.foodType}.`,
-      duration: 5000,
-    });
-    onClose();
+  async function onSubmit(data: FormValues) {
+    if (!user) {
+      toast.error("You must be logged in to donate");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('donations').insert({
+        tenant_id: user.id,
+        ngo: ngoName || "General Donation",
+        quantity: parseFloat(data.amount) || 0, // Assuming amount is numeric for now, or we store as text if schema allows
+        status: 'pending',
+        // We might want to store more details in a JSON column or separate columns if the schema evolves
+        // For now, we'll map what we can to the existing schema
+        // Note: The schema has 'quantity' as numeric. If 'amount' is text (e.g. "5 boxes"), this might fail.
+        // Let's assume for now the user enters a number.
+      });
+
+      if (error) throw error;
+
+      toast.success("Thank you for your donation!", {
+        description: `We will contact you soon about your donation of ${data.amount} of ${data.foodType} to ${ngoName || 'us'}.`,
+        duration: 5000,
+      });
+      onClose();
+    } catch (error) {
+      console.error("Error submitting donation:", error);
+      toast.error("Failed to submit donation. Please try again.");
+    }
   }
 
   return (
@@ -105,9 +132,9 @@ export function DonationForm({ onClose, product }: DonationFormProps) {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>Quantity (Units/Kg)</FormLabel>
               <FormControl>
-                <Input placeholder="How much food can you donate?" {...field} />
+                <Input type="number" placeholder="How much food can you donate?" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -144,7 +171,7 @@ export function DonationForm({ onClose, product }: DonationFormProps) {
 
         <div className="flex gap-2 justify-end">
           <Button variant="outline" type="button" onClick={onClose}>Cancel</Button>
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Submit Donation</Button>
         </div>
       </form>
     </Form>

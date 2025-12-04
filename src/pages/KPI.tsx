@@ -27,7 +27,7 @@ import UploadTrainingDataDialog from "@/components/ai/UploadTrainingDataDialog";
 import { AustralianComplianceDialog } from "@/components/AustralianComplianceDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { DynamicGreeting } from '@/components/DynamicGreeting';
-import ChatBot from "@/components/ChatBot";
+import { AladdinChatPanel } from "@/components/ai/AladdinChatPanel";
 import { ActionDetailsDialog } from "@/components/ActionDetailsDialog";
 import { aiInsightsService } from "@/services/aiInsightsService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -227,14 +227,14 @@ const SustainabilityCard = ({
   colorScheme?: 'blue' | 'green';
 }) => {
   return <div className="apple-card-hover p-4 h-full min-h-28 flex flex-col justify-between bg-white backdrop-blur-sm border border-gray-200">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-foreground text-sm font-medium">{label}</span>
-      </div>
-      <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-semibold text-blue-900">{value}</span>
-        <span className="text-emerald-600 text-sm font-medium">{subtext}</span>
-      </div>
-    </div>;
+    <div className="flex items-center gap-2 mb-1">
+      <span className="text-foreground text-sm font-medium">{label}</span>
+    </div>
+    <div className="flex items-baseline gap-2">
+      <span className="text-2xl font-semibold text-blue-900">{value}</span>
+      <span className="text-emerald-600 text-sm font-medium">{subtext}</span>
+    </div>
+  </div>;
 };
 const InsightCard = ({
   label,
@@ -458,11 +458,11 @@ const KPI = () => {
 
         // Convert markdown to plain text for PDF
         const cleanText = reportData.report.replace(/#{1,6}\s/g, '') // Remove markdown headers
-        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markdown
-        .replace(/\*(.*?)\*/g, '$1') // Remove italic markdown
-        .replace(/✅|❌/g, '') // Remove emoji symbols
-        .split('\n').filter(line => line.trim()) // Remove empty lines
-        .join('\n');
+          .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markdown
+          .replace(/\*(.*?)\*/g, '$1') // Remove italic markdown
+          .replace(/✅|❌/g, '') // Remove emoji symbols
+          .split('\n').filter(line => line.trim()) // Remove empty lines
+          .join('\n');
 
         // Add title
         pdf.setFontSize(16);
@@ -655,44 +655,44 @@ const KPI = () => {
     }
   };
   return <div className="min-h-screen bg-white pb-20 md:pb-0">
-      <div className="w-full min-h-screen animate-fade-in">
-          <header className="px-6 pt-8 pb-6">
-            <div className="flex justify-between items-center mb-1">
-              <div>
-                
-                <div className="flex justify-center mb-4">
-                  
-                </div>
-                
-                
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Avatar className="h-14 w-14 cursor-pointer absolute top-2 right-2">
-                    <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
-                    <AvatarFallback>O</AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-white z-50">
-                  <DropdownMenuItem asChild>
-                    <Link to="/configuration" className="flex items-center gap-2 w-full">
-                      <Settings className="h-4 w-4" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/pricing" className="flex items-center gap-2 w-full">
-                      <CreditCard className="h-4 w-4" />
-                      Pricing
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/integrations" className="flex items-center gap-2 w-full">
-                      <Plug className="h-4 w-4" />
-                      Integrations
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={async () => {
+    <div className="w-full min-h-screen animate-fade-in">
+      <header className="px-6 pt-8 pb-6">
+        <div className="flex justify-between items-center mb-1">
+          <div>
+
+            <div className="flex justify-center mb-4">
+
+            </div>
+
+
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="h-14 w-14 cursor-pointer absolute top-2 right-2">
+                <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
+                <AvatarFallback>O</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-white z-50">
+              <DropdownMenuItem asChild>
+                <Link to="/configuration" className="flex items-center gap-2 w-full">
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/pricing" className="flex items-center gap-2 w-full">
+                  <CreditCard className="h-4 w-4" />
+                  Pricing
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/integrations" className="flex items-center gap-2 w-full">
+                  <Plug className="h-4 w-4" />
+                  Integrations
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={async () => {
                 try {
                   await signOut();
                   toast.success("Session closed successfully");
@@ -702,327 +702,327 @@ const KPI = () => {
                   toast.error("Error logging out");
                 }
               }}>
-                    <LogOut className="h-4 w-4" />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </header>
+                <LogOut className="h-4 w-4" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
 
-          {/* Main dashboard content and chart - Moved to top */}
-          <section className="px-6 mt-0 mb-8 space-y-6">
-            {/* Time Filters */}
-            
-
-            {/* Performance Title */}
-            <h2 className="text-2xl font-semibold text-gray-900">Performance</h2>
-
-            {/* KPI Metrics - Expanded with Profit, Savings, Revenue */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <MetricCard icon={AreaChart} value={realData.totalSales} label="Total Sales" trend={realData.salesTrend} />
-              <MetricCard icon={Lock} value={realData.transactions} label="Transactions" trend={realData.transactionsTrend} />
-              <MetricCard icon={Package} value={realData.profit} label="Profit" trend={realData.profitTrend} />
-              <MetricCard icon={AlertTriangle} value={realData.savings} label="Operational Savings" trend={realData.savingsTrend} />
-              <MetricCard icon={Plus} value={realData.revenue} label="Revenue" trend={realData.revenueTrend} />
-              <MetricCard icon={User} value={realData.avgOrderValue} label="Avg Order Value" trend={realData.avgOrderTrend} />
-            </div>
-
-            {/* Deliverect Quick Access Button */}
-            <Card className="bg-gradient-to-r from-blue-500 to-indigo-600 border-0 shadow-lg hover:shadow-xl transition-shadow">
-              
-            </Card>
+      {/* Main dashboard content and chart - Moved to top */}
+      <section className="px-6 mt-0 mb-8 space-y-6">
+        {/* Time Filters */}
 
 
+        {/* Performance Title */}
+        <h2 className="text-2xl font-semibold text-gray-900">Performance</h2>
 
-      {aiInsights && <div className="space-y-4">
-      {/* Main AI Summary */}
-      <div className="apple-card-hover p-6 bg-white backdrop-blur-sm border border-gray-200">
-        <h4 className="font-semibold mb-2 text-indigo-900">AI Summary</h4>
-        <p className="text-sm text-indigo-700/80 mb-3">{aiInsights.executive_summary}</p>
-        {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && <div>
-            <h5 className="text-sm font-medium mb-1 text-indigo-800">Recommendations</h5>
-            <ul className="list-disc pl-5 text-sm text-indigo-700">
-              {aiInsights.recommendations.slice(0, 3).map((r: any, i: number) => <li key={i}>{typeof r === 'string' ? r : r.title || JSON.stringify(r)}</li>)}
-            </ul>
-          </div>}
-      </div>
-
-      {/* Sustainability Impact Cards */}
-      {aiInsights.sustainability_impact && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
-            <h4 className="font-semibold text-emerald-800 mb-2">Sustainability Impact</h4>
-            <div className="space-y-3">
-              <div>
-                <p className="text-emerald-700/80 text-sm font-medium">CO₂ Saved</p>
-                <p className="text-2xl font-bold text-emerald-900">{aiInsights.sustainability_impact.co2_saved_kg} kg</p>
-                <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.co2_saved_change}</p>
-              </div>
-              <div>
-                <p className="text-emerald-700/80 text-sm font-medium">Waste Reduced</p>
-                <p className="text-2xl font-bold text-emerald-900">{aiInsights.sustainability_impact.waste_reduced_percentage}%</p>
-                <p className="text-emerald-600 text-sm font-medium">Target: {aiInsights.sustainability_impact.waste_target}%</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
-            <h4 className="font-semibold text-blue-800 mb-2">Customer Insights</h4>
-            <div className="space-y-3">
-              <div>
-                <p className="text-foreground text-sm font-medium">Conversion Rate</p>
-                <p className="text-2xl font-bold text-blue-900">{aiInsights.customer_insights.conversion_rate}%</p>
-                <p className="text-emerald-600 text-sm font-medium">{aiInsights.customer_insights.conversion_change}</p>
-              </div>
-              <div>
-                <p className="text-foreground text-sm font-medium">Return Rate</p>
-                <p className="text-2xl font-bold text-blue-900">{aiInsights.customer_insights.return_rate}%</p>
-                <p className="text-orange-600 text-sm font-medium">{aiInsights.customer_insights.return_change}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
-            <h4 className="font-semibold text-purple-800 mb-2">Savings & Food Waste</h4>
-            <div className="space-y-3">
-              <div>
-                <p className="text-purple-700/80 text-sm font-medium">Cost Savings</p>
-                <p className="text-2xl font-bold text-purple-900">${aiInsights.sustainability_impact.cost_savings}</p>
-                <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.cost_savings_change}</p>
-              </div>
-              <div>
-                <p className="text-purple-700/80 text-sm font-medium">Food Waste Reduced</p>
-                <p className="text-2xl font-bold text-purple-900">{aiInsights.sustainability_impact.food_waste_reduced_kg} kg</p>
-                <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.food_waste_change}</p>
-              </div>
-            </div>
-          </div>
-        </div>}
-    </div>}
-          </section>
-
-          <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
-            {/* KPI groups in a single row */}
-            <section className="md:col-span-4 order-1 md:order-0 mt-6">
-              {/* Forecasting Overview */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Forecasting Overview</h2>
-                </div>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                  {/* Sales Forecast Card - Dynamic Data */}
-                  <SalesForecastCard data={dashboardData?.salesForecast} isLoading={isDashboardLoading} />
-
-                  {/* Key Influencing Factors Card - Dynamic Data */}
-                  <InfluencingFactorsCard data={dashboardData?.influencingFactors} isLoading={isDashboardLoading} />
-                </div>
-
-                {/* Top Products Forecast Table - Dynamic Data */}
-                <TopProductsForecastCard data={dashboardData?.topProducts} isLoading={isDashboardLoading} />
-              </div>
-
-              {/* Forecast Engine Section */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Forecast Engine</h2>
-                </div>
-                <ForecastEngineCard isLoading={isDashboardLoading} />
-              </div>
-
-              {/* Pricing Engine Section */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Pricing Engine</h2>
-                </div>
-                <PricingEngineCard isLoading={isDashboardLoading} />
-              </div>
-
-              {/* Inventory Optimizer Section */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Inventory Optimizer</h2>
-                </div>
-                <InventoryOptimizerCard isLoading={isDashboardLoading} />
-              </div>
-
-              {/* Risk Engine & Advanced Analytics Section */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Risk Engine</h2>
-                  <div className="flex gap-2">
-                    <FixExcelDatesButton />
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => refetchDashboard()}
-                      disabled={isDashboardLoading}
-                    >
-                      <RefreshCw className={`h-4 w-4 mr-2 ${isDashboardLoading ? 'animate-spin' : ''}`} />
-                      Actualizar
-                    </Button>
-                  </div>
-                </div>
-                <RiskEngineSection data={dashboardData?.riskEngine} isLoading={isDashboardLoading} />
-              </div>
-
-              {/* Recommendation Engine */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Recommendation Engine</h2>
-                </div>
-                <RecommendationEngineCard data={dashboardData?.recommendations} isLoading={isDashboardLoading} />
-              </div>
-
-              {/* Business Health */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Business Health</h2>
-                </div>
-                <BusinessHealthCards data={dashboardData?.businessHealth} isLoading={isDashboardLoading} />
-              </div>
-
-              {/* Alert Center */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Alert Center</h2>
-                </div>
-                <AlertCenterCard data={dashboardData?.alerts} isLoading={isDashboardLoading} />
-              </div>
-
-              {/* Sustainability Impact */}
-              <div className="mb-8">
-                <h3 className="text-2xl font-bold mb-4">Sustainability Impact</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <SustainabilityCard label="CO₂ Saved" value={realData.co2Saved} subtext={`${realData.co2Change} vs last week`} icon="🌱" colorScheme="blue" />
-                  <SustainabilityCard label="Waste Reduced" value={realData.wasteReduced} subtext={`Target: ${realData.wasteTarget}`} icon="♻️" colorScheme="blue" />
-                </div>
-              </div>
-
-              {/* Customer Insights */}
-              <div className="mb-8">
-                <h3 className="text-2xl font-bold mb-4">Customer Insights</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <InsightCard label="Conversion Rate" value={realData.conversionRate} trend={realData.conversionChange.replace('+', '')} icon="📊" />
-                  <InsightCard label="Return Rate" value={realData.returnRate} trend={realData.returnChange.replace('+', '')} icon="🔄" />
-                </div>
-              </div>
-
-              {/* Savings & Food Waste */}
-              <div className="mb-8">
-                <h3 className="text-2xl font-bold mb-4">Savings & Food Waste</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <SustainabilityCard label="Cost Savings" value={realData.costSavings} subtext={`${realData.costChange} vs last month`} icon="💰" colorScheme="green" />
-                  <SustainabilityCard label="Food Waste Reduced" value={realData.foodWasteReduced} subtext={`${realData.foodWasteChange} vs last month`} icon="🍽️" colorScheme="green" />
-                </div>
-              </div>
-            </section>
-
-            {/* AI Predictive Insights */}
-            
-
-            {/* Surprise Bags Performance */}
-            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
-              <h3 className="text-lg font-semibold mb-4">Surprise Bags Performance</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
-                <SustainabilityCard label="Active Surprise Bags" value={products.filter(p => p.isSurpriseBag && p.quantity > 0).length.toString()} subtext={`Total created: ${products.filter(p => p.isSurpriseBag).length}`} />
-                <SustainabilityCard label="Surprise Bag Revenue" value={`$${Math.round(parseFloat(realData.totalSales.replace(/[$,]/g, '')) * 0.15).toLocaleString()}`} subtext="15% of total sales" />
-                <SustainabilityCard label="Food Waste Prevented" value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 2.5)} kg`} subtext="Through surprise bags" />
-                <SustainabilityCard label="Environmental Impact" value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 1.8)} kg CO₂`} subtext="Emissions saved" />
-              </div>
-            </section>
-
-            {/* Customer Satisfaction & Performance */}
-            <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
-              <h3 className="text-lg font-semibold mb-4">Customer Satisfaction & Performance</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
-                <RatingInsightCard label="Surprise Bag rating" rating={4.72} status="Looks good" />
-                <RatingInsightCard label="Store experience rating" rating={4.75} status="Looks good" />
-                <RatingInsightCard label="Cancellations" percentage={0} status="Looks good" />
-                <RatingInsightCard label="Refunds" percentage={0} status="Looks good" />
-              </div>
-            </section>
-
-          </main>
-
-          {/* Main dashboard content and chart - Moved to bottom */}
-          
-
-          {/* Auto Tasks and Suppliers Row */}
-          <section className="px-6">
-
-            {/* Weather and Visitor Prediction Cards - Moved below Task List */}
-            <div className="grid md:grid-cols-2 gap-6 mt-6">
-              <MelbourneWeatherCard />
-
-              <div className="bg-white rounded-xl p-6 border border-gray-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-purple-500 rounded-full">
-                    <Users className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-purple-900">Visitor Prediction</h3>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-3xl font-bold text-purple-900">94</div>
-                      <p className="text-purple-700 text-sm">Expected visitors today</p>
-                    </div>
-                    <div className="flex items-center gap-1 text-green-600">
-                      <TrendingUp className="w-4 h-4" />
-                      <span className="text-sm font-medium">Up</span>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-purple-500" />
-                      <span className="text-purple-700">Peak: 1:00 PM</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-green-500" />
-                      <span className="text-purple-700">Confidence: 92%</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-purple-800">Key Factors:</p>
-                    <div className="flex flex-wrap gap-1">
-                      <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Weekday</span>
-                      <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Historical patterns</span>
-                      <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Regular hours</span>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-purple-100 rounded-lg p-3">
-                    <p className="text-purple-800 text-sm">AI recommendation: Normal staffing sufficient</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* NSW EPA Compliance Report */}
-            <div className="mt-8 max-w-md mx-auto">
-              <Card className="bg-white/80">
-                
-                
-              </Card>
-            </div>
-
-            <div className="text-center text-sm text-gray-500 space-y-2 mb-6 mt-8">
-              <div className="flex flex-col gap-4">
-                <AustralianComplianceDialog />
-                
-              </div>
-            </div>
-          </section>
+        {/* KPI Metrics - Expanded with Profit, Savings, Revenue */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <MetricCard icon={AreaChart} value={realData.totalSales} label="Total Sales" trend={realData.salesTrend} />
+          <MetricCard icon={Lock} value={realData.transactions} label="Transactions" trend={realData.transactionsTrend} />
+          <MetricCard icon={Package} value={realData.profit} label="Profit" trend={realData.profitTrend} />
+          <MetricCard icon={AlertTriangle} value={realData.savings} label="Operational Savings" trend={realData.savingsTrend} />
+          <MetricCard icon={Plus} value={realData.revenue} label="Revenue" trend={realData.revenueTrend} />
+          <MetricCard icon={User} value={realData.avgOrderValue} label="Avg Order Value" trend={realData.avgOrderTrend} />
         </div>
 
-        {/* Action Details Dialog */}
-        <ActionDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} actionDetails={currentActionDetails} onConfirm={handleConfirmAction} onCancel={handleCancelAction} />
+        {/* Deliverect Quick Access Button */}
+        <Card className="bg-gradient-to-r from-blue-500 to-indigo-600 border-0 shadow-lg hover:shadow-xl transition-shadow">
 
-      <BottomNav />
-    </div>;
+        </Card>
+
+
+
+        {aiInsights && <div className="space-y-4">
+          {/* Main AI Summary */}
+          <div className="apple-card-hover p-6 bg-white backdrop-blur-sm border border-gray-200">
+            <h4 className="font-semibold mb-2 text-indigo-900">AI Summary</h4>
+            <p className="text-sm text-indigo-700/80 mb-3">{aiInsights.executive_summary}</p>
+            {Array.isArray(aiInsights.recommendations) && aiInsights.recommendations.length > 0 && <div>
+              <h5 className="text-sm font-medium mb-1 text-indigo-800">Recommendations</h5>
+              <ul className="list-disc pl-5 text-sm text-indigo-700">
+                {aiInsights.recommendations.slice(0, 3).map((r: any, i: number) => <li key={i}>{typeof r === 'string' ? r : r.title || JSON.stringify(r)}</li>)}
+              </ul>
+            </div>}
+          </div>
+
+          {/* Sustainability Impact Cards */}
+          {aiInsights.sustainability_impact && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
+              <h4 className="font-semibold text-emerald-800 mb-2">Sustainability Impact</h4>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-emerald-700/80 text-sm font-medium">CO₂ Saved</p>
+                  <p className="text-2xl font-bold text-emerald-900">{aiInsights.sustainability_impact.co2_saved_kg} kg</p>
+                  <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.co2_saved_change}</p>
+                </div>
+                <div>
+                  <p className="text-emerald-700/80 text-sm font-medium">Waste Reduced</p>
+                  <p className="text-2xl font-bold text-emerald-900">{aiInsights.sustainability_impact.waste_reduced_percentage}%</p>
+                  <p className="text-emerald-600 text-sm font-medium">Target: {aiInsights.sustainability_impact.waste_target}%</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
+              <h4 className="font-semibold text-blue-800 mb-2">Customer Insights</h4>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-foreground text-sm font-medium">Conversion Rate</p>
+                  <p className="text-2xl font-bold text-blue-900">{aiInsights.customer_insights.conversion_rate}%</p>
+                  <p className="text-emerald-600 text-sm font-medium">{aiInsights.customer_insights.conversion_change}</p>
+                </div>
+                <div>
+                  <p className="text-foreground text-sm font-medium">Return Rate</p>
+                  <p className="text-2xl font-bold text-blue-900">{aiInsights.customer_insights.return_rate}%</p>
+                  <p className="text-orange-600 text-sm font-medium">{aiInsights.customer_insights.return_change}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="apple-card-hover p-4 bg-white backdrop-blur-sm border border-gray-200">
+              <h4 className="font-semibold text-purple-800 mb-2">Savings & Food Waste</h4>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-purple-700/80 text-sm font-medium">Cost Savings</p>
+                  <p className="text-2xl font-bold text-purple-900">${aiInsights.sustainability_impact.cost_savings}</p>
+                  <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.cost_savings_change}</p>
+                </div>
+                <div>
+                  <p className="text-purple-700/80 text-sm font-medium">Food Waste Reduced</p>
+                  <p className="text-2xl font-bold text-purple-900">{aiInsights.sustainability_impact.food_waste_reduced_kg} kg</p>
+                  <p className="text-emerald-600 text-sm font-medium">{aiInsights.sustainability_impact.food_waste_change}</p>
+                </div>
+              </div>
+            </div>
+          </div>}
+        </div>}
+      </section>
+
+      <main className="px-6 md:grid md:grid-cols-4 md:gap-6">
+        {/* KPI groups in a single row */}
+        <section className="md:col-span-4 order-1 md:order-0 mt-6">
+          {/* Forecasting Overview */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-foreground">Forecasting Overview</h2>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              {/* Sales Forecast Card - Dynamic Data */}
+              <SalesForecastCard data={dashboardData?.salesForecast} isLoading={isDashboardLoading} />
+
+              {/* Key Influencing Factors Card - Dynamic Data */}
+              <InfluencingFactorsCard data={dashboardData?.influencingFactors} isLoading={isDashboardLoading} />
+            </div>
+
+            {/* Top Products Forecast Table - Dynamic Data */}
+            <TopProductsForecastCard data={dashboardData?.topProducts} isLoading={isDashboardLoading} />
+          </div>
+
+          {/* Forecast Engine Section */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-foreground">Forecast Engine</h2>
+            </div>
+            <ForecastEngineCard isLoading={isDashboardLoading} />
+          </div>
+
+          {/* Pricing Engine Section */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-foreground">Pricing Engine</h2>
+            </div>
+            <PricingEngineCard isLoading={isDashboardLoading} />
+          </div>
+
+          {/* Inventory Optimizer Section */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-foreground">Inventory Optimizer</h2>
+            </div>
+            <InventoryOptimizerCard isLoading={isDashboardLoading} />
+          </div>
+
+          {/* Risk Engine & Advanced Analytics Section */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-foreground">Risk Engine</h2>
+              <div className="flex gap-2">
+                <FixExcelDatesButton />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refetchDashboard()}
+                  disabled={isDashboardLoading}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isDashboardLoading ? 'animate-spin' : ''}`} />
+                  Actualizar
+                </Button>
+              </div>
+            </div>
+            <RiskEngineSection data={dashboardData?.riskEngine} isLoading={isDashboardLoading} />
+          </div>
+
+          {/* Recommendation Engine */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-foreground">Recommendation Engine</h2>
+            </div>
+            <RecommendationEngineCard data={dashboardData?.recommendations} isLoading={isDashboardLoading} />
+          </div>
+
+          {/* Business Health */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-foreground">Business Health</h2>
+            </div>
+            <BusinessHealthCards data={dashboardData?.businessHealth} isLoading={isDashboardLoading} />
+          </div>
+
+          {/* Alert Center */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-foreground">Alert Center</h2>
+            </div>
+            <AlertCenterCard data={dashboardData?.alerts} isLoading={isDashboardLoading} />
+          </div>
+
+          {/* Sustainability Impact */}
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold mb-4">Sustainability Impact</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <SustainabilityCard label="CO₂ Saved" value={realData.co2Saved} subtext={`${realData.co2Change} vs last week`} icon="🌱" colorScheme="blue" />
+              <SustainabilityCard label="Waste Reduced" value={realData.wasteReduced} subtext={`Target: ${realData.wasteTarget}`} icon="♻️" colorScheme="blue" />
+            </div>
+          </div>
+
+          {/* Customer Insights */}
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold mb-4">Customer Insights</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <InsightCard label="Conversion Rate" value={realData.conversionRate} trend={realData.conversionChange.replace('+', '')} icon="📊" />
+              <InsightCard label="Return Rate" value={realData.returnRate} trend={realData.returnChange.replace('+', '')} icon="🔄" />
+            </div>
+          </div>
+
+          {/* Savings & Food Waste */}
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold mb-4">Savings & Food Waste</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <SustainabilityCard label="Cost Savings" value={realData.costSavings} subtext={`${realData.costChange} vs last month`} icon="💰" colorScheme="green" />
+              <SustainabilityCard label="Food Waste Reduced" value={realData.foodWasteReduced} subtext={`${realData.foodWasteChange} vs last month`} icon="🍽️" colorScheme="green" />
+            </div>
+          </div>
+        </section>
+
+        {/* AI Predictive Insights */}
+
+
+        {/* Surprise Bags Performance */}
+        <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
+          <h3 className="text-lg font-semibold mb-4">Surprise Bags Performance</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
+            <SustainabilityCard label="Active Surprise Bags" value={products.filter(p => p.isSurpriseBag && p.quantity > 0).length.toString()} subtext={`Total created: ${products.filter(p => p.isSurpriseBag).length}`} />
+            <SustainabilityCard label="Surprise Bag Revenue" value={`$${Math.round(parseFloat(realData.totalSales.replace(/[$,]/g, '')) * 0.15).toLocaleString()}`} subtext="15% of total sales" />
+            <SustainabilityCard label="Food Waste Prevented" value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 2.5)} kg`} subtext="Through surprise bags" />
+            <SustainabilityCard label="Environmental Impact" value={`${Math.round(products.filter(p => p.isSurpriseBag).length * 1.8)} kg CO₂`} subtext="Emissions saved" />
+          </div>
+        </section>
+
+        {/* Customer Satisfaction & Performance */}
+        <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
+          <h3 className="text-lg font-semibold mb-4">Customer Satisfaction & Performance</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
+            <RatingInsightCard label="Surprise Bag rating" rating={4.72} status="Looks good" />
+            <RatingInsightCard label="Store experience rating" rating={4.75} status="Looks good" />
+            <RatingInsightCard label="Cancellations" percentage={0} status="Looks good" />
+            <RatingInsightCard label="Refunds" percentage={0} status="Looks good" />
+          </div>
+        </section>
+
+      </main>
+
+      {/* Main dashboard content and chart - Moved to bottom */}
+
+
+      {/* Auto Tasks and Suppliers Row */}
+      <section className="px-6">
+
+        {/* Weather and Visitor Prediction Cards - Moved below Task List */}
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          <MelbourneWeatherCard />
+
+          <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-purple-500 rounded-full">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="font-semibold text-purple-900">Visitor Prediction</h3>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-purple-900">94</div>
+                  <p className="text-purple-700 text-sm">Expected visitors today</p>
+                </div>
+                <div className="flex items-center gap-1 text-green-600">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-sm font-medium">Up</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-purple-500" />
+                  <span className="text-purple-700">Peak: 1:00 PM</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                  <span className="text-purple-700">Confidence: 92%</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-purple-800">Key Factors:</p>
+                <div className="flex flex-wrap gap-1">
+                  <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Weekday</span>
+                  <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Historical patterns</span>
+                  <span className="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Regular hours</span>
+                </div>
+              </div>
+
+              <div className="bg-purple-100 rounded-lg p-3">
+                <p className="text-purple-800 text-sm">AI recommendation: Normal staffing sufficient</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* NSW EPA Compliance Report */}
+        <div className="mt-8 max-w-md mx-auto">
+          <Card className="bg-white/80">
+
+
+          </Card>
+        </div>
+
+        <div className="text-center text-sm text-gray-500 space-y-2 mb-6 mt-8">
+          <div className="flex flex-col gap-4">
+            <AustralianComplianceDialog />
+
+          </div>
+        </div>
+      </section>
+    </div>
+
+    {/* Action Details Dialog */}
+    <ActionDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} actionDetails={currentActionDetails} onConfirm={handleConfirmAction} onCancel={handleCancelAction} />
+
+    <BottomNav />
+  </div>;
 };
 export default KPI;

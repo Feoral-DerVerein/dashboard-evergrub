@@ -1,5 +1,5 @@
 import { DynamicGreeting } from '@/components/DynamicGreeting';
-import ChatBot from "@/components/ChatBot";
+import { AladdinChatPanel } from '@/components/ai/AladdinChatPanel';
 
 export const BottomNav = () => {
   return null;
@@ -11,8 +11,10 @@ const Dashboard = () => {
       {/* Welcome Banner */}
       <DynamicGreeting />
 
-      {/* AI ChatBot - Main Content */}
-      <ChatBot variant="inline" />
+      {/* Aladdin AI Assistant - Main Content */}
+      <div className="max-w-5xl mx-auto">
+        <AladdinChatPanel />
+      </div>
     </div>
   );
 };
