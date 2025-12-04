@@ -144,7 +144,7 @@ async def predict_risk(request: RiskRequest):
     }
 
 @app.post("/recommend/purchase")
-async def recommend_purchase(request: PurchaseRecommendationRequest):
+async def recommend_purchase(request: PurchaseRequest):
     """
     Generate purchase recommendation based on stock policies and forecast
     """
