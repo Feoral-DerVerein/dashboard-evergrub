@@ -150,7 +150,7 @@ async def recommend_purchase(request: PurchaseRecommendationRequest):
     """
         
     recommended_qty = round(deficit + fill_to_max)
-        reason = f"Projected stock ({round(projected_stock)}) below min ({request.min_stock})"
+    reason = f"Projected stock ({round(projected_stock)}) below min ({request.min_stock})"
     
     return {
         "product_id": request.product_id,
