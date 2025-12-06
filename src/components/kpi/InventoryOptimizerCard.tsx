@@ -6,6 +6,7 @@ import { AlertTriangle, CheckCircle, AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { performanceEngineService, InventoryItem } from "@/services/performanceEngineService";
 import { useAuth } from "@/context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 interface InventoryOptimizerCardProps {
   isLoading?: boolean;
@@ -13,13 +14,14 @@ interface InventoryOptimizerCardProps {
 
 const InventoryOptimizerCard = ({ isLoading: externalLoading }: InventoryOptimizerCardProps) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [inventoryData, setInventoryData] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       if (!user?.id) return;
-      
+
       setLoading(true);
       try {
         const data = await performanceEngineService.getInventoryData(user.id);
@@ -59,7 +61,7 @@ const InventoryOptimizerCard = ({ isLoading: externalLoading }: InventoryOptimiz
     return (
       <Card className="apple-card">
         <CardHeader>
-          <CardTitle>Optimal Inventory Levels</CardTitle>
+          <CardTitle>{t('cards.inventory_optimizer.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Skeleton className="h-[400px] w-full" />
@@ -71,7 +73,7 @@ const InventoryOptimizerCard = ({ isLoading: externalLoading }: InventoryOptimiz
   return (
     <Card className="apple-card">
       <CardHeader>
-        <CardTitle>Optimal Inventory Levels</CardTitle>
+        <CardTitle>{t('cards.inventory_optimizer.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Inventory Table */}
@@ -79,18 +81,18 @@ const InventoryOptimizerCard = ({ isLoading: externalLoading }: InventoryOptimiz
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-semibold">SKU</TableHead>
-                <TableHead className="font-semibold text-right">Current Stock</TableHead>
-                <TableHead className="font-semibold text-right">Recommended Stock</TableHead>
-                <TableHead className="font-semibold">Risk Level</TableHead>
-                <TableHead className="font-semibold">Order Suggestion</TableHead>
+                <TableHead className="font-semibold">{t('cards.inventory_optimizer.table.sku')}</TableHead>
+                <TableHead className="font-semibold text-right">{t('cards.inventory_optimizer.table.current')}</TableHead>
+                <TableHead className="font-semibold text-right">{t('cards.inventory_optimizer.table.recommended')}</TableHead>
+                <TableHead className="font-semibold">{t('cards.inventory_optimizer.table.risk')}</TableHead>
+                <TableHead className="font-semibold">{t('cards.inventory_optimizer.table.suggestion')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {inventoryData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    No hay productos disponibles para analizar
+                    {t('cards.forecast_engine.no_data')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -128,9 +130,7 @@ const InventoryOptimizerCard = ({ isLoading: externalLoading }: InventoryOptimiz
 
         {/* Explanation */}
         <p className="text-sm text-muted-foreground leading-relaxed">
-          The optimizer calculates ideal inventory by integrating demand forecasts, supplier lead times, 
-          and waste risk projections to maintain optimal stock levels while minimizing holding costs and 
-          preventing stockouts.
+          {t('cards.inventory_optimizer.explanation')}
         </p>
       </CardContent>
     </Card>

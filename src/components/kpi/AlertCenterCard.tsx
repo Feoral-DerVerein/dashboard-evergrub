@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Alert } from "@/services/dashboardAnalyticsService";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, AlertCircle, Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface AlertCenterCardProps {
   data?: Alert[];
@@ -9,6 +10,7 @@ interface AlertCenterCardProps {
 }
 
 const AlertCenterCard = ({ data, isLoading }: AlertCenterCardProps) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <Card className="p-6 animate-pulse">
@@ -50,10 +52,10 @@ const AlertCenterCard = ({ data, isLoading }: AlertCenterCardProps) => {
   if (!data || data.length === 0) {
     return (
       <Card className="p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Alerts</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.alert_center.title')}</h3>
         <div className="text-center py-8 text-muted-foreground flex flex-col items-center gap-2">
           <Info className="w-8 h-8 opacity-50" />
-          <p>No active alerts</p>
+          <p>{t('cards.alert_center.no_alerts')}</p>
         </div>
       </Card>
     );
@@ -61,7 +63,7 @@ const AlertCenterCard = ({ data, isLoading }: AlertCenterCardProps) => {
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4">Alerts</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.alert_center.title')}</h3>
       <div className="space-y-3 max-h-[400px] overflow-y-auto">
         {data.map((alert, idx) => (
           <div key={idx} className="p-4 bg-background border border-border rounded-lg">

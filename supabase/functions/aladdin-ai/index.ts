@@ -4,7 +4,12 @@ import { validateUser } from "../_shared/auth.ts"
 import { LLMClient } from "../_shared/llm-client.ts"
 import { fetchBusinessContext, contextToText } from "../_shared/business-context.ts"
 
-const SYSTEM_PROMPT = `You are **Food Aladdin**, an AI assistant specialized in food supply management, waste reduction, and regulatory compliance for the Negentropy AI platform.
+const SYSTEM_PROMPT = `You are **tu asistente de Negentropy AI** (Negentropy AI Assistant).
+IMPORTANT IDENTITY RULES:
+- NEVER introduce yourself as "Food Aladdin" or "Aladdin".
+- ALWAYS identify yourself as "tu asistente de Negentropy AI".
+- If asked who you are, say: "Soy tu asistente de Negentropy AI especializado en la gestión de alimentos."
+
 
 Your role is to help food businesses:
 - Reduce food waste and losses
@@ -139,13 +144,23 @@ serve(async (req) => {
             } catch (llmError: any) {
                 console.error('[Aladdin AI] LLM Error:', llmError)
 
+                // Check for specific error types to give better feedback
+                let errorMessage = llmError.message || 'Unknown error';
+                let isConfigError = false;
+
+                if (errorMessage.includes('No LLM API key found')) {
+                    isConfigError = true;
+                    errorMessage = "Configuration Error: No LLM API Key found. Please set GEMINI_API_KEY in Supabase secrets.";
+                }
+
                 // Fallback to keyword-based response if LLM fails
                 const fallbackResponse = generateFallbackResponse(query)
 
                 return new Response(JSON.stringify({
-                    answer: fallbackResponse.answer,
+                    answer: `⚠️ **Debug Error:** ${errorMessage}\n\n${fallbackResponse.answer}`,
                     fallback: true,
-                    error: llmError.message,
+                    error: errorMessage,
+                    isConfigError,
                     data: fallbackResponse.data
                 }), {
                     headers: { ...corsHeaders, 'Content-Type': 'application/json' }

@@ -39,6 +39,14 @@ import hiMateBanner from "@/assets/hi-mate-banner.png";
 import { useDashboardAnalytics } from "@/hooks/useDashboardAnalytics";
 import { RefreshCw } from "lucide-react";
 import { FixExcelDatesButton } from "@/components/kpi/FixExcelDatesButton";
+
+import { PrescriptiveActions } from "@/components/dashboard/PrescriptiveActions";
+import { useUnifiedDashboard } from "@/hooks/useUnifiedDashboard";
+
+import { useTranslation } from "react-i18next";
+
+import { storeProfileService } from "@/services/storeProfileService";
+import { StoreProfile } from "@/types/store.types";
 type TimeFilterPeriod = "Today" | "Week" | "Month" | "Quarter" | "Year";
 const chartDataSamples: Record<TimeFilterPeriod, {
   label: string;
@@ -265,6 +273,7 @@ const KPI = () => {
     signOut
   } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [suppliers, setSuppliers] = useState<Array<{
     id: string;
@@ -272,6 +281,7 @@ const KPI = () => {
     type: string;
   }>>([]);
   const [loadingInventory, setLoadingInventory] = useState(true);
+  const [storeProfile, setStoreProfile] = useState<StoreProfile | null>(null);
 
   // AI insights state
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
@@ -311,6 +321,17 @@ const KPI = () => {
   // Dashboard analytics with real-time data
   const { data: dashboardData, isLoading: isDashboardLoading, refetch: refetchDashboard } = useDashboardAnalytics();
 
+  // Unified Dashboard Data (Enterprise Features)
+  const {
+    kpiMetrics,
+    salesHistory,
+    stockByCategory,
+    integrations,
+    isLoading: isUnifiedLoading,
+    error: unifiedError,
+    refreshData
+  } = useUnifiedDashboard();
+
   // AI Predictive Insights state
   const [predictiveData, setPredictiveData] = useState({
     topSellingProduct: "Loading...",
@@ -326,26 +347,44 @@ const KPI = () => {
   // Load real business data
   const loadRealData = async () => {
     try {
-      // TODO: Conectar con datos reales del sistema POS
-      // Por ahora, todos los valores están en "0" hasta que se conecte el POS
-      console.log('Esperando conexión con sistema POS...');
+      if (!user?.id) return;
 
-      // Mock suppliers data para que la UI no se rompa
-      setSuppliers([{
-        id: '1',
-        name: 'Local Farm Co.',
-        type: 'produce'
-      }, {
-        id: '2',
-        name: 'Organic Supply',
-        type: 'organic'
-      }, {
-        id: '3',
-        name: 'Fresh Distributors',
-        type: 'dairy'
-      }]);
+      console.log('Loading real data for user:', user.id);
+
+      // 1. Fetch Store Profile
+      const profile = await storeProfileService.getStoreProfile(user.id);
+      if (profile) {
+        setStoreProfile(profile);
+      }
+
+      // 2. Fetch Real Products
+      setLoadingInventory(true);
+      const userProducts = await productService.getProductsByUser(user.id);
+      setProducts(userProducts);
+      setLoadingInventory(false);
+
+      // 3. Extract Suppliers from Products (using Brand/Category as proxy if no supplier field)
+      const uniqueBrands = [...new Set(userProducts.map(p => p.brand).filter(Boolean))];
+      const realSuppliers = uniqueBrands.map((brand, index) => ({
+        id: `sup-${index}`,
+        name: brand,
+        type: 'supplier'
+      }));
+
+      if (realSuppliers.length > 0) {
+        setSuppliers(realSuppliers);
+      } else {
+        // Fallback if no brands found
+        setSuppliers([
+          { id: '1', name: 'Local Farm Co.', type: 'produce' },
+          { id: '2', name: 'Organic Supply', type: 'organic' },
+          { id: '3', name: 'Fresh Distributors', type: 'dairy' }
+        ]);
+      }
+
     } catch (error) {
       console.error('Error loading real data:', error);
+      setLoadingInventory(false);
     }
   };
   useEffect(() => {
@@ -370,10 +409,12 @@ const KPI = () => {
       // Sample data structure for NSW EPA compliance report
       // In a real implementation, this would come from your database/API
       const complianceData = {
-        businessName: "WiseBite Demo Store",
-        address: "123 Main Street, Sydney, NSW 2000",
+        businessName: storeProfile?.name || "WiseBite Demo Store",
+        address: storeProfile?.location || "123 Main Street, Sydney, NSW 2000",
         ABN: "12 345 678 901",
         businessType: "Food Retail/Café",
+        reportingPeriod: "July 2024 - June 2025",
+        wasteReductionTarget: "30%",
         reportPeriod: {
           startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           endDate: new Date().toISOString().split('T')[0]
@@ -660,53 +701,16 @@ const KPI = () => {
         <div className="flex justify-between items-center mb-1">
           <div>
 
-            <div className="flex justify-center mb-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+              <div className="flex items-center gap-4">
+
+              </div>
 
             </div>
 
 
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Avatar className="h-14 w-14 cursor-pointer absolute top-2 right-2">
-                <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" alt="Ortega's logo" className="object-cover" />
-                <AvatarFallback>O</AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-white z-50">
-              <DropdownMenuItem asChild>
-                <Link to="/configuration" className="flex items-center gap-2 w-full">
-                  <Settings className="h-4 w-4" />
-                  Settings
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/pricing" className="flex items-center gap-2 w-full">
-                  <CreditCard className="h-4 w-4" />
-                  Pricing
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/integrations" className="flex items-center gap-2 w-full">
-                  <Plug className="h-4 w-4" />
-                  Integrations
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={async () => {
-                try {
-                  await signOut();
-                  toast.success("Session closed successfully");
-                  navigate("/login");
-                } catch (error) {
-                  console.error("Error logging out:", error);
-                  toast.error("Error logging out");
-                }
-              }}>
-                <LogOut className="h-4 w-4" />
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+
         </div>
       </header>
 
@@ -720,12 +724,12 @@ const KPI = () => {
 
         {/* KPI Metrics - Expanded with Profit, Savings, Revenue */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <MetricCard icon={AreaChart} value={realData.totalSales} label="Total Sales" trend={realData.salesTrend} />
-          <MetricCard icon={Lock} value={realData.transactions} label="Transactions" trend={realData.transactionsTrend} />
-          <MetricCard icon={Package} value={realData.profit} label="Profit" trend={realData.profitTrend} />
-          <MetricCard icon={AlertTriangle} value={realData.savings} label="Operational Savings" trend={realData.savingsTrend} />
-          <MetricCard icon={Plus} value={realData.revenue} label="Revenue" trend={realData.revenueTrend} />
-          <MetricCard icon={User} value={realData.avgOrderValue} label="Avg Order Value" trend={realData.avgOrderTrend} />
+          <MetricCard icon={AreaChart} value={realData.totalSales} label={t('kpi.metrics.total_sales')} trend={realData.salesTrend} />
+          <MetricCard icon={Lock} value={realData.transactions} label={t('kpi.metrics.transactions')} trend={realData.transactionsTrend} />
+          <MetricCard icon={Package} value={realData.profit} label={t('kpi.metrics.profit')} trend={realData.profitTrend} />
+          <MetricCard icon={AlertTriangle} value={realData.savings} label={t('kpi.metrics.operational_savings')} trend={realData.savingsTrend} />
+          <MetricCard icon={Plus} value={realData.revenue} label={t('kpi.metrics.revenue')} trend={realData.revenueTrend} />
+          <MetricCard icon={User} value={realData.avgOrderValue} label={t('kpi.metrics.avg_order_value')} trend={realData.avgOrderTrend} />
         </div>
 
         {/* Deliverect Quick Access Button */}
@@ -807,7 +811,7 @@ const KPI = () => {
           {/* Forecasting Overview */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-foreground">Forecasting Overview</h2>
+              <h2 className="text-2xl font-semibold text-foreground">{t('kpi_sections.forecasting_overview')}</h2>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -825,7 +829,7 @@ const KPI = () => {
           {/* Forecast Engine Section */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-foreground">Forecast Engine</h2>
+              <h2 className="text-2xl font-semibold text-foreground">{t('kpi_sections.forecast_engine')}</h2>
             </div>
             <ForecastEngineCard isLoading={isDashboardLoading} />
           </div>
@@ -833,7 +837,7 @@ const KPI = () => {
           {/* Pricing Engine Section */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-foreground">Pricing Engine</h2>
+              <h2 className="text-2xl font-semibold text-foreground">{t('kpi_sections.pricing_engine')}</h2>
             </div>
             <PricingEngineCard isLoading={isDashboardLoading} />
           </div>
@@ -841,7 +845,7 @@ const KPI = () => {
           {/* Inventory Optimizer Section */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-foreground">Inventory Optimizer</h2>
+              <h2 className="text-2xl font-semibold text-foreground">{t('kpi_sections.inventory_optimizer')}</h2>
             </div>
             <InventoryOptimizerCard isLoading={isDashboardLoading} />
           </div>
@@ -849,7 +853,7 @@ const KPI = () => {
           {/* Risk Engine & Advanced Analytics Section */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-foreground">Risk Engine</h2>
+              <h2 className="text-2xl font-semibold text-foreground">{t('kpi_sections.risk_engine')}</h2>
               <div className="flex gap-2">
                 <FixExcelDatesButton />
                 <Button
@@ -859,7 +863,7 @@ const KPI = () => {
                   disabled={isDashboardLoading}
                 >
                   <RefreshCw className={`h-4 w-4 mr-2 ${isDashboardLoading ? 'animate-spin' : ''}`} />
-                  Actualizar
+                  {t('dashboard.refresh')}
                 </Button>
               </div>
             </div>
@@ -869,7 +873,7 @@ const KPI = () => {
           {/* Recommendation Engine */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-foreground">Recommendation Engine</h2>
+              <h2 className="text-2xl font-semibold text-foreground">{t('kpi_sections.recommendation_engine')}</h2>
             </div>
             <RecommendationEngineCard data={dashboardData?.recommendations} isLoading={isDashboardLoading} />
           </div>
@@ -877,7 +881,7 @@ const KPI = () => {
           {/* Business Health */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-foreground">Business Health</h2>
+              <h2 className="text-2xl font-semibold text-foreground">{t('kpi_sections.business_health')}</h2>
             </div>
             <BusinessHealthCards data={dashboardData?.businessHealth} isLoading={isDashboardLoading} />
           </div>
@@ -885,40 +889,48 @@ const KPI = () => {
           {/* Alert Center */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-foreground">Alert Center</h2>
+              <h2 className="text-2xl font-semibold text-foreground">{t('kpi_sections.alert_center')}</h2>
             </div>
             <AlertCenterCard data={dashboardData?.alerts} isLoading={isDashboardLoading} />
           </div>
 
           {/* Sustainability Impact */}
           <div className="mb-8">
-            <h3 className="text-2xl font-bold mb-4">Sustainability Impact</h3>
+            <h3 className="text-2xl font-bold mb-4">{t('kpi_sections.sustainability_impact')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <SustainabilityCard label="CO₂ Saved" value={realData.co2Saved} subtext={`${realData.co2Change} vs last week`} icon="🌱" colorScheme="blue" />
-              <SustainabilityCard label="Waste Reduced" value={realData.wasteReduced} subtext={`Target: ${realData.wasteTarget}`} icon="♻️" colorScheme="blue" />
+              <SustainabilityCard label={t('kpi.sustainability.co2_saved')} value={realData.co2Saved} subtext={`${realData.co2Change} vs last week`} icon="🌱" colorScheme="blue" />
+              <SustainabilityCard label={t('kpi.sustainability.waste_reduced')} value={realData.wasteReduced} subtext={`Target: ${realData.wasteTarget}`} icon="♻️" colorScheme="blue" />
             </div>
           </div>
 
           {/* Customer Insights */}
           <div className="mb-8">
-            <h3 className="text-2xl font-bold mb-4">Customer Insights</h3>
+            <h3 className="text-2xl font-bold mb-4">{t('kpi_sections.customer_insights')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <InsightCard label="Conversion Rate" value={realData.conversionRate} trend={realData.conversionChange.replace('+', '')} icon="📊" />
-              <InsightCard label="Return Rate" value={realData.returnRate} trend={realData.returnChange.replace('+', '')} icon="🔄" />
+              <InsightCard label={t('kpi.insights.conversion_rate')} value={realData.conversionRate} trend={realData.conversionChange.replace('+', '')} icon="📊" />
+              <InsightCard label={t('kpi.insights.return_rate')} value={realData.returnRate} trend={realData.returnChange.replace('+', '')} icon="🔄" />
             </div>
           </div>
 
           {/* Savings & Food Waste */}
           <div className="mb-8">
-            <h3 className="text-2xl font-bold mb-4">Savings & Food Waste</h3>
+            <h3 className="text-2xl font-bold mb-4">{t('kpi_sections.savings_waste')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <SustainabilityCard label="Cost Savings" value={realData.costSavings} subtext={`${realData.costChange} vs last month`} icon="💰" colorScheme="green" />
-              <SustainabilityCard label="Food Waste Reduced" value={realData.foodWasteReduced} subtext={`${realData.foodWasteChange} vs last month`} icon="🍽️" colorScheme="green" />
+              <SustainabilityCard label={t('kpi.sustainability.cost_savings')} value={realData.costSavings} subtext={`${realData.costChange} vs last month`} icon="💰" colorScheme="green" />
+              <SustainabilityCard label={t('kpi.sustainability.food_waste_reduced')} value={realData.foodWasteReduced} subtext={`${realData.foodWasteChange} vs last month`} icon="🍽️" colorScheme="green" />
             </div>
           </div>
         </section>
 
-        {/* AI Predictive Insights */}
+        {/* AI Prescriptive Actions (Enterprise) */}
+        <section className="md:col-span-4 order-2 md:order-1 mt-0 mb-6">
+          <PrescriptiveActions
+            salesHistory={salesHistory}
+            stockByCategory={stockByCategory}
+            scenario="base"
+            isLoading={isUnifiedLoading}
+          />
+        </section>
 
 
         {/* Surprise Bags Performance */}

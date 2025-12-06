@@ -44,7 +44,7 @@ export class LLMClient {
     if (envProvider === 'gemini' && geminiKey) {
       this.provider = 'gemini'
       this.apiKey = geminiKey
-      this.defaultModel = Deno.env.get('LLM_MODEL') || 'gemini-1.5-flash-latest'
+      this.defaultModel = Deno.env.get('LLM_MODEL') || 'gemini-2.0-flash'
     } else if (envProvider === 'openai' && openaiKey) {
       this.provider = 'openai'
       this.apiKey = openaiKey
@@ -56,7 +56,7 @@ export class LLMClient {
     } else if (geminiKey) {
       this.provider = 'gemini'
       this.apiKey = geminiKey
-      this.defaultModel = Deno.env.get('LLM_MODEL') || 'gemini-1.5-flash-latest'
+      this.defaultModel = Deno.env.get('LLM_MODEL') || 'gemini-2.0-flash'
     } else if (openaiKey) {
       this.provider = 'openai'
       this.apiKey = openaiKey
@@ -210,15 +210,24 @@ export class LLMClient {
       }
     }
 
-    // Add system instruction if present
+    // MANUAL SYSTEM INJECTION (Compatible with v1 API)
+    // The v1 API does not support the 'systemInstruction' field for all models.
+    // Making it part of the prompt is the most robust method.
     if (systemMessage) {
-      requestBody.systemInstruction = {
-        parts: [{ text: systemMessage.content }]
+      // Option 1: Append to first user message (best for consistency)
+      if (contents.length > 0 && contents[0].role === 'user') {
+        contents[0].parts[0].text = `${systemMessage.content}\n\n${contents[0].parts[0].text}`
+      } else {
+        // Option 2: If conversation starts with model (unlikely) or is empty
+        contents.unshift({
+          role: 'user',
+          parts: [{ text: `System Instruction:\n${systemMessage.content}` }]
+        })
       }
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.apiKey}`,
+      `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${this.apiKey}`,
       {
         method: 'POST',
         headers: {

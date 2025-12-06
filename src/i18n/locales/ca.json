@@ -1,0 +1,273 @@
+{
+    "common": {
+        "dashboard": "Tauler de Control",
+        "forecasting": "Previsió",
+        "settings": "Configuració",
+        "profile": "Perfil",
+        "language": "Idioma",
+        "logout": "Tancar Sessió",
+        "welcome": "Benvingut a Negentropy AI",
+        "search": "Cercar...",
+        "notifications": "Notificacions"
+    },
+    "sidebar": {
+        "chat": "Xat",
+        "performance": "Rendiment",
+        "predictive_analytics": "Analítica Predictiva",
+        "autopilot": "Pilot Automàtic",
+        "inventory_products": "Inventari de Productes",
+        "impact_compliance": "Impacte i Compliment",
+        "account": "Compte",
+        "integrations": "Integracions",
+        "pricing": "Preus"
+    },
+    "kpi": {
+        "stock_value": "Valor d'Estoc",
+        "demand_24h": "Demanda (24h)",
+        "waste_risk": "Risc de Malbaratament",
+        "high_items": "Alt ({{count}} articles)",
+        "metrics": {
+            "total_products": "Productes Totals",
+            "low_stock_items": "Articles amb estoc baix",
+            "total_suppliers": "Proveïdors Totals",
+            "waste_reduced": "Malbaratament Reduït vs Mes Passat",
+            "total_sales": "Vendes Totals",
+            "transactions": "Transaccions",
+            "profit": "Benefici",
+            "operational_savings": "Estalvi Operatiu",
+            "revenue": "Ingressos",
+            "avg_order_value": "Valor Mitjà Comanda"
+        },
+        "sustainability": {
+            "co2_saved": "CO₂ Estalviat",
+            "plastic_reduced": "Plàstic Reduït",
+            "trees_equivalent": "Arbres Equivalents",
+            "water_saved": "Aigua Estalviada",
+            "waste_reduced": "Malbaratament Reduït",
+            "cost_savings": "Estalvi de Costos",
+            "food_waste_reduced": "Malbaratament Alimentari Reduït"
+        },
+        "insights": {
+            "customer_satisfaction": "Satisfacció del Client",
+            "return_rate": "Taxa de Devolució",
+            "retention_rate": "Taxa de Retenció",
+            "avg_order_value": "Valor Mitjà Comanda",
+            "conversion_rate": "Taxa de Conversió"
+        }
+    },
+    "predictive": {
+        "title": "Analítica Predictiva",
+        "subtitle": "Tauler d'Anàlisi Impulsat per IA",
+        "tabs": {
+            "predictive": "Analítica Predictiva",
+            "pricing": "Motor de Preus"
+        }
+    },
+    "autopilot": {
+        "title": "Pilot Automàtic",
+        "subtitle": "Sistema d'automatització en temps real"
+    },
+    "inventory": {
+        "title": "Inventari de Productes",
+        "stats": {
+            "total": "{{count}} productes a l'inventari",
+            "available": "{{count}} productes disponibles"
+        },
+        "loading": "Carregant inventari...",
+        "empty": "No hi ha productes a l'inventari."
+    },
+    "compliance_hub": {
+        "title": "Centre d'Impacte i Compliment",
+        "subtitle": "Gestiona el compliment de la Llei 1/2025 i les donacions d'aliments en un sol lloc.",
+        "tabs": {
+            "overview": "Resum de Compliment",
+            "donations": "Gestió de Donacions"
+        },
+        "risk_score": {
+            "title": "Puntuació de Risc Regulatori",
+            "medium": "Mitjà (45/100)",
+            "potential_fines": "Possibles multes: €2,001 - €60,000",
+            "reason": "Per què? Falten rebuts de donació del mes passat."
+        },
+        "alerts": {
+            "title": "Alertes d'Incompliment",
+            "quota_title": "Quota de Donació Obligatòria No Complerta",
+            "quota_desc": "Has donat el 12% de l'excedent. La llei requereix un 20% pel teu nivell.",
+            "audit_title": "Informe d'Auditoria Pendent",
+            "audit_desc": "L'informe anual d'auditoria de residus venç en 15 dies."
+        },
+        "legal_docs": {
+            "title": "Documents Legals",
+            "subtitle": "Gestiona els teus plans de prevenció i auditories.",
+            "generate_btn": "Generar Pla",
+            "dialog_title": "Generar Pla de Prevenció",
+            "dialog_desc": "Això generarà un nou Pla de Prevenció de Malbaratament Alimentari basat en el teu inventari i dades de vendes actuals, complint amb les regulacions locals.",
+            "cancel": "Cancel·lar",
+            "generate": "Generar"
+        },
+        "traceability": {
+            "title": "Registre Complet de Traçabilitat",
+            "desc": "Rastrea cada article des de l'entrada fins a la sortida (Venda, Donació o Malbaratament)"
+        }
+    },
+    "scenario": {
+        "label": "Escenari Actiu",
+        "base": "Base (Actual)",
+        "optimistic": "Optimista (+20%)",
+        "crisis": "Crisi (-30%)"
+    },
+    "actions": {
+        "title": "Accions Prescriptives IA",
+        "loading": "Inicia un escenari per veure accions...",
+        "impact_high": "Impacte Alt",
+        "impact_medium": "Impacte Mitjà",
+        "impact_low": "Impacte Baix",
+        "sections": {
+            "inventory": "Optimització d'Inventari",
+            "pricing": "Preus Dinàmics",
+            "sustainability": "Sostenibilitat i Donacions"
+        }
+    },
+    "compliance": {
+        "generate_btn": "Generar Informe PDF",
+        "title": "Generar Informe de Compliment",
+        "type_label": "Tipus d'Informe",
+        "date_start": "Data Inici",
+        "date_end": "Data Fi",
+        "generate_preview": "Generar Vista Prèvia",
+        "download_pdf": "Descarregar PDF",
+        "types": {
+            "spain_ley1_2025": "🇪🇸 Espanya - Compliment Llei 1/2025",
+            "prevention_plan": "🇪🇸 Espanya - Pla de Prevenció",
+            "australia_epa": "🇦🇺 Austràlia - NSW EPA"
+        }
+    },
+    "documentation": {
+        "title": "Documentació",
+        "subtitle": "Guies completes per a usuaris i referències d'API.",
+        "tabs": {
+            "user_guide": "Guia d'Usuari",
+            "api_reference": "Referència API"
+        }
+    },
+    "kpi_sections": {
+        "forecasting_overview": "Resum de Previsió",
+        "forecast_engine": "Motor de Previsió",
+        "pricing_engine": "Motor de Preus",
+        "inventory_optimizer": "Optimitzador d'Inventari",
+        "risk_engine": "Motor de Riscos",
+        "recommendation_engine": "Motor de Recomanacions",
+        "business_health": "Salut del Negoci",
+        "alert_center": "Centre d'Alertes",
+        "sustainability_impact": "Impacte de Sostenibilitat",
+        "customer_insights": "Insights de Clients",
+        "savings_waste": "Estalvis i Malbaratament"
+    },
+    "cards": {
+        "forecast_engine": {
+            "title": "Previsió de Demanda",
+            "table": {
+                "sku": "SKU",
+                "forecast": "Demanda Prevista",
+                "confidence": "Confiança",
+                "drivers": "Factors"
+            },
+            "no_data": "No hi ha productes disponibles per analitzar",
+            "explanation": "La previsió de demanda es calcula utilitzant patrons històrics de vendes, tendències estacionals, clima, promocions i efectes del dia de la setmana. Les puntuacions de confiança reflecteixen la precisió del model."
+        },
+        "pricing_engine": {
+            "title": "Preus Òptims",
+            "table": {
+                "sku": "SKU",
+                "current": "Preu Actual",
+                "recommended": "Preu Recomanat",
+                "margin_impact": "Impacte Marge",
+                "demand_impact": "Impacte Demanda"
+            },
+            "explanation": "El sistema calcula preus òptims basats en demanda actual, reducció de malbaratament projectada, elasticitat del producte, preus de la competència i rotació d'inventari per maximitzar ingressos i reduir malbaratament."
+        },
+        "inventory_optimizer": {
+            "title": "Nivells d'Inventari Òptims",
+            "table": {
+                "sku": "SKU",
+                "current": "Estoc Actual",
+                "recommended": "Estoc Recomanat",
+                "risk": "Nivell de Risc",
+                "suggestion": "Suggeriment de Comanda"
+            },
+            "explanation": "L'optimitzador calcula l'inventari ideal integrant previsions de demanda, temps d'entrega de proveïdors i projeccions de risc de malbaratament per mantenir nivells òptims i minimitzar costos."
+        },
+        "alert_center": {
+            "title": "Alertes",
+            "no_alerts": "No hi ha alertes actives"
+        },
+        "sales_forecast": {
+            "title": "Previsió de Vendes - Pròxims 7 Dies",
+            "total": "Previsió Total"
+        },
+        "risk_engine": {
+            "title_overview": "Resum de Riscos",
+            "title_critical": "SKUs Crítics",
+            "stockout_risk": "Risc d'Esgotament",
+            "overstock_risk": "Risc de Sobre-estoc",
+            "weather_sensitivity": "Sensibilitat Climàtica",
+            "volatility_index": "Índex de Volatilitat",
+            "no_critical": "No hi ha productes crítics en aquest moment"
+        },
+        "business_health": {
+            "inventory_turnover": "Rotació d'Inventari",
+            "waste_percentage": "Percentatge de Malbaratament",
+            "stockout_percentage": "Percentatge d'Esgotats",
+            "volatile_products": "Productes més Volàtils",
+            "overall_score": "Puntuació General"
+        },
+        "top_products": {
+            "title": "Productes Top - Previsió vs Estoc",
+            "no_data": "No hi ha dades de productes disponibles",
+            "current_stock": "Estoc Actual",
+            "forecast_demand": "Demanda Prevista",
+            "avg_daily_sales": "Vendes Diàries Mitjanes",
+            "risk": "Risc",
+            "units_day": "unit/dia"
+        },
+        "recommendation_engine": {
+            "title": "Recomanacions Accionables",
+            "no_data": "No hi ha recomanacions disponibles en aquest moment"
+        },
+        "influencing_factors": {
+            "title": "Factors Clau d'Influència",
+            "subtitle": "Factors externs que poden afectar el teu negoci en els propers dies",
+            "no_data": "No hi ha factors identificats en aquest moment"
+        },
+        "intelligent_news": {
+            "empty": "No hi ha notificacions en aquest moment",
+            "actions": {
+                "view_products": "Veure Productes",
+                "manage_inventory": "Gestionar Inventari",
+                "view_orders": "Veure Comandes",
+                "view_insights": "Veure Insights",
+                "create_offer": "Crear Oferta",
+                "view_deliveries": "Veure Entregues",
+                "complete": "Completar",
+                "delete": "Eliminar"
+            },
+            "priority": {
+                "high": "Prioritat Alta",
+                "medium": "Mitjana",
+                "info": "Info"
+            },
+            "titles": {
+                "urgent_expiring": "⚡ Urgent: Productes Caducant",
+                "products_nearing_expiration": "📦 Productes Pròxims a Caducar",
+                "low_stock_alert": "📊 Alerta Estoc Baix",
+                "new_orders": "🛒 Noves Comandes Rebudes",
+                "ai_recommendation": "🤖 Recomanació IA",
+                "smart_business_tip": "🤖 Consell Empresarial Intel·ligent",
+                "promotion_opportunity": "💡 Oportunitat de Promoció",
+                "customer_feedback": "⭐ Comentaris de Clients",
+                "pending_deliveries": "🚚 Entregues Pendents",
+                "sales_trend": "📈 Tendència de Vendes"
+            }
+        }
+    }
+}

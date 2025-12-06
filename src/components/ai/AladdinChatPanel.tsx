@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Send, Bot, User, Sparkles, TrendingUp, AlertCircle } from 'lucide-react'
+import { Send, User, Sparkles, TrendingUp, AlertCircle, Mic } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
+import { useAuth } from '@/context/AuthContext'
 
 interface Message {
     role: 'user' | 'assistant'
@@ -27,6 +28,7 @@ interface ActionableIntent {
 }
 
 export function AladdinChatPanel() {
+    const { user } = useAuth()
     const [messages, setMessages] = useState<Message[]>([])
     const [input, setInput] = useState('')
     const [loading, setLoading] = useState(false)
@@ -40,16 +42,16 @@ export function AladdinChatPanel() {
         }
     }, [messages])
 
-    // Welcome message on mount
-    useEffect(() => {
-        setMessages([
-            {
-                role: 'assistant',
-                content: '👋 ¡Hola! Soy **Negentropy Assistant**, tu asistente AI especializado en reducción de desperdicio y optimización de inventario.\n\nPuedo ayudarte con:\n- Analizar tu inventario actual y riesgos de expiración\n- Sugerir acciones para reducir pérdidas\n- Generar planes de prevención (Ley 1/2025)\n- Revisar tu performance de ventas y donaciones\n\n**Pregúntame algo**, por ejemplo:\n- "¿Cuánto desperdicio tengo actualmente?"\n- "¿Cómo puedo reducir pérdidas este mes?"\n- "Genera el plan de prevención de diciembre"',
-                timestamp: new Date()
-            }
-        ])
-    }, [])
+    // Helper to get user name
+    const getUserName = () => {
+        if (user?.user_metadata?.full_name) {
+            return user.user_metadata.full_name.split(' ')[0]
+        }
+        if (user?.email) {
+            return user.email.split('@')[0]
+        }
+        return 'Felipe' // Fallback fallback
+    }
 
     const handleSend = async () => {
         if (!input.trim()) return
@@ -138,132 +140,119 @@ export function AladdinChatPanel() {
         }
     }
 
+    const isChatStarted = messages.length > 0
+
     return (
-        <Card className="flex flex-col h-[600px]">
-            <CardHeader>
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Bot className="h-6 w-6 text-purple-600" />
-                        <div>
-                            <CardTitle>Negentropy Assistant</CardTitle>
-                            <CardDescription>Tu asistente inteligente para gestión de inventario</CardDescription>
-                        </div>
-                    </div>
-                    {contextSummary && (
-                        <div className="flex gap-2">
-                            <Badge variant="outline">
-                                <TrendingUp className="h-3 w-3 mr-1" />
-                                {contextSummary.inventory_items} items
-                            </Badge>
-                            {contextSummary.critical_items > 0 && (
-                                <Badge variant="destructive">
-                                    <AlertCircle className="h-3 w-3 mr-1" />
-                                    {contextSummary.critical_items} en riesgo
-                                </Badge>
-                            )}
-                        </div>
+        <Card className="flex flex-col h-[calc(100vh-100px)] border-none shadow-none bg-transparent">
+            {/* Context Badges - Only show when chat started or if we have context */}
+            {contextSummary && isChatStarted && (
+                <div className="absolute top-4 right-4 flex gap-2 z-10">
+                    <Badge variant="outline" className="bg-white/50 backdrop-blur-sm">
+                        <TrendingUp className="h-3 w-3 mr-1" />
+                        {contextSummary.inventory_items} items
+                    </Badge>
+                    {contextSummary.critical_items > 0 && (
+                        <Badge variant="destructive" className="animate-pulse">
+                            <AlertCircle className="h-3 w-3 mr-1" />
+                            {contextSummary.critical_items} en riesgo
+                        </Badge>
                     )}
                 </div>
-            </CardHeader>
+            )}
 
-            <CardContent className="flex-1 flex flex-col p-0">
-                <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-                    <div className="space-y-4">
-                        {messages.map((message, index) => (
-                            <div
-                                key={index}
-                                className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                                    }`}
-                            >
+            <CardContent className={`flex-1 flex flex-col p-0 transition-all duration-500 ease-in-out ${isChatStarted ? 'justify-end' : 'justify-center items-center'}`}>
+
+                {/* Messages Area */}
+                {isChatStarted && (
+                    <ScrollArea className="flex-1 w-full p-4 md:px-20 lg:px-40" ref={scrollAreaRef}>
+                        <div className="space-y-6 pb-4">
+                            {messages.map((message, index) => (
                                 <div
-                                    className={`flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full ${message.role === 'user'
-                                        ? 'bg-blue-600'
-                                        : 'bg-purple-600'
-                                        }`}
-                                >
-                                    {message.role === 'user' ? (
-                                        <User className="h-4 w-4 text-white" />
-                                    ) : (
-                                        <Sparkles className="h-4 w-4 text-white" />
-                                    )}
-                                </div>
-                                <div
-                                    className={`flex flex-col gap-1 max-w-[80%] ${message.role === 'user' ? 'items-end' : 'items-start'
-                                        }`}
+                                    key={index}
+                                    className={`flex gap-4 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                                 >
                                     <div
-                                        className={`rounded-lg px-4 py-2 ${message.role === 'user'
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-100 text-gray-900'
+                                        className={`flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full ${message.role === 'user'
+                                            ? 'bg-gray-200'
+                                            : 'bg-green-600'
                                             }`}
                                     >
-                                        <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                            {message.content}
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                                        <span>{message.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</span>
-                                        {message.metadata && (
-                                            <>
-                                                <span>•</span>
-                                                <span>{message.metadata.model}</span>
-                                                {message.metadata.tokens && (
-                                                    <>
-                                                        <span>•</span>
-                                                        <span>{message.metadata.tokens} tokens</span>
-                                                    </>
-                                                )}
-                                                {message.metadata.cost_usd && (
-                                                    <>
-                                                        <span>•</span>
-                                                        <span>${message.metadata.cost_usd.toFixed(4)}</span>
-                                                    </>
-                                                )}
-                                            </>
+                                        {message.role === 'user' ? (
+                                            <User className="h-4 w-4 text-gray-700" />
+                                        ) : (
+                                            <Sparkles className="h-4 w-4 text-white" />
                                         )}
                                     </div>
-                                </div>
-                            </div>
-                        ))}
-                        {loading && (
-                            <div className="flex gap-3">
-                                <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full bg-purple-600">
-                                    <Sparkles className="h-4 w-4 text-white animate-pulse" />
-                                </div>
-                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                    <div className="flex gap-1">
-                                        <div className="h-2 w-2 rounded-full bg-purple-600 animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                        <div className="h-2 w-2 rounded-full bg-purple-600 animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                        <div className="h-2 w-2 rounded-full bg-purple-600 animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                    <div className={`flex flex-col gap-1 max-w-[80%] ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                        <div className={`prose text-sm leading-relaxed ${message.role === 'user' ? 'text-gray-900 bg-gray-100 px-4 py-2 rounded-2xl' : 'text-gray-800'}`}>
+                                            <div className="whitespace-pre-wrap font-medium">
+                                                {message.content}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span>Pensando...</span>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                </ScrollArea>
+                            ))}
+                            {loading && (
+                                <div className="flex gap-4">
+                                    <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full bg-green-600">
+                                        <Sparkles className="h-4 w-4 text-white animate-pulse" />
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                                        <div className="flex gap-1">
+                                            <div className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                            <div className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                            <div className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </ScrollArea>
+                )}
 
-                <div className="border-t p-4">
-                    <div className="flex gap-2">
+                {/* Greeting - Only when chat hasn't started */}
+                {!isChatStarted && (
+                    <div className="flex justify-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <img
+                            src="/lovable-uploads/negentropy-logo.png"
+                            alt="Negentropy Logo"
+                            className="h-20 w-auto object-contain opacity-90"
+                        />
+                    </div>
+                )}
+
+                {/* Input Area */}
+                <div className={`w-full max-w-3xl px-4 ${isChatStarted ? 'mb-4' : 'mb-0'}`}>
+                    <div className="relative flex items-center bg-white rounded-full shadow-lg border border-gray-100 p-2 transition-shadow hover:shadow-xl focus-within:shadow-xl focus-within:border-gray-200">
+
+                        <Button variant="ghost" size="icon" className="h-8 w-8 ml-1 text-gray-400 hover:text-gray-600 rounded-full">
+                            <span className="text-lg font-light">+</span>
+                        </Button>
+
                         <Input
-                            placeholder="Pregúntame sobre tu inventario, ventas, o compliance..."
+                            placeholder="Pregunta lo que quieras"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyPress={handleKeyPress}
                             disabled={loading}
-                            className="flex-1"
+                            className="flex-1 border-none shadow-none focus-visible:ring-0 bg-transparent text-gray-600 placeholder:text-gray-400 h-10 px-4 text-lg"
                         />
-                        <Button
-                            onClick={handleSend}
-                            disabled={loading || !input.trim()}
-                            size="icon"
-                        >
-                            <Send className="h-4 w-4" />
-                        </Button>
+
+                        <div className="flex items-center gap-1 pr-1">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-gray-600 rounded-full">
+                                <Mic className="h-4 w-4" />
+                            </Button>
+
+                            <Button
+                                onClick={handleSend}
+                                disabled={loading || !input.trim()}
+                                size="icon"
+                                className={`h-8 w-8 rounded-full transition-all duration-200 ${input.trim() ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                            >
+                                {loading ? <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <Send className="h-4 w-4" />}
+                            </Button>
+                        </div>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                        Presiona Enter para enviar • Shift+Enter para nueva línea
-                    </p>
                 </div>
             </CardContent>
         </Card>

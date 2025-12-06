@@ -1,0 +1,273 @@
+{
+    "common": {
+        "dashboard": "Dashboard",
+        "forecasting": "Prognose",
+        "settings": "Einstellungen",
+        "profile": "Profil",
+        "language": "Sprache",
+        "logout": "Abmelden",
+        "welcome": "Willkommen bei Negentropy AI",
+        "search": "Suchen...",
+        "notifications": "Benachrichtigungen"
+    },
+    "sidebar": {
+        "chat": "Chat",
+        "performance": "Leistung",
+        "predictive_analytics": "Prädiktive Analytik",
+        "autopilot": "Autopilot",
+        "inventory_products": "Produktbestand",
+        "impact_compliance": "Auswirkung & Einhaltung",
+        "account": "Konto",
+        "integrations": "Integrationen",
+        "pricing": "Preise"
+    },
+    "kpi": {
+        "stock_value": "Bestandswert",
+        "demand_24h": "Nachfrage (24h)",
+        "waste_risk": "Verschwendungsrisiko",
+        "high_items": "Hoch ({{count}} Artikel)",
+        "metrics": {
+            "total_products": "Gesamtprodukte",
+            "low_stock_items": "Artikel mit geringem Bestand",
+            "total_suppliers": "Gesamtlieferanten",
+            "waste_reduced": "Reduzierter Abfall vs. Vormonat",
+            "total_sales": "Gesamtumsatz",
+            "transactions": "Transaktionen",
+            "profit": "Gewinn",
+            "operational_savings": "Betriebliche Einsparungen",
+            "revenue": "Einnahmen",
+            "avg_order_value": "Durchschn. Bestellwert"
+        },
+        "sustainability": {
+            "co2_saved": "CO₂ Eingespart",
+            "plastic_reduced": "Plastik Reduziert",
+            "trees_equivalent": "Bäume Äquivalent",
+            "water_saved": "Wasser Eingespart",
+            "waste_reduced": "Abfall Reduziert",
+            "cost_savings": "Kosteneinsparungen",
+            "food_waste_reduced": "Lebensmittelabfälle Reduziert"
+        },
+        "insights": {
+            "customer_satisfaction": "Kundenzufriedenheit",
+            "return_rate": "Rückgabequote",
+            "retention_rate": "Bindungsrate",
+            "avg_order_value": "Durchschn. Bestellwert",
+            "conversion_rate": "Konversionsrate"
+        }
+    },
+    "predictive": {
+        "title": "Prädiktive Analyse",
+        "subtitle": "KI-gestütztes Analyse-Dashboard",
+        "tabs": {
+            "predictive": "Prädiktive Analyse",
+            "pricing": "Preismaschine"
+        }
+    },
+    "autopilot": {
+        "title": "Autopilot",
+        "subtitle": "Echtzeit-Automatisierungssystem"
+    },
+    "inventory": {
+        "title": "Produktinventar",
+        "stats": {
+            "total": "{{count}} Produkte im Inventar",
+            "available": "{{count}} Produkte verfügbar"
+        },
+        "loading": "Lade Inventar...",
+        "empty": "Keine Produkte im Inventar."
+    },
+    "compliance_hub": {
+        "title": "Impact & Compliance Hub",
+        "subtitle": "Verwalten Sie die Einhaltung des Gesetzes 1/2025 und Lebensmittelspenden an einem Ort.",
+        "tabs": {
+            "overview": "Compliance-Übersicht",
+            "donations": "Spendenverwaltung"
+        },
+        "risk_score": {
+            "title": "Regulatorischer Risikoscore",
+            "medium": "Mittel (45/100)",
+            "potential_fines": "Mögliche Geldstrafen: 2.001 € - 60.000 €",
+            "reason": "Warum? Fehlende Spendenbelege für den letzten Monat."
+        },
+        "alerts": {
+            "title": "Verstöße-Warnungen",
+            "quota_title": "Pflichtspendenquote nicht erfüllt",
+            "quota_desc": "Sie haben 12% des Überschusses gespendet. Das Gesetz erfordert 20% für Ihre Stufe.",
+            "audit_title": "Auditbericht fällig",
+            "audit_desc": "Der jährliche Abfallauditbericht ist in 15 Tagen fällig."
+        },
+        "legal_docs": {
+            "title": "Rechtsdokumente",
+            "subtitle": "Verwalten Sie Ihre Präventionspläne und Audits.",
+            "generate_btn": "Plan generieren",
+            "dialog_title": "Präventionsplan generieren",
+            "dialog_desc": "Dies generiert einen neuen Lebensmittelabfall-Präventionsplan basierend auf Ihren aktuellen Inventar- und Verkaufsdaten, konform mit lokalen Vorschriften.",
+            "cancel": "Abbrechen",
+            "generate": "Generieren"
+        },
+        "traceability": {
+            "title": "Vollständiges Rückverfolgbarkeitsprotokoll",
+            "desc": "Verfolgen Sie jeden Artikel vom Eingang bis zum Ausgang (Verkauf, Spende oder Abfall)"
+        }
+    },
+    "scenario": {
+        "label": "Aktives Szenario",
+        "base": "Basis (Aktuell)",
+        "optimistic": "Optimistisch (+20%)",
+        "crisis": "Krise (-30%)"
+    },
+    "actions": {
+        "title": "KI-Vorschriften",
+        "loading": "Starten Sie ein Szenario, um Aktionen zu sehen...",
+        "impact_high": "Hohe Auswirkung",
+        "impact_medium": "Mittlere Auswirkung",
+        "impact_low": "Geringe Auswirkung",
+        "sections": {
+            "inventory": "Bestandsoptimierung",
+            "pricing": "Dynamische Preisgestaltung",
+            "sustainability": "Nachhaltigkeit & Spenden"
+        }
+    },
+    "compliance": {
+        "generate_btn": "PDF-Bericht erstellen",
+        "title": "Compliance-Bericht erstellen",
+        "type_label": "Berichtstyp",
+        "date_start": "Startdatum",
+        "date_end": "Enddatum",
+        "generate_preview": "Vorschau erstellen",
+        "download_pdf": "PDF herunterladen",
+        "types": {
+            "spain_ley1_2025": "🇪🇸 Spanien - Einhaltung Ley 1/2025",
+            "prevention_plan": "🇪🇸 Spanien - Präventionsplan",
+            "australia_epa": "🇦🇺 Australien - NSW EPA"
+        }
+    },
+    "documentation": {
+        "title": "Dokumentation",
+        "subtitle": "Umfassende Anleitungen für Endbenutzer und API-Referenzen.",
+        "tabs": {
+            "user_guide": "Benutzerhandbuch",
+            "api_reference": "API-Referenz"
+        }
+    },
+    "kpi_sections": {
+        "forecasting_overview": "Prognoseübersicht",
+        "forecast_engine": "Prognose-Engine",
+        "pricing_engine": "Preis-Engine",
+        "inventory_optimizer": "Bestandsoptimierer",
+        "risk_engine": "Risiko-Engine",
+        "recommendation_engine": "Empfehlungs-Engine",
+        "business_health": "Unternehmensgesundheit",
+        "alert_center": "Alarmzentrale",
+        "sustainability_impact": "Nachhaltigkeitsauswirkung",
+        "customer_insights": "Kundeneinblicke",
+        "savings_waste": "Einsparungen & Abfall"
+    },
+    "cards": {
+        "forecast_engine": {
+            "title": "Nachfrageprognose",
+            "table": {
+                "sku": "SKU",
+                "forecast": "Prognostizierte Nachfrage",
+                "confidence": "Konfidenz",
+                "drivers": "Faktoren"
+            },
+            "no_data": "Keine Produkte zur Analyse verfügbar",
+            "explanation": "Die Nachfrageprognose wird anhand historischer Verkaufsmuster, saisonaler Trends, Wetterbedingungen, Werbeaktionen und Wochentagseffekte berechnet. Konfidenzwerte spiegeln die Genauigkeit des Modells wider."
+        },
+        "pricing_engine": {
+            "title": "Optimale Preisgestaltung",
+            "table": {
+                "sku": "SKU",
+                "current": "Aktueller Preis",
+                "recommended": "Empfohlener Preis",
+                "margin_impact": "Margeneinfluss",
+                "demand_impact": "Nachfrageeinfluss"
+            },
+            "explanation": "Das System berechnet optimale Preise basierend auf aktuellen Nachfragemustern, prognostizierter Abfallreduzierung, Produktelastizität, Wettbewerbspreisen und Lagerumschlag, um Umsatz zu maximieren und Abfall zu reduzieren."
+        },
+        "inventory_optimizer": {
+            "title": "Optimale Lagerbestände",
+            "table": {
+                "sku": "SKU",
+                "current": "Aktueller Bestand",
+                "recommended": "Empfohlener Bestand",
+                "risk": "Risikostufe",
+                "suggestion": "Bestellvorschlag"
+            },
+            "explanation": "Der Optimierer berechnet den idealen Lagerbestand unter Einbeziehung von Nachfrageprognosen, Lieferzeiten und Abfallrisikoprognosen, um optimale Bestände zu halten und Kosten zu minimieren."
+        },
+        "alert_center": {
+            "title": "Benachrichtigungen",
+            "no_alerts": "Keine aktiven Benachrichtigungen"
+        },
+        "sales_forecast": {
+            "title": "Verkaufsprognose - Nächste 7 Tage",
+            "total": "Gesamtprognose"
+        },
+        "risk_engine": {
+            "title_overview": "Risikoübersicht",
+            "title_critical": "Kritische SKUs",
+            "stockout_risk": "Ausverkaufsrisiko",
+            "overstock_risk": "Überbestandsrisiko",
+            "weather_sensitivity": "Wetterempfindlichkeit",
+            "volatility_index": "Volatilitätsindex",
+            "no_critical": "Keine kritischen Produkte im Moment"
+        },
+        "business_health": {
+            "inventory_turnover": "Lagerumschlag",
+            "waste_percentage": "Abfallprozentsatz",
+            "stockout_percentage": "Ausverkaufsprozentsatz",
+            "volatile_products": "Volatilste Produkte",
+            "overall_score": "Gesamtbewertung"
+        },
+        "top_products": {
+            "title": "Top-Produkte - Prognose vs Bestand",
+            "no_data": "Keine Produktdaten verfügbar",
+            "current_stock": "Aktueller Bestand",
+            "forecast_demand": "Prognostizierte Nachfrage",
+            "avg_daily_sales": "Durchschnittlicher Tagesumsatz",
+            "risk": "Risiko",
+            "units_day": "Einh./Tag"
+        },
+        "recommendation_engine": {
+            "title": "Handlungsempfehlungen",
+            "no_data": "Derzeit keine Empfehlungen verfügbar"
+        },
+        "influencing_factors": {
+            "title": "Wichtige Einflussfaktoren",
+            "subtitle": "Externe Faktoren, die Ihr Geschäft in den nächsten Tagen beeinflussen könnten",
+            "no_data": "Derzeit keine Faktoren identifiziert"
+        },
+        "intelligent_news": {
+            "empty": "Derzeit keine Benachrichtigungen",
+            "actions": {
+                "view_products": "Produkte anzeigen",
+                "manage_inventory": "Inventar verwalten",
+                "view_orders": "Bestellungen anzeigen",
+                "view_insights": "Einblicke anzeigen",
+                "create_offer": "Angebot erstellen",
+                "view_deliveries": "Lieferungen anzeigen",
+                "complete": "Erledigen",
+                "delete": "Löschen"
+            },
+            "priority": {
+                "high": "Hohe Priorität",
+                "medium": "Mittel",
+                "info": "Info"
+            },
+            "titles": {
+                "urgent_expiring": "⚡ Dringend: Produkte laufen ab",
+                "products_nearing_expiration": "📦 Produkte laufen bald ab",
+                "low_stock_alert": "📊 Alarm: Geringer Lagerbestand",
+                "new_orders": "🛒 Neue Bestellungen eingegangen",
+                "ai_recommendation": "🤖 KI-Empfehlung",
+                "smart_business_tip": "🤖 Smart Business Tipp",
+                "promotion_opportunity": "💡 Werbemöglichkeit",
+                "customer_feedback": "⭐ Kundenfeedback",
+                "pending_deliveries": "🚚 Ausstehende Lieferungen",
+                "sales_trend": "📈 Verkaufstrend"
+            }
+        }
+    }
+}

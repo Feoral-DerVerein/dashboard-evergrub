@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Brain, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 import { IntelligenceAPI, WastePrediction } from '@/services/api/intelligence';
+import { useTranslation } from 'react-i18next';
 
 export const AIInsights = () => {
+    const { t } = useTranslation();
     const [wastePredictions, setWastePredictions] = useState<WastePrediction[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -47,11 +49,11 @@ export const AIInsights = () => {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Brain className="h-5 w-5 text-purple-600" />
-                        AI-Powered Insights
+                        {t('dashboard.ai_insights')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-center text-gray-500 py-8">Loading predictions...</div>
+                    <div className="text-center text-gray-500 py-8">{t('dashboard.loading')}</div>
                 </CardContent>
             </Card>
         );
@@ -62,13 +64,13 @@ export const AIInsights = () => {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Brain className="h-5 w-5 text-purple-600" />
-                    AI-Powered Insights
+                    {t('dashboard.ai_insights')}
                 </CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="space-y-3">
                     {wastePredictions.length === 0 ? (
-                        <div className="text-center text-gray-500 py-4">No waste risks detected</div>
+                        <div className="text-center text-gray-500 py-4">{t('dashboard.no_risks')}</div>
                     ) : (
                         wastePredictions.map((prediction) => (
                             <div
@@ -81,12 +83,12 @@ export const AIInsights = () => {
                                             {getRiskIcon(prediction.wasteRisk)}
                                             <h4 className="font-semibold text-gray-900">{prediction.productName}</h4>
                                             <Badge className={getRiskColor(prediction.wasteRisk)}>
-                                                {prediction.wasteRisk.toUpperCase()} RISK
+                                                {prediction.wasteRisk.toUpperCase()} {t('dashboard.risk_suffix')}
                                             </Badge>
                                         </div>
                                         <div className="text-sm text-gray-600 space-y-1">
-                                            <p>Stock: <span className="font-medium">{prediction.currentStock} units</span></p>
-                                            <p>Expires: <span className="font-medium">
+                                            <p>{t('dashboard.stock')}: <span className="font-medium">{prediction.currentStock} units</span></p>
+                                            <p>{t('dashboard.expires')}: <span className="font-medium">
                                                 {new Date(prediction.expirationDate).toLocaleDateString()}
                                             </span></p>
                                             <p className="text-purple-600 font-medium">
@@ -95,7 +97,7 @@ export const AIInsights = () => {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-xs text-gray-500">Confidence</div>
+                                        <div className="text-xs text-gray-500">{t('dashboard.confidence')}</div>
                                         <div className="text-lg font-bold text-purple-600">
                                             {Math.round(prediction.confidence * 100)}%
                                         </div>

@@ -49,7 +49,7 @@ cd /Users/felipeortegaalcantar/.gemini/antigravity/scratch
 # Set secrets
 supabase secrets set GEMINI_API_KEY=AIzaSy_YOUR_KEY_HERE
 supabase secrets set LLM_PROVIDER=gemini
-supabase secrets set LLM_MODEL=gemini-1.5-flash-latest
+supabase secrets set LLM_MODEL=gemini-2.0-flash
 ```
 
 ### Using OpenAI:

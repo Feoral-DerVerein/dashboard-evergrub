@@ -51,11 +51,27 @@ export interface InventoryStats {
     wasteReductionPercentage: number;
 }
 
+export interface SalesHistoryItem {
+    date: string;
+    actual: number;
+    forecast: number;
+    confidence: number;
+}
+
+export interface StockCategoryItem {
+    category: string;
+    inStock: number;
+    lowStock: number;
+    outOfStock: number;
+}
+
 export interface DashboardData {
     kpiMetrics: KPIMetrics;
     integrations: Integration[];
     salesStats: SalesStats;
     inventoryStats: InventoryStats;
+    salesHistory: SalesHistoryItem[];
+    stockByCategory: StockCategoryItem[];
     lastUpdated: Date;
     isLoading: boolean;
     error: Error | null;

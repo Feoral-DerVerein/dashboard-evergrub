@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Cloud, DollarSign, TrendingUp, Wifi } from 'lucide-react';
 import type { Integration } from '@/types/dashboard';
+import { useTranslation } from 'react-i18next';
 
 // Icon mapping
 const iconMap = {
@@ -21,22 +22,24 @@ export const IntegrationsStatus: React.FC<IntegrationsStatusProps> = ({
     integrations = [],
     isLoading = false
 }) => {
+    const { t } = useTranslation();
+
     // Format last sync time
     const formatLastSync = (lastSync: Date | null) => {
-        if (!lastSync) return 'Never';
+        if (!lastSync) return t('dashboard.integrations.never');
 
         const now = new Date();
         const diffMs = now.getTime() - lastSync.getTime();
         const diffMins = Math.floor(diffMs / 60000);
 
-        if (diffMins < 1) return 'Just now';
-        if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+        if (diffMins < 1) return t('dashboard.integrations.just_now');
+        if (diffMins < 60) return t('dashboard.integrations.minutes_ago', { count: diffMins, s: diffMins > 1 ? 's' : '' });
 
         const diffHours = Math.floor(diffMins / 60);
-        if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+        if (diffHours < 24) return t('dashboard.integrations.hours_ago', { count: diffHours, s: diffHours > 1 ? 's' : '' });
 
         const diffDays = Math.floor(diffHours / 24);
-        return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+        return t('dashboard.integrations.days_ago', { count: diffDays, s: diffDays > 1 ? 's' : '' });
     };
 
     // Get badge style based on status
@@ -58,7 +61,7 @@ export const IntegrationsStatus: React.FC<IntegrationsStatusProps> = ({
         return (
             <Card className="hover:shadow-lg transition-all duration-300">
                 <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-gray-800">Active Integrations</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-gray-800">{t('dashboard.integrations.title')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="grid gap-3 md:grid-cols-2">
@@ -84,11 +87,11 @@ export const IntegrationsStatus: React.FC<IntegrationsStatusProps> = ({
         return (
             <Card className="hover:shadow-lg transition-all duration-300">
                 <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-gray-800">Active Integrations</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-gray-800">{t('dashboard.integrations.title')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-center text-gray-500 py-4">
-                        No integrations configured yet.
+                        {t('dashboard.integrations.no_config')}
                     </p>
                 </CardContent>
             </Card>
@@ -98,7 +101,7 @@ export const IntegrationsStatus: React.FC<IntegrationsStatusProps> = ({
     return (
         <Card className="hover:shadow-lg transition-all duration-300">
             <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-800">Active Integrations</CardTitle>
+                <CardTitle className="text-lg font-semibold text-gray-800">{t('dashboard.integrations.title')}</CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="grid gap-3 md:grid-cols-2">
@@ -122,7 +125,7 @@ export const IntegrationsStatus: React.FC<IntegrationsStatusProps> = ({
                                     </Badge>
                                 </div>
                                 <div className="text-xs text-gray-500 ml-10">
-                                    Last sync: {formatLastSync(integration.lastSync)}
+                                    {t('dashboard.integrations.last_sync')} {formatLastSync(integration.lastSync)}
                                 </div>
                             </div>
                         );

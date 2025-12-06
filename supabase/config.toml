@@ -60,3 +60,18 @@ verify_jwt = true
 [functions.calculate-dashboard-analytics]
 verify_jwt = true
 
+
+[functions.daily-alerts]
+verify_jwt = false
+
+[functions.price-optimizer]
+verify_jwt = false
+
+[functions.weekly-report]
+verify_jwt = false
+
+[functions.compliance-monitor]
+verify_jwt = false
+
+[functions.onboarding-processor]
+verify_jwt = false

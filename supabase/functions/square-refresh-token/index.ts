@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { SquareProvider, SquareConfig } from '../_shared/pos/square.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -46,7 +47,7 @@ serve(async (req) => {
     // Check if token needs refresh
     const now = new Date();
     const expiresAt = connection.token_expires_at ? new Date(connection.token_expires_at) : null;
-    
+
     // Refresh if token expires in less than 24 hours or has no expiry date
     const shouldRefresh = !expiresAt || (expiresAt.getTime() - now.getTime()) < (24 * 60 * 60 * 1000);
 
@@ -70,64 +71,48 @@ serve(async (req) => {
     }
 
     // Get Square credentials
-    const squareApplicationId = Deno.env.get('SQUARE_APPLICATION_ID');
-    const squareApplicationSecret = Deno.env.get('SQUARE_APPLICATION_SECRET');
-    const squareEnvironment = Deno.env.get('SQUARE_ENVIRONMENT') || 'sandbox';
+    const config: SquareConfig = {
+      applicationId: Deno.env.get('SQUARE_APPLICATION_ID') || '',
+      applicationSecret: Deno.env.get('SQUARE_APPLICATION_SECRET') || '',
+      environment: (Deno.env.get('SQUARE_ENVIRONMENT') as 'sandbox' | 'production') || 'sandbox'
+    };
 
-    if (!squareApplicationId || !squareApplicationSecret) {
+    if (!config.applicationId || !config.applicationSecret) {
       throw new Error('Square credentials not configured');
     }
 
-    // Refresh the token
-    const tokenUrl = squareEnvironment === 'production'
-      ? 'https://connect.squareup.com/oauth2/token'
-      : 'https://connect.squareupsandbox.com/oauth2/token';
+    // Initialize Provider
+    const provider = new SquareProvider(config);
 
-    console.log('🔵 Refreshing access token...');
-    const tokenResponse = await fetch(tokenUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Square-Version': '2024-12-18',
-      },
-      body: JSON.stringify({
-        client_id: squareApplicationId,
-        client_secret: squareApplicationSecret,
-        refresh_token: connection.refresh_token,
-        grant_type: 'refresh_token',
-      }),
-    });
+    console.log('🔵 Refreshing access token via Provider...');
 
-    if (!tokenResponse.ok) {
-      const errorData = await tokenResponse.text();
-      console.error('❌ Token refresh failed:', errorData);
-      
+    let authResult;
+    try {
+      authResult = await provider.refreshToken(connection.refresh_token);
+    } catch (e: any) {
+      console.error('❌ Token refresh failed:', e);
       // If refresh token is invalid, mark connection as error
       await supabase
         .from('square_connections')
         .update({ connection_status: 'error' })
         .eq('id', connection.id);
-      
-      throw new Error(`Token refresh failed: ${errorData}`);
+      throw e;
     }
-
-    const tokenData = await tokenResponse.json();
-    const { access_token, refresh_token, expires_at } = tokenData;
 
     console.log('✅ New access token obtained');
 
     // Update connection with new tokens
     const updateData: any = {
-      access_token,
+      access_token: authResult.accessToken,
       last_tested_at: new Date().toISOString(),
       connection_status: 'connected',
     };
 
-    if (refresh_token) {
-      updateData.refresh_token = refresh_token;
+    if (authResult.refreshToken) {
+      updateData.refresh_token = authResult.refreshToken;
     }
-    if (expires_at) {
-      updateData.token_expires_at = expires_at;
+    if (authResult.expiresAt) {
+      updateData.token_expires_at = authResult.expiresAt.toISOString();
     }
 
     const { error: updateError } = await supabase
@@ -142,12 +127,13 @@ serve(async (req) => {
 
     console.log('✅ Connection updated with new token');
 
+
     return new Response(
       JSON.stringify({
         success: true,
         refreshed: true,
         message: 'Token refreshed successfully',
-        expires_at,
+        expires_at: authResult.expiresAt,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

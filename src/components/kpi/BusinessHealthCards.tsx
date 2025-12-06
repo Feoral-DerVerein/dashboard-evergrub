@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { BusinessHealth } from "@/services/dashboardAnalyticsService";
+import { useTranslation } from "react-i18next";
 
 interface BusinessHealthCardsProps {
   data?: BusinessHealth;
@@ -7,6 +8,7 @@ interface BusinessHealthCardsProps {
 }
 
 const BusinessHealthCards = ({ data, isLoading }: BusinessHealthCardsProps) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
@@ -31,31 +33,31 @@ const BusinessHealthCards = ({ data, isLoading }: BusinessHealthCardsProps) => {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
       <Card className="p-4">
-        <div className="text-sm text-muted-foreground mb-2">Rotación del inventario</div>
+        <div className="text-sm text-muted-foreground mb-2">{t('cards.business_health.inventory_turnover')}</div>
         <div className="text-3xl font-semibold text-foreground">{data.inventoryTurnover}x</div>
       </Card>
-      
+
       <Card className="p-4">
-        <div className="text-sm text-muted-foreground mb-2">% de merma</div>
+        <div className="text-sm text-muted-foreground mb-2">{t('cards.business_health.waste_percentage')}</div>
         <div className={`text-3xl font-semibold ${data.wastePercentage > 5 ? 'text-destructive' : 'text-success'}`}>
           {data.wastePercentage.toFixed(1)}%
         </div>
       </Card>
-      
+
       <Card className="p-4">
-        <div className="text-sm text-muted-foreground mb-2">% de productos agotados</div>
+        <div className="text-sm text-muted-foreground mb-2">{t('cards.business_health.stockout_percentage')}</div>
         <div className={`text-3xl font-semibold ${data.stockoutPercentage > 5 ? 'text-warning' : 'text-success'}`}>
           {data.stockoutPercentage.toFixed(1)}%
         </div>
       </Card>
-      
+
       <Card className="p-4">
-        <div className="text-sm text-muted-foreground mb-2">Productos más volátiles</div>
+        <div className="text-sm text-muted-foreground mb-2">{t('cards.business_health.volatile_products')}</div>
         <div className="text-3xl font-semibold text-foreground">{data.volatileProducts}</div>
       </Card>
-      
+
       <Card className="p-4">
-        <div className="text-sm text-muted-foreground mb-2">Score general</div>
+        <div className="text-sm text-muted-foreground mb-2">{t('cards.business_health.overall_score')}</div>
         <div className={`text-3xl font-semibold ${getScoreColor(data.overallScore)}`}>
           {data.overallScore}/100
         </div>

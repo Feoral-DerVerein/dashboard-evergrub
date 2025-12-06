@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { SalesForecast } from "@/services/dashboardAnalyticsService";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SalesForecastCardProps {
   data?: SalesForecast;
@@ -9,6 +10,7 @@ interface SalesForecastCardProps {
 }
 
 const SalesForecastCard = ({ data, isLoading }: SalesForecastCardProps) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <Card className="p-6 animate-pulse">
@@ -30,7 +32,7 @@ const SalesForecastCard = ({ data, isLoading }: SalesForecastCardProps) => {
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-foreground">Sales Forecast - Next 7 Days</h3>
+        <h3 className="text-lg font-semibold text-foreground">{t('cards.sales_forecast.title')}</h3>
         <div className="flex items-center gap-2">
           {data.growthVsLastWeek >= 0 ? (
             <TrendingUp className="w-5 h-5 text-success" />
@@ -44,41 +46,41 @@ const SalesForecastCard = ({ data, isLoading }: SalesForecastCardProps) => {
       </div>
 
       <div className="mb-4">
-        <div className="text-sm text-muted-foreground">Total Forecast</div>
+        <div className="text-sm text-muted-foreground">{t('cards.sales_forecast.total')}</div>
         <div className="text-2xl font-semibold text-foreground">${data.totalForecast.toFixed(2)}</div>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-          <XAxis 
-            dataKey="day" 
+          <XAxis
+            dataKey="day"
             className="text-muted-foreground"
             tick={{ fill: 'hsl(var(--muted-foreground))' }}
           />
-          <YAxis 
+          <YAxis
             className="text-muted-foreground"
             tick={{ fill: 'hsl(var(--muted-foreground))' }}
           />
-          <Tooltip 
-            contentStyle={{ 
+          <Tooltip
+            contentStyle={{
               backgroundColor: 'hsl(var(--background))',
               border: '1px solid hsl(var(--border))',
               borderRadius: '8px'
             }}
           />
           <Legend />
-          <Line 
-            type="monotone" 
-            dataKey="Forecast" 
-            stroke="hsl(var(--primary))" 
+          <Line
+            type="monotone"
+            dataKey="Forecast"
+            stroke="hsl(var(--primary))"
             strokeWidth={2}
             dot={{ fill: 'hsl(var(--primary))' }}
           />
-          <Line 
-            type="monotone" 
-            dataKey="Actual" 
-            stroke="hsl(var(--success))" 
+          <Line
+            type="monotone"
+            dataKey="Actual"
+            stroke="hsl(var(--success))"
             strokeWidth={2}
             dot={{ fill: 'hsl(var(--success))' }}
           />

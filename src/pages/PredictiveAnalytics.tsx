@@ -12,14 +12,17 @@ import ZonePricingCard from '@/components/pricing/ZonePricingCard';
 import PriceHistoryCard from '@/components/pricing/PriceHistoryCard';
 import PriceSimulatorCard from '@/components/pricing/PriceSimulatorCard';
 import { Brain, TrendingUp, DollarSign } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const PredictiveAnalytics = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Predictive Analytics</h1>
-        <p className="text-muted-foreground">AI-Powered Analytics Dashboard</p>
+        <h1 className="text-3xl font-bold text-foreground">{t('predictive.title')}</h1>
+        <p className="text-muted-foreground">{t('predictive.subtitle')}</p>
       </div>
 
       {/* Tabs for different sections */}
@@ -27,11 +30,11 @@ const PredictiveAnalytics = () => {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="predictive" className="gap-2">
             <TrendingUp className="h-4 w-4" />
-            Predictive Analytics
+            {t('predictive.tabs.predictive')}
           </TabsTrigger>
           <TabsTrigger value="pricing" className="gap-2">
             <DollarSign className="h-4 w-4" />
-            Pricing Engine
+            {t('predictive.tabs.pricing')}
           </TabsTrigger>
         </TabsList>
 

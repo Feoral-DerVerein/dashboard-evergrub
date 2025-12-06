@@ -1,0 +1,344 @@
+{
+    "chat": {
+        "placeholder": "Envía un mensaje...",
+        "data_analysis": "📊 Análisis de Datos:",
+        "available_products": "📦 Productos Disponibles:",
+        "expiring_soon": "📦 Productos caducando pronto (<72 horas):",
+        "quick_actions": "⚡ Acciones Rápidas:",
+        "inventory_products": "📦 Productos en Inventario",
+        "suggestions": {
+            "predictive_title": "Insights Predictivos IA",
+            "savings_title": "Ahorros y Desperdicio",
+            "recommendations_title": "Recomendaciones Inteligentes"
+        },
+        "notifications": {
+            "badge": "{{count}}",
+            "message": "Tienes {{count}} notificaciones pendientes: {{expiring}} productos caducando y {{lowStock}} con stock bajo."
+        }
+    },
+    "dashboard": {
+        "title": "Panel de Control",
+        "ai_insights": "Insights de IA",
+        "loading": "Cargando predicciones...",
+        "no_risks": "No se detectaron riesgos de desperdicio",
+        "stock": "Stock",
+        "expires": "Caduca",
+        "confidence": "Confianza",
+        "risk_suffix": "RIESGO",
+        "stock_trends_title": "Estado del Stock por Categoría",
+        "legend": {
+            "in_stock": "En Stock",
+            "low_stock": "Stock Bajo",
+            "out_of_stock": "Sin Stock"
+        },
+        "welcome": "Bienvenido al Panel de Negentropy",
+        "refresh": "Actualizar",
+        "last_updated": "Última actualización:",
+        "error_loading": "Error cargando datos:",
+        "user_info": "Información del Usuario",
+        "profile": {
+            "name": "Nombre:",
+            "email": "Email:",
+            "phone": "Teléfono:",
+            "country": "País:",
+            "business_type": "Tipo de Negocio:",
+            "not_set": "No establecido"
+        },
+        "kpi": {
+            "inventory_value": "Valor Total del Inventario",
+            "active_products": "Productos Activos",
+            "waste_reduction": "Reducción de Desperdicios",
+            "at_risk_items": "Ítems en Riesgo",
+            "last_month": "vs. mes anterior",
+            "items_in_stock": "ítems en stock",
+            "efficiency_rate": "tasa de eficiencia",
+            "expiring_soon": "caducan pronto"
+        },
+        "integrations": {
+            "title": "Integraciones Activas",
+            "no_config": "No hay integraciones configuradas.",
+            "last_sync": "Última sinc.:",
+            "never": "Nunca",
+            "just_now": "Ahora mismo",
+            "minutes_ago": "hace {{count}} minuto{{s}}",
+            "hours_ago": "hace {{count}} hora{{s}}",
+            "days_ago": "hace {{count}} día{{s}}"
+        },
+        "forecast": {
+            "title": "Previsión de Demanda (7 Días)",
+            "actual": "Demanda Real",
+            "forecasted": "Demanda Prevista"
+        }
+    },
+    "common": {
+        "dashboard": "Panel de Control",
+        "forecasting": "Previsión",
+        "settings": "Ajustes",
+        "profile": "Perfil",
+        "language": "Idioma",
+        "logout": "Cerrar Sesión",
+        "welcome": "Bienvenido a Negentropy AI",
+        "search": "Buscar...",
+        "notifications": "Notificaciones"
+    },
+    "sidebar": {
+        "chat": "Chat",
+        "performance": "Rendimiento",
+        "predictive_analytics": "Analítica Predictiva",
+        "autopilot": "Piloto Automático",
+        "inventory_products": "Inventario de Productos",
+        "impact_compliance": "Impacto y Cumplimiento",
+        "account": "Cuenta",
+        "integrations": "Integraciones",
+        "pricing": "Precios"
+    },
+    "kpi": {
+        "stock_value": "Valor del Stock",
+        "demand_24h": "Demanda (24h)",
+        "waste_risk": "Riesgo de Desperdicio",
+        "high_items": "Alto ({{count}} ítems)",
+        "metrics": {
+            "total_products": "Total Productos",
+            "low_stock_items": "Artículos con Stock Bajo",
+            "total_suppliers": "Total Proveedores",
+            "waste_reduced": "Merma Reducida vs Mes Pasado",
+            "total_sales": "Ventas Totales",
+            "transactions": "Transacciones",
+            "profit": "Beneficio",
+            "operational_savings": "Ahorro Operativo",
+            "revenue": "Ingresos",
+            "avg_order_value": "Valor Promedio Pedido"
+        },
+        "sustainability": {
+            "co2_saved": "CO₂ Ahorrado",
+            "plastic_reduced": "Plástico Reducido",
+            "trees_equivalent": "Árboles Equivalentes",
+            "water_saved": "Agua Ahorrada",
+            "waste_reduced": "Merma Reducida",
+            "cost_savings": "Ahorro de Costes",
+            "food_waste_reduced": "Desperdicio de Alimentos Reducido"
+        },
+        "insights": {
+            "customer_satisfaction": "Satisfacción del Cliente",
+            "return_rate": "Tasa de Devolución",
+            "retention_rate": "Tasa de Retención",
+            "avg_order_value": "Valor Promedio Pedido",
+            "conversion_rate": "Tasa de Conversión"
+        }
+    },
+    "predictive": {
+        "title": "Analítica Predictiva",
+        "subtitle": "Panel de Análisis Impulsado por IA",
+        "tabs": {
+            "predictive": "Analítica Predictiva",
+            "pricing": "Motor de Precios"
+        }
+    },
+    "autopilot": {
+        "title": "Piloto Automático",
+        "subtitle": "Sistema de automatización en tiempo real"
+    },
+    "inventory": {
+        "title": "Inventario de Productos",
+        "stats": {
+            "total": "{{count}} productos en inventario",
+            "available": "{{count}} productos disponibles"
+        },
+        "loading": "Cargando inventario...",
+        "empty": "No hay productos en el inventario."
+    },
+    "compliance_hub": {
+        "title": "Centro de Impacto y Cumplimiento",
+        "subtitle": "Gestiona el cumplimiento de la Ley 1/2025 y las donaciones de alimentos en un solo lugar.",
+        "tabs": {
+            "overview": "Resumen de Cumplimiento",
+            "donations": "Gestión de Donaciones"
+        },
+        "risk_score": {
+            "title": "Puntuación de Riesgo Regulatorio",
+            "medium": "Medio (45/100)",
+            "potential_fines": "Posibles multas: €2,001 - €60,000",
+            "reason": "¿Por qué? Faltan recibos de donación del mes pasado."
+        },
+        "alerts": {
+            "title": "Alertas de Incumplimiento",
+            "quota_title": "Cuota de Donación Obligatoria No Cumplida",
+            "quota_desc": "Has donado el 12% del excedente. La ley requiere un 20% para tu nivel.",
+            "audit_title": "Informe de Auditoría Pendiente",
+            "audit_desc": "El informe anual de auditoría de residuos vence en 15 días."
+        },
+        "legal_docs": {
+            "title": "Documentos Legales",
+            "subtitle": "Gestiona tus planes de prevención y auditorías.",
+            "generate_btn": "Generar Plan",
+            "dialog_title": "Generar Plan de Prevención",
+            "dialog_desc": "Esto generará un nuevo Plan de Prevención de Desperdicio Alimentario basado en tu inventario y datos de ventas actuales, cumpliendo con las regulaciones locales.",
+            "cancel": "Cancelar",
+            "generate": "Generar"
+        },
+        "traceability": {
+            "title": "Registro Completo de Trazabilidad",
+            "desc": "Rastrea cada artículo desde la entrada hasta la salida (Venta, Donación o Desperdicio)"
+        }
+    },
+    "scenario": {
+        "label": "Escenario Activo",
+        "base": "Base (Actual)",
+        "optimistic": "Optimista (+20%)",
+        "crisis": "Crisis (-30%)"
+    },
+    "actions": {
+        "title": "Acciones Prescriptivas IA",
+        "loading": "Inicia un escenario para ver acciones...",
+        "impact_high": "Impacto Alto",
+        "impact_medium": "Impacto Medio",
+        "impact_low": "Impacto Bajo",
+        "sections": {
+            "inventory": "Optimización de Inventario",
+            "pricing": "Precios Dinámicos",
+            "sustainability": "Sostenibilidad y Donaciones"
+        }
+    },
+    "compliance": {
+        "generate_btn": "Generar Informe PDF",
+        "title": "Generar Informe de Cumplimiento",
+        "type_label": "Tipo de Informe",
+        "date_start": "Fecha Inicio",
+        "date_end": "Fecha Fin",
+        "generate_preview": "Generar Vista Previa",
+        "download_pdf": "Descargar PDF",
+        "types": {
+            "spain_ley1_2025": "🇪🇸 España - Cumplimiento Ley 1/2025",
+            "prevention_plan": "🇪🇸 España - Plan de Prevención",
+            "australia_epa": "🇦🇺 Australia - NSW EPA"
+        }
+    },
+    "documentation": {
+        "title": "Documentación",
+        "subtitle": "Guías completas para usuarios y referencias de API.",
+        "tabs": {
+            "user_guide": "Guía de Usuario",
+            "api_reference": "Referencia API"
+        }
+    },
+    "kpi_sections": {
+        "forecasting_overview": "Resumen de Previsión",
+        "forecast_engine": "Motor de Previsión",
+        "pricing_engine": "Motor de Precios",
+        "inventory_optimizer": "Optimizador de Inventario",
+        "risk_engine": "Motor de Riesgos",
+        "recommendation_engine": "Motor de Recomendaciones",
+        "business_health": "Salud del Negocio",
+        "alert_center": "Centro de Alertas",
+        "sustainability_impact": "Impacto de Sostenibilidad",
+        "customer_insights": "Insights de Clientes",
+        "savings_waste": "Ahorros y Desperdicio"
+    },
+    "cards": {
+        "forecast_engine": {
+            "title": "Previsión de Demanda",
+            "table": {
+                "sku": "SKU",
+                "forecast": "Demanda Prevista",
+                "confidence": "Confianza",
+                "drivers": "Factores"
+            },
+            "no_data": "No hay productos disponibles para analizar",
+            "explanation": "La previsión de demanda se calcula utilizando patrones históricos de ventas, tendencias estacionales, clima, promociones y efectos del día de la semana. Las puntuaciones de confianza reflejan la precisión del modelo."
+        },
+        "pricing_engine": {
+            "title": "Precios Óptimos",
+            "table": {
+                "sku": "SKU",
+                "current": "Precio Actual",
+                "recommended": "Precio Recomendado",
+                "margin_impact": "Impacto Margen",
+                "demand_impact": "Impacto Demanda"
+            },
+            "explanation": "El sistema calcula precios óptimos basados en demanda actual, reducción de desperdicio proyectada, elasticidad del producto, precios de la competencia y rotación de inventario para maximizar ingresos y reducir desperdicio."
+        },
+        "inventory_optimizer": {
+            "title": "Niveles de Inventario Óptimos",
+            "table": {
+                "sku": "SKU",
+                "current": "Stock Actual",
+                "recommended": "Stock Recomendado",
+                "risk": "Nivel de Riesgo",
+                "suggestion": "Sugerencia de Pedido"
+            },
+            "explanation": "El optimizador calcula el inventario ideal integrando previsiones de demanda, tiempos de entrega de proveedores y proyecciones de riesgo de desperdicio para mantener niveles óptimos y minimizar costos."
+        },
+        "alert_center": {
+            "title": "Alertas",
+            "no_alerts": "No hay alertas activas"
+        },
+        "sales_forecast": {
+            "title": "Previsión de Ventas - Próximos 7 Días",
+            "total": "Previsión Total"
+        },
+        "risk_engine": {
+            "title_overview": "Resumen de Riesgos",
+            "title_critical": "SKUs Críticos",
+            "stockout_risk": "Riesgo de Agotamiento",
+            "overstock_risk": "Riesgo de Sobre-stock",
+            "weather_sensitivity": "Sensibilidad Climática",
+            "volatility_index": "Índice de Volatilidad",
+            "no_critical": "No hay productos críticos en este momento"
+        },
+        "business_health": {
+            "inventory_turnover": "Rotación de Inventario",
+            "waste_percentage": "Porcentaje de Merma",
+            "stockout_percentage": "Porcentaje de Agotados",
+            "volatile_products": "Productos más Volátiles",
+            "overall_score": "Puntuación General"
+        },
+        "top_products": {
+            "title": "Productos Top - Previsión vs Stock",
+            "no_data": "No hay datos de productos disponibles",
+            "current_stock": "Stock Actual",
+            "forecast_demand": "Demanda Prevista",
+            "avg_daily_sales": "Ventas Diarias Promedio",
+            "risk": "Riesgo",
+            "units_day": "unid/día"
+        },
+        "recommendation_engine": {
+            "title": "Recomendaciones Accionables",
+            "no_data": "No hay recomendaciones disponibles en este momento"
+        },
+        "influencing_factors": {
+            "title": "Factores Clave de Influencia",
+            "subtitle": "Factores externos que pueden afectar tu negocio en los próximos días",
+            "no_data": "No hay factores identificados en este momento"
+        },
+        "intelligent_news": {
+            "empty": "No hay notificaciones en este momento",
+            "actions": {
+                "view_products": "Ver Productos",
+                "manage_inventory": "Gestionar Inventario",
+                "view_orders": "Ver Pedidos",
+                "view_insights": "Ver Insights",
+                "create_offer": "Crear Oferta",
+                "view_deliveries": "Ver Entregas",
+                "complete": "Completar",
+                "delete": "Eliminar"
+            },
+            "priority": {
+                "high": "Prioridad Alta",
+                "medium": "Media",
+                "info": "Info"
+            },
+            "titles": {
+                "urgent_expiring": "⚡ Urgente: Productos Caducando",
+                "products_nearing_expiration": "📦 Productos Próximos a Caducar",
+                "low_stock_alert": "📊 Alerta Stock Bajo",
+                "new_orders": "🛒 Nuevos Pedidos Recibidos",
+                "ai_recommendation": "🤖 Recomendación IA",
+                "smart_business_tip": "🤖 Consejo Empresarial Inteligente",
+                "promotion_opportunity": "💡 Oportunidad de Promoción",
+                "customer_feedback": "⭐ Comentarios de Clientes",
+                "pending_deliveries": "🚚 Entregas Pendientes",
+                "sales_trend": "📈 Tendencia de Ventas"
+            }
+        }
+    }
+}

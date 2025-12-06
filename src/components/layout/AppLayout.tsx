@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useLocation, Link } from "react-router-dom";
-import { BarChart3, LogOut, Package, Truck, Plug, FileText, Settings, CreditCard, User, MessageSquare, Brain, Bot, Scale, Heart } from "lucide-react";
-import { KPIHeader } from "./KPIHeader";
+import { BarChart3, LogOut, Package, Truck, Plug, FileText, Settings, CreditCard, User, MessageSquare, Brain, Bot, Scale, Heart, Globe, Check, Network } from "lucide-react";
+
 import {
   Sidebar,
   SidebarContent,
@@ -21,33 +21,48 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-const menuItems = [
-  { title: "Chat", url: "/dashboard", icon: MessageSquare },
-  { title: "Performance", url: "/kpi", icon: BarChart3 },
-  { title: "Predictive Analytics", url: "/predictive-analytics", icon: Brain },
-  { title: "Auto-Pilot", url: "/autopilot", icon: Bot },
-  { title: "Inventory Products", url: "/inventory-products", icon: Package },
-  { title: "Notes", url: "/notes", icon: FileText },
-  { title: "Delivery", url: "/delivery", icon: Truck },
-  { title: "Legal Compliance", url: "/legal", icon: Scale },
-  { title: "Donate", url: "/donate", icon: Heart },
-];
+import { useTranslation } from "react-i18next";
+
 
 function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+
+  const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Español' },
+    { code: 'ca', name: 'Català' },
+    { code: 'de', name: 'Deutsch' },
+  ];
+
+  const handleLanguageChange = (langCode: string) => {
+    i18n.changeLanguage(langCode);
+  };
   const currentPath = location.pathname;
   const isCollapsed = state === "collapsed";
 
+  const menuItems = [
+    { title: t("sidebar.chat"), url: "/aladdin", icon: MessageSquare },
+    { title: t("sidebar.performance"), url: "/kpi", icon: BarChart3 },
+    { title: t("sidebar.predictive_analytics"), url: "/predictive-analytics", icon: Brain },
+    { title: t("sidebar.autopilot"), url: "/autopilot", icon: Bot },
+    { title: t("sidebar.inventory_products"), url: "/inventory-products", icon: Package },
+    { title: t("sidebar.impact_compliance"), url: "/legal", icon: Scale },
+  ];
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    toast.success("Logged out successfully");
+    toast.success(t("common.logout") + " successfully"); // Small adjustment for now, can be fully translated later
     navigate("/login");
   };
 
@@ -68,7 +83,7 @@ function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton
                     asChild
                     isActive={currentPath === item.url}
@@ -91,37 +106,70 @@ function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="w-full" tooltip="Account">
+                <SidebarMenuButton className="w-full" tooltip={t("sidebar.account")}>
                   <Avatar className="h-6 w-6">
                     <AvatarImage src="/lovable-uploads/81d95ee7-5dc6-4639-b0da-bb02c332b8ea.png" />
                     <AvatarFallback>U</AvatarFallback>
                   </Avatar>
-                  <span>Account</span>
+                  <span>{t("sidebar.account")}</span>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 z-50">
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center gap-2 w-full cursor-pointer">
                     <User className="h-4 w-4" />
-                    Profile
+                    {t("common.profile")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/integrations" className="flex items-center gap-2 w-full cursor-pointer">
                     <Plug className="h-4 w-4" />
-                    Integrations
+                    {t("sidebar.integrations")}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/docs" className="flex items-center gap-2 w-full cursor-pointer">
+                    <FileText className="h-4 w-4" />
+                    Documentation
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/pricing" className="flex items-center gap-2 w-full cursor-pointer">
                     <CreditCard className="h-4 w-4" />
-                    Pricing
+                    {t("sidebar.pricing")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/test-data" className="flex items-center gap-2 w-full cursor-pointer text-blue-600 font-medium bg-blue-50/50">
+                    <Network className="h-4 w-4" />
+                    Developer Tools
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Globe className="mr-2 h-4 w-4" />
+                    <span>{t("common.language")}</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {languages.map((lang) => (
+                      <DropdownMenuItem
+                        key={lang.code}
+                        onClick={() => handleLanguageChange(lang.code)}
+                      >
+                        <Check
+                          className={`mr-2 h-4 w-4 ${i18n.language === lang.code ? "opacity-100" : "opacity-0"
+                            }`}
+                        />
+                        {lang.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                   <LogOut className="h-4 w-4 mr-2" />
-                  Logout
+                  {t("common.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -140,9 +188,10 @@ const AppLayout = () => {
       <div className="min-h-screen flex w-full bg-gray-50">
         <AppSidebar />
         <main className="flex-1 glass-card">
-          <div className="h-14 border-b border-gray-100 flex items-center px-4 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-            <SidebarTrigger />
-            <KPIHeader />
+          <div className="h-14 border-b border-gray-100 flex items-center px-4 bg-white/80 backdrop-blur-sm sticky top-0 z-10 justify-between">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger />
+            </div>
           </div>
           <Outlet />
         </main>

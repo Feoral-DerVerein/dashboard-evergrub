@@ -1,0 +1,346 @@
+{
+    "chat": {
+        "placeholder": "Send a message...",
+        "data_analysis": "📊 Data Analysis:",
+        "available_products": "📦 Available Products:",
+        "expiring_soon": "📦 Products Expiring Soon (<72 hours):",
+        "quick_actions": "⚡ Quick Actions:",
+        "inventory_products": "📦 Inventory Products",
+        "suggestions": {
+            "predictive_title": "AI Predictive Insights",
+            "savings_title": "Savings & Food Waste",
+            "recommendations_title": "Smart Recommendations"
+        },
+        "notifications": {
+            "badge": "{{count}}",
+            "message": "You have {{count}} pending notifications: {{expiring}} products expiring soon and {{lowStock}} with low stock."
+        }
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "ai_insights": "AI-Powered Insights",
+        "loading": "Loading predictions...",
+        "no_risks": "No waste risks detected",
+        "stock": "Stock",
+        "expires": "Expires",
+        "confidence": "Confidence",
+        "risk_suffix": "RISK",
+        "stock_trends_title": "Stock Status by Category",
+        "legend": {
+            "in_stock": "In Stock",
+            "low_stock": "Low Stock",
+            "out_of_stock": "Out of Stock"
+        },
+        "welcome": "Welcome to Negentropy Dashboard",
+        "refresh": "Refresh",
+        "last_updated": "Last updated:",
+        "error_loading": "Error loading dashboard data:",
+        "user_info": "User Information",
+        "profile": {
+            "name": "Name:",
+            "email": "Email:",
+            "phone": "Phone:",
+            "country": "Country:",
+            "business_type": "Business Type:",
+            "not_set": "Not set"
+        },
+        "kpi": {
+            "inventory_value": "Total Inventory Value",
+            "active_products": "Active Products",
+            "waste_reduction": "Waste Reduction",
+            "at_risk_items": "At Risk Items",
+            "donated_meals": "Meals Donated",
+            "last_month": "vs. last month",
+            "items_in_stock": "items in stock",
+            "efficiency_rate": "efficiency rate",
+            "expiring_soon": "expiring soon",
+            "units_donated": "total units donated"
+        },
+        "integrations": {
+            "title": "Active Integrations",
+            "no_config": "No integrations configured yet.",
+            "last_sync": "Last sync:",
+            "never": "Never",
+            "just_now": "Just now",
+            "minutes_ago": "{{count}} minute{{s}} ago",
+            "hours_ago": "{{count}} hour{{s}} ago",
+            "days_ago": "{{count}} day{{s}} ago"
+        },
+        "forecast": {
+            "title": "Demand Forecast (Next 7 Days)",
+            "actual": "Actual Demand",
+            "forecasted": "Forecasted Demand"
+        }
+    },
+    "common": {
+        "dashboard": "Dashboard",
+        "forecasting": "Forecasting",
+        "settings": "Settings",
+        "profile": "Profile",
+        "language": "Language",
+        "logout": "Logout",
+        "welcome": "Welcome to Negentropy AI",
+        "search": "Search...",
+        "notifications": "Notifications"
+    },
+    "sidebar": {
+        "chat": "Chat",
+        "performance": "Performance",
+        "predictive_analytics": "Predictive Analytics",
+        "autopilot": "Auto-Pilot",
+        "inventory_products": "Inventory Products",
+        "impact_compliance": "Impact & Compliance",
+        "account": "Account",
+        "integrations": "Integrations",
+        "pricing": "Pricing"
+    },
+    "kpi": {
+        "stock_value": "Stock Value",
+        "demand_24h": "Demand (24h)",
+        "waste_risk": "Waste Risk",
+        "high_items": "High ({{count}} items)",
+        "metrics": {
+            "total_products": "Total Products",
+            "low_stock_items": "Low Stock Items",
+            "total_suppliers": "Total Suppliers",
+            "waste_reduced": "Waste Reduced vs Last Month",
+            "total_sales": "Total Sales",
+            "transactions": "Transactions",
+            "profit": "Profit",
+            "operational_savings": "Operational Savings",
+            "revenue": "Revenue",
+            "avg_order_value": "Avg Order Value"
+        },
+        "sustainability": {
+            "co2_saved": "CO₂ Saved",
+            "plastic_reduced": "Plastic Reduced",
+            "trees_equivalent": "Trees Equivalent",
+            "water_saved": "Water Saved",
+            "waste_reduced": "Waste Reduced",
+            "cost_savings": "Cost Savings",
+            "food_waste_reduced": "Food Waste Reduced"
+        },
+        "insights": {
+            "customer_satisfaction": "Customer Satisfaction",
+            "return_rate": "Return Rate",
+            "retention_rate": "Retention Rate",
+            "avg_order_value": "Avg Order Value",
+            "conversion_rate": "Conversion Rate"
+        }
+    },
+    "predictive": {
+        "title": "Predictive Analytics",
+        "subtitle": "AI-Powered Analytics Dashboard",
+        "tabs": {
+            "predictive": "Predictive Analytics",
+            "pricing": "Pricing Engine"
+        }
+    },
+    "autopilot": {
+        "title": "Auto-Pilot",
+        "subtitle": "Real-time automation system"
+    },
+    "inventory": {
+        "title": "Product Inventory",
+        "stats": {
+            "total": "{{count}} products in inventory",
+            "available": "{{count}} products available"
+        },
+        "loading": "Loading inventory...",
+        "empty": "No products in inventory."
+    },
+    "compliance_hub": {
+        "title": "Impact & Compliance Hub",
+        "subtitle": "Manage Ley 1/2025 compliance and food donations in one place.",
+        "tabs": {
+            "overview": "Compliance Overview",
+            "donations": "Donation Management"
+        },
+        "risk_score": {
+            "title": "Regulatory Risk Score",
+            "medium": "Medium (45/100)",
+            "potential_fines": "Potential fines: €2,001 - €60,000",
+            "reason": "Why? Missing donation receipts for last month."
+        },
+        "alerts": {
+            "title": "Non-Compliance Alerts",
+            "quota_title": "Mandatory Donation Quota Not Met",
+            "quota_desc": "You have donated 12% of surplus. Law requires 20% for your tier.",
+            "audit_title": "Audit Report Due",
+            "audit_desc": "Annual waste audit report is due in 15 days."
+        },
+        "legal_docs": {
+            "title": "Legal Documents",
+            "subtitle": "Manage your prevention plans and audits.",
+            "generate_btn": "Generate Plan",
+            "dialog_title": "Generate Prevention Plan",
+            "dialog_desc": "This will generate a new Food Waste Prevention Plan based on your current inventory and sales data, compliant with local regulations.",
+            "cancel": "Cancel",
+            "generate": "Generate"
+        },
+        "traceability": {
+            "title": "Complete Traceability Log",
+            "desc": "Track every item from entry to exit (Sale, Donation, or Waste)"
+        }
+    },
+    "scenario": {
+        "label": "Active Scenario",
+        "base": "Base (Current)",
+        "optimistic": "Optimistic (+20%)",
+        "crisis": "Crisis (-30%)"
+    },
+    "actions": {
+        "title": "AI Prescriptive Actions",
+        "loading": "Start a scenario to see actions...",
+        "impact_high": "High Impact",
+        "impact_medium": "Medium Impact",
+        "impact_low": "Low Impact",
+        "sections": {
+            "inventory": "Inventory Optimization",
+            "pricing": "Dynamic Pricing",
+            "sustainability": "Sustainability & Donations"
+        }
+    },
+    "compliance": {
+        "generate_btn": "Generate PDF Report",
+        "title": "Generate Compliance Report",
+        "type_label": "Report Type",
+        "date_start": "Start Date",
+        "date_end": "End Date",
+        "generate_preview": "Generate Preview",
+        "download_pdf": "Download PDF",
+        "types": {
+            "spain_ley1_2025": "🇪🇸 Spain - Compliance Ley 1/2025",
+            "prevention_plan": "🇪🇸 Spain - Prevention Plan",
+            "australia_epa": "🇦🇺 Australia - NSW EPA"
+        }
+    },
+    "documentation": {
+        "title": "Documentation",
+        "subtitle": "Comprehensive guides for end-users and API references.",
+        "tabs": {
+            "user_guide": "User Guide",
+            "api_reference": "API Reference"
+        }
+    },
+    "kpi_sections": {
+        "forecasting_overview": "Forecasting Overview",
+        "forecast_engine": "Forecast Engine",
+        "pricing_engine": "Pricing Engine",
+        "inventory_optimizer": "Inventory Optimizer",
+        "risk_engine": "Risk Engine",
+        "recommendation_engine": "Recommendation Engine",
+        "business_health": "Business Health",
+        "alert_center": "Alert Center",
+        "sustainability_impact": "Sustainability Impact",
+        "customer_insights": "Customer Insights",
+        "savings_waste": "Savings & Food Waste"
+    },
+    "cards": {
+        "forecast_engine": {
+            "title": "Demand Forecast",
+            "table": {
+                "sku": "SKU",
+                "forecast": "Demand Forecast",
+                "confidence": "Confidence",
+                "drivers": "Drivers"
+            },
+            "no_data": "No products available for analysis",
+            "explanation": "The demand forecast is calculated using historical sales patterns, seasonal trends, weather conditions, promotional activities, and day-of-week effects. Confidence scores reflect model accuracy based on historical prediction performance."
+        },
+        "pricing_engine": {
+            "title": "Optimal Pricing",
+            "table": {
+                "sku": "SKU",
+                "current": "Current Price",
+                "recommended": "Recommended Price",
+                "margin_impact": "Margin Impact",
+                "demand_impact": "Demand Impact"
+            },
+            "explanation": "The system calculates optimal pricing based on current demand patterns, projected waste reduction, product elasticity, competitor pricing, and inventory turnover rates to maximize both revenue and reduce food waste."
+        },
+        "inventory_optimizer": {
+            "title": "Optimal Inventory Levels",
+            "table": {
+                "sku": "SKU",
+                "current": "Current Stock",
+                "recommended": "Recommended Stock",
+                "risk": "Risk Level",
+                "suggestion": "Order Suggestion"
+            },
+            "explanation": "The optimizer calculates ideal inventory by integrating demand forecasts, supplier lead times, and waste risk projections to maintain optimal stock levels while minimizing holding costs and preventing stockouts."
+        },
+        "alert_center": {
+            "title": "Alerts",
+            "no_alerts": "No active alerts"
+        },
+        "sales_forecast": {
+            "title": "Sales Forecast - Next 7 Days",
+            "total": "Total Forecast"
+        },
+        "risk_engine": {
+            "title_overview": "Risk Overview",
+            "title_critical": "Critical SKUs",
+            "stockout_risk": "Stockout Risk",
+            "overstock_risk": "Overstock Risk",
+            "weather_sensitivity": "Weather Sensitivity",
+            "volatility_index": "Volatility Index",
+            "no_critical": "No critical products at this moment"
+        },
+        "business_health": {
+            "inventory_turnover": "Inventory Turnover",
+            "waste_percentage": "Waste Percentage",
+            "stockout_percentage": "Stockout Percentage",
+            "volatile_products": "Most Volatile Products",
+            "overall_score": "Overall Score"
+        },
+        "top_products": {
+            "title": "Top Products - Forecast vs Stock",
+            "no_data": "No product data available",
+            "current_stock": "Current Stock",
+            "forecast_demand": "Forecast Demand",
+            "avg_daily_sales": "Avg Daily Sales",
+            "risk": "Risk",
+            "units_day": "units/day"
+        },
+        "recommendation_engine": {
+            "title": "Actionable Recommendations",
+            "no_data": "No recommendations available at this time"
+        },
+        "influencing_factors": {
+            "title": "Key Influencing Factors",
+            "subtitle": "External factors that may affect your business in the next few days",
+            "no_data": "No factors identified at this moment"
+        },
+        "intelligent_news": {
+            "empty": "No notifications at the moment",
+            "actions": {
+                "view_products": "View Products",
+                "manage_inventory": "Manage Inventory",
+                "view_orders": "View Orders",
+                "view_insights": "View Insights",
+                "create_offer": "Create Offer",
+                "view_deliveries": "View Deliveries",
+                "complete": "Complete",
+                "delete": "Delete"
+            },
+            "priority": {
+                "high": "High Priority",
+                "medium": "Medium",
+                "info": "Info"
+            },
+            "titles": {
+                "urgent_expiring": "⚡ Urgent: Products Expiring Soon",
+                "products_nearing_expiration": "📦 Products Nearing Expiration",
+                "low_stock_alert": "📊 Low Stock Alert",
+                "new_orders": "🛒 New Orders Received",
+                "ai_recommendation": "🤖 AI Recommendation",
+                "smart_business_tip": "🤖 Smart Business Tip",
+                "promotion_opportunity": "💡 Promotion Opportunity",
+                "customer_feedback": "⭐ Customer Feedback",
+                "pending_deliveries": "🚚 Pending Deliveries",
+                "sales_trend": "📈 Sales Trend"
+            }
+        }
+    }
+}

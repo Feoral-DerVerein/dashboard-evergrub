@@ -28,7 +28,7 @@ serve(async (req) => {
     );
 
     const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken);
-    
+
     if (userError || !user) {
       console.error('Auth error in predict-waste, userError:', userError);
       throw new Error('Unauthorized');
@@ -48,65 +48,100 @@ serve(async (req) => {
     const predictions = [];
     let totalWasteValue = 0;
 
-    for (const product of products || []) {
-      let wasteQuantity = 0;
-      let wasteCause = '';
-      let confidence = 0;
-      let recommendation = '';
+    const mlServiceUrl = Deno.env.get('ML_SERVICE_URL') || 'http://localhost:8000';
+    const mlApiKey = Deno.env.get('ML_SERVICE_API_KEY') || '';
 
-      // Check expiration
-      if (product.expirationdate) {
-        const expiryDate = new Date(product.expirationdate);
-        const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    // Process products in parallel batches to avoid timeout
+    const batchSize = 5;
+    for (let i = 0; i < (products || []).length; i += batchSize) {
+      const batch = products.slice(i, i + batchSize);
 
-        if (daysUntilExpiry <= 7 && daysUntilExpiry > 0) {
-          // High risk of waste due to expiration
-          wasteQuantity = Math.ceil(product.quantity * 0.3); // 30% waste prediction
-          wasteCause = 'expiration';
-          confidence = 0.75;
-          recommendation = `Consider ${daysUntilExpiry <= 3 ? 'immediate' : 'urgent'} discount or donation. Expires in ${daysUntilExpiry} days.`;
-        } else if (daysUntilExpiry <= 0) {
-          // Already expired
-          wasteQuantity = product.quantity;
-          wasteCause = 'expiration';
-          confidence = 0.95;
-          recommendation = 'Product expired. Remove from inventory immediately.';
+      await Promise.all(batch.map(async (product: any) => {
+        try {
+          // Calculate days to expiry
+          let daysUntilExpiry = 30; // Default
+          if (product.expirationdate) {
+            const expiryDate = new Date(product.expirationdate);
+            daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          }
+
+          // Call ML Service
+          const response = await fetch(`${mlServiceUrl}/predict/risk`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${mlApiKey}`
+            },
+            body: JSON.stringify({
+              product_id: product.id,
+              stock: product.quantity,
+              avg_daily_sales: product.daily_sales_rate || 2, // approximation if missing
+              days_to_expiry: daysUntilExpiry,
+              product_cost: product.price || 0
+            })
+          });
+
+          if (response.ok) {
+            const riskAnalysis = await response.json();
+            const riskScore = riskAnalysis.waste_risk_score; // 0-1 scale assumed
+
+            if (riskScore > 0.3) { // Threshold for prediction
+              const wasteQuantity = Math.ceil(product.quantity * riskAnalysis.waste_risk_score);
+              const wasteValue = wasteQuantity * (product.price || 0);
+              totalWasteValue += wasteValue;
+
+              let wasteCause = 'other';
+              let recommendation = 'Check inventory';
+
+              if (daysUntilExpiry < 7) {
+                wasteCause = 'expiration';
+                recommendation = `Expires in ${daysUntilExpiry} days. Discount immediately.`;
+              } else if (riskAnalysis.expiration_risk_score > 0.7) {
+                wasteCause = 'low_demand';
+                recommendation = 'Demand is too low for current stock levels.';
+              }
+
+              predictions.push({
+                user_id: user.id,
+                product_id: product.id,
+                product_name: product.name,
+                prediction_date: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                predicted_waste_quantity: wasteQuantity,
+                predicted_waste_value: wasteValue,
+                waste_cause: wasteCause,
+                confidence_score: riskScore,
+                recommendation: recommendation,
+              });
+            }
+          } else {
+            // Fallback to local logic if ML service fails
+            throw new Error("ML Service error");
+          }
+
+        } catch (err) {
+          console.error(`Error predicting waste for ${product.id}, falling back to local:`, err);
+          // Local heuristic fallback
+          // ... (simplified fallback logic)
+          if (product.expirationdate) {
+            const expiryDate = new Date(product.expirationdate);
+            const days = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            if (days <= 7 && days > 0) {
+              predictions.push({
+                user_id: user.id,
+                product_id: product.id,
+                product_name: product.name,
+                prediction_date: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                predicted_waste_quantity: Math.ceil(product.quantity * 0.3),
+                predicted_waste_value: Math.ceil(product.quantity * 0.3) * (product.price || 0),
+                waste_cause: 'expiration',
+                confidence_score: 0.7,
+                recommendation: `Expires in ${days} days. Local fallback.`
+              });
+              totalWasteValue += Math.ceil(product.quantity * 0.3) * (product.price || 0);
+            }
+          }
         }
-      }
-
-      // Check for overstock (quantity > 50)
-      if (product.quantity > 50 && !wasteQuantity) {
-        wasteQuantity = Math.ceil(product.quantity * 0.15); // 15% waste prediction
-        wasteCause = 'overstock';
-        confidence = 0.60;
-        recommendation = 'High inventory level. Consider promotions to increase sales velocity.';
-      }
-
-      // Check for low demand (if we have sales history)
-      // This is simplified - in production you'd analyze actual sales velocity
-      if (product.quantity > 20 && !wasteQuantity) {
-        wasteQuantity = Math.ceil(product.quantity * 0.10); // 10% waste prediction
-        wasteCause = 'low_demand';
-        confidence = 0.50;
-        recommendation = 'Monitor sales closely. May need marketing push or price adjustment.';
-      }
-
-      if (wasteQuantity > 0) {
-        const wasteValue = wasteQuantity * (product.price || 0);
-        totalWasteValue += wasteValue;
-
-        predictions.push({
-          user_id: user.id,
-          product_id: product.id,
-          product_name: product.name,
-          prediction_date: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days ahead
-          predicted_waste_quantity: wasteQuantity,
-          predicted_waste_value: wasteValue,
-          waste_cause: wasteCause,
-          confidence_score: confidence,
-          recommendation,
-        });
-      }
+      }));
     }
 
     // Store predictions
@@ -131,7 +166,7 @@ serve(async (req) => {
     // Calculate weekly trend
     const trend = [];
     const weeks = ['Week -3', 'Week -2', 'Week -1', 'Current', 'Prediction'];
-    
+
     for (let i = 0; i < 5; i++) {
       if (i < 4) {
         // Historical data (simplified)

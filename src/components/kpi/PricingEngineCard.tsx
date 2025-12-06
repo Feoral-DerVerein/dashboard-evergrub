@@ -6,6 +6,7 @@ import { ArrowUp, ArrowDown, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { performanceEngineService, PricingItem } from "@/services/performanceEngineService";
 import { useAuth } from "@/context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 interface PricingEngineCardProps {
   isLoading?: boolean;
@@ -13,13 +14,14 @@ interface PricingEngineCardProps {
 
 const PricingEngineCard = ({ isLoading: externalLoading }: PricingEngineCardProps) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [pricingData, setPricingData] = useState<PricingItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       if (!user?.id) return;
-      
+
       setLoading(true);
       try {
         const data = await performanceEngineService.getPricingData(user.id);
@@ -52,7 +54,7 @@ const PricingEngineCard = ({ isLoading: externalLoading }: PricingEngineCardProp
     return (
       <Card className="apple-card">
         <CardHeader>
-          <CardTitle>Optimal Pricing</CardTitle>
+          <CardTitle>{t('cards.pricing_engine.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Skeleton className="h-[350px] w-full" />
@@ -64,7 +66,7 @@ const PricingEngineCard = ({ isLoading: externalLoading }: PricingEngineCardProp
   return (
     <Card className="apple-card">
       <CardHeader>
-        <CardTitle>Optimal Pricing</CardTitle>
+        <CardTitle>{t('cards.pricing_engine.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Pricing Table */}
@@ -72,18 +74,18 @@ const PricingEngineCard = ({ isLoading: externalLoading }: PricingEngineCardProp
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-semibold">SKU</TableHead>
-                <TableHead className="font-semibold text-right">Current Price</TableHead>
-                <TableHead className="font-semibold text-right">Recommended Price</TableHead>
-                <TableHead className="font-semibold text-right">Margin Impact</TableHead>
-                <TableHead className="font-semibold text-right">Demand Impact</TableHead>
+                <TableHead className="font-semibold">{t('cards.pricing_engine.table.sku')}</TableHead>
+                <TableHead className="font-semibold text-right">{t('cards.pricing_engine.table.current')}</TableHead>
+                <TableHead className="font-semibold text-right">{t('cards.pricing_engine.table.recommended')}</TableHead>
+                <TableHead className="font-semibold text-right">{t('cards.pricing_engine.table.margin_impact')}</TableHead>
+                <TableHead className="font-semibold text-right">{t('cards.pricing_engine.table.demand_impact')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {pricingData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    No hay productos disponibles para analizar
+                    {t('cards.forecast_engine.no_data')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -117,9 +119,7 @@ const PricingEngineCard = ({ isLoading: externalLoading }: PricingEngineCardProp
 
         {/* Explanation */}
         <p className="text-sm text-muted-foreground leading-relaxed">
-          The system calculates optimal pricing based on current demand patterns, projected waste reduction, 
-          product elasticity, competitor pricing, and inventory turnover rates to maximize both revenue and 
-          reduce food waste.
+          {t('cards.pricing_engine.explanation')}
         </p>
       </CardContent>
     </Card>

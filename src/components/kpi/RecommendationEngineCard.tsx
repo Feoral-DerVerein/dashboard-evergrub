@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Recommendation } from "@/services/dashboardAnalyticsService";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 interface RecommendationEngineCardProps {
   data?: Recommendation[];
@@ -8,6 +9,7 @@ interface RecommendationEngineCardProps {
 }
 
 const RecommendationEngineCard = ({ data, isLoading }: RecommendationEngineCardProps) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <Card className="p-6 animate-pulse">
@@ -28,9 +30,9 @@ const RecommendationEngineCard = ({ data, isLoading }: RecommendationEngineCardP
   if (!data || data.length === 0) {
     return (
       <Card className="p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Actionable Recommendations</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.recommendation_engine.title')}</h3>
         <div className="text-center py-8 text-muted-foreground">
-          No recommendations available at this time
+          {t('cards.recommendation_engine.no_data')}
         </div>
       </Card>
     );
@@ -38,7 +40,7 @@ const RecommendationEngineCard = ({ data, isLoading }: RecommendationEngineCardP
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4">Actionable Recommendations</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.recommendation_engine.title')}</h3>
       <div className="space-y-3 max-h-[400px] overflow-y-auto">
         {data.map((rec, idx) => (
           <div key={idx} className="p-4 bg-background border border-border rounded-lg hover:border-primary/50 transition-colors">

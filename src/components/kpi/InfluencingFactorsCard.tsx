@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { InfluencingFactor } from "@/services/dashboardAnalyticsService";
 import { TrendingUp, TrendingDown, Calendar, Cloud, Users, Package } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface InfluencingFactorsCardProps {
   data?: InfluencingFactor[];
@@ -8,6 +9,7 @@ interface InfluencingFactorsCardProps {
 }
 
 const InfluencingFactorsCard = ({ data, isLoading }: InfluencingFactorsCardProps) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <Card className="p-6 animate-pulse">
@@ -27,9 +29,9 @@ const InfluencingFactorsCard = ({ data, isLoading }: InfluencingFactorsCardProps
   if (!data || data.length === 0) {
     return (
       <Card className="p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Key Influencing Factors</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.influencing_factors.title')}</h3>
         <div className="text-center py-8 text-muted-foreground">
-          No hay factores identificados en este momento
+          {t('cards.influencing_factors.no_data')}
         </div>
       </Card>
     );
@@ -66,11 +68,11 @@ const InfluencingFactorsCard = ({ data, isLoading }: InfluencingFactorsCardProps
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4">Key Influencing Factors</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.influencing_factors.title')}</h3>
       <div className="text-sm text-muted-foreground mb-4">
-        Factores externos que pueden afectar tu negocio en los próximos días
+        {t('cards.influencing_factors.subtitle')}
       </div>
-      
+
       <div className="space-y-3">
         {data.map((factor, idx) => (
           <div key={idx} className="p-4 bg-background border border-border rounded-lg hover:border-primary/50 transition-colors">

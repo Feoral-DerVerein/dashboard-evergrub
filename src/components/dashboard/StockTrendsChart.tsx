@@ -1,25 +1,24 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
+import type { StockCategoryItem } from '@/types/dashboard';
 
-// Mock data for stock trends by category
-const stockData = [
-    { category: 'Dairy', inStock: 450, lowStock: 23, outOfStock: 5 },
-    { category: 'Produce', inStock: 320, lowStock: 45, outOfStock: 12 },
-    { category: 'Meat', inStock: 280, lowStock: 18, outOfStock: 3 },
-    { category: 'Bakery', inStock: 190, lowStock: 32, outOfStock: 8 },
-    { category: 'Beverages', inStock: 410, lowStock: 15, outOfStock: 2 },
-];
+interface StockTrendsChartProps {
+    data?: StockCategoryItem[];
+}
 
-export const StockTrendsChart = () => {
+export const StockTrendsChart: React.FC<StockTrendsChartProps> = ({ data = [] }) => {
+    const { t } = useTranslation();
+
     return (
         <Card className="hover:shadow-lg transition-all duration-300">
             <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-800">Stock Status by Category</CardTitle>
+                <CardTitle className="text-lg font-semibold text-gray-800">{t('dashboard.stock_trends_title')}</CardTitle>
             </CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={stockData}>
+                    <BarChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                         <XAxis
                             dataKey="category"
@@ -39,9 +38,9 @@ export const StockTrendsChart = () => {
                             }}
                         />
                         <Legend />
-                        <Bar dataKey="inStock" fill="#10b981" name="In Stock" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="lowStock" fill="#f59e0b" name="Low Stock" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="outOfStock" fill="#ef4444" name="Out of Stock" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="inStock" fill="#10b981" name={t('dashboard.legend.in_stock')} radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="lowStock" fill="#f59e0b" name={t('dashboard.legend.low_stock')} radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="outOfStock" fill="#ef4444" name={t('dashboard.legend.out_of_stock')} radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
             </CardContent>

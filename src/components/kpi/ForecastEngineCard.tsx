@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
 import { performanceEngineService, ForecastItem, ForecastChartData } from "@/services/performanceEngineService";
 import { useAuth } from "@/context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 interface ForecastEngineCardProps {
   isLoading?: boolean;
@@ -13,6 +14,7 @@ interface ForecastEngineCardProps {
 
 const ForecastEngineCard = ({ isLoading: externalLoading }: ForecastEngineCardProps) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [forecastData, setForecastData] = useState<ForecastItem[]>([]);
   const [chartData, setChartData] = useState<ForecastChartData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +22,7 @@ const ForecastEngineCard = ({ isLoading: externalLoading }: ForecastEngineCardPr
   useEffect(() => {
     const loadData = async () => {
       if (!user?.id) return;
-      
+
       setLoading(true);
       try {
         const data = await performanceEngineService.getForecastData(user.id);
@@ -48,7 +50,7 @@ const ForecastEngineCard = ({ isLoading: externalLoading }: ForecastEngineCardPr
     return (
       <Card className="apple-card">
         <CardHeader>
-          <CardTitle>Demand Forecast</CardTitle>
+          <CardTitle>{t('cards.forecast_engine.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <Skeleton className="h-[200px] w-full" />
@@ -68,26 +70,26 @@ const ForecastEngineCard = ({ isLoading: externalLoading }: ForecastEngineCardPr
         <div className="h-[200px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <XAxis 
-                dataKey="day" 
+              <XAxis
+                dataKey="day"
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
               />
-              <YAxis 
+              <YAxis
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
               />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",
                   border: "1px solid hsl(var(--border))",
                   borderRadius: "8px",
                 }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="demand" 
-                stroke="hsl(var(--primary))" 
+              <Line
+                type="monotone"
+                dataKey="demand"
+                stroke="hsl(var(--primary))"
                 strokeWidth={2}
                 dot={{ fill: "hsl(var(--primary))", r: 4 }}
               />
@@ -100,17 +102,17 @@ const ForecastEngineCard = ({ isLoading: externalLoading }: ForecastEngineCardPr
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-semibold">SKU</TableHead>
-                <TableHead className="font-semibold text-right">Demand Forecast</TableHead>
-                <TableHead className="font-semibold text-right">Confidence</TableHead>
-                <TableHead className="font-semibold">Drivers</TableHead>
+                <TableHead className="font-semibold">{t('cards.forecast_engine.table.sku')}</TableHead>
+                <TableHead className="font-semibold text-right">{t('cards.forecast_engine.table.forecast')}</TableHead>
+                <TableHead className="font-semibold text-right">{t('cards.forecast_engine.table.confidence')}</TableHead>
+                <TableHead className="font-semibold">{t('cards.forecast_engine.table.drivers')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {forecastData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                    No hay productos disponibles para analizar
+                    {t('cards.forecast_engine.no_data')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -138,9 +140,7 @@ const ForecastEngineCard = ({ isLoading: externalLoading }: ForecastEngineCardPr
 
         {/* Explanation */}
         <p className="text-sm text-muted-foreground leading-relaxed">
-          The demand forecast is calculated using historical sales patterns, seasonal trends, weather conditions, 
-          promotional activities, and day-of-week effects. Confidence scores reflect model accuracy based on 
-          historical prediction performance.
+          {t('cards.forecast_engine.explanation')}
         </p>
       </CardContent>
     </Card>

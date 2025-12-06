@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { TopProduct } from "@/services/dashboardAnalyticsService";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface TopProductsForecastCardProps {
   data?: TopProduct[];
@@ -9,6 +10,7 @@ interface TopProductsForecastCardProps {
 }
 
 const TopProductsForecastCard = ({ data, isLoading }: TopProductsForecastCardProps) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <Card className="p-6 animate-pulse">
@@ -29,9 +31,9 @@ const TopProductsForecastCard = ({ data, isLoading }: TopProductsForecastCardPro
   if (!data || data.length === 0) {
     return (
       <Card className="p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Top Products - Forecast vs Stock</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.top_products.title')}</h3>
         <div className="text-center py-8 text-muted-foreground">
-          No hay datos de productos disponibles
+          {t('cards.top_products.no_data')}
         </div>
       </Card>
     );
@@ -61,8 +63,8 @@ const TopProductsForecastCard = ({ data, isLoading }: TopProductsForecastCardPro
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4">Top Products - Forecast vs Stock</h3>
-      
+      <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.top_products.title')}</h3>
+
       <div className="space-y-3 max-h-[500px] overflow-y-auto">
         {data.map((product, idx) => (
           <div key={idx} className="p-4 bg-background border border-border rounded-lg hover:border-primary/50 transition-colors">
@@ -72,26 +74,26 @@ const TopProductsForecastCard = ({ data, isLoading }: TopProductsForecastCardPro
                 <div className="font-medium text-foreground">{product.name}</div>
               </div>
               <Badge variant={getRiskBadgeVariant(product.riskLevel)}>
-                {product.riskLevel} Risk
+                {product.riskLevel} {t('cards.top_products.risk')}
               </Badge>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4 mb-2">
               <div>
-                <div className="text-xs text-muted-foreground">Current Stock</div>
+                <div className="text-xs text-muted-foreground">{t('cards.top_products.current_stock')}</div>
                 <div className="text-lg font-semibold text-foreground">{product.currentStock}</div>
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Forecast Demand</div>
+                <div className="text-xs text-muted-foreground">{t('cards.top_products.forecast_demand')}</div>
                 <div className="text-lg font-semibold text-primary">{product.forecastDemand}</div>
               </div>
             </div>
 
             <div className="mb-2">
-              <div className="text-xs text-muted-foreground">Avg Daily Sales</div>
-              <div className="text-sm font-medium text-foreground">{product.avgDailySales.toFixed(1)} units/day</div>
+              <div className="text-xs text-muted-foreground">{t('cards.top_products.avg_daily_sales')}</div>
+              <div className="text-sm font-medium text-foreground">{product.avgDailySales.toFixed(1)} {t('cards.top_products.units_day')}</div>
             </div>
-            
+
             <div className="text-sm text-muted-foreground bg-muted/30 p-2 rounded">
               💡 {product.recommendation}
             </div>

@@ -1,10 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from typing import List, Optional
 import uvicorn
 import logging
 import os
 from forecasting import Forecaster
+from sync import synchronizer
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -111,6 +112,16 @@ async def predict_scenario(request: ForecastRequest):
     except Exception as e:
         logger.error(f"Error in predict_scenario: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/sync/forecasts")
+async def trigger_forecast_sync(background_tasks: BackgroundTasks):
+    """
+    Triggers a background full synchronization of forecasts.
+    Fetches latest sales data, re-trains models, and updates 'demand_forecasts' table.
+    """
+    logger.info("Received request to trigger forecast sync")
+    background_tasks.add_task(synchronizer.run_sync)
+    return {"status": "accepted", "message": "Forecast synchronization started in background"}
 
 @app.post("/macro/update")
 async def update_macro_data(indicators: List[dict]):

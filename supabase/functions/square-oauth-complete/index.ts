@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { SquareProvider, SquareConfig } from '../_shared/pos/square.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,230 +14,97 @@ serve(async (req) => {
 
   try {
     const { code, state } = await req.json();
-    
-    console.log('🔵 Starting Square OAuth token exchange...');
+    console.log('🔵 Starting Square OAuth token exchange (via Adapter)...');
 
     if (!code) {
       throw new Error('Authorization code is required');
     }
 
-    // Get Square credentials from environment
-    const squareApplicationId = Deno.env.get('SQUARE_APPLICATION_ID');
-    const squareApplicationSecret = Deno.env.get('SQUARE_APPLICATION_SECRET');
-    const squareEnvironment = Deno.env.get('SQUARE_ENVIRONMENT') || 'sandbox';
+    const config: SquareConfig = {
+      applicationId: Deno.env.get('SQUARE_APPLICATION_ID') || '',
+      applicationSecret: Deno.env.get('SQUARE_APPLICATION_SECRET') || '',
+      environment: (Deno.env.get('SQUARE_ENVIRONMENT') as 'sandbox' | 'production') || 'sandbox'
+    };
 
-    if (!squareApplicationId || !squareApplicationSecret) {
+    if (!config.applicationId || !config.applicationSecret) {
       throw new Error('Square credentials not configured');
     }
 
-    // Exchange code for access token
-    const tokenUrl = squareEnvironment === 'production'
-      ? 'https://connect.squareup.com/oauth2/token'
-      : 'https://connect.squareupsandbox.com/oauth2/token';
+    // Initialize Provider
+    const provider = new SquareProvider(config);
 
-    console.log('🔵 Exchanging authorization code for access token...');
-    const tokenResponse = await fetch(tokenUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Square-Version': '2024-12-18',
-      },
-      body: JSON.stringify({
-        client_id: squareApplicationId,
-        client_secret: squareApplicationSecret,
-        code,
-        grant_type: 'authorization_code',
-      }),
-    });
 
-    if (!tokenResponse.ok) {
-      const errorData = await tokenResponse.text();
-      console.error('❌ Token exchange failed:', errorData);
-      throw new Error(`Token exchange failed: ${errorData}`);
-    }
+    // 1. Exchange Code
+    const authResult = await provider.exchangeCode(code);
+    console.log('✅ Access token obtained for merchant:', authResult.merchantId);
 
-    const tokenData = await tokenResponse.json();
-    const { access_token, refresh_token, merchant_id, expires_at } = tokenData;
-
-    console.log('✅ Access token obtained for merchant:', merchant_id);
-    console.log('✅ Refresh token:', refresh_token ? 'Received' : 'Not received');
-
-    // Get merchant locations
-    const locationsUrl = squareEnvironment === 'production'
-      ? 'https://connect.squareup.com/v2/locations'
-      : 'https://connect.squareupsandbox.com/v2/locations';
-
-    console.log('🔵 Fetching merchant locations...');
-    const locationsResponse = await fetch(locationsUrl, {
-      headers: {
-        'Authorization': `Bearer ${access_token}`,
-        'Square-Version': '2024-12-18',
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!locationsResponse.ok) {
-      throw new Error('Failed to fetch locations');
-    }
-
-    const locationsData = await locationsResponse.json();
-    const primaryLocation = locationsData.locations?.[0];
+    // 2. Get Locations
+    const locations = await provider.getLocations(authResult.accessToken);
+    const primaryLocation = locations[0];
 
     if (!primaryLocation) {
       throw new Error('No locations found for this merchant');
     }
 
-    console.log('✅ Primary location:', primaryLocation.name);
-
-    // Get user from JWT
+    // 3. Supabase Auth & Storage
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('No authorization header');
-    }
+    if (!authHeader) throw new Error('No authorization header');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get user from token
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
-    if (userError || !user) {
-      throw new Error('User not authenticated');
-    }
+    if (userError || !user) throw new Error('User not authenticated');
 
-    // Save Square connection with refresh token
-    console.log('🔵 Saving Square connection to database...');
+    // Save Connection
+    console.log('🔵 Saving connection...');
     const connectionData: any = {
       user_id: user.id,
-      application_id: squareApplicationId,
-      access_token,
+      application_id: config.applicationId,
+      access_token: authResult.accessToken,
       location_id: primaryLocation.id,
       location_name: primaryLocation.name,
       connection_status: 'connected',
       last_tested_at: new Date().toISOString(),
     };
 
-    // Guardar refresh_token y expires_at si están disponibles
-    if (refresh_token) {
-      connectionData.refresh_token = refresh_token;
-    }
-    if (expires_at) {
-      connectionData.token_expires_at = expires_at;
-    }
+    if (authResult.refreshToken) connectionData.refresh_token = authResult.refreshToken;
+    // authResult.expiresAt is now a Date object
+    if (authResult.expiresAt) connectionData.token_expires_at = authResult.expiresAt.toISOString();
 
-    const { data: connection, error: connectionError } = await supabase
+    const { data: connection, error: connError } = await supabase
       .from('square_connections')
       .upsert(connectionData)
       .select()
       .single();
 
-    if (connectionError) {
-      console.error('❌ Failed to save connection:', connectionError);
-      throw connectionError;
-    }
+    if (connError) throw connError;
 
-    console.log('✅ Connection saved:', connection.id);
+    // 4. Fetch Catalog via Provider
+    console.log('🔵 Fetching catalog via provider...');
+    const products = await provider.getProducts(authResult.accessToken);
+    console.log(`✅ Found ${products.length} items`);
 
-    // Fetch catalog
-    console.log('🔵 Fetching product catalog from Square...');
-    const catalogUrl = squareEnvironment === 'production'
-      ? 'https://connect.squareup.com/v2/catalog/list?types=ITEM'
-      : 'https://connect.squareupsandbox.com/v2/catalog/list?types=ITEM';
+    if (products.length > 0) {
+      const dbProducts = products.map(p => ({
+        userid: user.id,
+        name: p.name,
+        category: p.category,
+        price: p.price, // Provider already handles conversion
+        quantity: 0,
+        expirationdate: null,
+        is_marketplace_visible: true,
+        source: 'square',
+        external_id: p.id,
+      }));
 
-    const catalogResponse = await fetch(catalogUrl, {
-      headers: {
-        'Authorization': `Bearer ${access_token}`,
-        'Square-Version': '2024-12-18',
-        'Content-Type': 'application/json',
-      },
-    });
 
-    if (!catalogResponse.ok) {
-      console.warn('⚠️ Failed to fetch catalog, but connection saved');
-      return new Response(
-        JSON.stringify({
-          success: true,
-          connection_id: connection.id,
-          location_name: primaryLocation.name,
-          catalog_synced: false,
-          message: 'Connection saved but catalog sync failed',
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const catalogData = await catalogResponse.json();
-    const items = catalogData.objects || [];
-
-    console.log(`✅ Found ${items.length} items in catalog`);
-
-    // Import products to database
-    if (items.length > 0) {
-      console.log('🔵 Importing products to database...');
-      
-      const products = items.map((item: any) => {
-        const variation = item.item_data?.variations?.[0];
-        const price = variation?.item_variation_data?.price_money?.amount || 0;
-        
-        return {
-          userid: user.id,
-          name: item.item_data?.name || 'Unnamed Product',
-          category: item.item_data?.category?.name || 'General',
-          price: price / 100, // Convert cents to dollars
-          quantity: 0, // Square doesn't provide inventory in catalog API
-          expirationdate: null,
-          is_marketplace_visible: true,
-          source: 'square',
-          external_id: item.id,
-        };
-      });
-
-      const { data: insertedProducts, error: productsError } = await supabase
-        .from('products')
-        .insert(products)
-        .select();
-
-      if (productsError) {
-        console.error('❌ Failed to insert products:', productsError);
-      } else {
-        console.log(`✅ Imported ${insertedProducts.length} products`);
-      }
-    }
-
-    // Register webhook with n8n
-    console.log('🔵 Registering webhook with n8n...');
-    try {
-      const n8nWebhookUrl = Deno.env.get('N8N_SQUARE_WEBHOOK_URL');
-      if (n8nWebhookUrl) {
-        const webhookResponse = await fetch(`${n8nWebhookUrl}/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            application_id: squareApplicationId,
-            access_token,
-            location_id: primaryLocation.id,
-            connection_id: connection.id,
-            action: 'register_webhook',
-          }),
-        });
-
-        if (webhookResponse.ok) {
-          const webhookData = await webhookResponse.json();
-          console.log('✅ Webhook registered:', webhookData);
-          
-          await supabase
-            .from('square_connections')
-            .update({
-              webhook_url: webhookData.webhook_url || n8nWebhookUrl,
-              webhook_enabled: true,
-            })
-            .eq('id', connection.id);
-        }
-      }
-    } catch (webhookError) {
-      console.warn('⚠️ Webhook registration failed:', webhookError);
+      const { error: prodError } = await supabase.from('products').insert(dbProducts);
+      if (prodError) console.error('❌ Failed to insert products:', prodError);
+      else console.log(`✅ Imported products`);
     }
 
     return new Response(
@@ -245,24 +113,16 @@ serve(async (req) => {
         connection_id: connection.id,
         location_name: primaryLocation.name,
         catalog_synced: true,
-        products_imported: items.length,
+        products_imported: products.length,
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
+
   } catch (error) {
     console.error('❌ Error in OAuth complete:', error);
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
 });
