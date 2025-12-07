@@ -6,16 +6,24 @@ WORKDIR /app
 
 # Install system dependencies required for Prophet and other libraries
 # libgomp1 is needed for Prophet on Linux
+# Install system dependencies required for Prophet and other libraries
+# libgomp1 is needed for Prophet on Linux
+# python3-dev and build-essential for compilation if needed
 RUN apt-get update && apt-get install -y \
     libgomp1 \
     build-essential \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the requirements file into the container
 COPY requirements.txt .
 
+# Upgrade pip and install build tools to favor binary wheels or clean builds
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Using --prefer-binary to try and avoid compilation if possible
+RUN pip install --no-cache-dir --prefer-binary -r requirements.txt
 
 # Copy the current directory contents into the container at /app
 COPY . .
