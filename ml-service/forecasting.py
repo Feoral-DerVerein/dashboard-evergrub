@@ -3,63 +3,20 @@ import numpy as np
 import logging
 from datetime import timedelta
 
-logger = logging.getLogger(__name__)
-
+# Nixtla Imports
 try:
-    from prophet import Prophet
-    PROPHET_AVAILABLE = True
+    from statsforecast import StatsForecast
+    from statsforecast.models import AutoARIMA, SeasonalNaive
+    NIXTLA_AVAILABLE = True
 except ImportError:
-    PROPHET_AVAILABLE = False
-    logger.warning("Prophet not available. Using Lightweight Heuristic Forecaster.")
+    NIXTLA_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
 
 class Forecaster:
     def __init__(self):
         self.model = None
 
-    def train_and_predict(self, history_data, periods=30, regressors=None):
-        """
-        Trains a Prophet model on historical data and predicts future demand.
-        
-        Args:
-            history_data (list of dict): List of {'date': 'YYYY-MM-DD', 'value': float}
-            periods (int): Number of days to forecast
-            regressors (list of dict, optional): List of {'date': 'YYYY-MM-DD', 'name': str, 'value': float}
-            
-        Returns:
-            list of dict: Forecasted values [{'date': 'YYYY-MM-DD', 'predicted_demand': float, ...}]
-        """
-        if not history_data or len(history_data) < 5:
-            logger.warning("Not enough data to train model. Returning simple average.")
-            return self._simple_average_forecast(history_data, periods)
-
-        try:
-            df = pd.DataFrame(history_data)
-            df = df.rename(columns={'date': 'ds', 'value': 'y'})
-            df['ds'] = pd.to_datetime(df['ds'])
-            
-            # Initialize Prophet model
-            m = Prophet(daily_seasonality=True, yearly_seasonality=False, weekly_seasonality=True)
-            
-            # Add regressors if provided
-            regressor_df = None
-            if regressors:
-                reg_data = []
-                for r in regressors:
-                    reg_data.append({'ds': r['date'], r['name']: r['value']})
-                
-                regressor_df = pd.DataFrame(reg_data)
-                regressor_df['ds'] = pd.to_datetime(regressor_df['ds'])
-                
-                # Pivot to have columns for each regressor
-                # This assumes we might have multiple rows per date if multiple regressors
-                # Better approach: organize input as list of dicts where keys are regressor names
-                # But let's stick to the simple structure and pivot
-                
-                # Group by date and merge
-                # Simplified: Assuming input regressors are already structured or we process them
-                # Let's assume regressors is a list of dicts: [{'date': '...', 'inflation': 0.05, 'temp': 25}, ...]
-                
-                # Re-processing based on assumption: regressors is a list of dicts with 'date' and other keys
                 regressor_df = pd.DataFrame(regressors)
                 regressor_df['ds'] = pd.to_datetime(regressor_df['date'])
                 
