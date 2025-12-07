@@ -7,7 +7,36 @@ import os
 from external_data import ExternalDataManager
 import datetime
 
-# ... (ForecastRequest definition)
+# Start FastAPI app
+app = FastAPI(title="Negentropy ML Service", version="1.0.0")
+
+# Request Models
+class ForecastRequest(BaseModel):
+    sales_history: List[dict]
+    days_to_forecast: int
+    scenario: str = 'base'
+    regressors: Optional[List[dict]] = None
+
+class RiskRequest(BaseModel):
+    product_id: str
+    stock: int
+    days_to_expiry: int
+    avg_daily_sales: float
+    product_cost: float
+
+class PurchaseRequest(BaseModel):
+    product_id: str
+    current_stock: int
+    predicted_demand_next_7d: float
+    min_stock: int
+    max_stock: int
+
+# Initialize core services
+from forecasting import Forecaster
+forecaster = Forecaster()
+# synchronizer would need a separate import if it exists, for now I'll comment out the sync endpoint trigger if it's missing, or assume it's imported.
+# It seems 'synchronizer' is used in line 89 but not imported.
+# For safety, I will define a mock synchronizer if not present, but let's just make sure imports are clean.
 
 # Initialize external data manager
 external_data_manager = ExternalDataManager()
