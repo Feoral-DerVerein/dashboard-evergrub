@@ -8,6 +8,7 @@ WORKDIR /app
 # libgomp1 is needed for Prophet on Linux
 RUN apt-get update && apt-get install -y \
     libgomp1 \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the requirements file into the container

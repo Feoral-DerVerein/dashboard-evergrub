@@ -234,6 +234,70 @@
         "customer_insights": "Insights de Clientes",
         "savings_waste": "Ahorros y Desperdicio"
     },
+    "sales_prediction": {
+        "title": "Predicción de Ventas",
+        "description": "Predicciones basadas en historial, clima, eventos y estacionalidad",
+        "legend": {
+            "actual": "Ventas Reales",
+            "predicted": "Predicción"
+        },
+        "filters": {
+            "time_range": {
+                "hourly": "Por Hora",
+                "daily": "Diario",
+                "weekly": "Semanal",
+                "monthly": "Mensual"
+            },
+            "products": {
+                "all": "Todos los productos",
+                "bakery": "Panadería",
+                "drinks": "Bebidas",
+                "food": "Comida"
+            }
+        }
+    },
+    "autopilot_control": {
+        "title": "Control de Auto-Piloto",
+        "description": "Configura módulos de automatización en tiempo real",
+        "modules": {
+            "pricing": "Motor de Precios",
+            "promotions": "Promociones Automáticas",
+            "production": "Recomendaciones de Producción",
+            "inventory": "Reabastecimiento Inteligente"
+        },
+        "frequency": {
+            "realtime": "Tiempo real",
+            "hourly": "Cada hora",
+            "daily": "Diario"
+        },
+        "status": {
+            "active": "Activo",
+            "last_execution": "Última ejecución: {{date}}",
+            "enabled": "{{module}} activado",
+            "disabled": "{{module}} desactivado"
+        },
+        "action_logs": {
+            "title": "Registro de Acciones Automáticas",
+            "description": "Últimas 20 acciones ejecutadas por piloto automático",
+            "empty": "No hay acciones registradas"
+        },
+        "price_sync": {
+            "title": "Cola de Sincronización de Precios",
+            "description": "Sincronización automática con TPV y otros sistemas",
+            "process_btn": "Procesar Cola",
+            "status": {
+                "pending": "Pendiente",
+                "completed": "Completado",
+                "failed": "Fallido",
+                "syncing": "Sincronizando..."
+            },
+            "toast": {
+                "success": "{{count}} precios sincronizados correctamente",
+                "failure": "{{count}} sincronizaciones fallidas"
+            },
+            "empty": "No hay ítems en la cola"
+        }
+    },
     "cards": {
         "forecast_engine": {
             "title": "Previsión de Demanda",
@@ -339,6 +403,54 @@
                 "pending_deliveries": "🚚 Entregas Pendientes",
                 "sales_trend": "📈 Tendencia de Ventas"
             }
+        }
+    },
+    "pricing": {
+        "title": "Negentropy AI",
+        "subtitle": "El Agente Económico Autónomo para tu negocio.",
+        "plan_card": {
+            "title": "Acceso Todo en Uno",
+            "subtitle": "Plataforma Completa",
+            "description": "Acceso completo al motor de predicción, inventario y cumplimiento.",
+            "period": "EUR / mes",
+            "features": {
+                "smart_inventory": "Inventario Inteligente: Rastreo y Alertas de Caducidad",
+                "demand_forecasting": "Predicción de Demanda con IA",
+                "prescriptive_actions": "Acciones Prescriptivas: Auto-Precio y Reposición",
+                "compliance_hub": "Compliance Hub: Informes PDF Automatizados",
+                "marketplace_access": "Acceso al Marketplace: Vende Excedentes",
+                "analytics": "Analítica en Tiempo Real de Ventas y Desperdicio",
+                "support": "Soporte Prioritario 24/7"
+            },
+            "button": {
+                "subscribe": "Suscribirse con Stripe",
+                "processing": "Procesando..."
+            }
+        },
+        "roi_section": {
+            "title": "Maximiza tu ROI",
+            "subtitle": "Reduce desperdicio, aumenta ventas y automatiza el cumplimiento.",
+            "less_waste": {
+                "title": "Menos Desperdicio",
+                "concept": "Eficiencia",
+                "description": "Reducción de merma en los primeros 3 meses"
+            },
+            "more_sales": {
+                "title": "Más Ventas",
+                "concept": "Optimización",
+                "description": "Aumento de margen vía precios dinámicos"
+            }
+        },
+        "contact": {
+            "text": "¿Necesitas un acuerdo personalizado? Contacta Ventas",
+            "dialog_title": "Contactar Ventas",
+            "dialog_desc": "Completa el formulario y nuestro equipo te contactará pronto",
+            "name_label": "Nombre",
+            "email_label": "Correo",
+            "company_label": "Empresa",
+            "message_label": "Mensaje",
+            "send_btn": "Enviar Mensaje",
+            "success_toast": "¡Gracias! Nos pondremos en contacto contigo pronto."
         }
     }
 }

@@ -163,6 +163,70 @@
         "customer_insights": "Insights de Clients",
         "savings_waste": "Estalvis i Malbaratament"
     },
+    "sales_prediction": {
+        "title": "Predicció de Vendes",
+        "description": "Prediccions basades en historial, clima, esdeveniments i estacionalitat",
+        "legend": {
+            "actual": "Vendes Reals",
+            "predicted": "Predicció"
+        },
+        "filters": {
+            "time_range": {
+                "hourly": "Per Hora",
+                "daily": "Diari",
+                "weekly": "Setmanal",
+                "monthly": "Mensual"
+            },
+            "products": {
+                "all": "Tots els productes",
+                "bakery": "Forn",
+                "drinks": "Begudes",
+                "food": "Menjar"
+            }
+        }
+    },
+    "autopilot_control": {
+        "title": "Control d'Auto-Pilot",
+        "description": "Configura mòduls d'automatització en temps real",
+        "modules": {
+            "pricing": "Motor de Preus",
+            "promotions": "Promocions Automàtiques",
+            "production": "Recomanacions de Producció",
+            "inventory": "Reabastiment Intel·ligent"
+        },
+        "frequency": {
+            "realtime": "Temps real",
+            "hourly": "Cada hora",
+            "daily": "Diari"
+        },
+        "status": {
+            "active": "Actiu",
+            "last_execution": "Última execució: {{date}}",
+            "enabled": "{{module}} activat",
+            "disabled": "{{module}} desactivat"
+        },
+        "action_logs": {
+            "title": "Registre d'Accions Automàtiques",
+            "description": "Últimes 20 accions executades pel pilot automàtic",
+            "empty": "No hi ha accions registrades"
+        },
+        "price_sync": {
+            "title": "Cua de Sincronització de Preus",
+            "description": "Sincronització automàtica amb TPV i altres sistemes",
+            "process_btn": "Processar Cua",
+            "status": {
+                "pending": "Pendent",
+                "completed": "Completat",
+                "failed": "Fallit",
+                "syncing": "Sincronitzant..."
+            },
+            "toast": {
+                "success": "{{count}} preus sincronitzats correctament",
+                "failure": "{{count}} sincronitzacions fallides"
+            },
+            "empty": "No hi ha ítems a la cua"
+        }
+    },
     "cards": {
         "forecast_engine": {
             "title": "Previsió de Demanda",
@@ -268,6 +332,54 @@
                 "pending_deliveries": "🚚 Entregues Pendents",
                 "sales_trend": "📈 Tendència de Vendes"
             }
+        }
+    },
+    "pricing": {
+        "title": "Negentropy AI",
+        "subtitle": "L'Agent Econòmic Autònom per al teu negoci.",
+        "plan_card": {
+            "title": "Accés Tot en Un",
+            "subtitle": "Plataforma Completa",
+            "description": "Accés complet al motor de predicció, inventari i compliment.",
+            "period": "EUR / mes",
+            "features": {
+                "smart_inventory": "Inventari Intel·ligent: Seguiment i Alertes de Caducitat",
+                "demand_forecasting": "Predicció de Demanda amb IA",
+                "prescriptive_actions": "Accions Prescriptivas: Auto-Preu i Reposició",
+                "compliance_hub": "Compliance Hub: Informes PDF Automatitzats",
+                "marketplace_access": "Accés al Marketplace: Ven Excedents",
+                "analytics": "Analítica en Temps Real de Vendes i Malbaratament",
+                "support": "Suport Prioritari 24/7"
+            },
+            "button": {
+                "subscribe": "Subscriure's amb Stripe",
+                "processing": "Processant..."
+            }
+        },
+        "roi_section": {
+            "title": "Maximitza el teu ROI",
+            "subtitle": "Redueix malbaratament, augmenta vendes i automatitza el compliment.",
+            "less_waste": {
+                "title": "Menys Malbaratament",
+                "concept": "Eficiència",
+                "description": "Reducció de minva en els primers 3 mesos"
+            },
+            "more_sales": {
+                "title": "Més Vendes",
+                "concept": "Optimització",
+                "description": "Augment de marge via preus dinàmics"
+            }
+        },
+        "contact": {
+            "text": "Necessites un acord personalitzat? Contacta Vendes",
+            "dialog_title": "Contactar Vendes",
+            "dialog_desc": "Omple el formulari i el nostre equip et contactarà aviat",
+            "name_label": "Nom",
+            "email_label": "Correu",
+            "company_label": "Empresa",
+            "message_label": "Missatge",
+            "send_btn": "Enviar Missatge",
+            "success_toast": "Gràcies! Ens posarem en contacte amb tu aviat."
         }
     }
 }

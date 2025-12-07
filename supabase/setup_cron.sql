@@ -13,16 +13,14 @@ select cron.schedule(
     $$
 );
 
--- Note: To schedule the ML Service sync, you would add another cron job
--- once the ML Service is deployed to Render/Railway and you have the URL.
--- Example:
--- select cron.schedule(
---    'ml-forecast-sync',
---    '0 2 * * *', -- 2 AM daily
---    $$
---    select net.http_post(
---        url:='https://negentropy-ml-service.onrender.com/sync/forecasts',
---        headers:='{"Content-Type": "application/json"}'::jsonb
---    ) as request_id;
---    $$
--- );
+-- Schedule ML Forecast Sync at 2 AM
+select cron.schedule(
+    'ml-forecast-sync',
+    '0 2 * * *', -- 2 AM daily
+    $$
+    select net.http_post(
+        url:='https://negentropy-ml-service-nies.onrender.com/sync/forecasts',
+        headers:='{"Content-Type": "application/json"}'::jsonb
+    ) as request_id;
+    $$
+);

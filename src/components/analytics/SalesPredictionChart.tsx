@@ -5,8 +5,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { predictiveAnalyticsService, SalesPrediction } from '@/services/predictiveAnalyticsService';
 import { TrendingUp, Calendar } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from 'react-i18next';
 
 const SalesPredictionChart = () => {
+  const { t, i18n } = useTranslation();
   const [timeRange, setTimeRange] = useState<'hour' | 'day' | 'week' | 'month'>('day');
   const [productFilter, setProductFilter] = useState<string>('all');
   const [data, setData] = useState<SalesPrediction[]>([]);
@@ -27,15 +29,19 @@ const SalesPredictionChart = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
+    const locale = i18n.language === 'en' ? 'en-US' :
+      i18n.language === 'es' ? 'es-MX' :
+        i18n.language === 'ca' ? 'ca-ES' : 'de-DE';
+
     switch (timeRange) {
       case 'hour':
-        return date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
       case 'day':
-        return date.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' });
+        return date.toLocaleDateString(locale, { weekday: 'short', day: 'numeric' });
       case 'week':
-        return `Sem ${Math.ceil(date.getDate() / 7)}`;
+        return `W ${Math.ceil(date.getDate() / 7)}`; // Simplified week label
       case 'month':
-        return date.toLocaleDateString('es-MX', { month: 'short' });
+        return date.toLocaleDateString(locale, { month: 'short' });
       default:
         return '';
     }
@@ -54,7 +60,7 @@ const SalesPredictionChart = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
-            <CardTitle>Sales Prediction</CardTitle>
+            <CardTitle>{t('sales_prediction.title')}</CardTitle>
           </div>
           <div className="flex gap-2">
             <Select value={timeRange} onValueChange={(value: any) => setTimeRange(value)}>
@@ -62,10 +68,10 @@ const SalesPredictionChart = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="hour">Hourly</SelectItem>
-                <SelectItem value="day">Daily</SelectItem>
-                <SelectItem value="week">Weekly</SelectItem>
-                <SelectItem value="month">Monthly</SelectItem>
+                <SelectItem value="hour">{t('sales_prediction.filters.time_range.hourly')}</SelectItem>
+                <SelectItem value="day">{t('sales_prediction.filters.time_range.daily')}</SelectItem>
+                <SelectItem value="week">{t('sales_prediction.filters.time_range.weekly')}</SelectItem>
+                <SelectItem value="month">{t('sales_prediction.filters.time_range.monthly')}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={productFilter} onValueChange={setProductFilter}>
@@ -73,16 +79,16 @@ const SalesPredictionChart = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All products</SelectItem>
-                <SelectItem value="bakery">Bakery</SelectItem>
-                <SelectItem value="drinks">Drinks</SelectItem>
-                <SelectItem value="food">Food</SelectItem>
+                <SelectItem value="all">{t('sales_prediction.filters.products.all')}</SelectItem>
+                <SelectItem value="bakery">{t('sales_prediction.filters.products.bakery')}</SelectItem>
+                <SelectItem value="drinks">{t('sales_prediction.filters.products.drinks')}</SelectItem>
+                <SelectItem value="food">{t('sales_prediction.filters.products.food')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
         <CardDescription>
-          Predictions based on history, weather, events and seasonality
+          {t('sales_prediction.description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -103,13 +109,13 @@ const SalesPredictionChart = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   tick={{ fill: 'hsl(var(--muted-foreground))' }}
                   tickLine={{ stroke: 'hsl(var(--border))' }}
                   className="text-xs"
                 />
-                <YAxis 
+                <YAxis
                   tick={{ fill: 'hsl(var(--muted-foreground))' }}
                   tickLine={{ stroke: 'hsl(var(--border))' }}
                   className="text-xs"
@@ -125,12 +131,16 @@ const SalesPredictionChart = () => {
                   labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600, marginBottom: '8px' }}
                   formatter={(value: number, name: string) => [
                     `€${value.toFixed(0)} / $${(value * 1.1).toFixed(0)}`,
-                    name
+                    name === 'Actual Sales' ? t('sales_prediction.legend.actual') : t('sales_prediction.legend.predicted')
                   ]}
                 />
-                <Legend 
+                <Legend
                   wrapperStyle={{ paddingTop: '20px' }}
                   iconType="line"
+                  payload={[
+                    { value: t('sales_prediction.legend.actual'), type: 'line', color: 'hsl(var(--primary))' },
+                    { value: t('sales_prediction.legend.predicted'), type: 'line', color: 'hsl(var(--chart-2))', payload: { strokeDasharray: '8 4' } }
+                  ]}
                 />
                 <Line
                   type="monotone"
@@ -159,5 +169,4 @@ const SalesPredictionChart = () => {
     </Card>
   );
 };
-
 export default SalesPredictionChart;

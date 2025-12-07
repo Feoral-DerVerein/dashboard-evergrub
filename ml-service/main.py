@@ -4,64 +4,13 @@ from typing import List, Optional
 import uvicorn
 import logging
 import os
-from forecasting import Forecaster
-from sync import synchronizer
+from external_data import ExternalDataManager
+import datetime
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# ... (ForecastRequest definition)
 
-app = FastAPI(title="Negentropy ML Service")
-forecaster = Forecaster()
-
-# Data Models
-class SalesDataPoint(BaseModel):
-    date: str
-    value: float
-
-class ForecastRequest(BaseModel):
-    sales_history: List[SalesDataPoint] # Changed SalesData to SalesDataPoint to match existing model
-    days_to_forecast: int = 7
-    scenario: Optional[str] = 'base' # base, optimistic, pessimistic
-    regressors: Optional[List[dict]] = None # List of macro indicators
-
-class DemandRequest(BaseModel):
-    product_id: str
-    history: List[SalesDataPoint]
-    days: Optional[int] = 30
-
-class RiskRequest(BaseModel):
-    product_id: str
-    stock: float
-    avg_daily_sales: float
-    days_to_expiry: int
-    product_cost: float # Added product_cost as it's used in predict_risk
-
-class PurchaseRequest(BaseModel):
-    product_id: str
-    current_stock: float
-    min_stock: float
-    max_stock: float
-    predicted_demand_next_7d: float
-
-@app.get("/")
-def health_check():
-    return {"status": "ok", "service": "negentropy-ml-service"}
-
-@app.post("/predict/demand")
-def predict_demand(request: DemandRequest):
-    """
-    Generate demand forecast using Prophet
-    """
-    logger.info(f"Predicting demand for product {request.product_id} with {len(request.history)} data points")
-    
-    history_data = [{'date': d.date, 'value': d.value} for d in request.history]
-    forecast = forecaster.train_and_predict(history_data, periods=request.days)
-    
-    return {
-        "product_id": request.product_id,
-        "forecast": forecast
-    }
+# Initialize external data manager
+external_data_manager = ExternalDataManager()
 
 @app.post("/predict/scenario")
 async def predict_scenario(request: ForecastRequest):
@@ -73,10 +22,27 @@ async def predict_scenario(request: ForecastRequest):
         # Prepare history data
         history_data = [{'date': d.date, 'value': d.value} for d in request.sales_history]
         
-        # Prepare regressors if provided
-        # request.regressors is expected to be a list of dicts: [{'date': '2023-01-01', 'inflation': 0.05}, ...]
-        regressors = request.regressors if request.regressors else None
+        if not history_data:
+             raise HTTPException(status_code=400, detail="No historical data provided")
+
+        # Determine date range for external data
+        # Start from the earliest history date
+        dates = [d['date'] for d in history_data]
+        min_date = min(dates)
         
+        # End date is today + days_to_forecast
+        today = datetime.date.today()
+        future_end = today + datetime.timedelta(days=request.days_to_forecast)
+        max_date_str = future_end.strftime('%Y-%m-%d')
+        
+        # Prepare regressors if provided, otherwise fetch them
+        regressors = request.regressors
+        
+        if not regressors:
+            logger.info("Fetching external regressors (Weather/Holidays)...")
+            # Default location: Madrid (todo: make configurable)
+            regressors = external_data_manager.get_regressors(min_date, max_date_str)
+            
         if regressors:
             logger.info(f"Using {len(regressors)} external regressor data points")
             

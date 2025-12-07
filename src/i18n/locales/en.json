@@ -236,6 +236,70 @@
         "customer_insights": "Customer Insights",
         "savings_waste": "Savings & Food Waste"
     },
+    "sales_prediction": {
+        "title": "Sales Prediction",
+        "description": "Predictions based on history, weather, events and seasonality",
+        "legend": {
+            "actual": "Actual Sales",
+            "predicted": "Prediction"
+        },
+        "filters": {
+            "time_range": {
+                "hourly": "Hourly",
+                "daily": "Daily",
+                "weekly": "Weekly",
+                "monthly": "Monthly"
+            },
+            "products": {
+                "all": "All products",
+                "bakery": "Bakery",
+                "drinks": "Drinks",
+                "food": "Food"
+            }
+        }
+    },
+    "autopilot_control": {
+        "title": "Auto-Pilot Control",
+        "description": "Configure real-time automation modules",
+        "modules": {
+            "pricing": "Pricing Engine",
+            "promotions": "Automatic Promotions",
+            "production": "Production Recommendations",
+            "inventory": "Smart Reordering"
+        },
+        "frequency": {
+            "realtime": "Real-time",
+            "hourly": "Hourly",
+            "daily": "Daily"
+        },
+        "status": {
+            "active": "Active",
+            "last_execution": "Last execution: {{date}}",
+            "enabled": "{{module}} enabled",
+            "disabled": "{{module}} disabled"
+        },
+        "action_logs": {
+            "title": "Automatic Actions Log",
+            "description": "Last 20 actions executed by auto-pilot",
+            "empty": "No actions recorded"
+        },
+        "price_sync": {
+            "title": "Price Sync Queue",
+            "description": "Automatic synchronization with POS and other systems",
+            "process_btn": "Process Queue",
+            "status": {
+                "pending": "Pending",
+                "completed": "Completed",
+                "failed": "Failed",
+                "syncing": "Syncing..."
+            },
+            "toast": {
+                "success": "{{count}} prices synchronized successfully",
+                "failure": "{{count}} synchronizations failed"
+            },
+            "empty": "No items in queue"
+        }
+    },
     "cards": {
         "forecast_engine": {
             "title": "Demand Forecast",
@@ -341,6 +405,54 @@
                 "pending_deliveries": "🚚 Pending Deliveries",
                 "sales_trend": "📈 Sales Trend"
             }
+        }
+    },
+    "pricing": {
+        "title": "Negentropy AI",
+        "subtitle": "The Autonomous Economic Agent for your business.",
+        "plan_card": {
+            "title": "All-In-One Access",
+            "subtitle": "Full Platform",
+            "description": "Complete access to the forecasting, inventory, and compliance engine.",
+            "period": "EUR / month",
+            "features": {
+                "smart_inventory": "Smart Inventory: Expiration Tracking & Alerts",
+                "demand_forecasting": "AI Demand Forecasting",
+                "prescriptive_actions": "Prescriptive Actions: Auto-Pricing & Restock",
+                "compliance_hub": "Compliance Hub: Automated PDF Reports",
+                "marketplace_access": "Marketplace Access: Sell Surplus Food",
+                "analytics": "Real-time Waste & Sales Analytics",
+                "support": "24/7 Priority Support"
+            },
+            "button": {
+                "subscribe": "Subscribe with Stripe",
+                "processing": "Processing..."
+            }
+        },
+        "roi_section": {
+            "title": "Maximize Your ROI",
+            "subtitle": "Reduce waste, increase sales, and automate compliance.",
+            "less_waste": {
+                "title": "Less Waste",
+                "concept": "Efficiency",
+                "description": "Reduction in food waste in the first 3 months"
+            },
+            "more_sales": {
+                "title": "More Sales",
+                "concept": "Optimization",
+                "description": "Increase in profit margin via dynamic pricing"
+            }
+        },
+        "contact": {
+            "text": "Need a custom enterprise agreement? Contact Sales",
+            "dialog_title": "Contact Sales",
+            "dialog_desc": "Fill out the form and our team will get in touch with you",
+            "name_label": "Name",
+            "email_label": "Email",
+            "company_label": "Company",
+            "message_label": "Message",
+            "send_btn": "Send Message",
+            "success_toast": "Thank you! We'll get in touch with you soon."
         }
     }
 }

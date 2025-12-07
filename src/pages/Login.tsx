@@ -222,8 +222,8 @@ const Login = () => {
       email={currentUserEmail}
     />
 
-    {/* Spline Background */}
-    <div className="absolute inset-0 z-0">
+    {/* Spline Background with Fallback Gradient */}
+    <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-900 to-black">
       <spline-viewer url="https://prod.spline.design/JM7ixbJx6pmDGkyo/scene.splinecode" style={{
         width: '100%',
         height: '100%'

@@ -5,8 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { autopilotService, PriceSyncQueue } from '@/services/autopilotService';
 import { DollarSign, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const PriceSyncQueueCard = () => {
+  const { t } = useTranslation();
   const [queue, setQueue] = useState<PriceSyncQueue[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,9 +32,9 @@ const PriceSyncQueueCard = () => {
     setIsProcessing(true);
     try {
       const result = await autopilotService.processPriceSyncQueue();
-      toast.success(`${result.processed} prices synchronized successfully`);
+      toast.success(t('autopilot_control.price_sync.toast.success', { count: result.processed }));
       if (result.failed > 0) {
-        toast.error(`${result.failed} synchronizations failed`);
+        toast.error(t('autopilot_control.price_sync.toast.failure', { count: result.failed }));
       }
       loadQueue();
     } catch (error) {
@@ -53,10 +55,10 @@ const PriceSyncQueueCard = () => {
           <div>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-primary" />
-              Price Sync Queue
+              {t('autopilot_control.price_sync.title')}
             </CardTitle>
             <CardDescription>
-              Automatic synchronization with POS and other systems
+              {t('autopilot_control.price_sync.description')}
             </CardDescription>
           </div>
           <Button
@@ -65,7 +67,7 @@ const PriceSyncQueueCard = () => {
             className="gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
-            Process Queue
+            {t('autopilot_control.price_sync.process_btn')}
           </Button>
         </div>
       </CardHeader>
@@ -75,17 +77,17 @@ const PriceSyncQueueCard = () => {
           <div className="grid grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
             <div className="text-center">
               <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
-              <p className="text-xs text-muted-foreground">Pending</p>
+              <p className="text-xs text-muted-foreground">{t('autopilot_control.price_sync.status.pending')}</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-green-600">
                 {queue.filter(item => item.sync_status === 'completed').length}
               </p>
-              <p className="text-xs text-muted-foreground">Completed</p>
+              <p className="text-xs text-muted-foreground">{t('autopilot_control.price_sync.status.completed')}</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-red-600">{failedCount}</p>
-              <p className="text-xs text-muted-foreground">Failed</p>
+              <p className="text-xs text-muted-foreground">{t('autopilot_control.price_sync.status.failed')}</p>
             </div>
           </div>
 
@@ -120,14 +122,14 @@ const PriceSyncQueueCard = () => {
                     item.sync_status === 'completed'
                       ? 'default'
                       : item.sync_status === 'failed'
-                      ? 'destructive'
-                      : 'secondary'
+                        ? 'destructive'
+                        : 'secondary'
                   }
                 >
-                  {item.sync_status === 'completed' && 'Completed'}
-                  {item.sync_status === 'pending' && 'Pending'}
-                  {item.sync_status === 'failed' && 'Failed'}
-                  {item.sync_status === 'syncing' && 'Syncing...'}
+                  {item.sync_status === 'completed' && t('autopilot_control.price_sync.status.completed')}
+                  {item.sync_status === 'pending' && t('autopilot_control.price_sync.status.pending')}
+                  {item.sync_status === 'failed' && t('autopilot_control.price_sync.status.failed')}
+                  {item.sync_status === 'syncing' && t('autopilot_control.price_sync.status.syncing')}
                 </Badge>
               </div>
             ))}
@@ -136,7 +138,7 @@ const PriceSyncQueueCard = () => {
           {queue.length === 0 && !isLoading && (
             <div className="text-center py-8 text-muted-foreground">
               <CheckCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No items in queue</p>
+              <p className="text-sm">{t('autopilot_control.price_sync.empty')}</p>
             </div>
           )}
         </div>

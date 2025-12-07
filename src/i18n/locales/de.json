@@ -163,6 +163,70 @@
         "customer_insights": "Kundeneinblicke",
         "savings_waste": "Einsparungen & Abfall"
     },
+    "sales_prediction": {
+        "title": "Verkaufsprognose",
+        "description": "Prognosen basierend auf Historie, Wetter, Ereignissen und Saisonalität",
+        "legend": {
+            "actual": "Tatsächliche Verkäufe",
+            "predicted": "Prognose"
+        },
+        "filters": {
+            "time_range": {
+                "hourly": "Stündlich",
+                "daily": "Täglich",
+                "weekly": "Wöchentlich",
+                "monthly": "Monatlich"
+            },
+            "products": {
+                "all": "Alle Produkte",
+                "bakery": "Bäckerei",
+                "drinks": "Getränke",
+                "food": "Lebensmittel"
+            }
+        }
+    },
+    "autopilot_control": {
+        "title": "Autopilot-Steuerung",
+        "description": "Konfigurieren Sie Echtzeit-Automatisierungsmodule",
+        "modules": {
+            "pricing": "Preis-Engine",
+            "promotions": "Automatische Werbeaktionen",
+            "production": "Produktionsempfehlungen",
+            "inventory": "Intelligente Nachbestellung"
+        },
+        "frequency": {
+            "realtime": "Echtzeit",
+            "hourly": "Stündlich",
+            "daily": "Täglich"
+        },
+        "status": {
+            "active": "Aktiv",
+            "last_execution": "Letzte Ausführung: {{date}}",
+            "enabled": "{{module}} aktiviert",
+            "disabled": "{{module}} deaktiviert"
+        },
+        "action_logs": {
+            "title": "Protokoll der Automatischen Aktionen",
+            "description": "Die letzten 20 vom Autopiloten ausgeführten Aktionen",
+            "empty": "Keine Aktionen aufgezeichnet"
+        },
+        "price_sync": {
+            "title": "Preissynchronisierungswarteschlange",
+            "description": "Automatische Synchronisierung mit POS und anderen Systemen",
+            "process_btn": "Warteschlange verarbeiten",
+            "status": {
+                "pending": "Ausstehend",
+                "completed": "Abgeschlossen",
+                "failed": "Fehlgeschlagen",
+                "syncing": "Synchronisierung..."
+            },
+            "toast": {
+                "success": "{{count}} Preise erfolgreich synchronisiert",
+                "failure": "{{count}} Synchronisierungen fehlgeschlagen"
+            },
+            "empty": "Keine Artikel in der Warteschlange"
+        }
+    },
     "cards": {
         "forecast_engine": {
             "title": "Nachfrageprognose",
@@ -268,6 +332,54 @@
                 "pending_deliveries": "🚚 Ausstehende Lieferungen",
                 "sales_trend": "📈 Verkaufstrend"
             }
+        }
+    },
+    "pricing": {
+        "title": "Negentropy AI",
+        "subtitle": "Der Autonome Wirtschaftsagent für Ihr Unternehmen.",
+        "plan_card": {
+            "title": "All-In-One Zugang",
+            "subtitle": "Vollständige Plattform",
+            "description": "Vollständiger Zugriff auf Prognose-, Inventar- und Compliance-Engine.",
+            "period": "EUR / Monat",
+            "features": {
+                "smart_inventory": "Intelligentes Inventar: Verfallsverfolgung & Warnungen",
+                "demand_forecasting": "KI-Nachfrageprognose",
+                "prescriptive_actions": "Präskriptive Aktionen: Auto-Preisgestaltung & Nachbestellung",
+                "compliance_hub": "Compliance Hub: Automatisierte PDF-Berichte",
+                "marketplace_access": "Marktplatz-Zugang: Überschuss verkaufen",
+                "analytics": "Echtzeit-Abfall- & Verkaufsanalytik",
+                "support": "24/7 Priority Support"
+            },
+            "button": {
+                "subscribe": "Abonnieren mit Stripe",
+                "processing": "Verarbeitung..."
+            }
+        },
+        "roi_section": {
+            "title": "Maximieren Sie Ihren ROI",
+            "subtitle": "Reduzieren Sie Abfall, steigern Sie den Umsatz und automatisieren Sie die Compliance.",
+            "less_waste": {
+                "title": "Weniger Abfall",
+                "concept": "Effizienz",
+                "description": "Reduzierung von Lebensmittelabfällen in den ersten 3 Monaten"
+            },
+            "more_sales": {
+                "title": "Mehr Umsatz",
+                "concept": "Optimierung",
+                "description": "Margensteigerung durch dynamische Preisgestaltung"
+            }
+        },
+        "contact": {
+            "text": "Benötigen Sie eine individuelle Unternehmensvereinbarung? Kontaktieren Sie den Vertrieb",
+            "dialog_title": "Vertrieb kontaktieren",
+            "dialog_desc": "Füllen Sie das Formular aus und unser Team wird sich in Kürze mit Ihnen in Verbindung setzen",
+            "name_label": "Name",
+            "email_label": "E-Mail",
+            "company_label": "Firma",
+            "message_label": "Nachricht",
+            "send_btn": "Nachricht senden",
+            "success_toast": "Danke! Wir werden uns bald bei Ihnen melden."
         }
     }
 }

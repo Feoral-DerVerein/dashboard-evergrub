@@ -11,7 +11,7 @@ interface CompletionStepProps {
 const features = [
     { icon: BarChart3, title: "AI Forecasting", description: "Smart demand predictions" },
     { icon: Shield, title: "Compliance Hub", description: "Legal monitoring" },
-    { icon: BrainCircuit, title: "Aladdin AI", description: "Your AI assistant" }
+    { icon: BrainCircuit, title: "Negen AI", description: "Your AI assistant" }
 ];
 
 const CompletionStep = ({ onComplete }: CompletionStepProps) => {

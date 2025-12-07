@@ -2,16 +2,23 @@ import { PricingCard } from "@/components/pricing/PricingCard";
 import { RevenueModelCard } from "@/components/pricing/RevenueModelCard";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Percent, Megaphone, Mail, ArrowLeft } from "lucide-react";
+import { Percent, Megaphone, Mail, ArrowLeft, Loader2, Globe } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { stripePromise, STRIPE_PLANS } from "@/integrations/stripe/client";
+import { useAuth } from "@/context/AuthContext";
+import { useTranslation } from "react-i18next";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const { user, session } = useAuth();
+  const { t, i18n } = useTranslation();
+  const [loading, setLoading] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -20,9 +27,63 @@ const Pricing = () => {
     message: "",
   });
 
-  const handleGetStarted = () => {
-    // Redirect to registration or payment flow
-    navigate("/payment");
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
+  const handleSubscribe = async () => {
+    if (!user) {
+      toast.error(t('pricing.login_required_toast'));
+      navigate("/login");
+      return;
+    }
+
+    setLoading(true);
+
+    // SIMULATION MODE: Set to TRUE if you don't have real keys yet. Set to FALSE for production.
+    const isSimulation = false;
+
+    if (isSimulation) {
+      setTimeout(() => {
+        setLoading(false);
+        toast.success("Simulation Mode: Subscription Successful! 🚀");
+        navigate("/dashboard?payment=success");
+      }, 2000);
+      return;
+    }
+
+    try {
+      const stripe = await stripePromise;
+      if (!stripe) throw new Error("Stripe failed to initialize");
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({
+          priceId: STRIPE_PLANS.ALL_IN_ONE.priceId,
+          successUrl: `${window.location.origin}/dashboard?payment=success`,
+          cancelUrl: `${window.location.origin}/pricing?payment=cancelled`,
+        }),
+      });
+
+      const { sessionId, error } = await response.json();
+      if (error) throw new Error(error);
+
+      const { error: stripeError } = await stripe.redirectToCheckout({
+        sessionId,
+      });
+
+      if (stripeError) throw stripeError;
+
+    } catch (error: any) {
+      console.error("Payment error:", error);
+      toast.error(error.message || t("pricing.payment_error_toast"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleContactSales = () => {
@@ -31,37 +92,25 @@ const Pricing = () => {
 
   const handleSubmitContact = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the contact form data to your backend
-    toast.success("Thank you! We'll get in touch with you soon.");
+    toast.success(t('pricing.contact.success_toast'));
     setShowContactDialog(false);
     setContactForm({ name: "", email: "", company: "", message: "" });
   };
 
-  const startedFeatures = [
-    "Access to basic food waste dashboard",
-    "Up to 100 listed products",
-    "Automated monthly reports",
-    "Email support",
-    "Access to B2B/B2C marketplace",
-    "Automated inventory notifications",
-  ];
-
-  const enterpriseFeatures = [
-    "Everything in Started, with expanded limits",
-    "Unlimited products",
-    "Advanced dashboard with real-time analytics",
-    "Automated regulatory reports (Bin Trim / NSW EPA)",
-    "Custom ERP/POS integrations",
-    "24/7 priority support",
-    "Dedicated account manager",
-    "Whitelabel available",
-    "Automated NGO donation workflows",
+  const platformFeatures = [
+    t('pricing.plan_card.features.smart_inventory'),
+    t('pricing.plan_card.features.demand_forecasting'),
+    t('pricing.plan_card.features.prescriptive_actions'),
+    t('pricing.plan_card.features.compliance_hub'),
+    t('pricing.plan_card.features.marketplace_access'),
+    t('pricing.plan_card.features.analytics'),
+    t('pricing.plan_card.features.support'),
   ];
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Back Button */}
-      <div className="absolute top-4 left-4">
+      {/* Top Bar */}
+      <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
         <Button
           variant="ghost"
           size="icon"
@@ -70,45 +119,52 @@ const Pricing = () => {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="hover:bg-muted">
+              <Globe className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => changeLanguage('en')}>🇺🇸 English</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => changeLanguage('es')}>🇪🇸 Español</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => changeLanguage('ca')}>🏳️ Català</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => changeLanguage('de')}>🇩🇪 Deutsch</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Header */}
       <div className="container mx-auto px-4 pt-16 pb-8">
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <h1 className="text-5xl font-bold text-foreground">
-            Subscription Plans
-          </h1>
+          <div className="flex justify-center">
+            <img
+              src="/negentropy-logo.png"
+              alt="Negentropy AI"
+              className="h-20 w-auto object-contain mb-4"
+            />
+          </div>
           <p className="text-xl text-muted-foreground">
-            Choose the perfect plan for your business and start reducing food waste today
+            {t('pricing.subtitle')}
           </p>
         </div>
       </div>
 
       {/* Pricing Cards */}
       <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="max-w-md mx-auto">
           <PricingCard
-            title="Started"
-            subtitle="Small Business"
-            price={100}
-            period="USD / month"
-            description="Monthly subscription for retailers and small farms"
-            features={startedFeatures}
-            buttonText="Get Started"
-            onButtonClick={handleGetStarted}
-            isPrimary={false}
-          />
-
-          <PricingCard
-            title="Enterprise"
-            subtitle="Big Business"
-            price="Contact Us"
-            description="Custom solution for supermarket chains and wholesalers"
-            features={enterpriseFeatures}
-            buttonText="Contact Sales"
-            onButtonClick={handleContactSales}
-            recommended={true}
+            title={t('pricing.plan_card.title')}
+            subtitle={t('pricing.plan_card.subtitle')}
+            price="€150"
+            period={t('pricing.plan_card.period')}
+            description={t('pricing.plan_card.description')}
+            features={platformFeatures}
+            buttonText={loading ? t('pricing.plan_card.button.processing') : t('pricing.plan_card.button.subscribe')}
+            onButtonClick={handleSubscribe}
             isPrimary={true}
+            recommended={true}
           />
         </div>
       </div>
@@ -118,73 +174,50 @@ const Pricing = () => {
         <div className="max-w-5xl mx-auto space-y-8">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-bold text-foreground">
-              Additional Revenue Streams
+              {t('pricing.roi_section.title')}
             </h2>
             <p className="text-muted-foreground">
-              Complementary revenue sources for your business
+              {t('pricing.roi_section.subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <RevenueModelCard
               icon={Percent}
-              title="Transaction Fee"
-              concept="B2B - B2C"
-              value="3%"
-              description="Commission on each marketplace transaction"
+              title={t('pricing.roi_section.less_waste.title')}
+              concept={t('pricing.roi_section.less_waste.concept')}
+              value="-30%"
+              description={t('pricing.roi_section.less_waste.description')}
             />
 
             <RevenueModelCard
               icon={Mail}
-              title="Enterprise Plan"
-              concept="Customization"
-              value="Contact"
-              description="Tailored solutions based on business needs"
+              title={t('pricing.roi_section.more_sales.title')}
+              concept={t('pricing.roi_section.more_sales.concept')}
+              value="+15%"
+              description={t('pricing.roi_section.more_sales.description')}
             />
           </div>
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-3xl mx-auto text-center space-y-6">
-          <h3 className="text-2xl font-semibold text-foreground">
-            Ready to get started?
-          </h3>
-          <p className="text-muted-foreground">
-            Join hundreds of businesses already reducing food waste with Negentropy
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Button 
-              size="lg" 
-              onClick={handleGetStarted}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              Get Started Now
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              onClick={handleContactSales}
-            >
-              Talk to Sales
-            </Button>
-          </div>
-        </div>
+      {/* Contact Section */}
+      <div className="container mx-auto px-4 py-8 text-center">
+        <Button variant="ghost" onClick={handleContactSales}>{t('pricing.contact.text')}</Button>
       </div>
 
       {/* Contact Dialog */}
       <Dialog open={showContactDialog} onOpenChange={setShowContactDialog}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Contact Sales</DialogTitle>
+            <DialogTitle>{t('pricing.contact.dialog_title')}</DialogTitle>
             <DialogDescription>
-              Fill out the form and our team will get in touch with you
+              {t('pricing.contact.dialog_desc')}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmitContact} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t('pricing.contact.name_label')}</Label>
               <Input
                 id="name"
                 value={contactForm.name}
@@ -193,7 +226,7 @@ const Pricing = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('pricing.contact.email_label')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -203,7 +236,7 @@ const Pricing = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="company">Company</Label>
+              <Label htmlFor="company">{t('pricing.contact.company_label')}</Label>
               <Input
                 id="company"
                 value={contactForm.company}
@@ -212,7 +245,7 @@ const Pricing = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="message">Message</Label>
+              <Label htmlFor="message">{t('pricing.contact.message_label')}</Label>
               <Textarea
                 id="message"
                 value={contactForm.message}
@@ -222,7 +255,7 @@ const Pricing = () => {
               />
             </div>
             <Button type="submit" className="w-full">
-              Send Message
+              {t('pricing.contact.send_btn')}
             </Button>
           </form>
         </DialogContent>

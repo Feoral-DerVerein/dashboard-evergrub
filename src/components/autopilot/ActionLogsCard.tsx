@@ -4,8 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { autopilotService, ActionLog } from '@/services/autopilotService';
 import { Activity, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ActionLogsCard = () => {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<ActionLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -68,10 +70,10 @@ const ActionLogsCard = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Activity className="h-5 w-5 text-primary" />
-          Automatic Actions Log
+          {t('autopilot_control.action_logs.title')}
         </CardTitle>
         <CardDescription>
-          Last 20 actions executed by auto-pilot
+          {t('autopilot_control.action_logs.description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -91,7 +93,7 @@ const ActionLogsCard = () => {
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span className="font-medium capitalize">{log.module}</span>
                     <span>•</span>
-                    <span>{new Date(log.created_at).toLocaleString('en-US')}</span>
+                    <span>{new Date(log.created_at).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -100,7 +102,7 @@ const ActionLogsCard = () => {
             {logs.length === 0 && !isLoading && (
               <div className="text-center py-8 text-muted-foreground">
                 <Activity className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No actions recorded</p>
+                <p className="text-sm">{t('autopilot_control.action_logs.empty')}</p>
               </div>
             )}
           </div>

@@ -13,7 +13,7 @@ const TOTAL_STEPS = 4;
 
 const OnboardingWizard = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, refreshProfile } = useAuth();
     const [currentStep, setCurrentStep] = useState(0);
     const [onboardingData, setOnboardingData] = useState<OnboardingData>({});
     const [isLoading, setIsLoading] = useState(true);
@@ -76,11 +76,13 @@ const OnboardingWizard = () => {
         }
     };
 
+
     const handleComplete = async () => {
         if (!user?.id) return;
 
         try {
             await onboardingService.completeOnboarding(user.id, onboardingData);
+            await refreshProfile(); // Force refresh to update context state
             navigate("/dashboard", { replace: true });
         } catch (error) {
             console.error("Error completing onboarding:", error);
@@ -105,7 +107,7 @@ const OnboardingWizard = () => {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <img
-                                src="/lovable-uploads/0f7e7e81-92c8-4655-88b7-fef69d30e950.png"
+                                src="/negentropy-logo.png"
                                 alt="Negentropy"
                                 className="h-8 w-auto"
                             />
@@ -115,10 +117,10 @@ const OnboardingWizard = () => {
                                 <div key={label} className="flex items-center">
                                     <div
                                         className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${index < currentStep
-                                                ? "bg-green-500 text-white"
-                                                : index === currentStep
-                                                    ? "bg-green-100 text-green-700 ring-2 ring-green-500"
-                                                    : "bg-gray-100 text-gray-400"
+                                            ? "bg-green-500 text-white"
+                                            : index === currentStep
+                                                ? "bg-green-100 text-green-700 ring-2 ring-green-500"
+                                                : "bg-gray-100 text-gray-400"
                                             }`}
                                     >
                                         {index + 1}

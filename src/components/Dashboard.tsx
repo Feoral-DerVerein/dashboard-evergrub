@@ -11,7 +11,7 @@ const Dashboard = () => {
       {/* Welcome Banner */}
       <DynamicGreeting />
 
-      {/* Aladdin AI Assistant - Main Content */}
+      {/* Negen AI Assistant - Main Content */}
       <div className="max-w-5xl mx-auto">
         <AladdinChatPanel />
       </div>

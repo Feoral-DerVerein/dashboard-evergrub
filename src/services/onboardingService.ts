@@ -15,6 +15,7 @@ export interface OnboardingData {
     dataImported?: boolean;
     preferences?: UserPreferences;
     skipped?: boolean;
+    logoUrl?: string; // Added logoUrl
 }
 
 export interface UserPreferences {
@@ -114,7 +115,8 @@ export const onboardingService = {
             const currentData = (profileData?.onboarding_data as OnboardingData) || {};
             const mergedData = { ...currentData, ...finalData };
 
-            const { error } = await supabase
+            // 1. Update Profile status
+            const { error: profileError } = await supabase
                 .from('profiles')
                 .update({
                     onboarding_completed: true,
@@ -123,10 +125,31 @@ export const onboardingService = {
                 } as Record<string, unknown>)
                 .eq('id', userId);
 
-            if (error) {
-                console.error('Error completing onboarding:', error);
-                throw error;
+            if (profileError) {
+                console.error('Error completing onboarding (profile):', profileError);
+                throw profileError;
             }
+
+            // 2. Create/Update Store Profile
+            // This enables the dashboard to show the correct name and logo
+            const { error: storeError } = await supabase
+                .from('store_profiles')
+                .upsert({
+                    userId: userId,
+                    name: mergedData.businessName || 'My Business',
+                    description: `${mergedData.businessType} - ${mergedData.businessSize}`,
+                    categories: mergedData.businessType ? [mergedData.businessType] : [],
+                    logoUrl: (mergedData as any).logoUrl, // Assuming logoUrl is passed in mergedData
+                    location: mergedData.country,
+                    // Default values for required fields if any (check schema if needed)
+                } as any, { onConflict: 'userId' });
+
+            if (storeError) {
+                console.error('Error creating store profile:', storeError);
+                // Don't throw here to avoid blocking completion if store profile fails, 
+                // but log it. User can fix in settings.
+            }
+
         } catch (err) {
             console.error('Error in completeOnboarding:', err);
             throw err;

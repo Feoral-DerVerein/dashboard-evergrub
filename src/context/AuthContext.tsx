@@ -6,8 +6,10 @@ type AuthContextType = {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  profile: any | null; // Adding profile to context
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  refreshProfile: () => Promise<void>; // Expose refresh function
 };
 
 // Crear el contexto con un valor por defecto para evitar errores
@@ -15,8 +17,10 @@ const defaultAuthContext: AuthContextType = {
   session: null,
   user: null,
   loading: true,
-  signOut: async () => {},
-  signInWithGoogle: async () => {},
+  profile: null,
+  signOut: async () => { },
+  signInWithGoogle: async () => { },
+  refreshProfile: async () => { },
 };
 
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
@@ -24,11 +28,30 @@ const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+      } else {
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error('Error in fetchProfile:', error);
+    }
+  };
 
   useEffect(() => {
     console.log("AuthProvider: initializing");
-    
+
     // Verificar primero si ya hay una sesión activa
     const getInitialSession = async () => {
       try {
@@ -36,6 +59,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log("Initial session check:", currentSession?.user?.email || "No session");
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
+
+        if (currentSession?.user) {
+          await fetchProfile(currentSession.user.id);
+        }
       } catch (error) {
         console.error("Error getting initial session:", error);
       } finally {
@@ -44,15 +71,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     getInitialSession();
-    
+
+    // Failsafe: force loading false after 5 seconds
+    const timeout = setTimeout(() => {
+      setLoading(prev => {
+        if (prev) {
+          console.warn("Auth loading timed out, forcing false");
+          return false;
+        }
+        return prev;
+      });
+    }, 5000);
+
     // Configurar el detector de cambios de estado de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
+      async (event, currentSession) => {
         console.log("Auth state changed:", event, currentSession?.user?.email || "No session");
-        
+
         // Sincronizar state con la sesión actual
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
+
+        if (currentSession?.user) {
+          await fetchProfile(currentSession.user.id);
+        } else {
+          setProfile(null);
+        }
       }
     );
 
@@ -62,9 +106,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchProfile(user.id);
+    }
+  };
+
   const signOut = async () => {
     console.log("Signing out");
     await supabase.auth.signOut();
+    setProfile(null);
   };
 
   const signInWithGoogle = async () => {
@@ -81,8 +132,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     session,
     user,
     loading,
+    profile,
     signOut,
     signInWithGoogle,
+    refreshProfile
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

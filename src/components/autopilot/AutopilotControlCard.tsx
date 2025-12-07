@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { autopilotService, AutopilotSettings } from '@/services/autopilotService';
 import { Bot, DollarSign, Megaphone, Package, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const moduleIcons = {
   pricing: DollarSign,
@@ -14,14 +15,8 @@ const moduleIcons = {
   inventory: ShoppingCart,
 };
 
-const moduleLabels = {
-  pricing: 'Pricing Engine',
-  promotions: 'Automatic Promotions',
-  production: 'Production Recommendations',
-  inventory: 'Smart Reordering',
-};
-
 const AutopilotControlCard = () => {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<AutopilotSettings[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,10 +35,17 @@ const AutopilotControlCard = () => {
     }
   };
 
+  const getModuleLabel = (moduleName: string) => {
+    return t(`autopilot_control.modules.${moduleName}`, moduleName); // Fallback to key if not found
+  };
+
   const handleToggleModule = async (moduleName: string, isActive: boolean) => {
     try {
       await autopilotService.updateSettings(moduleName, { is_active: isActive });
-      toast.success(isActive ? `${moduleLabels[moduleName as keyof typeof moduleLabels]} enabled` : `${moduleLabels[moduleName as keyof typeof moduleLabels]} disabled`);
+      const message = isActive
+        ? t('autopilot_control.status.enabled', { module: getModuleLabel(moduleName) })
+        : t('autopilot_control.status.disabled', { module: getModuleLabel(moduleName) });
+      toast.success(message);
       loadSettings();
     } catch (error) {
       console.error('Error updating settings:', error);
@@ -66,6 +68,9 @@ const AutopilotControlCard = () => {
     return settings.find(s => s.module_name === moduleName);
   };
 
+  // Keys derived from moduleIcons keys which match translation keys
+  const moduleKeys = Object.keys(moduleIcons);
+
   return (
     <Card>
       <CardHeader>
@@ -74,17 +79,18 @@ const AutopilotControlCard = () => {
             <Bot className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <CardTitle>Auto-Pilot Control</CardTitle>
+            <CardTitle>{t('autopilot_control.title')}</CardTitle>
             <CardDescription>
-              Configure real-time automation modules
+              {t('autopilot_control.description')}
             </CardDescription>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {Object.entries(moduleLabels).map(([key, label]) => {
+        {moduleKeys.map((key) => {
           const Icon = moduleIcons[key as keyof typeof moduleIcons];
           const setting = getModuleSetting(key);
+          const label = t(`autopilot_control.modules.${key}`);
 
           return (
             <div
@@ -98,14 +104,15 @@ const AutopilotControlCard = () => {
                     <p className="font-medium">{label}</p>
                     {setting?.is_active && (
                       <Badge variant="default" className="text-xs">
-                        Active
+                        {t('autopilot_control.status.active')}
                       </Badge>
                     )}
                   </div>
                   {setting?.last_execution && (
                     <p className="text-xs text-muted-foreground">
-                      Last execution:{' '}
-                      {new Date(setting.last_execution).toLocaleString('en-US')}
+                      {t('autopilot_control.status.last_execution', {
+                        date: new Date(setting.last_execution).toLocaleString()
+                      })}
                     </p>
                   )}
                 </div>
@@ -121,9 +128,9 @@ const AutopilotControlCard = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="realtime">Real-time</SelectItem>
-                    <SelectItem value="hourly">Hourly</SelectItem>
-                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="realtime">{t('autopilot_control.frequency.realtime')}</SelectItem>
+                    <SelectItem value="hourly">{t('autopilot_control.frequency.hourly')}</SelectItem>
+                    <SelectItem value="daily">{t('autopilot_control.frequency.daily')}</SelectItem>
                   </SelectContent>
                 </Select>
 
