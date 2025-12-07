@@ -1,8 +1,16 @@
 import pandas as pd
-from prophet import Prophet
+import numpy as np
 import logging
+from datetime import timedelta
 
 logger = logging.getLogger(__name__)
+
+try:
+    from prophet import Prophet
+    PROPHET_AVAILABLE = True
+except ImportError:
+    PROPHET_AVAILABLE = False
+    logger.warning("Prophet not available. Using Lightweight Heuristic Forecaster.")
 
 class Forecaster:
     def __init__(self):
