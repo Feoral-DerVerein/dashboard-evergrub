@@ -12,15 +12,24 @@ interface PrescriptiveActionsProps {
     salesHistory?: any[]; // Keep for compatibility but optional
     stockByCategory?: any[]; // Keep for compatibility but optional
     scenario: 'base' | 'optimistic' | 'crisis';
+    isLoading?: boolean;
 }
 
 export const PrescriptiveActions: React.FC<PrescriptiveActionsProps> = ({
-    scenario
+    scenario,
+    isLoading
 }) => {
     const { t } = useTranslation();
     const { user } = useAuth();
     const [actions, setActions] = useState<PrescriptiveAction[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(isLoading || true);
+
+    // Update internal loading state if parent prop changes
+    useEffect(() => {
+        if (typeof isLoading !== 'undefined') {
+            setLoading(isLoading);
+        }
+    }, [isLoading]);
     const [executingId, setExecutingId] = useState<string | null>(null);
 
     const fetchActions = async () => {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,10 +25,22 @@ interface ClientWishlistCardsProps {
   onProductAdd?: (product: any, clientId: string) => void;
   selectedCategory?: string;
 }
-
 export const ClientWishlistCards = ({ onProductAdd, selectedCategory }: ClientWishlistCardsProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  // ... rest of the component body needs to be preserved or I need to do a targeted replace for the top part.
+  // Since I saw lines 1-27 are imports, and line 28 is `const { user }...`, I will insert the function def at 28.
+  // And checking the end, `};` is at 273.
+  // Wait, if I just insert the line, I might mess up the indentation or the closing brace.
+  // The file currently ENDS with `};`. This `};` probably belongs to the `if (isLoading)` or `if (empty)` blocks?
+  // No, looking at step 540, line 271-273:
+  // 271:   </div>
+  // 272: );
+  // 273: };
+  // It seems the closing brace IS there?
+  // Ah, line 273 `};` exists. But there is NO OPENING brace.
+  // So I just need to add the opening line.
+
   const [clientWishlists, setClientWishlists] = useState<ClientWishlistData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,28 +52,27 @@ export const ClientWishlistCards = ({ onProductAdd, selectedCategory }: ClientWi
 
   const loadClientWishlists = async () => {
     if (!user) return;
-    
+
     setIsLoading(true);
     try {
       // Get all wishlists from different users
-      const { data: wishlists, error } = await supabase
-        .from('wishlists')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const wishlistsRef = collection(db, 'wishlists');
+      const q = query(wishlistsRef, orderBy('created_at', 'desc'));
+      const snapshot = await getDocs(q);
 
-      if (error) throw error;
+      const wishlists = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
 
       // Group by user_id and create client cards
       const groupedWishlists: { [key: string]: any } = {};
-      
-      wishlists?.forEach((wishlist) => {
+
+      wishlists.forEach((wishlist) => {
         if (!groupedWishlists[wishlist.user_id]) {
           groupedWishlists[wishlist.user_id] = {
             user_id: wishlist.user_id,
             client_id: wishlist.user_id.substring(0, 8).toUpperCase(),
             date: new Date(wishlist.created_at).toLocaleDateString('en-US', {
               day: '2-digit',
-              month: '2-digit', 
+              month: '2-digit',
               year: 'numeric'
             }),
             products: []
@@ -136,14 +148,14 @@ export const ClientWishlistCards = ({ onProductAdd, selectedCategory }: ClientWi
       // Filter mock clients by category if needed
       const filteredMockClients = mockClients.map(client => ({
         ...client,
-        products: client.products.filter(product => 
+        products: client.products.filter(product =>
           !selectedCategory || product.category === selectedCategory
         )
       })).filter(client => client.products.length > 0);
 
       const combinedClients = [...clientWishlistsArray, ...filteredMockClients];
       setClientWishlists(combinedClients);
-      
+
     } catch (error: any) {
       console.error("Error loading client wishlists:", error);
       toast({
@@ -200,7 +212,7 @@ export const ClientWishlistCards = ({ onProductAdd, selectedCategory }: ClientWi
         <h3 className="text-lg font-semibold">Client Preferences</h3>
         <Badge variant="secondary">{clientWishlists.length} clients</Badge>
       </div>
-      
+
       <div className="space-y-6 max-h-96 overflow-y-auto pr-2">
         {clientWishlists.map((client, index) => (
           <div key={client.user_id} className="bg-background border border-border rounded-lg p-4">
@@ -233,7 +245,7 @@ export const ClientWishlistCards = ({ onProductAdd, selectedCategory }: ClientWi
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
-                  
+
                   <div className="space-y-3">
                     <h5 className="text-sm font-semibold leading-tight">{product.name}</h5>
                     <div className="flex items-center justify-between">
@@ -252,7 +264,7 @@ export const ClientWishlistCards = ({ onProductAdd, selectedCategory }: ClientWi
                 </div>
               ))}
             </div>
-            
+
             {client.products.length > 4 && (
               <div className="mt-4 text-center">
                 <Badge variant="secondary" className="text-xs text-green-600 bg-green-50 border-green-200">
@@ -263,7 +275,7 @@ export const ClientWishlistCards = ({ onProductAdd, selectedCategory }: ClientWi
           </div>
         ))}
       </div>
-      
+
       <div className="text-center pt-4 border-t border-border">
         <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
           <span className="text-sm">🎯</span>

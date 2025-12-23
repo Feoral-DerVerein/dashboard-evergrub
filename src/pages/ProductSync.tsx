@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { storage } from "@/lib/firebase";
+import { ref, uploadBytes } from "firebase/storage";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 
@@ -16,8 +17,8 @@ const ProductSync = () => {
     }
     setIsUploading(true);
     try {
-      const { error } = await supabase.storage.from("imports").upload("products.csv", file, { upsert: true });
-      if (error) throw error;
+      const storageRef = ref(storage, "imports/products.csv");
+      await uploadBytes(storageRef, file);
       toast({ title: "CSV subido", description: "Se guardó en imports/products.csv" });
     } catch (e: any) {
       toast({ title: "Error al subir", description: e?.message || "Inténtalo de nuevo", variant: "destructive" });
@@ -29,11 +30,16 @@ const ProductSync = () => {
   const handleRunNow = async () => {
     setIsRunning(true);
     try {
-      const { data, error } = await supabase.functions.invoke("sync-products-from-storage", {
-        body: { path: "products.csv" },
+      // TODO: Implement Firebase Function for sync
+      console.warn("Product sync function not yet migrated to Firebase");
+
+      // Mock success for now to avoid breaking UI flow
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      toast({
+        title: "Sync simulada",
+        description: "La función de sincronización se migrará a Cloud Functions pronto."
       });
-      if (error) throw error;
-      toast({ title: "Sync ejecutada", description: `Insertados: ${data?.inserted || 0} • Fallidos: ${data?.failed || 0}` });
     } catch (e: any) {
       toast({ title: "Error al ejecutar", description: e?.message || "Revisa logs", variant: "destructive" });
     } finally {

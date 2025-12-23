@@ -1,4 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/firebase";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 
 export interface OnboardingStatus {
     completed: boolean;
@@ -27,7 +28,7 @@ export interface UserPreferences {
 }
 
 // Type for raw profile data from Supabase (handles columns that may not be in generated types yet)
-interface ProfileOnboardingData {
+interface UserProfileData {
     onboarding_completed?: boolean;
     onboarding_step?: number;
     onboarding_data?: OnboardingData;
@@ -36,15 +37,12 @@ interface ProfileOnboardingData {
 export const onboardingService = {
     async getOnboardingStatus(userId: string): Promise<OnboardingStatus> {
         try {
-            // Use raw query to handle columns that might not be in generated types
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
+            // Firestore: users collection
+            const docRef = doc(db, 'users', userId);
+            const docSnap = await getDoc(docRef);
 
-            if (error) {
-                console.error('Error fetching onboarding status:', error);
+            if (!docSnap.exists()) {
+                // Return default if user doc doesn't exist yet
                 return {
                     completed: false,
                     currentStep: 0,
@@ -52,8 +50,7 @@ export const onboardingService = {
                 };
             }
 
-            // Cast to handle dynamic columns
-            const profileData = data as unknown as ProfileOnboardingData;
+            const profileData = docSnap.data() as UserProfileData;
 
             return {
                 completed: profileData?.onboarding_completed ?? false,
@@ -72,30 +69,20 @@ export const onboardingService = {
 
     async saveStepData(userId: string, step: number, stepData: Partial<OnboardingData>): Promise<void> {
         try {
-            // First get current data
-            const { data: currentProfile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
+            const docRef = doc(db, 'users', userId);
+            const docSnap = await getDoc(docRef);
 
-            const profileData = currentProfile as unknown as ProfileOnboardingData;
-            const currentData = (profileData?.onboarding_data as OnboardingData) || {};
+            const currentData = docSnap.exists()
+                ? ((docSnap.data() as UserProfileData).onboarding_data || {})
+                : {};
+
             const mergedData = { ...currentData, ...stepData };
 
-            // Use rpc or raw update to handle dynamic columns
-            const { error } = await supabase
-                .from('profiles')
-                .update({
-                    onboarding_step: step,
-                    onboarding_data: mergedData
-                } as Record<string, unknown>)
-                .eq('id', userId);
+            await setDoc(docRef, {
+                onboarding_step: step,
+                onboarding_data: mergedData
+            }, { merge: true });
 
-            if (error) {
-                console.error('Error saving step data:', error);
-                throw error;
-            }
         } catch (err) {
             console.error('Error in saveStepData:', err);
             throw err;
@@ -104,51 +91,36 @@ export const onboardingService = {
 
     async completeOnboarding(userId: string, finalData?: Partial<OnboardingData>): Promise<void> {
         try {
-            // Get current data and merge with final data
-            const { data: currentProfile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
+            const docRef = doc(db, 'users', userId);
+            const docSnap = await getDoc(docRef);
 
-            const profileData = currentProfile as unknown as ProfileOnboardingData;
-            const currentData = (profileData?.onboarding_data as OnboardingData) || {};
+            const currentData = docSnap.exists()
+                ? ((docSnap.data() as UserProfileData).onboarding_data || {})
+                : {};
+
             const mergedData = { ...currentData, ...finalData };
 
-            // 1. Update Profile status
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .update({
-                    onboarding_completed: true,
-                    onboarding_step: 4,
-                    onboarding_data: mergedData
-                } as Record<string, unknown>)
-                .eq('id', userId);
-
-            if (profileError) {
-                console.error('Error completing onboarding (profile):', profileError);
-                throw profileError;
-            }
+            // 1. Update User Profile status
+            await setDoc(docRef, {
+                onboarding_completed: true,
+                onboarding_step: 4,
+                onboarding_data: mergedData
+            }, { merge: true });
 
             // 2. Create/Update Store Profile
-            // This enables the dashboard to show the correct name and logo
-            const { error: storeError } = await supabase
-                .from('store_profiles')
-                .upsert({
-                    userId: userId,
-                    name: mergedData.businessName || 'My Business',
-                    description: `${mergedData.businessType} - ${mergedData.businessSize}`,
-                    categories: mergedData.businessType ? [mergedData.businessType] : [],
-                    logoUrl: (mergedData as any).logoUrl, // Assuming logoUrl is passed in mergedData
-                    location: mergedData.country,
-                    // Default values for required fields if any (check schema if needed)
-                } as any, { onConflict: 'userId' });
+            // Firestore: store_profiles collection
+            // Assuming store profile ID is same as userID for 1:1 relationship or we query by userId.
+            // Let's use userId as document ID for store_profile ensures uniqueness easily.
+            const storeDocRef = doc(db, 'store_profiles', userId);
 
-            if (storeError) {
-                console.error('Error creating store profile:', storeError);
-                // Don't throw here to avoid blocking completion if store profile fails, 
-                // but log it. User can fix in settings.
-            }
+            await setDoc(storeDocRef, {
+                userId: userId,
+                name: mergedData.businessName || 'My Business',
+                description: `${mergedData.businessType || ''} - ${mergedData.businessSize || ''}`,
+                categories: mergedData.businessType ? [mergedData.businessType] : [],
+                logoUrl: (mergedData as any).logoUrl,
+                location: mergedData.country,
+            }, { merge: true });
 
         } catch (err) {
             console.error('Error in completeOnboarding:', err);
@@ -158,19 +130,12 @@ export const onboardingService = {
 
     async skipOnboarding(userId: string): Promise<void> {
         try {
-            const { error } = await supabase
-                .from('profiles')
-                .update({
-                    onboarding_completed: true,
-                    onboarding_step: -1,
-                    onboarding_data: { skipped: true }
-                } as Record<string, unknown>)
-                .eq('id', userId);
-
-            if (error) {
-                console.error('Error skipping onboarding:', error);
-                throw error;
-            }
+            const docRef = doc(db, 'users', userId);
+            await setDoc(docRef, {
+                onboarding_completed: true,
+                onboarding_step: -1,
+                onboarding_data: { skipped: true }
+            }, { merge: true });
         } catch (err) {
             console.error('Error in skipOnboarding:', err);
             throw err;

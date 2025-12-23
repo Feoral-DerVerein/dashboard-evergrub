@@ -1,5 +1,5 @@
 
-import { User } from "@supabase/supabase-js";
+// import { User } from "@supabase/supabase-js";
 
 export interface OrderItem {
   id: string;

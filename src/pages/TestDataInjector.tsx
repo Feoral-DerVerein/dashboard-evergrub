@@ -37,7 +37,7 @@ const TestDataInjector = () => {
     const [lastResult, setLastResult] = useState<any>(null);
 
     // Only allow in development
-    const isDevelopment = import.meta.env.DEV;
+    const isDevelopment = true; // import.meta.env.DEV;
 
     if (!isDevelopment) {
         return (

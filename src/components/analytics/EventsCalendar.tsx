@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { predictiveAnalyticsService, EventData } from '@/services/predictiveAnalyticsService';
@@ -44,7 +45,10 @@ const EventsCalendar = () => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-primary" />
-          <CardTitle>Events Calendar</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            Events Calendar
+            <HelpTooltip kpiName="Calendario de Eventos" />
+          </CardTitle>
         </div>
         <CardDescription>Holidays and events that affect demand</CardDescription>
       </CardHeader>

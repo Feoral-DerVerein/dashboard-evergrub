@@ -40,7 +40,7 @@ import TestDataInjector from "@/pages/TestDataInjector";
 import InventoryEnterprise from "@/pages/InventoryEnterprise";
 import ForecastingEnterprise from "@/pages/ForecastingEnterprise";
 import LegalCompliance from "@/pages/LegalCompliance";
-import AladdinAI from "@/pages/AladdinAI";
+import NegentropyAI from "@/pages/NegentropyAI";
 import ComplianceHub from "@/pages/ComplianceHub";
 import OnboardingWizard from "@/pages/OnboardingWizard";
 
@@ -72,6 +72,7 @@ const MainRoutes = () => {
         <Route path="/ads" element={<Ads />} />
         <Route path="/ads/create" element={<CreateAd />} />
         <Route path="/donate" element={<ComplianceHub />} />
+        <Route path="/donations" element={<Navigate to="/donate?tab=donations" replace />} />
         <Route path="/users" element={<Users />} />
         <Route path="/payment" element={<PaymentPortal />} />
 
@@ -93,14 +94,14 @@ const MainRoutes = () => {
         <Route path="/inventory-enterprise" element={<InventoryEnterprise />} />
         <Route path="/forecasting" element={<ForecastingEnterprise />} />
         <Route path="/legal" element={<ComplianceHub />} />
-        {/* Redirect /aladdin to main dashboard - AI is now integrated there */}
-        <Route path="/aladdin" element={<AladdinAI />} />
+        {/* Redirect /negentropy to main dashboard - AI is now integrated there */}
+        <Route path="/negentropy" element={<NegentropyAI />} />
 
       </Route>
 
       {/* Default redirects */}
       <Route path="/" element={
-        user ? <Navigate to="/aladdin" replace /> : <Navigate to="/login" replace />
+        user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
       } />
 
       {/* 404 page */}

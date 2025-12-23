@@ -9,7 +9,8 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { toast } from "sonner";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/firebase";
+import { collection, addDoc } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 
 const formSchema = z.object({
@@ -42,7 +43,7 @@ export function DonationForm({ onClose, ngoName, product }: DonationFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: user?.user_metadata?.full_name || "",
+      name: user?.displayName || "",
       email: user?.email || "",
       phone: "",
       amount: product ? product.quantity.toString() : "",
@@ -58,18 +59,17 @@ export function DonationForm({ onClose, ngoName, product }: DonationFormProps) {
     }
 
     try {
-      const { error } = await supabase.from('donations').insert({
-        tenant_id: user.id,
+      await addDoc(collection(db, 'donations'), {
+        tenant_id: user.uid,
         ngo: ngoName || "General Donation",
         quantity: parseFloat(data.amount) || 0, // Assuming amount is numeric for now, or we store as text if schema allows
         status: 'pending',
+        created_at: new Date().toISOString(),
         // We might want to store more details in a JSON column or separate columns if the schema evolves
         // For now, we'll map what we can to the existing schema
         // Note: The schema has 'quantity' as numeric. If 'amount' is text (e.g. "5 boxes"), this might fail.
         // Let's assume for now the user enters a number.
       });
-
-      if (error) throw error;
 
       toast.success("Thank you for your donation!", {
         description: `We will contact you soon about your donation of ${data.amount} of ${data.foodType} to ${ngoName || 'us'}.`,

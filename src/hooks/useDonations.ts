@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import { donationService } from "@/services/donationService";
+import { Donation, CreateDonationDTO } from "@/services/types";
+
+// Re-export shared types
+export type { Donation, CreateDonationDTO };
 
 export interface Ngo {
   id: string;
@@ -12,22 +16,8 @@ export interface Ngo {
   tax_id: string;
   status: string;
   created_at: string;
-}
-
-export interface Donation {
-  id: string;
-  product_id?: number;
-  quantity: number;
-  ngo: string;
-  pickup_time?: string;
-  status: string;
-  observations?: string;
-  document_url?: string;
-  expiration_date?: string;
-  value_eur?: number;
-  kg?: number;
-  created_at: string;
-  updated_at: string;
+  agreement_url?: string;
+  agreement_name?: string;
 }
 
 export interface DonationCandidate {
@@ -39,127 +29,65 @@ export interface DonationCandidate {
   quantity_available: number;
 }
 
-export interface CreateDonationData {
-  product_id?: string;
-  quantity: number;
-  ngo: string;
-  pickup_time?: string;
-  observations?: string;
-  expiration_date?: string;
-  value_eur?: number;
-  kg?: number;
-}
-
 export function useDonations() {
   const { user } = useAuth();
   const [ngos, setNgos] = useState<Ngo[]>([]);
   const [donations, setDonations] = useState<Donation[]>([]);
   const [donationCandidates, setDonationCandidates] = useState<DonationCandidate[]>([]);
+  const [pendingProposals, setPendingProposals] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Fetch NGOs
   const fetchNgos = async () => {
-    if (!user) return;
-    
     try {
-      const { data, error } = await supabase
-        .from("ngos")
-        .select("*")
-        .eq("tenant_id", user.id)
-        .eq("status", "active")
-        .order("name", { ascending: true });
-
-      if (error) throw error;
-      setNgos(data || []);
+      const data = await donationService.getNgos(user?.id || 'demo-user');
+      setNgos(data);
     } catch (error) {
       console.error("Error fetching NGOs:", error);
       toast.error("Error al cargar ONGs");
     }
   };
 
-  // Fetch donation history
+  // Fetch donation history (completed/picked_up)
   const fetchDonationHistory = async () => {
-    if (!user) return;
-    
     try {
-      const { data, error } = await supabase
-        .from("donations")
-        .select("*")
-        .eq("tenant_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setDonations(data || []);
+      const history = await donationService.getHistory(user?.id || 'demo-user');
+      setDonations(history);
     } catch (error) {
       console.error("Error fetching donation history:", error);
       toast.error("Error al cargar historial de donaciones");
     }
   };
 
+  // Fetch pending donation proposals
+  const fetchPendingProposals = async () => {
+    try {
+      const proposals = await donationService.getPendingProposals(user?.id || 'demo-user');
+      setPendingProposals(proposals);
+    } catch (error) {
+      console.error("Error fetching pending proposals:", error);
+    }
+  };
+
   // Fetch products close to expiration (candidates for donation)
   const fetchDonationCandidates = async () => {
-    if (!user) return;
-    
     try {
-      // Get products expiring in the next 7 days
-      const sevenDaysFromNow = new Date();
-      sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-      
-      const { data, error } = await supabase
-        .from("products")
-        .select("id, name, quantity, expiration_date")
-        .eq("tenant_id", user.id)
-        .not("expiration_date", "is", null)
-        .lte("expiration_date", sevenDaysFromNow.toISOString())
-        .gt("quantity", 0)
-        .order("expiration_date", { ascending: true });
-
-      if (error) throw error;
-      
-      // Map to candidate format
-      const candidates: DonationCandidate[] = (data || []).map((product: any) => ({
-        id: product.id,
-        product_id: product.id,
-        name: product.name,
-        product_name: product.name,
-        expiration_date: product.expiration_date,
-        quantity_available: product.quantity,
-      }));
-      
-      setDonationCandidates(candidates);
+      const candidates = await donationService.getCandidates(user?.id || 'demo-user');
+      setDonationCandidates(candidates as DonationCandidate[]);
     } catch (error) {
       console.error("Error fetching donation candidates:", error);
-      toast.error("Error al cargar productos candidatos");
+      setDonationCandidates([]);
     }
   };
 
   // Create a new donation
-  const createDonation = async (data: CreateDonationData): Promise<boolean> => {
-    if (!user) {
-      toast.error("Debes iniciar sesión");
-      return false;
-    }
-
+  const createDonation = async (data: CreateDonationDTO): Promise<boolean> => {
     try {
       setLoading(true);
-      
-      const { error } = await supabase.from("donations").insert({
-        tenant_id: user.id,
-        product_id: data.product_id ? parseInt(data.product_id) : null,
-        quantity: data.quantity,
-        ngo: data.ngo,
-        pickup_time: data.pickup_time || null,
-        observations: data.observations || null,
-        expiration_date: data.expiration_date || null,
-        value_eur: data.value_eur || 0,
-        kg: data.kg || 0,
-        status: "pending",
-      });
-
-      if (error) throw error;
-
+      await donationService.createProposal(data, user?.id || 'demo-user');
       toast.success("Donación creada correctamente");
       await fetchDonationHistory();
+      await fetchPendingProposals();
       return true;
     } catch (error) {
       console.error("Error creating donation:", error);
@@ -177,11 +105,6 @@ export function useDonations() {
     pickupTime?: string,
     observations?: string
   ): Promise<boolean> => {
-    if (!user) {
-      toast.error("Debes iniciar sesión");
-      return false;
-    }
-
     if (!ngo) {
       toast.error("Selecciona una ONG");
       return false;
@@ -189,22 +112,18 @@ export function useDonations() {
 
     try {
       setLoading(true);
-      
-      const { error } = await supabase.from("donations").insert({
-        tenant_id: user.id,
+      await donationService.scheduleDonation(candidate.id, {
         product_id: candidate.product_id,
         quantity: candidate.quantity_available,
-        expiration_date: candidate.expiration_date,
         ngo: ngo,
-        pickup_time: pickupTime || null,
-        observations: observations || null,
-        status: "pending",
-      });
-
-      if (error) throw error;
+        pickup_time: pickupTime,
+        observations: observations,
+        expiration_date: candidate.expiration_date
+      }, user?.id || 'demo-user');
 
       toast.success("Donación programada correctamente");
       await fetchDonationHistory();
+      await fetchPendingProposals();
       await fetchDonationCandidates(); // Refresh candidates
       return true;
     } catch (error) {
@@ -218,21 +137,9 @@ export function useDonations() {
 
   // Create a new NGO
   const createNgo = async (ngoData: Omit<Ngo, "id" | "created_at" | "status">): Promise<boolean> => {
-    if (!user) {
-      toast.error("Debes iniciar sesión");
-      return false;
-    }
-
     try {
       setLoading(true);
-      
-      const { error } = await supabase.from("ngos").insert({
-        tenant_id: user.id,
-        ...ngoData,
-        status: "active",
-      });
-
-      if (error) throw error;
+      await donationService.createNgo(ngoData, user?.id || 'demo-user');
 
       toast.success("ONG registrada correctamente");
       await fetchNgos();
@@ -247,20 +154,10 @@ export function useDonations() {
   };
 
   // Generate a donation document (PDF)
-  // This is a placeholder - actual PDF generation would need backend implementation
   const generateDocument = async (donationId: string): Promise<void> => {
     try {
       setLoading(true);
-      
-      // For now, just show a message
-      // In production, this would call a Supabase Edge Function or external API
       toast.info("Generación de documentos próximamente disponible");
-      
-      // TODO: Implement actual PDF generation
-      // const { data, error } = await supabase.functions.invoke('generate-donation-certificate', {
-      //   body: { donation_id: donationId }
-      // });
-      
     } catch (error) {
       console.error("Error generating document:", error);
       toast.error("Error al generar el documento");
@@ -269,26 +166,105 @@ export function useDonations() {
     }
   };
 
+  // Mark a proposal as ready/completed
+  const markProposalAsReady = async (id: string): Promise<boolean> => {
+    try {
+      setLoading(true);
+      const success = await donationService.markAsReady(id);
+
+      if (success) {
+        toast.success("Propuesta marcada como lista");
+        await fetchPendingProposals();
+        await fetchDonationHistory();
+        return true;
+      } else {
+        toast.error("No se pudo actualizar la propuesta");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error marking proposal as ready:", error);
+      toast.error("Error al actualizar la propuesta");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Initial load
   useEffect(() => {
-    if (user) {
-      fetchNgos();
-      fetchDonationHistory();
-      fetchDonationCandidates();
-    }
+    fetchNgos();
+    fetchDonationHistory();
+    fetchDonationCandidates();
+    fetchPendingProposals();
   }, [user]);
+
+  // Upload Evidence
+  const uploadEvidence = async (donationId: string, file: File): Promise<boolean> => {
+    try {
+      setLoading(true);
+      // Upload to Firebase Storage
+      const { storageService } = await import('@/services/storageService');
+      const downloadUrl = await storageService.uploadEvidence(file, donationId);
+
+      // Persist to Firestore
+      await donationService.updateProposal(donationId, {
+        document_url: downloadUrl,
+        evidence_name: file.name
+      });
+
+      toast.success("Evidencia subida correctamente");
+      await fetchDonationHistory(); // Refresh list to show new link
+      return true;
+    } catch (error) {
+      console.error("Error uploading evidence:", error);
+      toast.error("Error al subir el documento");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Upload Agreement
+  const uploadAgreement = async (ngoId: string, file: File): Promise<boolean> => {
+    try {
+      setLoading(true);
+      const { storageService } = await import('@/services/storageService');
+      const downloadUrl = await storageService.uploadAgreement(file, ngoId);
+
+      // Persist to Firestore
+      await donationService.updateNgo(ngoId, {
+        agreement_url: downloadUrl,
+        agreement_name: file.name
+      });
+
+      toast.success("Convenio subido correctamente");
+      await fetchNgos(); // Refresh list
+      return true;
+    } catch (error) {
+      console.error("Error uploading agreement:", error);
+      toast.error("Error al subir el convenio");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
     ngos,
     donations,
     donationCandidates,
+    pendingProposals,
     loading,
     fetchNgos,
     fetchDonationHistory,
     fetchDonationCandidates,
+    fetchPendingProposals,
     createDonation,
     scheduleDonation,
     createNgo,
     generateDocument,
+    markProposalAsReady,
+    uploadEvidence,
+    uploadAgreement,
   };
 }

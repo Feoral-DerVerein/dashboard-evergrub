@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { FileJson, FileText, Sheet, Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, query, where, getDocs, limit } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MB in bytes
@@ -121,11 +122,20 @@ export const DataUploadSection = () => {
 
     try {
       // Get store profile for business info
-      const { data: storeProfile } = await supabase
-        .from('store_profiles')
-        .select('name, categories')
-        .eq('userId', user.id)
-        .maybeSingle();
+      let storeProfile: any = null;
+      try {
+        const q = query(
+          collection(db, 'store_profiles'),
+          where('userId', '==', user.uid),
+          limit(1)
+        );
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          storeProfile = snapshot.docs[0].data();
+        }
+      } catch (err) {
+        console.error("Error fetching store profile", err);
+      }
 
       // Read JSON file content
       let jsonData = null;
@@ -144,35 +154,32 @@ export const DataUploadSection = () => {
         };
       }
 
-      // Save to Supabase
-      const { error } = await supabase
-        .from('uploaded_data')
-        .insert({
-          user_id: user.id,
-          business_name: storeProfile?.name || 'Unknown',
-          business_type: storeProfile?.categories?.[0] || 'Unknown',
-          json_data: jsonData,
-          pdf_info: pdfInfo,
-          google_sheet_url: googleSheetUrl || null
-        });
+      // Save to Firestore
+      await addDoc(collection(db, 'uploaded_data'), {
+        user_id: user.uid,
+        business_name: storeProfile?.name || 'Unknown',
+        business_type: storeProfile?.categories?.[0] || 'Unknown',
+        json_data: jsonData,
+        pdf_info: pdfInfo,
+        google_sheet_url: googleSheetUrl || null,
+        created_at: new Date().toISOString()
+      });
 
-      if (error) throw error;
-      
       setStatusMessage({
         type: 'success',
-        message: 'Data successfully saved to Supabase!'
+        message: 'Data successfully saved to Firestore!'
       });
 
       toast({
         title: "Success",
-        description: "Data has been saved to Supabase successfully. n8n can now access it via realtime."
+        description: "Data has been saved to Firestore successfully. n8n can now access it via realtime."
       });
 
       // Clear form
       setJsonFile(null);
       setPdfFile(null);
       setGoogleSheetUrl('');
-      
+
       // Reset file inputs
       const fileInputs = document.querySelectorAll('input[type="file"]');
       fileInputs.forEach((input) => {
@@ -185,7 +192,7 @@ export const DataUploadSection = () => {
         type: 'error',
         message: error instanceof Error ? error.message : 'Failed to upload data'
       });
-      
+
       toast({
         title: "Error",
         description: "Could not save data. Please try again.",
@@ -278,25 +285,22 @@ export const DataUploadSection = () => {
 
         {/* Status Message */}
         {statusMessage && (
-          <div className={`p-4 rounded-lg flex items-start gap-3 ${
-            statusMessage.type === 'success' 
-              ? 'bg-green-50 border border-green-200' 
-              : 'bg-red-50 border border-red-200'
-          }`}>
+          <div className={`p-4 rounded-lg flex items-start gap-3 ${statusMessage.type === 'success'
+            ? 'bg-green-50 border border-green-200'
+            : 'bg-red-50 border border-red-200'
+            }`}>
             {statusMessage.type === 'success' ? (
               <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
             ) : (
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             )}
             <div className="flex-1">
-              <p className={`text-sm font-medium ${
-                statusMessage.type === 'success' ? 'text-green-900' : 'text-red-900'
-              }`}>
+              <p className={`text-sm font-medium ${statusMessage.type === 'success' ? 'text-green-900' : 'text-red-900'
+                }`}>
                 {statusMessage.type === 'success' ? 'Success!' : 'Error'}
               </p>
-              <p className={`text-sm ${
-                statusMessage.type === 'success' ? 'text-green-700' : 'text-red-700'
-              }`}>
+              <p className={`text-sm ${statusMessage.type === 'success' ? 'text-green-700' : 'text-red-700'
+                }`}>
                 {statusMessage.message}
               </p>
             </div>

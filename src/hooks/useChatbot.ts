@@ -1,16 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '@/types/chatbot.types';
 import type { BusinessCardData } from '@/components/chat/BusinessCards';
-import { supabase } from '@/integrations/supabase/client';
+import { db, auth } from '@/lib/firebase';
+import { collection, query, where, getDocs, limit, orderBy } from 'firebase/firestore';
+import { fetchMetrics } from './useMetricsData';
 
-// Function to get performance data
+// Function to get performance data locally
 const getPerformanceData = async (dataType: 'all' | 'sales_metrics' | 'sustainability_metrics' | 'customer_metrics' | 'surprise_bags_metrics' | 'grain_transactions' = 'all') => {
   try {
-    const { data, error } = await supabase.functions.invoke('get-performance-data', {
-      body: { dataType }
-    });
-    
-    if (error) throw error;
+    const user = auth.currentUser;
+    if (!user) return null;
+
+    // Use the renamed fetchMetrics from useMetricsData
+    // We fetch 'month' by default for context
+    const data = await fetchMetrics(user.uid, 'month');
     return data;
   } catch (error) {
     console.error('Error fetching performance data:', error);
@@ -25,8 +28,8 @@ const generateCardsFromResponse = (responseText: string, userMessage: string): B
   const lowerMessage = userMessage.toLowerCase();
 
   // Predictive Analytics card
-  if (lowerMessage.includes('predictive') || lowerMessage.includes('analytics') || 
-      lowerMessage.includes('forecast') || lowerMessage.includes('prediction')) {
+  if (lowerMessage.includes('predictive') || lowerMessage.includes('analytics') ||
+    lowerMessage.includes('forecast') || lowerMessage.includes('prediction')) {
     cards.push({
       id: 'predictive-analytics-card',
       type: 'predictive_analytics',
@@ -40,8 +43,8 @@ const generateCardsFromResponse = (responseText: string, userMessage: string): B
   }
 
   // Auto-Pilot card
-  if (lowerMessage.includes('autopilot') || lowerMessage.includes('auto-pilot') || 
-      lowerMessage.includes('automation') || lowerMessage.includes('automatic')) {
+  if (lowerMessage.includes('autopilot') || lowerMessage.includes('auto-pilot') ||
+    lowerMessage.includes('automation') || lowerMessage.includes('automatic')) {
     cards.push({
       id: 'autopilot-card',
       type: 'autopilot',
@@ -55,8 +58,8 @@ const generateCardsFromResponse = (responseText: string, userMessage: string): B
   }
 
   // Performance/KPI card
-  if (lowerMessage.includes('performance') || lowerMessage.includes('kpi') || 
-      lowerMessage.includes('metrics') || lowerMessage.includes('dashboard')) {
+  if (lowerMessage.includes('performance') || lowerMessage.includes('kpi') ||
+    lowerMessage.includes('metrics') || lowerMessage.includes('dashboard')) {
     cards.push({
       id: 'performance-card',
       type: 'performance',
@@ -74,7 +77,7 @@ const generateCardsFromResponse = (responseText: string, userMessage: string): B
 
   // Inventory card
   if (lowerMessage.includes('inventory') || lowerMessage.includes('stock') ||
-      lowerMessage.includes('inventario')) {
+    lowerMessage.includes('inventario')) {
     cards.push({
       id: 'inventory-card',
       type: 'inventory',
@@ -89,9 +92,9 @@ const generateCardsFromResponse = (responseText: string, userMessage: string): B
   }
 
   // Expiring products card - only if specifically asking about expiring products
-  if ((lowerMessage.includes('expir') || lowerMessage.includes('waste') || 
-       lowerMessage.includes('venc') || lowerMessage.includes('caduc')) && 
-      !lowerMessage.includes('inventory')) {
+  if ((lowerMessage.includes('expir') || lowerMessage.includes('waste') ||
+    lowerMessage.includes('venc') || lowerMessage.includes('caduc')) &&
+    !lowerMessage.includes('inventory')) {
     cards.push({
       id: 'expiry-card',
       type: 'expiry',
@@ -131,7 +134,7 @@ export const useChatbot = () => {
     content: 'Hello! I\'m your Negentropy assistant. How can I help you today? ',
     timestamp: new Date()
   }]);
-  
+
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -195,10 +198,10 @@ export const useChatbot = () => {
   const simulateTyping = async (response: string): Promise<void> => {
     return new Promise((resolve) => {
       setIsTyping(true);
-      
+
       // Show typing indicator for a realistic duration
       const typingDuration = Math.min(response.length * 30, 2000); // Max 2 seconds
-      
+
       setTimeout(() => {
         setIsTyping(false);
         resolve();
@@ -224,27 +227,27 @@ export const useChatbot = () => {
 
     // Check if asking for expiring products
     const lowerMessage = messageText.toLowerCase();
-    const isAskingForExpiring = lowerMessage.includes('expir') || lowerMessage.includes('surplus') || 
-                                 lowerMessage.includes('venc') || lowerMessage.includes('caduc');
+    const isAskingForExpiring = lowerMessage.includes('expir') || lowerMessage.includes('surplus') ||
+      lowerMessage.includes('venc') || lowerMessage.includes('caduc');
 
     // Check if asking for inventory/products
-    const isAskingForInventory = lowerMessage.includes('product') || 
-                                  lowerMessage.includes('inventory') || 
-                                  lowerMessage.includes('inventario') ||
-                                  lowerMessage.includes('stock') ||
-                                  lowerMessage.includes('catalog') ||
-                                  lowerMessage.includes('catálogo');
+    const isAskingForInventory = lowerMessage.includes('product') ||
+      lowerMessage.includes('inventory') ||
+      lowerMessage.includes('inventario') ||
+      lowerMessage.includes('stock') ||
+      lowerMessage.includes('catalog') ||
+      lowerMessage.includes('catálogo');
 
     // Check if asking for performance/metrics data
-    const isAskingForPerformance = lowerMessage.includes('performance') || 
-                                   lowerMessage.includes('metrics') || 
-                                   lowerMessage.includes('recomendation') ||
-                                   lowerMessage.includes('recommendation') ||
-                                   lowerMessage.includes('sales') ||
-                                   lowerMessage.includes('ventas') ||
-                                   lowerMessage.includes('sostenibilidad') ||
-                                   lowerMessage.includes('sustainability') ||
-                                   lowerMessage.includes('analytics');
+    const isAskingForPerformance = lowerMessage.includes('performance') ||
+      lowerMessage.includes('metrics') ||
+      lowerMessage.includes('recomendation') ||
+      lowerMessage.includes('recommendation') ||
+      lowerMessage.includes('sales') ||
+      lowerMessage.includes('ventas') ||
+      lowerMessage.includes('sostenibilidad') ||
+      lowerMessage.includes('sustainability') ||
+      lowerMessage.includes('analytics');
 
     console.log("Sending to n8n webhook:", messageText);
 
@@ -261,21 +264,23 @@ export const useChatbot = () => {
         content: messageText
       });
 
-      // ALWAYS fetch products data from Supabase to provide context to n8n
+      // ALWAYS fetch products data from Firestore to provide context to n8n
       let productsContext = null;
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = auth.currentUser;
         if (user) {
-          const { data: products } = await supabase
-            .from('products')
-            .select('*')
-            .eq('userid', user.id)
-            .order('created_at', { ascending: false })
-            .limit(50); // Get latest 50 products
+          const q = query(
+            collection(db, 'products'),
+            where('userid', '==', user.uid),
+            orderBy('created_at', 'desc'),
+            limit(50)
+          );
+          const snapshot = await getDocs(q);
+          const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
           if (products && products.length > 0) {
             const now = new Date();
-            productsContext = products.map(p => {
+            productsContext = products.map((p: any) => {
               let daysUntilExpiry = null;
               if (p.expirationdate) {
                 try {
@@ -287,7 +292,7 @@ export const useChatbot = () => {
                   console.error('Error parsing expiration date:', e);
                 }
               }
-              
+
               return {
                 id: p.id,
                 name: p.name,
@@ -319,7 +324,7 @@ export const useChatbot = () => {
       }
 
       // Call n8n webhook with all context
-      const requestBody: any = { 
+      const requestBody: any = {
         messages: conversationHistory,
         productsData: productsContext // Always include products data
       };
@@ -354,16 +359,16 @@ export const useChatbot = () => {
         });
         throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
-      
+
       const data = await response.json();
       console.log("✅ Webhook response data:", data);
-      
+
       // Parse JSON response from n8n
       const rawResponse = data.output || data.response || 'I received your message.';
       let responseText = '';
       let buttons = undefined;
       let actions = undefined;
-      
+
       if (typeof rawResponse === 'string' && rawResponse.trim().startsWith('{')) {
         try {
           const parsed = JSON.parse(rawResponse);
@@ -382,7 +387,7 @@ export const useChatbot = () => {
       } else {
         responseText = rawResponse;
       }
-      
+
       // Simulate typing animation
       await simulateTyping(responseText);
 
@@ -401,25 +406,27 @@ export const useChatbot = () => {
       let expiringProductsData = data.expiring_products;
       if (isAskingForExpiring && !expiringProductsData) {
         try {
-          const { data: { user } } = await supabase.auth.getUser();
+          const user = auth.currentUser;
           if (user) {
-            const { data: products } = await supabase
-              .from('products')
-              .select('*')
-              .eq('userid', user.id)
-              .gt('quantity', 0)
-              .order('expirationdate', { ascending: true });
+            const q = query(
+              collection(db, 'products'),
+              where('userid', '==', user.uid),
+              where('quantity', '>', 0),
+              orderBy('expirationdate', 'asc')
+            );
+            const snapshot = await getDocs(q);
+            const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             if (products) {
               const now = new Date();
               const threeDaysFromNow = new Date(now.getTime() + (72 * 60 * 60 * 1000));
-              
+
               expiringProductsData = products
-                .filter(p => {
+                .filter((p: any) => {
                   const expDate = new Date(p.expirationdate);
                   return expDate <= threeDaysFromNow && expDate > now;
                 })
-                .map(p => ({
+                .map((p: any) => ({
                   id: p.id,
                   name: p.name,
                   quantity: p.quantity,
@@ -440,18 +447,20 @@ export const useChatbot = () => {
       let inventoryProductsData = null;
       if (isAskingForInventory && !isAskingForExpiring) {
         try {
-          const { data: { user } } = await supabase.auth.getUser();
+          const user = auth.currentUser;
           if (user) {
-            const { data: products } = await supabase
-              .from('products')
-              .select('*')
-              .eq('userid', user.id)
-              .order('created_at', { ascending: false })
-              .limit(20);
+            const q = query(
+              collection(db, 'products'),
+              where('userid', '==', user.uid),
+              orderBy('created_at', 'desc'),
+              limit(20)
+            );
+            const snapshot = await getDocs(q);
+            const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             if (products) {
               const now = new Date();
-              inventoryProductsData = products.map(p => {
+              inventoryProductsData = products.map((p: any) => {
                 let daysLeft = null;
                 if (p.expirationdate) {
                   try {
@@ -463,7 +472,7 @@ export const useChatbot = () => {
                     console.error('Error parsing expiration date:', e);
                   }
                 }
-                
+
                 return {
                   id: p.id.toString(),
                   product_id: p.id.toString(),
@@ -529,16 +538,16 @@ export const useChatbot = () => {
         message: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined
       });
-      
+
       await simulateTyping('Sorry, there was an error.');
-      
+
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
         content: 'Sorry, I\'m experiencing technical difficulties. Please try again in a few moments.',
         timestamp: new Date()
       };
-      
+
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);

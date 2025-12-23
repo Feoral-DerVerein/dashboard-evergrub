@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -144,6 +145,7 @@ const ZonePricingCard = () => {
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary" />
               Precios por Zona Geográfica
+              <HelpTooltip kpiName="Precios por Zona" />
             </CardTitle>
             <CardDescription>
               Ajusta precios según ubicación y demanda local

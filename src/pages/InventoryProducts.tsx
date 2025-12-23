@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { inventoryProductsService, type InventoryProduct } from '@/services/inventoryProductsService';
 import { useToast } from '@/hooks/use-toast';
 import { InventoryProductCard } from '@/components/inventory/InventoryProductCard';
+import DemoProductCard from '@/components/inventory/DemoProductCard';
 import { ProductDetailsDialog } from '@/components/inventory/ProductDetailsDialog';
 import { useTranslation } from 'react-i18next';
 
@@ -78,18 +80,25 @@ export default function InventoryProducts() {
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">{t('inventory.title')}</h1>
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          {t('inventory.title')}
+          <HelpTooltip kpiName="Inventario de Productos" />
+        </h1>
         <div className="flex gap-4 mt-2">
           <p className="text-muted-foreground">
-            {t('inventory.stats.total', { count: products.length })}
+            {t('inventory.stats.total', { count: products.length + 1 })}
           </p>
           <Badge variant="secondary" className="text-sm">
-            {t('inventory.stats.available', { count: products.length })}
+            {t('inventory.stats.available', { count: products.length + 1 })}
           </Badge>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {/* Demo Product Card - Always shown first */}
+        <DemoProductCard />
+
+        {/* Real Products */}
         {products.map((product) => {
           const daysLeft = getDaysUntilExpiration(product.expiration_date || null);
 

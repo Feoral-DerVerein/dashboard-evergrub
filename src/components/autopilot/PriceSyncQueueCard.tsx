@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { autopilotService, PriceSyncQueue } from '@/services/autopilotService';
@@ -56,6 +57,7 @@ const PriceSyncQueueCard = () => {
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-primary" />
               {t('autopilot_control.price_sync.title')}
+              <HelpTooltip kpiName="Cola de Sincronización" />
             </CardTitle>
             <CardDescription>
               {t('autopilot_control.price_sync.description')}

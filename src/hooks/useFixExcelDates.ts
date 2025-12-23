@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+
 import { useToast } from '@/hooks/use-toast';
 
 export const useFixExcelDates = () => {
@@ -8,18 +8,21 @@ export const useFixExcelDates = () => {
 
   const fixExcelDates = async () => {
     setIsFixing(true);
-    
-    try {
-      console.log('🔧 Starting Excel date conversion...');
-      
-      const { data, error } = await supabase.functions.invoke('fix-excel-dates', {
-        method: 'POST',
-      });
 
-      if (error) {
-        console.error('❌ Error fixing dates:', error);
-        throw error;
-      }
+    try {
+      console.log('🔧 Starting Excel date conversion (Mocked)');
+
+      // Mocked delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const data = { convertedCount: 0, message: "Mocked conversion" };
+
+      /*
+      // Firebase Cloud Function implementation needed later
+      const response = await fetch("YOUR_CLOUD_FUNCTION_URL/fixExcelDates", { method: 'POST' });
+      const data = await response.json();
+      */
+
+
 
       console.log('✅ Dates fixed successfully:', data);
 
@@ -31,13 +34,13 @@ export const useFixExcelDates = () => {
       return data;
     } catch (error) {
       console.error('❌ Error in fixExcelDates:', error);
-      
+
       toast({
         title: "Error al convertir fechas",
         description: error.message || "No se pudieron convertir las fechas",
         variant: "destructive",
       });
-      
+
       throw error;
     } finally {
       setIsFixing(false);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { predictiveAnalyticsService, CorrelatedProduct } from '@/services/predictiveAnalyticsService';
@@ -50,7 +51,10 @@ const CorrelatedProductsMatrix = () => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Network className="h-5 w-5 text-primary" />
-          <CardTitle>Correlated Products</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            Correlated Products
+            <HelpTooltip kpiName="Matriz de Correlación" />
+          </CardTitle>
         </div>
         <CardDescription>
           Products frequently purchased together - Create smart combos

@@ -15,7 +15,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import AdPerformancePredictor from '@/components/ads/AdPerformancePredictor';
 import { adsService, type Ad, type AdCampaign } from '@/services/adsService';
-import { supabase } from '@/integrations/supabase/client';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -34,7 +35,7 @@ const StatusBadge = ({ status }: { status: string }) => {
         return 'outline';
     }
   };
-  
+
   return (
     <Badge variant={getVariant(status)}>
       {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -74,7 +75,7 @@ const Ads = () => {
   });
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingEditImage, setUploadingEditImage] = useState(false);
-  
+
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -84,14 +85,14 @@ const Ads = () => {
   useEffect(() => {
     const loadData = async () => {
       if (!user) return;
-      
+
       try {
         setLoading(true);
         const [campaignsData, adsData] = await Promise.all([
           adsService.getUserCampaigns(user.id),
           adsService.getUserAds(user.id)
         ]);
-        
+
         setCampaigns(campaignsData);
         setAds(adsData);
       } catch (error) {
@@ -132,7 +133,7 @@ const Ads = () => {
         .reduce((sum, ad) => sum + ad.clicks, 0);
       const totalSpent = filteredCampaigns.reduce((sum, campaign) => sum + campaign.total_spent, 0);
       const avgCost = totalClicks > 0 ? totalSpent / totalClicks : 0;
-      
+
       return { totalReach, totalImpressions, totalClicks, avgCost, totalSpent };
     } else {
       const totalReach = filteredAds.reduce((sum, ad) => sum + (ad.total_spent * 100), 0);
@@ -140,31 +141,25 @@ const Ads = () => {
       const totalClicks = filteredAds.reduce((sum, ad) => sum + ad.clicks, 0);
       const totalSpent = filteredAds.reduce((sum, ad) => sum + ad.total_spent, 0);
       const avgCost = totalClicks > 0 ? totalSpent / totalClicks : 0;
-      
+
       return { totalReach, totalImpressions, totalClicks, avgCost, totalSpent };
     }
   };
 
   const uploadImage = async (file: File, isEdit: boolean = false) => {
     if (!user) return null;
-    
+
     const setUploading = isEdit ? setUploadingEditImage : setUploadingImage;
     setUploading(true);
-    
+
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-      
-      const { data, error } = await supabase.storage
-        .from('ad-images')
-        .upload(fileName, file);
-      
-      if (error) throw error;
-      
-      const { data: { publicUrl } } = supabase.storage
-        .from('ad-images')
-        .getPublicUrl(fileName);
-      
+      const storageRef = ref(storage, `ad-images/${fileName}`);
+
+      await uploadBytes(storageRef, file);
+      const publicUrl = await getDownloadURL(storageRef);
+
       return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -182,7 +177,7 @@ const Ads = () => {
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, isEdit: boolean = false) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    
+
     const imageUrl = await uploadImage(file);
     if (imageUrl) {
       if (isEdit) {
@@ -223,7 +218,7 @@ const Ads = () => {
       setAds(prev => prev.map(ad => ad.id === updatedAd.id ? updatedAd : ad));
       setShowEditAdDialog(false);
       setEditingAd(null);
-      
+
       toast({
         title: "Success",
         description: "Ad updated successfully"
@@ -272,7 +267,7 @@ const Ads = () => {
         ad_type: 'banner',
         status: 'draft'
       });
-      
+
       toast({
         title: "Success",
         description: "Ad created successfully"
@@ -308,7 +303,7 @@ const Ads = () => {
             Back
           </Button>
           <h1 className="text-xl font-semibold flex-1">Advertising</h1>
-          
+
           <div className="flex gap-2">
             <Dialog open={showCreateAdDialog} onOpenChange={setShowCreateAdDialog}>
               <DialogTrigger asChild>
@@ -378,8 +373,8 @@ const Ads = () => {
                       </div>
                       {newAd.image_url && (
                         <div className="flex items-center gap-3">
-                          <img 
-                            src={newAd.image_url} 
+                          <img
+                            src={newAd.image_url}
                             alt="Ad preview"
                             className="w-16 h-16 object-cover rounded-lg border"
                           />
@@ -501,8 +496,8 @@ const Ads = () => {
                       </div>
                       {editingAd?.image_url && (
                         <div className="flex items-center gap-3">
-                          <img 
-                            src={editingAd.image_url} 
+                          <img
+                            src={editingAd.image_url}
                             alt="Ad preview"
                             className="w-16 h-16 object-cover rounded-lg border"
                           />
@@ -551,8 +546,8 @@ const Ads = () => {
                   </div>
                   <div>
                     <Label htmlFor="edit-ad-status">Status</Label>
-                    <Select 
-                      value={editingAd?.status || 'draft'} 
+                    <Select
+                      value={editingAd?.status || 'draft'}
                       onValueChange={(value) => setEditingAd(prev => prev ? ({ ...prev, status: value as Ad['status'] }) : null)}
                     >
                       <SelectTrigger>
@@ -568,8 +563,8 @@ const Ads = () => {
                   </div>
                   <div>
                     <Label htmlFor="edit-ad-type">Ad Type</Label>
-                    <Select 
-                      value={editingAd?.ad_type || 'banner'} 
+                    <Select
+                      value={editingAd?.ad_type || 'banner'}
                       onValueChange={(value) => setEditingAd(prev => prev ? ({ ...prev, ad_type: value as Ad['ad_type'] }) : null)}
                     >
                       <SelectTrigger>
@@ -595,7 +590,7 @@ const Ads = () => {
             </Dialog>
           </div>
         </header>
-        
+
         <main className="p-4 space-y-5">
           {/* Stats Overview */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -607,7 +602,7 @@ const Ads = () => {
                 <div className="text-2xl font-bold">{stats.totalReach.toLocaleString()}</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Impressions</CardTitle>
@@ -616,7 +611,7 @@ const Ads = () => {
                 <div className="text-2xl font-bold">{stats.totalImpressions.toLocaleString()}</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Clicks</CardTitle>
@@ -625,7 +620,7 @@ const Ads = () => {
                 <div className="text-2xl font-bold">{stats.totalClicks.toLocaleString()}</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Average CPC</CardTitle>
@@ -634,7 +629,7 @@ const Ads = () => {
                 <div className="text-2xl font-bold">${stats.avgCost.toFixed(2)}</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
@@ -691,8 +686,8 @@ const Ads = () => {
                           <TableCell>
                             <div className="flex items-center gap-3">
                               {ad.image_url ? (
-                                <img 
-                                  src={ad.image_url} 
+                                <img
+                                  src={ad.image_url}
                                   alt={ad.title}
                                   className="w-8 h-8 object-cover rounded-lg"
                                 />
@@ -714,7 +709,7 @@ const Ads = () => {
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline">
-                               {ad.ad_type === 'banner' ? 'Banner' : 
+                              {ad.ad_type === 'banner' ? 'Banner' :
                                 ad.ad_type === 'sidebar' ? 'Sidebar' : 'Popup'}
                             </Badge>
                           </TableCell>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -80,6 +81,7 @@ const PriceHistoryCard = () => {
             <CardTitle className="flex items-center gap-2">
               <History className="h-5 w-5 text-primary" />
               Historial y Análisis
+              <HelpTooltip kpiName="Historial de Precios" />
             </CardTitle>
             <CardDescription>
               Evolución de precios y cambios recientes

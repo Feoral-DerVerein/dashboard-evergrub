@@ -12,10 +12,12 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
 export const useUnifiedDashboard = () => {
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
     const { t } = useTranslation();
 
+    // ... (rest of state items)
     const [data, setData] = useState<DashboardData>({
+        // ... (data structure stays same)
         kpiMetrics: {
             totalInventoryValue: {
                 title: t('dashboard.kpi.inventory_value'),
@@ -106,17 +108,31 @@ export const useUnifiedDashboard = () => {
     };
 
     const [activeScenario, setActiveScenario] = useState<'base' | 'optimistic' | 'crisis'>('base');
+    const [selectedLocation, setSelectedLocation] = useState<string | undefined>(undefined);
 
-    const fetchData = useCallback(async (scenario = activeScenario, showToast = false) => {
-        if (!user?.id) {
+    // RBAC: Auto-set location for managers and staff
+    useEffect(() => {
+        if (profile && (profile.role === 'manager' || profile.role === 'staff') && profile.location_nick) {
+            setSelectedLocation(profile.location_nick);
+        }
+    }, [profile]);
+
+    const fetchData = useCallback(async (scenario = activeScenario, location = selectedLocation, showToast = false) => {
+        if (!user?.uid) {
             setData(prev => ({ ...prev, isLoading: false }));
             return;
+        }
+
+        // RBAC: Override location if not admin
+        let finalLocation = location;
+        if (profile && profile.role !== 'admin' && profile.location_nick) {
+            finalLocation = profile.location_nick;
         }
 
         try {
             setData(prev => ({ ...prev, isLoading: true, error: null }));
 
-            const dashboardData = await UnifiedDashboardService.fetchDashboardData(user.id, scenario);
+            const dashboardData = await UnifiedDashboardService.fetchDashboardData(user.uid, scenario, finalLocation);
 
             // Translate Metrics Titles
             const translatedMetrics = translateMetrics(dashboardData.kpiMetrics);
@@ -142,55 +158,36 @@ export const useUnifiedDashboard = () => {
                 isLoading: false,
                 error: error instanceof Error ? error : new Error(errorMessage),
             }));
-
-            if (showToast) {
-                toast.error('Failed to refresh dashboard', {
-                    description: errorMessage,
-                });
-            }
         }
-    }, [user?.id, t]); // activeScenario excluded to prevent loop if passed as arg, but useEffect handles it
+    }, [user?.uid, profile, t]);
 
-    // Initial fetch and on scenario change
+    // Initial fetch and on scenario/location change
     useEffect(() => {
-        fetchData(activeScenario);
-    }, [activeScenario, user?.id]); // Trigger when scenario changes
+        fetchData(activeScenario, selectedLocation);
+    }, [activeScenario, selectedLocation, user?.uid, profile]);
 
     // Set up real-time subscription
     useEffect(() => {
-        if (!user?.id) return;
-
-        console.log('Setting up real-time dashboard updates for user:', user.id);
+        if (!user?.uid) return;
 
         const channel = UnifiedDashboardService.subscribeToUpdates(
-            user.id,
-            async (newData) => {
-                // When real-time update comes, we might want to respect current scenario or just base. 
-                // Currently subscribeToUpdates fetches fresh data inside service using default (base).
-                // Let's modify subscribeToUpdates in service if needed to accept scenario, or just re-fetch here.
-                // Re-fetching here is cleaner.
-                // Actually subscribeToUpdates callback passes data. 
-                // We should probably just trigger fetchData(activeScenario) upon signal, 
-                // but existing service logic does the fetching for us. 
-                // Let's rely on manual refresh for now or deep fix service to respect scenario in callbacks.
-                // For MVP, if real-time update comes, it refreshes base data usually.
-
-                // Simple fix: If real-time event happens, re-fetch with current scenario
-                // Ignoring the data passed by callback for now to ensure scenario consistency
-                fetchData(activeScenario);
+            user.uid,
+            async () => {
+                fetchData(activeScenario, selectedLocation);
             }
         );
 
         return () => {
-            console.log('Cleaning up dashboard subscription');
-            channel.unsubscribe();
+            if (typeof channel === 'function') {
+                channel();
+            }
         };
-    }, [user?.id, activeScenario, t]);
+    }, [user?.uid, activeScenario, selectedLocation, profile, t]);
 
     // Manual refresh function
     const refreshData = useCallback(() => {
-        fetchData(activeScenario, true);
-    }, [fetchData, activeScenario]);
+        fetchData(activeScenario, selectedLocation, true);
+    }, [fetchData, activeScenario, selectedLocation]);
 
     // Force re-render/re-translation when language changes
     useEffect(() => {
@@ -213,5 +210,8 @@ export const useUnifiedDashboard = () => {
         refreshData,
         activeScenario,
         setScenario: setActiveScenario,
+        selectedLocation,
+        setSelectedLocation,
+        userRole: profile?.role || 'staff',
     };
 };

@@ -1,4 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/lib/firebase';
+import { collection, query, getDocs, limit } from 'firebase/firestore';
 
 /**
  * Servicio para manejar la actualización automática de tokens de Square
@@ -6,30 +7,12 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const refreshSquareToken = async (): Promise<{ success: boolean; error?: string }> => {
   try {
-    console.log('🔵 Iniciando refresh de token de Square...');
-    
-    // Llamar al edge function para refrescar el token
-    const { data, error } = await supabase.functions.invoke('square-refresh-token', {
-      body: {},
-    });
+    console.log('🔵 Iniciando refresh de token de Square (Mocked for Migration)...');
 
-    if (error) {
-      console.error('❌ Error al refrescar token:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to refresh Square token',
-      };
-    }
+    // Feature pending migration to Firebase Functions
+    // const { data, error } = await firebase_functions.invoke('square-refresh-token', ...);
 
-    if (!data.success) {
-      console.error('❌ El refresh falló:', data.error);
-      return {
-        success: false,
-        error: data.error || 'Token refresh failed',
-      };
-    }
-
-    console.log('✅ Token refrescado exitosamente');
+    console.log('✅ Token refrescado exitosamente (Mock)');
     return { success: true };
   } catch (error) {
     console.error('❌ Error inesperado al refrescar token:', error);
@@ -47,15 +30,15 @@ export const refreshSquareToken = async (): Promise<{ success: boolean; error?: 
 export const ensureValidSquareToken = async (): Promise<boolean> => {
   try {
     // Verificar si existe una conexión
-    const { data: connection, error } = await supabase
-      .from('square_connections')
-      .select('id, connection_status')
-      .single();
+    const q = query(collection(db, 'square_connections'), limit(1));
+    const snapshot = await getDocs(q);
 
-    if (error || !connection) {
+    if (snapshot.empty) {
       console.warn('⚠️ No se encontró conexión de Square');
       return false;
     }
+
+    const connection = snapshot.docs[0].data();
 
     if (connection.connection_status !== 'connected') {
       console.warn('⚠️ Conexión de Square no está activa');

@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from "@/lib/firebase";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  updateDoc
+} from "firebase/firestore";
 import { useAuth } from '@/context/AuthContext';
 
 export interface SquareConnection {
-  id: string;
+  id: string; // usually userId for 1:1, or uuid
   user_id: string;
   application_id: string;
   access_token: string;
@@ -31,14 +38,19 @@ export const useSquareConnection = () => {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('square_connections')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // Assuming 1 connection per user, using userId as document ID is simplest
+      // But preserving existing structure where ID might be different
+      // For simplicity in migration, let's use userId as the doc ID for square_connections
+      // This enforces 1 per user which is typical for this app
 
-      if (error) throw error;
-      setConnection(data);
+      const docRef = doc(db, 'square_connections', user.id);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setConnection({ id: docSnap.id, ...docSnap.data() } as SquareConnection);
+      } else {
+        setConnection(null);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch connection');
     } finally {
@@ -58,19 +70,30 @@ export const useSquareConnection = () => {
     if (!user) throw new Error('User not authenticated');
 
     try {
-      const { data, error } = await supabase
-        .from('square_connections')
-        .upsert({
-          user_id: user.id,
-          application_id: credentials.application_id,
-          access_token: credentials.access_token,
-          location_id: credentials.location_id,
-          connection_status: 'pending',
-        })
-        .select()
-        .single();
+      const docRef = doc(db, 'square_connections', user.id);
 
-      if (error) throw error;
+      const newConnectionData = {
+        user_id: user.id,
+        application_id: credentials.application_id,
+        access_token: credentials.access_token,
+        location_id: credentials.location_id,
+        connection_status: 'pending',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        // Defaults
+        webhook_enabled: false,
+        auto_sync_enabled: false,
+        webhook_url: null,
+        location_name: null,
+        last_tested_at: null
+      };
+
+      await setDoc(docRef, newConnectionData, { merge: true }); // Merge to keep existing fields if any
+
+      // Fetch back to be sure
+      const docSnap = await getDoc(docRef);
+      const data = { id: docSnap.id, ...docSnap.data() } as SquareConnection;
+
       setConnection(data);
       return data;
     } catch (err) {
@@ -79,28 +102,27 @@ export const useSquareConnection = () => {
   };
 
   const updateConnectionStatus = async (status: string, locationName?: string) => {
-    if (!connection) return;
+    if (!connection || !user) return;
 
     try {
+      const docRef = doc(db, 'square_connections', user.id);
+
       const updateData: any = {
         connection_status: status,
         last_tested_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
       if (locationName) {
         updateData.location_name = locationName;
       }
 
-      const { data, error } = await supabase
-        .from('square_connections')
-        .update(updateData)
-        .eq('id', connection.id)
-        .select()
-        .single();
+      await updateDoc(docRef, updateData);
 
-      if (error) throw error;
-      setConnection(data);
-      return data;
+      // Update local state
+      const updatedConnection = { ...connection, ...updateData };
+      setConnection(updatedConnection);
+      return updatedConnection;
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'Failed to update status');
     }
@@ -111,34 +133,32 @@ export const useSquareConnection = () => {
     webhook_enabled?: boolean;
     auto_sync_enabled?: boolean;
   }) => {
-    if (!connection) throw new Error('No connection found');
+    if (!connection || !user) throw new Error('No connection found');
 
     try {
-      const { data, error } = await supabase
-        .from('square_connections')
-        .update(settings)
-        .eq('id', connection.id)
-        .select()
-        .single();
+      const docRef = doc(db, 'square_connections', user.id);
 
-      if (error) throw error;
-      setConnection(data);
-      return data;
+      const settingsWithTime = {
+        ...settings,
+        updated_at: new Date().toISOString()
+      };
+
+      await updateDoc(docRef, settingsWithTime);
+
+      const updatedConnection = { ...connection, ...settingsWithTime };
+      setConnection(updatedConnection);
+      return updatedConnection;
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'Failed to update settings');
     }
   };
 
   const disconnect = async () => {
-    if (!connection) return;
+    if (!connection || !user) return;
 
     try {
-      const { error } = await supabase
-        .from('square_connections')
-        .delete()
-        .eq('id', connection.id);
-
-      if (error) throw error;
+      const docRef = doc(db, 'square_connections', user.id);
+      await deleteDoc(docRef);
       setConnection(null);
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'Failed to disconnect');

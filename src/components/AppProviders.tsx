@@ -7,6 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { OrderProvider } from "@/context/OrderContext";
 import { TenantProvider } from "@/context/TenantContext";
+import { NegentropyChatProvider } from "@/context/NegentropyChatContext";
 
 const queryClient = new QueryClient();
 
@@ -21,11 +22,13 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
         <BrowserRouter>
           <AuthProvider>
             <TenantProvider>
-              <OrderProvider>
-                {children}
-                <Toaster />
-                <Sonner />
-              </OrderProvider>
+              <NegentropyChatProvider>
+                <OrderProvider>
+                  {children}
+                  <Toaster />
+                  <Sonner />
+                </OrderProvider>
+              </NegentropyChatProvider>
             </TenantProvider>
           </AuthProvider>
         </BrowserRouter>

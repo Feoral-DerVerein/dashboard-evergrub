@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, query, where, getDocs, limit } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,7 +53,7 @@ const POSConnectionForm = ({
     productCategories: "",
     averageOrderValue: ""
   });
-  
+
   // New states for JSON and PDF uploads
   const [jsonFile, setJsonFile] = useState<File | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -283,7 +284,7 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
         body: JSON.stringify({
           ...data,
           timestamp: new Date().toISOString(),
-          userId: "current-user-id" // Replace with actual user ID
+          userId: user?.uid // Replace with actual user ID
         })
       });
       if (response.ok) {
@@ -305,23 +306,23 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
   };
   if (status === "success") {
     return <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4">
-        <Card className="w-full max-w-md mx-auto backdrop-blur-xl bg-background/80 border border-white/20 shadow-2xl">
-          <CardContent className="p-8 text-center">
-            <CheckCircle className="h-16 w-16 text-white mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-green-600 mb-2">Connection Successful!</h2>
-            <p className="text-muted-foreground">
-              We're now analyzing your data. Your dashboard will be ready in a few minutes.
-            </p>
-          </CardContent>
-        </Card>
-      </div>;
+      <Card className="w-full max-w-md mx-auto backdrop-blur-xl bg-background/80 border border-white/20 shadow-2xl">
+        <CardContent className="p-8 text-center">
+          <CheckCircle className="h-16 w-16 text-white mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-green-600 mb-2">Connection Successful!</h2>
+          <p className="text-muted-foreground">
+            We're now analyzing your data. Your dashboard will be ready in a few minutes.
+          </p>
+        </CardContent>
+      </Card>
+    </div>;
   }
   return <div className="min-h-screen bg-white p-4">
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-full max-w-4xl mx-auto space-y-8">
-          
-          {/* Main POS Connection Card */}
-          <motion.div initial={{
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-4xl mx-auto space-y-8">
+
+        {/* Main POS Connection Card */}
+        <motion.div initial={{
           opacity: 0,
           y: 20
         }} animate={{
@@ -330,9 +331,9 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
         }} transition={{
           duration: 0.6
         }}>
-            <Card className="bg-white border border-gray-200 rounded-3xl shadow-lg overflow-hidden">
-              <CardHeader className="text-center pb-6 bg-white border-b border-gray-100">
-                <motion.div initial={{
+          <Card className="bg-white border border-gray-200 rounded-3xl shadow-lg overflow-hidden">
+            <CardHeader className="text-center pb-6 bg-white border-b border-gray-100">
+              <motion.div initial={{
                 scale: 0.9
               }} animate={{
                 scale: 1
@@ -341,18 +342,18 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
                 type: "spring",
                 stiffness: 200
               }}>
-                  <h1 className="text-3xl font-bold tracking-tight text-black">
-                    Connect Your POS System
-                  </h1>
-                  <p className="text-muted-foreground mt-2 text-lg">
-                    Streamline your business data integration in minutes
-                  </p>
-                </motion.div>
-              </CardHeader>
+                <h1 className="text-3xl font-bold tracking-tight text-black">
+                  Connect Your POS System
+                </h1>
+                <p className="text-muted-foreground mt-2 text-lg">
+                  Streamline your business data integration in minutes
+                </p>
+              </motion.div>
+            </CardHeader>
 
-              <CardContent className="space-y-8 p-8">
-                {/* Step 1 */}
-                <motion.div className="space-y-3" initial={{
+            <CardContent className="space-y-8 p-8">
+              {/* Step 1 */}
+              <motion.div className="space-y-3" initial={{
                 opacity: 0,
                 x: -20
               }} animate={{
@@ -361,21 +362,21 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
               }} transition={{
                 delay: 0.3
               }}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center text-sm font-bold shadow-lg">
-                      1
-                    </div>
-                    <h3 className="text-lg font-semibold">Get Your API Key</h3>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center text-sm font-bold shadow-lg">
+                    1
                   </div>
-                   <p className="text-black ml-11">
-                     Find your API key in your POS system's developer settings.
-                   </p>
-                </motion.div>
+                  <h3 className="text-lg font-semibold">Get Your API Key</h3>
+                </div>
+                <p className="text-black ml-11">
+                  Find your API key in your POS system's developer settings.
+                </p>
+              </motion.div>
 
-                <Separator className="border-white/30" />
+              <Separator className="border-white/30" />
 
-                {/* Step 2 - API Form */}
-                <motion.div className="space-y-6" initial={{
+              {/* Step 2 - API Form */}
+              <motion.div className="space-y-6" initial={{
                 opacity: 0,
                 x: -20
               }} animate={{
@@ -384,137 +385,137 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
               }} transition={{
                 delay: 0.4
               }}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center text-sm font-bold shadow-lg">
-                      2
-                    </div>
-                    <h3 className="text-lg font-semibold">Enter Your Details</h3>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center text-sm font-bold shadow-lg">
+                    2
                   </div>
+                  <h3 className="text-lg font-semibold">Enter Your Details</h3>
+                </div>
 
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5 ml-11">
-                      {status === "error" && <motion.div initial={{
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5 ml-11">
+                    {status === "error" && <motion.div initial={{
                       opacity: 0,
                       scale: 0.95
                     }} animate={{
                       opacity: 1,
                       scale: 1
                     }}>
-                          <Alert variant="destructive" className="glass-card bg-red-50/50 border-red-200/50">
-                            <XCircle className="h-4 w-4" />
-                            <AlertDescription>{errorMessage}</AlertDescription>
-                          </Alert>
-                        </motion.div>}
+                      <Alert variant="destructive" className="glass-card bg-red-50/50 border-red-200/50">
+                        <XCircle className="h-4 w-4" />
+                        <AlertDescription>{errorMessage}</AlertDescription>
+                      </Alert>
+                    </motion.div>}
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <FormField control={form.control} name="businessName" render={({
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <FormField control={form.control} name="businessName" render={({
                         field
                       }) => <FormItem>
-                              <FormLabel className="text-sm font-medium">Business Name</FormLabel>
-                              <FormControl>
-                                <Input placeholder="e.g. Central Café" {...field} className="glass-input bg-white/50 border-white/30 focus:border-green-400 focus:ring-green-400/20" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>} />
+                          <FormLabel className="text-sm font-medium">Business Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g. Central Café" {...field} className="glass-input bg-white/50 border-white/30 focus:border-green-400 focus:ring-green-400/20" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>} />
 
-                        <FormField control={form.control} name="businessType" render={({
+                      <FormField control={form.control} name="businessType" render={({
                         field
                       }) => <FormItem>
-                              <FormLabel className="text-sm font-medium">Business Type</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="glass-input bg-white/50 border-white/30 focus:border-green-400">
-                                    <SelectValue placeholder="Select business type" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent className="glass-card bg-white/90 backdrop-blur-xl">
-                                  {businessTypes.map(type => <SelectItem key={type.value} value={type.value} className="hover:bg-green-50">
-                                      {type.label}
-                                    </SelectItem>)}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>} />
-                      </div>
+                          <FormLabel className="text-sm font-medium">Business Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="glass-input bg-white/50 border-white/30 focus:border-green-400">
+                                <SelectValue placeholder="Select business type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="glass-card bg-white/90 backdrop-blur-xl">
+                              {businessTypes.map(type => <SelectItem key={type.value} value={type.value} className="hover:bg-green-50">
+                                {type.label}
+                              </SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>} />
+                    </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <FormField control={form.control} name="posType" render={({
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <FormField control={form.control} name="posType" render={({
                         field
                       }) => <FormItem>
-                              <FormLabel className="text-sm font-medium">POS System Type</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="glass-input bg-white/50 border-white/30 focus:border-green-400">
-                                    <SelectValue placeholder="Select POS system" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent className="glass-card bg-white/90 backdrop-blur-xl">
-                                  {posTypes.map(pos => <SelectItem key={pos.value} value={pos.value} className="hover:bg-green-50">
-                                      {pos.label}
-                                    </SelectItem>)}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>} />
+                          <FormLabel className="text-sm font-medium">POS System Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="glass-input bg-white/50 border-white/30 focus:border-green-400">
+                                <SelectValue placeholder="Select POS system" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="glass-card bg-white/90 backdrop-blur-xl">
+                              {posTypes.map(pos => <SelectItem key={pos.value} value={pos.value} className="hover:bg-green-50">
+                                {pos.label}
+                              </SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>} />
 
-                        <FormField control={form.control} name="apiKey" render={({
+                      <FormField control={form.control} name="apiKey" render={({
                         field
                       }) => <FormItem>
-                              <FormLabel className="text-sm font-medium">API Key</FormLabel>
-                              <FormControl>
-                                <Input type="password" placeholder="Enter your API key" {...field} className="glass-input bg-white/50 border-white/30 focus:border-green-400 focus:ring-green-400/20" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>} />
-                      </div>
+                          <FormLabel className="text-sm font-medium">API Key</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="Enter your API key" {...field} className="glass-input bg-white/50 border-white/30 focus:border-green-400 focus:ring-green-400/20" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>} />
+                    </div>
 
-                      <FormField control={form.control} name="apiUrl" render={({
+                    <FormField control={form.control} name="apiUrl" render={({
                       field
                     }) => <FormItem>
-                            <FormLabel className="text-sm font-medium">API URL (optional)</FormLabel>
-                            <FormControl>
-                              <Input placeholder="https://api.yourpos.com/v1" {...field} className="glass-input bg-white/50 border-white/30 focus:border-green-400 focus:ring-green-400/20" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>} />
+                        <FormLabel className="text-sm font-medium">API URL (optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://api.yourpos.com/v1" {...field} className="glass-input bg-white/50 border-white/30 focus:border-green-400 focus:ring-green-400/20" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>} />
 
-                      <Button type="submit" className="w-full h-12 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg transition-all duration-300 transform hover:scale-[1.02]" disabled={isLoading}>
-                        {isLoading ? <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Connecting...
-                          </> : <>
-                            <Link className="mr-2 h-4 w-4" />
-                            Connect and Start Optimizing
-                          </>}
-                      </Button>
+                    <Button type="submit" className="w-full h-12 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg transition-all duration-300 transform hover:scale-[1.02]" disabled={isLoading}>
+                      {isLoading ? <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Connecting...
+                      </> : <>
+                        <Link className="mr-2 h-4 w-4" />
+                        Connect and Start Optimizing
+                      </>}
+                    </Button>
 
-                      <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                          <Separator className="w-full border-white/30" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                          <span className="bg-white/60 backdrop-blur-sm px-4 py-1 rounded-full text-muted-foreground font-medium">
-                            or
-                          </span>
-                        </div>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <Separator className="w-full border-white/30" />
                       </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white/60 backdrop-blur-sm px-4 py-1 rounded-full text-muted-foreground font-medium">
+                          or
+                        </span>
+                      </div>
+                    </div>
 
-                      <Button type="button" variant="outline" className="w-full h-12 text-sm font-semibold glass-button bg-white/30 border-white/40 hover:bg-white/40 backdrop-blur-sm" onClick={() => {
+                    <Button type="button" variant="outline" className="w-full h-12 text-sm font-semibold glass-button bg-white/30 border-white/40 hover:bg-white/40 backdrop-blur-sm" onClick={() => {
                       localStorage.setItem("posOnboardingCompleted", "true");
                       window.location.href = "/kpi";
                     }}>
-                        <Coffee className="mr-2 h-4 w-4 text-gray-900" />
-                        Continue without API
-                      </Button>
-                    </form>
-                  </Form>
-                </motion.div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                      <Coffee className="mr-2 h-4 w-4 text-gray-900" />
+                      Continue without API
+                    </Button>
+                  </form>
+                </Form>
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-          {/* Alternative Data Sources Section */}
-          <motion.div initial={{
+        {/* Alternative Data Sources Section */}
+        <motion.div initial={{
           opacity: 0,
           y: 30
         }} animate={{
@@ -524,414 +525,413 @@ Example Cafe,2500,150,Coffee|Pastries|Sandwiches,16.50`;
           delay: 0.5,
           duration: 0.6
         }}>
-            <Card className="glass-card backdrop-blur-xl bg-white/25 border border-white/20 rounded-3xl shadow-[0_25px_45px_rgba(0,0,0,0.1)] overflow-hidden">
-              <CardHeader className="text-center pb-6 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm">
-                <h2 className="text-2xl font-bold tracking-tight text-black">
-                  Alternative Data Sources
-                </h2>
-                <p className="text-muted-foreground mt-1">
-                  Multiple ways to get your business data connected
-                </p>
-              </CardHeader>
+          <Card className="glass-card backdrop-blur-xl bg-white/25 border border-white/20 rounded-3xl shadow-[0_25px_45px_rgba(0,0,0,0.1)] overflow-hidden">
+            <CardHeader className="text-center pb-6 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm">
+              <h2 className="text-2xl font-bold tracking-tight text-black">
+                Alternative Data Sources
+              </h2>
+              <p className="text-muted-foreground mt-1">
+                Multiple ways to get your business data connected
+              </p>
+            </CardHeader>
 
-              <CardContent className="p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  
-                  {/* Google Sheets Integration */}
-                  <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
+            <CardContent className="p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                {/* Google Sheets Integration */}
+                <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
                   scale: 1.02
                 }} transition={{
                   type: "spring",
                   stiffness: 300
                 }}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <FileSpreadsheet className="h-6 w-6 text-white" />
-                      <h3 className="font-semibold">Google Sheets</h3>
-                    </div>
-                    <div className="space-y-3">
-                      <Input placeholder="Paste your Google Sheets URL here" value={googleSheetUrl} onChange={e => setGoogleSheetUrl(e.target.value)} className="glass-input bg-white/50 border-white/30 focus:border-green-400" />
-                       <Button onClick={handleGoogleSheetsConnect} disabled={isLoading} className="w-full bg-white text-gray-900 hover:bg-white/90">
-                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-gray-900" /> : <Link className="mr-2 h-4 w-4 text-gray-900" />}
-                         Connect Google Sheet
-                       </Button>
-                      <p className="text-xs text-muted-foreground">
-                        Share your sheet with view permissions
-                      </p>
-                    </div>
-                  </motion.div>
-
-                  {/* CSV File Upload */}
-                  <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
-                  scale: 1.02
-                }} transition={{
-                  type: "spring",
-                  stiffness: 300
-                }}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <Upload className="h-6 w-6 text-white" />
-                      <h3 className="font-semibold">CSV Upload</h3>
-                    </div>
-                    <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-300 ${isDragActive ? 'border-green-400 bg-green-50/50' : 'border-white/40 hover:border-green-300 bg-white/20'}`}>
-                      <input {...getInputProps()} />
-                      <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm">
-                        {isDragActive ? 'Drop files here...' : 'Drag & drop CSV files or click to browse'}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Supported: .csv, .xlsx (max 5 files)
-                      </p>
-                    </div>
-                    
-                    {isUploading && <div className="mt-4">
-                        <Progress value={uploadProgress} className="w-full" />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Uploading... {uploadProgress}%
-                        </p>
-                      </div>}
-                    
-                    {uploadedFiles.length > 0 && <div className="mt-4">
-                        <p className="text-sm font-medium mb-2">Uploaded Files:</p>
-                        {uploadedFiles.map((file, index) => <div key={index} className="text-xs bg-green-50/50 p-2 rounded border">
-                            {file.name} ({(file.size / 1024).toFixed(1)} KB)
-                          </div>)}
-                      </div>}
-                  </motion.div>
-
-                  {/* Manual Data Entry */}
-                  <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
-                  scale: 1.02
-                }} transition={{
-                  type: "spring",
-                  stiffness: 300
-                }}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <Edit3 className="h-6 w-6 text-white" />
-                      <h3 className="font-semibold">Manual Entry</h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Enter your business metrics manually for quick setup
+                  <div className="flex items-center gap-3 mb-4">
+                    <FileSpreadsheet className="h-6 w-6 text-white" />
+                    <h3 className="font-semibold">Google Sheets</h3>
+                  </div>
+                  <div className="space-y-3">
+                    <Input placeholder="Paste your Google Sheets URL here" value={googleSheetUrl} onChange={e => setGoogleSheetUrl(e.target.value)} className="glass-input bg-white/50 border-white/30 focus:border-green-400" />
+                    <Button onClick={handleGoogleSheetsConnect} disabled={isLoading} className="w-full bg-white text-gray-900 hover:bg-white/90">
+                      {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-gray-900" /> : <Link className="mr-2 h-4 w-4 text-gray-900" />}
+                      Connect Google Sheet
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      Share your sheet with view permissions
                     </p>
-                    <Dialog open={isManualEntryOpen} onOpenChange={setIsManualEntryOpen}>
-                      <DialogTrigger asChild>
-                         <Button className="w-full bg-white text-gray-900 hover:bg-white/90">
-                           <Edit3 className="mr-2 h-4 w-4 text-gray-900" />
-                           Enter Data Manually
-                         </Button>
-                      </DialogTrigger>
-                      <DialogContent className="glass-modal bg-white/90 backdrop-blur-xl border border-white/30 rounded-2xl">
-                        <DialogHeader>
-                          <DialogTitle>Manual Data Entry</DialogTitle>
-                          <DialogDescription>
-                            Enter your basic business metrics to get started quickly
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="dailySales">Daily Sales (Average)</Label>
-                            <Input id="dailySales" placeholder="e.g. 2500" value={manualData.dailySales} onChange={e => setManualData(prev => ({
+                  </div>
+                </motion.div>
+
+                {/* CSV File Upload */}
+                <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
+                  scale: 1.02
+                }} transition={{
+                  type: "spring",
+                  stiffness: 300
+                }}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <Upload className="h-6 w-6 text-white" />
+                    <h3 className="font-semibold">CSV Upload</h3>
+                  </div>
+                  <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-300 ${isDragActive ? 'border-green-400 bg-green-50/50' : 'border-white/40 hover:border-green-300 bg-white/20'}`}>
+                    <input {...getInputProps()} />
+                    <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm">
+                      {isDragActive ? 'Drop files here...' : 'Drag & drop CSV files or click to browse'}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Supported: .csv, .xlsx (max 5 files)
+                    </p>
+                  </div>
+
+                  {isUploading && <div className="mt-4">
+                    <Progress value={uploadProgress} className="w-full" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Uploading... {uploadProgress}%
+                    </p>
+                  </div>}
+
+                  {uploadedFiles.length > 0 && <div className="mt-4">
+                    <p className="text-sm font-medium mb-2">Uploaded Files:</p>
+                    {uploadedFiles.map((file, index) => <div key={index} className="text-xs bg-green-50/50 p-2 rounded border">
+                      {file.name} ({(file.size / 1024).toFixed(1)} KB)
+                    </div>)}
+                  </div>}
+                </motion.div>
+
+                {/* Manual Data Entry */}
+                <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
+                  scale: 1.02
+                }} transition={{
+                  type: "spring",
+                  stiffness: 300
+                }}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <Edit3 className="h-6 w-6 text-white" />
+                    <h3 className="font-semibold">Manual Entry</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Enter your business metrics manually for quick setup
+                  </p>
+                  <Dialog open={isManualEntryOpen} onOpenChange={setIsManualEntryOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full bg-white text-gray-900 hover:bg-white/90">
+                        <Edit3 className="mr-2 h-4 w-4 text-gray-900" />
+                        Enter Data Manually
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="glass-modal bg-white/90 backdrop-blur-xl border border-white/30 rounded-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Manual Data Entry</DialogTitle>
+                        <DialogDescription>
+                          Enter your basic business metrics to get started quickly
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="dailySales">Daily Sales (Average)</Label>
+                          <Input id="dailySales" placeholder="e.g. 2500" value={manualData.dailySales} onChange={e => setManualData(prev => ({
                             ...prev,
                             dailySales: e.target.value
                           }))} className="glass-input" />
-                          </div>
-                          <div>
-                            <Label htmlFor="monthlyTransactions">Monthly Transactions</Label>
-                            <Input id="monthlyTransactions" placeholder="e.g. 450" value={manualData.monthlyTransactions} onChange={e => setManualData(prev => ({
+                        </div>
+                        <div>
+                          <Label htmlFor="monthlyTransactions">Monthly Transactions</Label>
+                          <Input id="monthlyTransactions" placeholder="e.g. 450" value={manualData.monthlyTransactions} onChange={e => setManualData(prev => ({
                             ...prev,
                             monthlyTransactions: e.target.value
                           }))} className="glass-input" />
-                          </div>
-                          <div>
-                            <Label htmlFor="productCategories">Product Categories</Label>
-                            <Textarea id="productCategories" placeholder="e.g. Coffee, Pastries, Sandwiches" value={manualData.productCategories} onChange={e => setManualData(prev => ({
+                        </div>
+                        <div>
+                          <Label htmlFor="productCategories">Product Categories</Label>
+                          <Textarea id="productCategories" placeholder="e.g. Coffee, Pastries, Sandwiches" value={manualData.productCategories} onChange={e => setManualData(prev => ({
                             ...prev,
                             productCategories: e.target.value
                           }))} className="glass-input" />
-                          </div>
-                          <div>
-                            <Label htmlFor="averageOrderValue">Average Order Value</Label>
-                            <Input id="averageOrderValue" placeholder="e.g. 16.50" value={manualData.averageOrderValue} onChange={e => setManualData(prev => ({
+                        </div>
+                        <div>
+                          <Label htmlFor="averageOrderValue">Average Order Value</Label>
+                          <Input id="averageOrderValue" placeholder="e.g. 16.50" value={manualData.averageOrderValue} onChange={e => setManualData(prev => ({
                             ...prev,
                             averageOrderValue: e.target.value
                           }))} className="glass-input" />
-                          </div>
                         </div>
-                        <div className="flex gap-3 mt-6">
-                          <Button variant="outline" onClick={() => setIsManualEntryOpen(false)} className="flex-1 glass-button">
-                            Cancel
-                          </Button>
-                           <Button onClick={handleManualDataSubmit} className="flex-1 bg-white text-gray-900 hover:bg-white/90">
-                             Save Data
-                           </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </motion.div>
+                      </div>
+                      <div className="flex gap-3 mt-6">
+                        <Button variant="outline" onClick={() => setIsManualEntryOpen(false)} className="flex-1 glass-button">
+                          Cancel
+                        </Button>
+                        <Button onClick={handleManualDataSubmit} className="flex-1 bg-white text-gray-900 hover:bg-white/90">
+                          Save Data
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </motion.div>
 
-                  {/* Template Download */}
-                  <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
+                {/* Template Download */}
+                <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
                   scale: 1.02
                 }} transition={{
                   type: "spring",
                   stiffness: 300
                 }}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <Download className="h-6 w-6 text-white" />
-                      <h3 className="font-semibold">Template Import</h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Download our template, fill it out, and upload it back
-                    </p>
-                    <div className="space-y-3">
-                       <Button variant="outline" onClick={downloadTemplate} className="w-full glass-button bg-white/40 hover:bg-white/50">
-                         <Download className="mr-2 h-4 w-4 text-gray-900" />
-                         Download Template
-                       </Button>
-                       <Button className="w-full bg-white text-gray-900 hover:bg-white/90" onClick={() => {
+                  <div className="flex items-center gap-3 mb-4">
+                    <Download className="h-6 w-6 text-white" />
+                    <h3 className="font-semibold">Template Import</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Download our template, fill it out, and upload it back
+                  </p>
+                  <div className="space-y-3">
+                    <Button variant="outline" onClick={downloadTemplate} className="w-full glass-button bg-white/40 hover:bg-white/50">
+                      <Download className="mr-2 h-4 w-4 text-gray-900" />
+                      Download Template
+                    </Button>
+                    <Button className="w-full bg-white text-gray-900 hover:bg-white/90" onClick={() => {
                       // Trigger file picker for completed template
                       document.getElementById('template-upload')?.click();
                     }}>
-                         <Upload className="mr-2 h-4 w-4 text-gray-900" />
-                         Upload Completed Template
-                       </Button>
-                      <input id="template-upload" type="file" accept=".csv,.xlsx" className="hidden" onChange={e => {
+                      <Upload className="mr-2 h-4 w-4 text-gray-900" />
+                      Upload Completed Template
+                    </Button>
+                    <input id="template-upload" type="file" accept=".csv,.xlsx" className="hidden" onChange={e => {
                       if (e.target.files) {
                         simulateFileUpload(Array.from(e.target.files));
                       }
                     }} />
-                    </div>
-                  </motion.div>
+                  </div>
+                </motion.div>
 
-                </div>
+              </div>
 
-                {/* New data upload sections */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                  {/* JSON File Upload */}
-                  <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
-                    scale: 1.02
-                  }} transition={{
-                    type: "spring",
-                    stiffness: 300
-                  }}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <FileJson className="h-6 w-6 text-white" />
-                      <h3 className="font-semibold">Subir archivo JSON</h3>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="relative">
-                        <Input
-                          id="json-upload-onboarding"
-                          type="file"
-                          accept=".json,application/json"
-                          onChange={handleJsonFileChange}
-                          className="glass-input bg-white/50 border-white/30 focus:border-green-400"
-                        />
-                        {jsonFile && (
-                          <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600" />
-                        )}
-                      </div>
+              {/* New data upload sections */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                {/* JSON File Upload */}
+                <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
+                  scale: 1.02
+                }} transition={{
+                  type: "spring",
+                  stiffness: 300
+                }}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <FileJson className="h-6 w-6 text-white" />
+                    <h3 className="font-semibold">Subir archivo JSON</h3>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <Input
+                        id="json-upload-onboarding"
+                        type="file"
+                        accept=".json,application/json"
+                        onChange={handleJsonFileChange}
+                        className="glass-input bg-white/50 border-white/30 focus:border-green-400"
+                      />
                       {jsonFile && (
-                        <p className="text-xs text-muted-foreground">
-                          Selected: {jsonFile.name}
-                        </p>
+                        <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600" />
                       )}
                     </div>
-                  </motion.div>
-
-                  {/* PDF File Upload */}
-                  <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
-                    scale: 1.02
-                  }} transition={{
-                    type: "spring",
-                    stiffness: 300
-                  }}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <FileText className="h-6 w-6 text-white" />
-                      <h3 className="font-semibold">Subir archivo PDF</h3>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="relative">
-                        <Input
-                          id="pdf-upload-onboarding"
-                          type="file"
-                          accept=".pdf,application/pdf"
-                          onChange={handlePdfFileChange}
-                          className="glass-input bg-white/50 border-white/30 focus:border-green-400"
-                        />
-                        {pdfFile && (
-                          <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600" />
-                        )}
-                      </div>
-                      {pdfFile && (
-                        <p className="text-xs text-muted-foreground">
-                          Selected: {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)}MB)
-                        </p>
-                      )}
+                    {jsonFile && (
                       <p className="text-xs text-muted-foreground">
-                        Maximum file size: 10MB
+                        Selected: {jsonFile.name}
                       </p>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Status Message */}
-                {statusMessage && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`mt-6 p-4 rounded-lg flex items-start gap-3 ${
-                      statusMessage.type === 'success' 
-                        ? 'bg-green-50/80 border border-green-200' 
-                        : 'bg-red-50/80 border border-red-200'
-                    }`}
-                  >
-                    {statusMessage.type === 'success' ? (
-                      <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    ) : (
-                      <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                     )}
-                    <div className="flex-1">
-                      <p className={`text-sm font-medium ${
-                        statusMessage.type === 'success' ? 'text-green-900' : 'text-red-900'
-                      }`}>
-                        {statusMessage.type === 'success' ? 'Success!' : 'Error'}
-                      </p>
-                      <p className={`text-sm ${
-                        statusMessage.type === 'success' ? 'text-green-700' : 'text-red-700'
-                      }`}>
-                        {statusMessage.message}
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
+                  </div>
+                </motion.div>
 
-                <motion.div className="mt-8 text-center" initial={{
+                {/* PDF File Upload */}
+                <motion.div className="glass-card bg-white/30 p-6 rounded-2xl border border-white/30" whileHover={{
+                  scale: 1.02
+                }} transition={{
+                  type: "spring",
+                  stiffness: 300
+                }}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <FileText className="h-6 w-6 text-white" />
+                    <h3 className="font-semibold">Subir archivo PDF</h3>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <Input
+                        id="pdf-upload-onboarding"
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={handlePdfFileChange}
+                        className="glass-input bg-white/50 border-white/30 focus:border-green-400"
+                      />
+                      {pdfFile && (
+                        <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600" />
+                      )}
+                    </div>
+                    {pdfFile && (
+                      <p className="text-xs text-muted-foreground">
+                        Selected: {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)}MB)
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Maximum file size: 10MB
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Status Message */}
+              {statusMessage && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`mt-6 p-4 rounded-lg flex items-start gap-3 ${statusMessage.type === 'success'
+                    ? 'bg-green-50/80 border border-green-200'
+                    : 'bg-red-50/80 border border-red-200'
+                    }`}
+                >
+                  {statusMessage.type === 'success' ? (
+                    <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  )}
+                  <div className="flex-1">
+                    <p className={`text-sm font-medium ${statusMessage.type === 'success' ? 'text-green-900' : 'text-red-900'
+                      }`}>
+                      {statusMessage.type === 'success' ? 'Success!' : 'Error'}
+                    </p>
+                    <p className={`text-sm ${statusMessage.type === 'success' ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                      {statusMessage.message}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+
+              <motion.div className="mt-8 text-center" initial={{
                 opacity: 0
               }} animate={{
                 opacity: 1
               }} transition={{
                 delay: 0.8
               }}>
-                  <Button 
-                    onClick={async () => {
-                      if (!user) {
-                        toast.error("You must be logged in to continue");
-                        return;
-                      }
+                <Button
+                  onClick={async () => {
+                    if (!user) {
+                      toast.error("You must be logged in to continue");
+                      return;
+                    }
 
-                      const hasData = uploadedFiles.length > 0 || googleSheetUrl || jsonFile || pdfFile || Object.values(manualData).some(value => value);
-                      
-                      if (!hasData) {
-                        toast.error("Please upload files, connect Google Sheets, or enter manual data first");
-                        return;
-                      }
+                    const hasData = uploadedFiles.length > 0 || googleSheetUrl || jsonFile || pdfFile || Object.values(manualData).some(value => value);
 
-                      // Validate Google Sheets URL if provided
-                      if (googleSheetUrl && !validateGoogleSheetUrl(googleSheetUrl)) {
-                        toast.error("Please enter a valid Google Sheets URL");
-                        return;
-                      }
+                    if (!hasData) {
+                      toast.error("Please upload files, connect Google Sheets, or enter manual data first");
+                      return;
+                    }
 
-                      setIsUploading(true);
-                      setStatusMessage(null);
+                    // Validate Google Sheets URL if provided
+                    if (googleSheetUrl && !validateGoogleSheetUrl(googleSheetUrl)) {
+                      toast.error("Please enter a valid Google Sheets URL");
+                      return;
+                    }
 
+                    setIsUploading(true);
+                    setStatusMessage(null);
+
+                    try {
+                      // Get store profile for business info
+                      let storeProfile = null;
                       try {
-                        // Get store profile for business info
-                        const { data: storeProfile } = await supabase
-                          .from('store_profiles')
-                          .select('name, categories')
-                          .eq('userId', user.id)
-                          .maybeSingle();
-
-                        // Read JSON file content
-                        let jsonData = null;
-                        if (jsonFile) {
-                          const jsonText = await jsonFile.text();
-                          jsonData = JSON.parse(jsonText);
+                        const q = query(collection(db, 'store_profiles'), where('userId', '==', user.uid), limit(1));
+                        const snapshot = await getDocs(q);
+                        if (!snapshot.empty) {
+                          storeProfile = snapshot.docs[0].data();
                         }
-
-                        // Prepare PDF info
-                        let pdfInfo = null;
-                        if (pdfFile) {
-                          pdfInfo = {
-                            name: pdfFile.name,
-                            size: pdfFile.size,
-                            type: pdfFile.type
-                          };
-                        }
-
-                        // Prepare CSV info
-                        let csvInfo = null;
-                        if (uploadedFiles.length > 0) {
-                          csvInfo = uploadedFiles.map(f => ({
-                            name: f.name,
-                            size: f.size,
-                            type: f.type
-                          }));
-                        }
-
-                        // Save to Supabase
-                        const { error } = await supabase
-                          .from('uploaded_data')
-                          .insert({
-                            user_id: user.id,
-                            business_name: storeProfile?.name || form.getValues("businessName") || 'Unknown',
-                            business_type: storeProfile?.categories?.[0] || form.getValues("businessType") || 'Unknown',
-                            json_data: jsonData,
-                            pdf_info: pdfInfo,
-                            csv_files: csvInfo,
-                            google_sheet_url: googleSheetUrl || null,
-                            manual_data: Object.values(manualData).some(value => value) ? JSON.stringify(manualData) : null
-                          });
-
-                        if (error) throw error;
-
-                        setStatusMessage({
-                          type: 'success',
-                          message: 'Data successfully saved to Supabase!'
-                        });
-
-                        toast.success("Data saved to Supabase! n8n can now access it via realtime.");
-
-                        // Complete onboarding after success
-                        setTimeout(() => {
-                          localStorage.setItem("posOnboardingCompleted", "true");
-                          onComplete();
-                        }, 1500);
-
-                      } catch (error) {
-                        console.error('Error uploading data:', error);
-                        setStatusMessage({
-                          type: 'error',
-                          message: error instanceof Error ? error.message : 'Failed to upload data'
-                        });
-                        
-                        toast.error("Could not save data. Please try again.");
-                      } finally {
-                        setIsUploading(false);
+                      } catch (err) {
+                        console.error("Error fetching store profile", err);
                       }
-                    }}
-                    className="w-full h-12 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg transition-all duration-300 transform hover:scale-[1.02]" 
-                    disabled={isUploading || (uploadedFiles.length === 0 && !googleSheetUrl && !jsonFile && !pdfFile && !Object.values(manualData).some(value => value))}
-                  >
-                    {isUploading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Guardando...
-                      </>
-                    ) : (
-                      <>
-                        <Link className="mr-2 h-4 w-4" />
-                        Save & Continue
-                      </>
-                    )}
-                  </Button>
-                </motion.div>
-              </CardContent>
-            </Card>
-          </motion.div>
 
-        </div>
+                      // Read JSON file content
+                      let jsonData = null;
+                      if (jsonFile) {
+                        const jsonText = await jsonFile.text();
+                        jsonData = JSON.parse(jsonText);
+                      }
+
+                      // Prepare PDF info
+                      let pdfInfo = null;
+                      if (pdfFile) {
+                        pdfInfo = {
+                          name: pdfFile.name,
+                          size: pdfFile.size,
+                          type: pdfFile.type
+                        };
+                      }
+
+                      // Prepare CSV info
+                      let csvInfo = null;
+                      if (uploadedFiles.length > 0) {
+                        csvInfo = uploadedFiles.map(f => ({
+                          name: f.name,
+                          size: f.size,
+                          type: f.type
+                        }));
+                      }
+
+                      // Save to Firestore
+                      await addDoc(collection(db, 'uploaded_data'), {
+                        user_id: user.uid,
+                        business_name: storeProfile?.name || form.getValues("businessName") || 'Unknown',
+                        business_type: storeProfile?.categories?.[0] || form.getValues("businessType") || 'Unknown',
+                        json_data: jsonData,
+                        pdf_info: pdfInfo,
+                        csv_files: csvInfo,
+                        google_sheet_url: googleSheetUrl || null,
+                        manual_data: Object.values(manualData).some(value => value) ? JSON.stringify(manualData) : null,
+                        created_at: new Date().toISOString()
+                      });
+
+                      setStatusMessage({
+                        type: 'success',
+                        message: 'Data successfully saved!'
+                      });
+
+                      toast.success("Data saved! n8n can now access it via realtime.");
+
+                      // Complete onboarding after success
+                      setTimeout(() => {
+                        localStorage.setItem("posOnboardingCompleted", "true");
+                        onComplete();
+                      }, 1500);
+
+                    } catch (error) {
+                      console.error('Error uploading data:', error);
+                      setStatusMessage({
+                        type: 'error',
+                        message: error instanceof Error ? error.message : 'Failed to upload data'
+                      });
+
+                      toast.error("Could not save data. Please try again.");
+                    } finally {
+                      setIsUploading(false);
+                    }
+                  }}
+                  className="w-full h-12 text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
+                  disabled={isUploading || (uploadedFiles.length === 0 && !googleSheetUrl && !jsonFile && !pdfFile && !Object.values(manualData).some(value => value))}
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Guardando...
+                    </>
+                  ) : (
+                    <>
+                      <Link className="mr-2 h-4 w-4" />
+                      Save & Continue
+                    </>
+                  )}
+                </Button>
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
       </div>
-    </div>;
+    </div>
+  </div>;
 };
 export default POSConnectionForm;

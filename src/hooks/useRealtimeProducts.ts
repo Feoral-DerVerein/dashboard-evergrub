@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { productService, Product } from '@/services/productService';
+import { db } from "@/lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  getDocs,
+  DocumentData
+} from "firebase/firestore";
+import { Product } from '@/services/productService'; // Assuming type is compatible or I'll redefine partial
 import { useToast } from '@/hooks/use-toast';
 
 export const useRealtimeProducts = (userId?: string) => {
@@ -9,176 +17,90 @@ export const useRealtimeProducts = (userId?: string) => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Load initial products
   useEffect(() => {
-    const loadProducts = async () => {
-      if (!userId) {
-        setLoading(false);
-        return;
-      }
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
 
-      try {
-        console.log("Loading products for user:", userId);
-        const userProducts = await productService.getProductsByUser(userId);
-        console.log("Loaded products:", userProducts.length);
-        setProducts(userProducts);
-      } catch (error: any) {
-        console.error("Error loading products:", error);
-        setError(error.message || "Failed to load products");
-        toast({
-          title: "Error",
-          description: "Failed to load products: " + (error.message || "Unknown error"),
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+    console.log("Setting up Firestore realtime subscription for products, userId:", userId);
+    setLoading(true);
 
-    loadProducts();
-  }, [userId, toast]);
+    const q = query(
+      collection(db, "products"),
+      where("tenant_id", "==", userId)
+    );
 
-  // Set up real-time subscription
-  useEffect(() => {
-    if (!userId) return;
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const currentProducts: Product[] = [];
 
-    console.log("Setting up real-time subscription for products");
-    
-    const channel = supabase
-      .channel('products-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'products',
-          filter: `userid=eq.${userId}`
-        },
-        (payload) => {
-          console.log('Real-time INSERT:', payload);
-          const newProduct = payload.new as any;
-          
-          // Map database fields to Product interface
-          const mappedProduct: Product = {
-            id: newProduct.id,
-            name: newProduct.name,
-            price: newProduct.price,
-            discount: newProduct.discount,
-            description: newProduct.description,
-            category: newProduct.category,
-            brand: newProduct.brand,
-            quantity: newProduct.quantity,
-            expirationDate: newProduct.expirationdate,
-            image: newProduct.image,
-            storeId: newProduct.storeid,
-            userId: newProduct.userid,
-            barcode: newProduct.barcode,
-            isMarketplaceVisible: newProduct.is_marketplace_visible,
-            isSurpriseBag: newProduct.is_surprise_bag,
-            originalPrice: newProduct.original_price,
-            pickupTimeStart: newProduct.pickup_time_start,
-            pickupTimeEnd: newProduct.pickup_time_end,
-            surpriseBagContents: newProduct.surprise_bag_contents ? [newProduct.surprise_bag_contents] : undefined
-          };
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        // Map Firestore data to Product interface
+        // Ensuring all fields match what frontend expects
+        currentProducts.push({
+          id: doc.id,
+          name: data.name,
+          category: data.category,
+          price: data.price,
+          quantity: data.quantity,
+          unit: data.unit || 'units',
+          image: data.image,
+          expiryDate: data.expiration_date, // Mapping expiration_date -> expiryDate
+          expirationDate: data.expiration_date,
+          status: data.status,
+          minStockLevel: data.min_stock_level,
+          shelfLife: data.shelf_life,
+          batchNumber: data.batch_number,
+          supplier: data.supplier,
+          notes: data.notes,
 
-          setProducts(prev => [...prev, mappedProduct]);
-          
-          toast({
-            title: "Product Added",
-            description: `${newProduct.name} has been added to your inventory`,
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'products',
-          filter: `userid=eq.${userId}`
-        },
-        (payload) => {
-          console.log('Real-time UPDATE:', payload);
-          const updatedProduct = payload.new as any;
-          
-          // Map database fields to Product interface
-          const mappedProduct: Product = {
-            id: updatedProduct.id,
-            name: updatedProduct.name,
-            price: updatedProduct.price,
-            discount: updatedProduct.discount,
-            description: updatedProduct.description,
-            category: updatedProduct.category,
-            brand: updatedProduct.brand,
-            quantity: updatedProduct.quantity,
-            expirationDate: updatedProduct.expirationdate,
-            image: updatedProduct.image,
-            storeId: updatedProduct.storeid,
-            userId: updatedProduct.userid,
-            barcode: updatedProduct.barcode,
-            isMarketplaceVisible: updatedProduct.is_marketplace_visible,
-            isSurpriseBag: updatedProduct.is_surprise_bag,
-            originalPrice: updatedProduct.original_price,
-            pickupTimeStart: updatedProduct.pickup_time_start,
-            pickupTimeEnd: updatedProduct.pickup_time_end,
-            surpriseBagContents: updatedProduct.surprise_bag_contents ? [updatedProduct.surprise_bag_contents] : undefined
-          };
+          // Legacy/Other potential fields
+          description: data.description,
+          discount: data.discount,
+          brand: data.brand,
+          storeId: data.store_id, // Mapping store_id -> storeId
+          userId: data.tenant_id, // Mapping tenant_id -> userId
+          barcode: data.barcode,
+          isMarketplaceVisible: data.is_marketplace_visible,
+          isSurpriseBag: data.is_surprise_bag,
+          originalPrice: data.original_price,
+          pickupTimeStart: data.pickup_time_start,
+          pickupTimeEnd: data.pickup_time_end,
+          surpriseBagContents: data.surprise_bag_contents ? [data.surprise_bag_contents] : undefined
+        } as unknown as Product);
+      });
 
-          setProducts(prev => 
-            prev.map(product => 
-              product.id === mappedProduct.id ? mappedProduct : product
-            )
-          );
-          
+      setProducts(currentProducts);
+      setLoading(false);
+
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "modified") {
+          // Toast for updates
+          const data = change.doc.data();
+          // Optional: don't toast on initial load, only subsequent updates
+          // But onSnapshot fires initial with "added" usually. "modified" is strictly updates.
           toast({
             title: "Product Updated",
-            description: `${updatedProduct.name} has been updated`,
+            description: `${data.name} has been updated`,
           });
         }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'products',
-          filter: `userid=eq.${userId}`
-        },
-        (payload) => {
-          console.log('Real-time DELETE:', payload);
-          const deletedProduct = payload.old as any;
-          
-          setProducts(prev => 
-            prev.filter(product => product.id !== deletedProduct.id)
-          );
-          
-          toast({
-            title: "Product Deleted",
-            description: `Product has been removed from your inventory`,
-          });
-        }
-      )
-      .subscribe();
+      });
+    }, (err) => {
+      console.error("Firestore subscription error:", err);
+      setError(err.message);
+      setLoading(false);
+    });
 
-    // Cleanup subscription
     return () => {
-      console.log("Cleaning up real-time subscription");
-      supabase.removeChannel(channel);
+      console.log("Cleaning up Firestore subscription");
+      unsubscribe();
     };
   }, [userId, toast]);
 
   const refreshProducts = async () => {
-    if (!userId) return;
-    
-    setLoading(true);
-    try {
-      const userProducts = await productService.getProductsByUser(userId);
-      setProducts(userProducts);
-    } catch (error: any) {
-      setError(error.message || "Failed to refresh products");
-    } finally {
-      setLoading(false);
-    }
+    // No-op for realtime, but kept for interface compatibility
+    // Could potentially re-run query if needed manually
   };
 
   return {

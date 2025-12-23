@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { storage } from "@/lib/firebase";
+import { ref, uploadBytes } from "firebase/storage";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,14 +57,15 @@ const UploadTrainingDataDialog: React.FC = () => {
       const uploads = Array.from(files).map(async (file) => {
         const ext = file.name.split(".").pop()?.toLowerCase() || "dat";
         const time = new Date().toISOString().replace(/[:.]/g, "-");
-        const path = `${user.id}/${time}-${file.name}`;
-        const { error } = await supabase.storage
-          .from("ai-training")
-          .upload(path, file, {
-            upsert: true,
-            contentType: file.type || `application/${ext}`,
-          });
-        if (error) throw error;
+        // Use user.uid instead of user.id
+        const path = `ai-training/${user?.uid}/${time}-${file.name}`;
+
+        const storageRef = ref(storage, path);
+        const metadata = {
+          contentType: file.type || `application/${ext}`,
+        };
+
+        await uploadBytes(storageRef, file, metadata);
         return path;
       });
 

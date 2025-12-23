@@ -1,4 +1,16 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db, auth } from "@/lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  orderBy,
+  limit
+} from "firebase/firestore";
 
 export interface DeliverectConnection {
   id: string;
@@ -70,216 +82,185 @@ export interface DeliverectDelivery {
 const deliverectService = {
   // ===== Connection Management =====
   async getConnection(): Promise<DeliverectConnection | null> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
-      .from('deliverect_connections')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
+    const q = query(collection(db, 'deliverect_connections'), where('user_id', '==', user.uid), limit(1));
+    const snapshot = await getDocs(q);
 
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
+    if (snapshot.empty) return null;
+    return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as DeliverectConnection;
   },
 
   async saveConnection(connection: Omit<DeliverectConnection, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<DeliverectConnection> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
-      .from('deliverect_connections')
-      .upsert({
-        user_id: user.id,
-        ...connection,
-      })
-      .select()
-      .single();
+    // Check if exists
+    const q = query(collection(db, 'deliverect_connections'), where('user_id', '==', user.uid), limit(1));
+    const snapshot = await getDocs(q);
 
-    if (error) throw error;
-    return data;
+    const data = {
+      user_id: user.uid,
+      ...connection,
+      updated_at: new Date().toISOString()
+    };
+
+    if (!snapshot.empty) {
+      // Update
+      const docRef = snapshot.docs[0].ref;
+      await updateDoc(docRef, data);
+      return { id: docRef.id, ...snapshot.docs[0].data(), ...data } as DeliverectConnection;
+    } else {
+      // Create
+      const newData = { ...data, created_at: new Date().toISOString() };
+      const docRef = await addDoc(collection(db, 'deliverect_connections'), newData);
+      return { id: docRef.id, ...newData } as DeliverectConnection;
+    }
   },
 
   async updateConnection(updates: Partial<DeliverectConnection>): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const { error } = await supabase
-      .from('deliverect_connections')
-      .update(updates)
-      .eq('user_id', user.id);
+    const q = query(collection(db, 'deliverect_connections'), where('user_id', '==', user.uid), limit(1));
+    const snapshot = await getDocs(q);
 
-    if (error) throw error;
+    if (!snapshot.empty) {
+      await updateDoc(snapshot.docs[0].ref, {
+        ...updates,
+        updated_at: new Date().toISOString()
+      });
+    }
   },
 
   async deleteConnection(): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const { error } = await supabase
-      .from('deliverect_connections')
-      .delete()
-      .eq('user_id', user.id);
+    const q = query(collection(db, 'deliverect_connections'), where('user_id', '==', user.uid), limit(1));
+    const snapshot = await getDocs(q);
 
-    if (error) throw error;
+    if (!snapshot.empty) {
+      await deleteDoc(snapshot.docs[0].ref);
+    }
   },
 
   // ===== Shipment Management =====
   async createShipment(shipment: Omit<DeliverectShipment, 'id' | 'user_id'>): Promise<DeliverectShipment> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
-      .from('deliverect_shipments')
-      .insert({
-        user_id: user.id,
-        ...shipment,
-      })
-      .select()
-      .single();
+    const data = {
+      user_id: user.uid,
+      ...shipment,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
 
-    if (error) throw error;
-    return data as DeliverectShipment;
+    const docRef = await addDoc(collection(db, 'deliverect_shipments'), data);
+    return { id: docRef.id, ...data } as DeliverectShipment;
   },
 
   async getShipments(): Promise<DeliverectShipment[]> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
-      .from('deliverect_shipments')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return (data || []) as DeliverectShipment[];
+    const q = query(collection(db, 'deliverect_shipments'), where('user_id', '==', user.uid), orderBy('created_at', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as DeliverectShipment));
   },
 
   async updateShipmentStatus(shipmentId: string, status: string, errorMessage?: string): Promise<void> {
-    const { error } = await supabase
-      .from('deliverect_shipments')
-      .update({ 
-        status,
-        error_message: errorMessage,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', shipmentId);
-
-    if (error) throw error;
+    const docRef = doc(db, 'deliverect_shipments', shipmentId);
+    await updateDoc(docRef, {
+      status,
+      error_message: errorMessage,
+      updated_at: new Date().toISOString()
+    });
   },
 
   // ===== Order Management =====
   async createOrder(order: Omit<DeliverectOrder, 'id' | 'user_id'>): Promise<DeliverectOrder> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
-      .from('deliverect_orders')
-      .insert({
-        user_id: user.id,
-        ...order,
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data as DeliverectOrder;
+    const data = {
+      user_id: user.uid,
+      ...order,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    const docRef = await addDoc(collection(db, 'deliverect_orders'), data);
+    return { id: docRef.id, ...data } as DeliverectOrder;
   },
 
   async getOrders(): Promise<DeliverectOrder[]> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
-      .from('deliverect_orders')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return (data || []) as DeliverectOrder[];
+    const q = query(collection(db, 'deliverect_orders'), where('user_id', '==', user.uid), orderBy('created_at', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as DeliverectOrder));
   },
 
   async updateOrderStatus(orderId: string, status: string): Promise<void> {
-    const { error } = await supabase
-      .from('deliverect_orders')
-      .update({ 
-        order_status: status,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', orderId);
-
-    if (error) throw error;
+    const docRef = doc(db, 'deliverect_orders', orderId);
+    await updateDoc(docRef, {
+      order_status: status,
+      updated_at: new Date().toISOString()
+    });
   },
 
   // ===== Delivery/Dispatch Management =====
   async createDelivery(delivery: Omit<DeliverectDelivery, 'id' | 'user_id'>): Promise<DeliverectDelivery> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
-      .from('deliverect_deliveries')
-      .insert({
-        user_id: user.id,
-        ...delivery,
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data as DeliverectDelivery;
+    const data = {
+      user_id: user.uid,
+      ...delivery,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    const docRef = await addDoc(collection(db, 'deliverect_deliveries'), data);
+    return { id: docRef.id, ...data } as DeliverectDelivery;
   },
 
   async getDeliveries(): Promise<DeliverectDelivery[]> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
-      .from('deliverect_deliveries')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return (data || []) as DeliverectDelivery[];
+    const q = query(collection(db, 'deliverect_deliveries'), where('user_id', '==', user.uid), orderBy('created_at', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as DeliverectDelivery));
   },
 
   async updateDeliveryStatus(deliveryId: string, status: string): Promise<void> {
-    const { error } = await supabase
-      .from('deliverect_deliveries')
-      .update({ 
-        dispatch_status: status,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', deliveryId);
-
-    if (error) throw error;
+    const docRef = doc(db, 'deliverect_deliveries', deliveryId);
+    await updateDoc(docRef, {
+      dispatch_status: status,
+      updated_at: new Date().toISOString()
+    });
   },
 
   async assignCourier(deliveryId: string, courierName: string, courierPhone: string): Promise<void> {
-    const { error } = await supabase
-      .from('deliverect_deliveries')
-      .update({ 
-        courier_name: courierName,
-        courier_phone: courierPhone,
-        dispatch_status: 'assigned',
-        assigned_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', deliveryId);
-
-    if (error) throw error;
+    const docRef = doc(db, 'deliverect_deliveries', deliveryId);
+    await updateDoc(docRef, {
+      courier_name: courierName,
+      courier_phone: courierPhone,
+      dispatch_status: 'assigned',
+      assigned_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
   },
 
   // ===== API Integration =====
   async sendToDeliverect(shipmentId: string): Promise<void> {
-    const { data, error } = await supabase.functions.invoke('send-to-deliverect', {
-      body: { shipmentId }
-    });
-
-    if (error) throw error;
-    return data;
+    // Feature pending migration to Firebase Functions
+    // const { data, error } = await firebase_functions.invoke('send-to-deliverect', { ... });
+    console.log("Deliverect integration mocked (pending Cloud Functions)");
+    return;
   },
 
   async testConnection(apiKey: string, locationId: string): Promise<boolean> {

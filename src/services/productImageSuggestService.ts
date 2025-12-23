@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+
 
 async function offByBarcode(barcode?: string): Promise<string | null> {
   if (!barcode) return null;
@@ -42,17 +42,10 @@ interface ProductData {
 
 export const productImageSuggestService = {
   async suggestImage(barcode?: string, name?: string): Promise<string | null> {
-    // 1) Try Edge Function first
-    try {
-      const { data, error } = await supabase.functions.invoke('product-image-suggest', {
-        body: { barcode, name }
-      });
-      if (!error && (data as any)?.imageUrl) {
-        return (data as any).imageUrl as string;
-      }
-    } catch (e) {
-      console.warn('Edge function suggest failed, falling back to client OFF:', e);
-    }
+    // 1) Try Firebase Function (Mocked/Future)
+    // Feature pending migration to Firebase Functions
+    // const { data } = await firebase_functions.invoke('product-image-suggest', ...);
+    console.log("Using client-side OpenFoodFacts fallback for image suggestion");
 
     // 2) Fallback: call Open Food Facts directly from client
     const byCode = await offByBarcode(barcode);
@@ -63,17 +56,10 @@ export const productImageSuggestService = {
   },
 
   async getProductData(barcode?: string, name?: string): Promise<ProductData | null> {
-    // 1) Try Edge Function first
-    try {
-      const { data, error } = await supabase.functions.invoke('product-data-suggest', {
-        body: { barcode, name }
-      });
-      if (!error && (data as any)?.name) {
-        return data as ProductData;
-      }
-    } catch (e) {
-      console.warn('Edge function product data failed, falling back to client OFF:', e);
-    }
+    // 1) Try Firebase Function (Mocked/Future)
+    // Feature pending migration to Firebase Functions
+    // const { data } = await firebase_functions.invoke('product-data-suggest', ...);
+    console.log("Using client-side OpenFoodFacts fallback for product data");
 
     // 2) Fallback: call Open Food Facts directly from client
     const productData = await getProductDataByBarcode(barcode);
@@ -93,7 +79,7 @@ async function getProductDataByBarcode(barcode?: string): Promise<ProductData | 
     const json = await res.json();
     const p = json?.product;
     if (!p) return null;
-    
+
     return {
       name: p.product_name || p.product_name_en,
       brand: p.brands?.split(',')[0]?.trim(),

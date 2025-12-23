@@ -29,7 +29,7 @@ export const testSquareConnection = async (
     }
 
     const data = await response.json();
-    
+
     return {
       success: true,
       locationName: data.location?.name || 'Unknown Location',
@@ -39,5 +39,42 @@ export const testSquareConnection = async (
       success: false,
       error: error instanceof Error ? error.message : 'Network error occurred',
     };
+  }
+};
+
+export const squareService = {
+  testConnection: testSquareConnection,
+  getProducts: async (credentials: SquareCredentials): Promise<{
+    success: boolean;
+    products?: any[];
+    error?: string;
+  }> => {
+    try {
+      const response = await fetch('https://connect.squareup.com/v2/catalog/list?types=ITEM', {
+        headers: {
+          'Square-Version': '2024-12-18',
+          'Authorization': `Bearer ${credentials.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${response.statusText}`,
+        };
+      }
+
+      const data = await response.json();
+      return {
+        success: true,
+        products: data.objects || [],
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch Square products',
+      };
+    }
   }
 };

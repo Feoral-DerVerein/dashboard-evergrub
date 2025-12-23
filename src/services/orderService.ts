@@ -1,312 +1,133 @@
-import { supabase } from "@/integrations/supabase/client";
 import { Order, OrderItem, mapDbOrderToOrder, DbOrder, DbOrderItem } from "@/types/order.types";
 import { toast } from "sonner";
 
-interface UpdateOrderItemParams {
-  order_id: string;
-  product_id: string | number; // Updated to accept both string and number
-  quantity: number;
-  price: number;
-  name: string;
-  category: string | null;
-}
+// Mock Data Store Keys
+const STORAGE_KEY_ORDERS = 'mock_orders';
+const STORAGE_KEY_ORDER_ITEMS = 'mock_order_items';
+
+// Helper to get mock data
+const getMockOrders = (): any[] => {
+  const stored = localStorage.getItem(STORAGE_KEY_ORDERS);
+  return stored ? JSON.parse(stored) : [];
+};
+const getMockOrderItems = (): any[] => {
+  const stored = localStorage.getItem(STORAGE_KEY_ORDER_ITEMS);
+  return stored ? JSON.parse(stored) : [];
+};
+
+// Seed initial data if empty
+const seedOrders = () => {
+  if (!localStorage.getItem(STORAGE_KEY_ORDERS)) {
+    const initialOrders = [
+      { id: 'ord-1', user_id: 'user-1', status: 'pending', total: 45.00, customer_name: 'John Doe', timestamp: new Date().toISOString() },
+      { id: 'ord-2', user_id: 'user-1', status: 'completed', total: 12.50, customer_name: 'Jane Smith', timestamp: new Date(Date.now() - 86400000).toISOString() }
+    ];
+    localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(initialOrders));
+
+    const initialItems = [
+      { id: 'item-1', order_id: 'ord-1', product_id: 1, quantity: 2, price: 5.00, name: 'Latte' },
+      { id: 'item-2', order_id: 'ord-1', product_id: 2, quantity: 1, price: 3.50, name: 'Croissant' }
+    ];
+    localStorage.setItem(STORAGE_KEY_ORDER_ITEMS, JSON.stringify(initialItems));
+  }
+};
+seedOrders(); // Run seed
 
 export const createOrderItem = async (orderItem: OrderItem) => {
-  try {
-    const { data, error } = await supabase
-      .from('order_items')
-      .insert([orderItem])
-      .select();
-
-    if (error) {
-      console.error("Error creating order item:", error);
-      toast.error("Error creating order item. Something went wrong. Please try again.");
-      return { success: false, error };
-    }
-
-    console.log("Order item created successfully:", data);
-    return { success: true, data };
-  } catch (error) {
-    console.error("Exception creating order item:", error);
-    toast.error("Unexpected error. Please check the console for details.");
-    return { success: false, error };
-  }
+  const items = getMockOrderItems();
+  const newItem = { ...orderItem, id: `item-${Date.now()}` };
+  items.push(newItem);
+  localStorage.setItem(STORAGE_KEY_ORDER_ITEMS, JSON.stringify(items));
+  return { success: true, data: [newItem] };
 };
 
 export const updateOrderItem = async (
   order_id: string,
-  product_id: string | number, // Updated to accept both string and number
-  updates: Partial<Omit<UpdateOrderItemParams, 'product_id'>>
+  product_id: string | number,
+  updates: any
 ) => {
-  try {
-    // Convert product_id to number if it's a string and contains only digits
-    const productIdValue = typeof product_id === 'string' && /^\d+$/.test(product_id) 
-      ? parseInt(product_id, 10) 
-      : product_id;
-      
-    const { data, error } = await supabase
-      .from('order_items')
-      .update(updates)
-      .eq('order_id', order_id)
-      .eq('product_id', productIdValue as number) // Force type assertion here
-      .select();
+  const items = getMockOrderItems();
+  const index = items.findIndex((i: any) => i.order_id === order_id && i.product_id == product_id);
+  if (index === -1) return { success: false, error: "Item not found" };
 
-    if (error) {
-      console.error("Error updating order item:", error);
-      toast.error("Error updating order item. Something went wrong. Please try again.");
-      return { success: false, error };
-    }
-
-    console.log("Order item updated successfully:", data);
-    return { success: true, data };
-  } catch (error) {
-    console.error("Exception updating order item:", error);
-    toast.error("Unexpected error. Please check the console for details.");
-    return { success: false, error };
-  }
+  items[index] = { ...items[index], ...updates };
+  localStorage.setItem(STORAGE_KEY_ORDER_ITEMS, JSON.stringify(items));
+  return { success: true, data: [items[index]] };
 };
 
 export const deleteOrderItem = async (order_id: string, product_id: string | number) => {
-  try {
-    // Convert product_id to number if it's a string and contains only digits
-    const productIdValue = typeof product_id === 'string' && /^\d+$/.test(product_id) 
-      ? parseInt(product_id, 10) 
-      : product_id;
-    
-    const { data, error } = await supabase
-      .from('order_items')
-      .delete()
-      .eq('order_id', order_id)
-      .eq('product_id', productIdValue as number) // Force type assertion here
-      .select();
-
-    if (error) {
-      console.error("Error deleting order item:", error);
-      toast.error("Error deleting order item. Something went wrong. Please try again.");
-      return { success: false, error };
-    }
-
-    console.log("Order item deleted successfully");
-    return { success: true, data };
-  } catch (error) {
-    console.error("Exception deleting order item:", error);
-    toast.error("Unexpected error. Please check the console for details.");
-    return { success: false, error };
-  }
+  let items = getMockOrderItems();
+  items = items.filter((i: any) => !(i.order_id === order_id && i.product_id == product_id));
+  localStorage.setItem(STORAGE_KEY_ORDER_ITEMS, JSON.stringify(items));
+  return { success: true };
 };
 
 export const getOrder = async (orderId: string): Promise<Order | null> => {
-  try {
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('id', orderId)
-      .single();
+  const orders = getMockOrders();
+  const orderData = orders.find((o: any) => o.id === orderId);
+  if (!orderData) return null;
 
-    if (error) {
-      console.error("Error fetching order:", error);
-      return null;
-    }
+  const items = await getOrderItems(orderId);
 
-    // Need to fetch order items separately
-    const orderItems = await getOrderItems(orderId);
-    
-    // Convert the database order to our application order type
-    const order: Order = {
-      id: data.id,
-      customerName: data.customer_name,
-      customerImage: data.customer_image || "/placeholder.svg",
-      items: orderItems,
-      status: data.status as "pending" | "accepted" | "completed" | "rejected",
-      timestamp: data.timestamp,
-      total: data.total,
-      location: data.location || "",
-      phone: data.phone || "",
-      specialRequest: data.special_request || undefined,
-      userId: data.user_id
-    };
-
-    return order;
-  } catch (error) {
-    console.error("Exception fetching order:", error);
-    return null;
-  }
+  return {
+    id: orderData.id,
+    customerName: orderData.customer_name,
+    customerImage: orderData.customer_image || "/placeholder.svg",
+    items: items,
+    status: orderData.status as "pending" | "accepted" | "completed" | "rejected",
+    timestamp: orderData.timestamp,
+    total: orderData.total,
+    location: orderData.location || "",
+    phone: orderData.phone || "",
+    specialRequest: orderData.special_request || undefined,
+    userId: orderData.user_id
+  };
 };
 
 export const getUserOrders = async (): Promise<Order[]> => {
-  try {
-    console.log("Fetching user orders...");
-    
-    // Get all orders (you might want to filter by user_id if needed)
-    const { data: ordersData, error: ordersError } = await supabase
-      .from('orders')
-      .select('*')
-      .order('timestamp', { ascending: false });
-    
-    if (ordersError) {
-      console.error("Error fetching orders:", ordersError);
-      return [];
-    }
-    
-    console.log("Orders data fetched:", ordersData);
-    
-    if (!ordersData || ordersData.length === 0) {
-      return [];
-    }
+  const ordersData = getMockOrders();
+  // In a real app we'd filter by user_id but for mock we return all
 
-    // Get all order items for these orders
-    const orderIds = ordersData.map((order: DbOrder) => order.id);
-    const { data: itemsData, error: itemsError } = await supabase
-      .from('order_items')
-      .select('*')
-      .in('order_id', orderIds);
-    
-    if (itemsError) {
-      console.error("Error fetching order items:", itemsError);
-      return [];
-    }
-
-    // Map DB orders to app orders
-    const orders: Order[] = ordersData.map((dbOrder: DbOrder) => {
-      // Find items for this order
-      const orderItems = (itemsData || []).filter(
-        (item: DbOrderItem) => item.order_id === dbOrder.id
-      );
-      
-      return mapDbOrderToOrder(dbOrder, orderItems);
-    });
-
-    return orders;
-  } catch (error) {
-    console.error("Exception in getUserOrders:", error);
-    return [];
-  }
+  return Promise.all(ordersData.map(async (order: any) => {
+    const items = await getOrderItems(order.id);
+    return {
+      id: order.id,
+      customerName: order.customer_name,
+      customerImage: "/placeholder.svg",
+      items: items,
+      status: order.status,
+      timestamp: order.timestamp,
+      total: order.total,
+      location: order.location || "",
+      phone: order.phone || "",
+      userId: order.user_id
+    };
+  }));
 };
 
 export const getOrderItems = async (orderId: string): Promise<OrderItem[]> => {
-  try {
-    const { data, error } = await supabase
-      .from('order_items')
-      .select('*')
-      .eq('order_id', orderId);
-
-    if (error) {
-      console.error("Error fetching order items:", error);
-      return [];
-    }
-
-    return data as OrderItem[];
-  } catch (error) {
-    console.error("Exception fetching order items:", error);
-    return [];
-  }
+  const items = getMockOrderItems();
+  return items.filter((i: any) => i.order_id === orderId);
 };
 
 export const updateOrderStatus = async (
-  orderId: string, 
+  orderId: string,
   status: "pending" | "accepted" | "completed" | "rejected",
   fromOrdersPage: boolean = false
 ) => {
-  try {
-    console.log(`Updating order ${orderId} status to ${status}, fromOrdersPage: ${fromOrdersPage}`);
-    
-    // Verify if we can access the order first
-    const { data: checkOrder, error: checkError } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('id', orderId)
-      .single();
-      
-    if (checkError) {
-      console.error("Error checking order access:", checkError);
-      return { success: false, error: { message: "Could not access order" } };
-    }
-    
-    // Proceed with the update
-    const { data, error } = await supabase
-      .from('orders')
-      .update({ 
-        status, 
-        from_orders_page: fromOrdersPage, 
-        updated_at: new Date().toISOString() 
-      })
-      .eq('id', orderId)
-      .select();
-    
-    if (error) {
-      console.error("Error updating order status:", error);
-      return { success: false, error };
-    }
-    
-    console.log(`Order ${orderId} status updated to ${status}, result:`, data);
-    
-    // If the status is completed, the database trigger will automatically create a sales record
-    if (status === 'completed') {
-      console.log("Order completed, sales record will be created by database trigger");
-    }
-    
-    // Broadcast the status change to connected clients
-    try {
-      const broadcastResult = await broadcastOrderStatusChange(orderId, status);
-      console.log("Broadcast result:", broadcastResult);
-    } catch (broadcastError) {
-      console.error("Error broadcasting status change:", broadcastError);
-      // Continue even if broadcast fails
-    }
-    
-    return { success: true, data };
-  } catch (error) {
-    console.error("Exception in updateOrderStatus:", error);
-    return { success: false, error };
-  }
+  const orders = getMockOrders();
+  const index = orders.findIndex((o: any) => o.id === orderId);
+  if (index === -1) return { success: false, error: "Order not found" };
+
+  orders[index].status = status;
+  orders[index].updated_at = new Date().toISOString();
+  localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(orders));
+
+  console.log(`Order ${orderId} status updated to ${status}`);
+  return { success: true, data: [orders[index]] };
 };
 
-// Get completed orders (sales)
 export const getCompletedOrders = async (): Promise<Order[]> => {
-  try {
-    const { data: ordersData, error: ordersError } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('status', 'completed')
-      .order('updated_at', { ascending: false });
-    
-    if (ordersError) {
-      console.error("Error fetching completed orders:", ordersError);
-      return [];
-    }
-    
-    if (!ordersData || ordersData.length === 0) {
-      return [];
-    }
-
-    // Get all order items for these orders
-    const orderIds = ordersData.map((order: DbOrder) => order.id);
-    const { data: itemsData, error: itemsError } = await supabase
-      .from('order_items')
-      .select('*')
-      .in('order_id', orderIds);
-    
-    if (itemsError) {
-      console.error("Error fetching order items for completed orders:", itemsError);
-      return [];
-    }
-
-    // Map DB orders to app orders
-    const orders: Order[] = ordersData.map((dbOrder: DbOrder) => {
-      // Find items for this order
-      const orderItems = (itemsData || []).filter(
-        (item: DbOrderItem) => item.order_id === dbOrder.id
-      );
-      
-      return mapDbOrderToOrder(dbOrder, orderItems);
-    });
-
-    return orders;
-  } catch (error) {
-    console.error("Exception in getCompletedOrders:", error);
-    return [];
-  }
+  const allOrders = await getUserOrders();
+  return allOrders.filter(o => o.status === 'completed');
 };
-
-// Re-export broadcastOrderStatusChange from the Supabase client
-import { broadcastOrderStatusChange } from "@/integrations/supabase/client";

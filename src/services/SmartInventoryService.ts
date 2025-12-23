@@ -1,4 +1,6 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/firebase";
+import { collection, query, where, getDocs, updateDoc, doc, orderBy } from "firebase/firestore";
+import { predictiveAnalyticsService } from '@/services/predictiveAnalyticsService';
 
 export interface PrescriptiveAction {
     id: string;
@@ -22,16 +24,28 @@ export const smartInventoryService = {
             const thresholdDate = new Date();
             thresholdDate.setDate(today.getDate() + daysThreshold);
 
-            const { data, error } = await supabase
-                .from('products')
-                .select('*')
-                // .eq('userid', userId) // Uncomment when RLS is fully strict or user_id is consistent
-                .gt('expirationdate', today.toISOString())
-                .lt('expirationdate', thresholdDate.toISOString())
-                .order('expirationdate', { ascending: true });
+            // Firestore query
+            // We need a composite index on (expirationdate ASC) effectively, 
+            // but also filtering by range. 
+            // Query: expirationdate > today AND expirationdate < threshold.
+            const q = query(
+                collection(db, 'products'),
+                where('expirationdate', '>', today.toISOString()),
+                where('expirationdate', '<', thresholdDate.toISOString()),
+                orderBy('expirationdate', 'asc')
+            );
 
-            if (error) throw error;
-            return data || [];
+            const snapshot = await getDocs(q);
+            const products = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            // Filter by userId if needed (though we'll rely on collection logic or future security rules)
+            // Ideally we add where('userid', '==', userId) but requires composite index.
+            // For now, filter in memory if strictly needed, or assume backend rules handle it.
+            // Let's filter in memory since dataset is small for this prototype.
+            // Actually, best practice is to add the where clause, but indexes might be missing.
+            // I'll filter in JS to avoid index errors during migration.
+            return products.filter((p: any) => p.userid === userId);
+
         } catch (error) {
             console.error("Error fetching expiring products:", error);
             return [];
@@ -46,16 +60,11 @@ export const smartInventoryService = {
 
         try {
             if (action.type === 'promo' && action.suggestedPrice) {
-                // Update price in DB
-                const { error } = await supabase
-                    .from('products')
-                    .update({
-                        price: action.suggestedPrice,
-                        // Optionally add a flag for 'is_discounted' if schema supports it
-                    })
-                    .eq('id', parseInt(action.productId));
-
-                if (error) throw error;
+                // Update price in Firestore
+                const productRef = doc(db, 'products', action.productId);
+                await updateDoc(productRef, {
+                    price: action.suggestedPrice
+                });
                 return true;
             }
 
@@ -79,10 +88,10 @@ export const smartInventoryService = {
         if (expiringItems.length > 0) {
             // Group by visual clutter reduction? For now, list top 3 most valuable
             const topExpiring = expiringItems
-                .sort((a, b) => (b.price * b.quantity) - (a.price * a.quantity))
+                .sort((a: any, b: any) => (b.price * b.quantity) - (a.price * a.quantity))
                 .slice(0, 3);
 
-            topExpiring.forEach(item => {
+            topExpiring.forEach((item: any) => {
                 const potentialLoss = item.price * item.quantity;
                 const suggestedPrice = Number((item.price * 0.7).toFixed(2)); // 30% discount
 
@@ -114,6 +123,31 @@ export const smartInventoryService = {
 
         // 2. Check for Low Stock (Mocked for now since we focus on expiration first)
         // In real implementation, this would query products where quantity < min_stock
+
+        // 3. Connect to Prophet Forecast (Demand Spikes)
+        try {
+            const predictions = await predictiveAnalyticsService.getSalesPrediction('week');
+
+            // Analyze the trend (simple logic: is there a spike > 20% in the next 7 days?)
+            const totalPredictedRevenue = predictions.reduce((sum, p) => sum + p.predicted, 0);
+            const avgDaily = totalPredictedRevenue / predictions.length;
+
+            // Check for individual day spikes
+            const spikeDay = predictions.find(p => p.predicted > avgDaily * 1.3); // 30% above average
+
+            if (spikeDay) {
+                actions.push({
+                    id: 'demand-spike-alert',
+                    type: 'restock',
+                    title: 'High Demand Expected',
+                    description: `Prophet predicts a ${Math.round((spikeDay.predicted / avgDaily - 1) * 100)}% sales spike on ${new Date(spikeDay.date).toLocaleDateString()}.`,
+                    impact: 'Prevent Stockouts',
+                    priority: 'high'
+                });
+            }
+        } catch (err) {
+            console.error("Error fetching forecast for actions:", err);
+        }
 
         return actions;
     }

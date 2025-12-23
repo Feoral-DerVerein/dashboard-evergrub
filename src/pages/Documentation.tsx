@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Code, Shield, Network, Zap, BookOpen } from "lucide-react";
+import { FileText, Code, Shield, Network, Zap, BookOpen, Scale } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function Documentation() {
@@ -16,7 +16,7 @@ export default function Documentation() {
             </div>
 
             <Tabs defaultValue="user-guide" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+                <TabsList className="grid w-full grid-cols-3 lg:w-[600px]">
                     <TabsTrigger value="user-guide" className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
                         {t('documentation.tabs.user_guide')}
@@ -24,6 +24,10 @@ export default function Documentation() {
                     <TabsTrigger value="api-reference" className="flex items-center gap-2">
                         <Code className="h-4 w-4" />
                         {t('documentation.tabs.api_reference')}
+                    </TabsTrigger>
+                    <TabsTrigger value="legal" className="flex items-center gap-2">
+                        <Scale className="h-4 w-4" />
+                        Legal
                     </TabsTrigger>
                 </TabsList>
 
@@ -143,7 +147,7 @@ export default function Documentation() {
                                     {/* generate-sales-predictions */}
                                     <div className="space-y-4">
                                         <div className="flex items-baseline justify-between">
-                                            <h3 className="text-lg font-bold font-mono text-blue-700">POST /generate-sales-predictions</h3>
+                                            <h3 className="text-lg font-bold font-mono text-gray-500">POST /generate-sales-predictions (Deprecated/Mock)</h3>
                                             <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Authenticated</span>
                                         </div>
                                         <p className="text-sm text-gray-600">
@@ -163,7 +167,7 @@ export default function Documentation() {
                                     {/* aladdin-ai */}
                                     <div className="space-y-4">
                                         <div className="flex items-baseline justify-between">
-                                            <h3 className="text-lg font-bold font-mono text-blue-700">POST /aladdin-ai</h3>
+                                            <h3 className="text-lg font-bold font-mono text-blue-700">POST /negentropy-ai</h3>
                                             <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Public</span>
                                         </div>
                                         <p className="text-sm text-gray-600">
@@ -174,6 +178,69 @@ export default function Documentation() {
 
                                 </div>
                             </ScrollArea>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+                {/* Legal Documents Content */}
+                <TabsContent value="legal" className="mt-6 space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Política de Privacidad (RGPD)</CardTitle>
+                            <CardDescription>
+                                Cumplimiento con el Reglamento General de Protección de Datos (UE 2016/679).
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4 text-sm text-gray-700">
+                            <p><strong>1. Responsable del Tratamiento:</strong> Negentropy AI, S.L.</p>
+                            <p><strong>2. Finalidad:</strong> Gestión de la plataforma de optimización de inventario y donaciones.</p>
+                            <p><strong>3. Legitimación:</strong> Ejecución de contrato y cumplimiento de obligaciones legales (Ley 1/2025).</p>
+                            <p><strong>4. Destinatarios:</strong> No se cederán datos a terceros, salvo obligación legal o a entidades benéficas (Fesbal) bajo instrucción del usuario.</p>
+                            <p><strong>5. Derechos:</strong> Acceder, rectificar y suprimir los datos, así como otros derechos, enviando un correo a privacy@negentropy.ai.</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Términos de Servicio</CardTitle>
+                            <CardDescription>Condiciones de uso de la plataforma Negentropy AI.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4 text-sm text-gray-700">
+                            <p>
+                                El uso de esta plataforma implica la aceptación de que las predicciones de IA son herramientas de soporte a la decisión y no garantías de resultados futuros.
+                                El usuario es responsable de la veracidad de los datos de inventario introducidos.
+                            </p>
+                            <ul className="list-disc pl-5 space-y-1">
+                                <li>Licencia de uso no exclusiva e intransferible.</li>
+                                <li>SLA garantizado del 99.5% para clientes Enterprise.</li>
+                                <li>Propiedad de los datos: El cliente conserva total propiedad sobre sus datos comerciales.</li>
+                            </ul>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Contrato SaaS Estándar</CardTitle>
+                            <CardDescription>Acuerdo marco de prestación de servicios en la nube.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ScrollArea className="h-[200px] w-full rounded-md border p-4 bg-gray-50 text-xs font-mono text-gray-600">
+                                <p className="mb-2"><strong>CLÁUSULA PRIMERA: OBJETO</strong></p>
+                                <p className="mb-4">Por el presente contrato, el PROVEEDOR presta al CLIENTE el servicio de software "Negentropy AI" en modalidad SaaS...</p>
+
+                                <p className="mb-2"><strong>CLÁUSULA SEGUNDA: DURACIÓN</strong></p>
+                                <p className="mb-4">El contrato tendrá una duración inicial de 12 meses, prorrogables automáticamente...</p>
+
+                                <p className="mb-2"><strong>CLÁUSULA TERCERA: CONFIDENCIALIDAD</strong></p>
+                                <p className="mb-4">Ambas partes se obligan a guardar estricta confidencialidad sobre la información técnica y comercial...</p>
+
+                                <p className="mb-2"><strong>CLÁUSULA CUARTA: RESPONSABILIDAD</strong></p>
+                                <p className="mb-4">La responsabilidad acumulada del PROVEEDOR no excederá el importe de las cuotas abonadas en los últimos 12 meses...</p>
+                            </ScrollArea>
+                            <div className="mt-4 flex justify-end">
+                                <a href="#" className="text-blue-600 hover:underline text-sm flex items-center gap-1">
+                                    <FileText className="w-4 h-4" /> Descargar PDF completo
+                                </a>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -117,6 +118,7 @@ const RealtimeMonitoringCard = () => {
             <CardTitle className="flex items-center gap-2">
               <RefreshCw className="h-5 w-5 text-primary animate-pulse" />
               Monitoreo en Tiempo Real
+              <HelpTooltip kpiName="Monitorización en Tiempo Real" />
             </CardTitle>
             <CardDescription>
               Precios actualizados automáticamente
@@ -189,8 +191,8 @@ const RealtimeMonitoringCard = () => {
                           daysLeft <= 1
                             ? 'destructive'
                             : daysLeft <= 3
-                            ? 'default'
-                            : 'secondary'
+                              ? 'default'
+                              : 'secondary'
                         }
                       >
                         {daysLeft} días

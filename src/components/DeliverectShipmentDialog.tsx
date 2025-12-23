@@ -20,7 +20,10 @@ interface SelectedProduct extends Product {
   selectedQuantity: number;
 }
 
+import { useAuth } from "@/context/AuthContext";
+
 export const DeliverectShipmentDialog = ({ open, onOpenChange }: DeliverectShipmentDialogProps) => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -32,14 +35,14 @@ export const DeliverectShipmentDialog = ({ open, onOpenChange }: DeliverectShipm
     }
   }, [open]);
 
+
+
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const userProducts = await productService.getProductsByUser(user.id);
+      const userProducts = await productService.getProductsByUser(user.uid);
       setProducts(userProducts.filter(p => p.quantity > 0));
     } catch (error) {
       console.error("Error loading products:", error);
@@ -51,7 +54,7 @@ export const DeliverectShipmentDialog = ({ open, onOpenChange }: DeliverectShipm
 
   const handleProductSelect = (product: Product, checked: boolean) => {
     const newSelected = new Map(selectedProducts);
-    
+
     if (checked) {
       newSelected.set(product.id!, {
         ...product,
@@ -60,23 +63,23 @@ export const DeliverectShipmentDialog = ({ open, onOpenChange }: DeliverectShipm
     } else {
       newSelected.delete(product.id!);
     }
-    
+
     setSelectedProducts(newSelected);
   };
 
   const handleQuantityChange = (productId: number, quantity: number) => {
     const newSelected = new Map(selectedProducts);
     const product = newSelected.get(productId);
-    
+
     if (product) {
       const maxQuantity = products.find(p => p.id === productId)?.quantity || 0;
       const validQuantity = Math.max(1, Math.min(quantity, maxQuantity));
-      
+
       newSelected.set(productId, {
         ...product,
         selectedQuantity: validQuantity
       });
-      
+
       setSelectedProducts(newSelected);
     }
   };
@@ -132,7 +135,7 @@ export const DeliverectShipmentDialog = ({ open, onOpenChange }: DeliverectShipm
   };
 
   const totalItems = Array.from(selectedProducts.values()).reduce(
-    (sum, p) => sum + p.selectedQuantity, 
+    (sum, p) => sum + p.selectedQuantity,
     0
   );
 
@@ -177,13 +180,13 @@ export const DeliverectShipmentDialog = ({ open, onOpenChange }: DeliverectShipm
                             handleProductSelect(product, checked as boolean)
                           }
                         />
-                        
+
                         <img
                           src={product.image || "/placeholder.svg"}
                           alt={product.name}
                           className="w-16 h-16 object-cover rounded"
                         />
-                        
+
                         <div className="flex-1">
                           <h4 className="font-medium">{product.name}</h4>
                           <p className="text-sm text-muted-foreground">

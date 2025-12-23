@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -60,7 +61,10 @@ const SalesPredictionChart = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
-            <CardTitle>{t('sales_prediction.title')}</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              {t('sales_prediction.title')}
+              <HelpTooltip kpiName="Predicción de Ventas - Próximos 7 Días" />
+            </CardTitle>
           </div>
           <div className="flex gap-2">
             <Select value={timeRange} onValueChange={(value: any) => setTimeRange(value)}>

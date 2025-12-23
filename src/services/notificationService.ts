@@ -1,4 +1,13 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/firebase";
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  getDocs,
+  updateDoc,
+  doc
+} from "firebase/firestore";
 
 export interface Notification {
   id: string;
@@ -19,132 +28,101 @@ export interface Notification {
 export const notificationService = {
   async getAllNotifications(): Promise<Notification[]> {
     try {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .order('timestamp', { ascending: false });
-      
-      if (error) {
-        console.error("Error fetching notifications:", error);
-        throw error;
-      }
-      
-      return data as Notification[];
+      const q = query(
+        collection(db, 'notifications'),
+        orderBy('timestamp', 'desc')
+      );
+
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification));
     } catch (error) {
       console.error("Error in getAllNotifications:", error);
       return [];
     }
   },
-  
+
   async markAsRead(notificationId: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', notificationId);
-      
-      if (error) {
-        console.error("Error marking notification as read:", error);
-        throw error;
-      }
+      const docRef = doc(db, 'notifications', notificationId);
+      await updateDoc(docRef, { is_read: true });
     } catch (error) {
       console.error("Error in markAsRead:", error);
       throw error;
     }
   },
-  
+
   async createOrderNotification(orderId: string, title: string, description: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          title,
-          description,
-          order_id: orderId,
-          type: 'order'
-        });
-      
-      if (error) {
-        console.error("Error creating order notification:", error);
-        throw error;
-      }
+      await addDoc(collection(db, 'notifications'), {
+        title,
+        description,
+        order_id: orderId,
+        type: 'order',
+        timestamp: new Date().toISOString(),
+        is_read: false
+      });
     } catch (error) {
       console.error("Error in createOrderNotification:", error);
     }
   },
-  
+
   async createWishlistNotification(productId: number, productName: string, productImage?: string, productPrice?: string, customerName?: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          title: `New wishlist item: ${productName}`,
-          description: `Someone added ${productName} to their wishlist`,
-          type: 'wishlist',
-          product_id: productId.toString(),
-          product_image: productImage,
-          product_price: productPrice,
-          customer_name: customerName || 'Anonymous Customer'
-        });
-      
-      if (error) {
-        console.error("Error creating wishlist notification:", error);
-        throw error;
-      }
+      await addDoc(collection(db, 'notifications'), {
+        title: `New wishlist item: ${productName}`,
+        description: `Someone added ${productName} to their wishlist`,
+        type: 'wishlist',
+        product_id: productId.toString(),
+        product_image: productImage,
+        product_price: productPrice,
+        customer_name: customerName || 'Anonymous Customer',
+        timestamp: new Date().toISOString(),
+        is_read: false
+      });
     } catch (error) {
       console.error("Error in createWishlistNotification:", error);
     }
   },
-  
+
   async createSalesNotification(orderId: string, amount: number): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          title: `New sale recorded`,
-          description: `A sale for $${amount.toFixed(2)} has been completed`,
-          order_id: orderId,
-          type: 'sales'
-        });
-      
-      if (error) {
-        console.error("Error creating sales notification:", error);
-        throw error;
-      }
+      await addDoc(collection(db, 'notifications'), {
+        title: `New sale recorded`,
+        description: `A sale for $${amount.toFixed(2)} has been completed`,
+        order_id: orderId,
+        type: 'sales',
+        timestamp: new Date().toISOString(),
+        is_read: false
+      });
     } catch (error) {
       console.error("Error in createSalesNotification:", error);
     }
   },
-  
+
   async createPurchaseRequestNotification(productId: string, productName: string, buyerName: string, quantity: number, offerPrice?: number): Promise<void> {
     try {
-      const title = offerPrice 
+      const title = offerPrice
         ? `New offer for ${productName}`
         : `Someone wants to buy ${productName}`;
-      
-      const description = offerPrice 
+
+      const description = offerPrice
         ? `${buyerName} made an offer of $${offerPrice} for ${quantity} units`
         : `${buyerName} is interested in buying ${quantity} units`;
-        
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          title,
-          description,
-          product_id: productId,
-          customer_name: buyerName,
-          type: 'purchase'
-        });
-      
-      if (error) {
-        console.error("Error creating purchase request notification:", error);
-        throw error;
-      }
+
+      await addDoc(collection(db, 'notifications'), {
+        title,
+        description,
+        product_id: productId,
+        customer_name: buyerName,
+        type: 'purchase',
+        timestamp: new Date().toISOString(),
+        is_read: false
+      });
     } catch (error) {
       console.error("Error in createPurchaseRequestNotification:", error);
     }
   },
-  
+
   async createSampleProductNotifications(): Promise<void> {
     const sampleProducts = [
       {
@@ -188,19 +166,19 @@ export const notificationService = {
         customer: "Emily Parker"
       }
     ];
-    
+
     try {
       for (const product of sampleProducts) {
         await this.createWishlistNotification(
-          product.id, 
-          product.name, 
-          product.image, 
+          product.id,
+          product.name,
+          product.image,
           product.price,
           product.customer
         );
         console.log(`Created notification for product: ${product.name}`);
       }
-      
+
       console.log("Sample product notifications created successfully");
     } catch (error) {
       console.error("Error creating sample product notifications:", error);

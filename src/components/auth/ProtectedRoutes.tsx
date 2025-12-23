@@ -18,14 +18,20 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  // If no user, redirect to home/login
+  // If no user, redirect to login
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // Check if onboarding is completed
-  // If not completed and NOT currently on the onboarding page, redirect to onboarding
-  if (profile && !profile.onboarding_completed && location.pathname !== '/onboarding') {
+  // Only redirect to onboarding if:
+  // 1. Profile exists AND
+  // 2. onboarding_completed is explicitly false AND
+  // 3. We're not already on the onboarding page
+  // If profile is null/undefined, assume onboarding is complete to avoid loops
+  const needsOnboarding = profile && profile.onboarding_completed === false;
+
+  if (needsOnboarding && location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
 
@@ -33,3 +39,4 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 };
 
 export default ProtectedRoute;
+

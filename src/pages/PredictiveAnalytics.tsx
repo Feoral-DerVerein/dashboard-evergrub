@@ -11,7 +11,10 @@ import ExpirationAutomationCard from '@/components/pricing/ExpirationAutomationC
 import ZonePricingCard from '@/components/pricing/ZonePricingCard';
 import PriceHistoryCard from '@/components/pricing/PriceHistoryCard';
 import PriceSimulatorCard from '@/components/pricing/PriceSimulatorCard';
-import { Brain, TrendingUp, DollarSign } from 'lucide-react';
+import AutopilotControlCard from '@/components/autopilot/AutopilotControlCard';
+import ActionLogsCard from '@/components/autopilot/ActionLogsCard';
+import PriceSyncQueueCard from '@/components/autopilot/PriceSyncQueueCard';
+import { Brain, TrendingUp, DollarSign, Bot } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const PredictiveAnalytics = () => {
@@ -27,7 +30,7 @@ const PredictiveAnalytics = () => {
 
       {/* Tabs for different sections */}
       <Tabs defaultValue="predictive" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="predictive" className="gap-2">
             <TrendingUp className="h-4 w-4" />
             {t('predictive.tabs.predictive')}
@@ -35,6 +38,10 @@ const PredictiveAnalytics = () => {
           <TabsTrigger value="pricing" className="gap-2">
             <DollarSign className="h-4 w-4" />
             {t('predictive.tabs.pricing')}
+          </TabsTrigger>
+          <TabsTrigger value="autopilot" className="gap-2">
+            <Bot className="h-4 w-4" />
+            {t('autopilot.title')}
           </TabsTrigger>
         </TabsList>
 
@@ -60,9 +67,18 @@ const PredictiveAnalytics = () => {
             <PriceHistoryCard />
             <PriceSimulatorCard />
           </div>
+
+        </TabsContent>
+
+        {/* Autopilot Tab */}
+        <TabsContent value="autopilot" className="space-y-6">
+          <AutopilotControlCard />
+          <PriceSyncQueueCard />
+          <ActionLogsCard />
         </TabsContent>
       </Tabs>
-    </div>
+
+    </div >
   );
 };
 

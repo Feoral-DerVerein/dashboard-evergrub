@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HelpTooltip } from "@/components/dashboard/HelpTooltip";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,11 +21,11 @@ const InventoryOptimizerCard = ({ isLoading: externalLoading }: InventoryOptimiz
 
   useEffect(() => {
     const loadData = async () => {
-      if (!user?.id) return;
+      if (!user?.uid) return;
 
       setLoading(true);
       try {
-        const data = await performanceEngineService.getInventoryData(user.id);
+        const data = await performanceEngineService.getInventoryData(user.uid);
         setInventoryData(data);
       } catch (error) {
         console.error("Error loading inventory data:", error);
@@ -34,7 +35,7 @@ const InventoryOptimizerCard = ({ isLoading: externalLoading }: InventoryOptimiz
     };
 
     loadData();
-  }, [user?.id]);
+  }, [user?.uid]);
 
   const isLoading = externalLoading || loading;
 
@@ -73,7 +74,10 @@ const InventoryOptimizerCard = ({ isLoading: externalLoading }: InventoryOptimiz
   return (
     <Card className="apple-card">
       <CardHeader>
-        <CardTitle>{t('cards.inventory_optimizer.title')}</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          {t('cards.inventory_optimizer.title')}
+          <HelpTooltip kpiName={t('cards.inventory_optimizer.title')} />
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Inventory Table */}

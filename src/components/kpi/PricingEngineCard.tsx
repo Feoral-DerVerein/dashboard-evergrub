@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HelpTooltip } from "@/components/dashboard/HelpTooltip";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,11 +21,11 @@ const PricingEngineCard = ({ isLoading: externalLoading }: PricingEngineCardProp
 
   useEffect(() => {
     const loadData = async () => {
-      if (!user?.id) return;
+      if (!user?.uid) return;
 
       setLoading(true);
       try {
-        const data = await performanceEngineService.getPricingData(user.id);
+        const data = await performanceEngineService.getPricingData(user.uid);
         setPricingData(data);
       } catch (error) {
         console.error("Error loading pricing data:", error);
@@ -34,7 +35,7 @@ const PricingEngineCard = ({ isLoading: externalLoading }: PricingEngineCardProp
     };
 
     loadData();
-  }, [user?.id]);
+  }, [user?.uid]);
 
   const isLoading = externalLoading || loading;
 
@@ -66,7 +67,10 @@ const PricingEngineCard = ({ isLoading: externalLoading }: PricingEngineCardProp
   return (
     <Card className="apple-card">
       <CardHeader>
-        <CardTitle>{t('cards.pricing_engine.title')}</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          {t('cards.pricing_engine.title')}
+          <HelpTooltip kpiName={t('cards.pricing_engine.title')} />
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Pricing Table */}

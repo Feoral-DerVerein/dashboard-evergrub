@@ -1,22 +1,26 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { StickyNote } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/lib/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 
 interface TextSelectionToolbarProps {
+  // ... existing interface
   containerRef: React.RefObject<HTMLDivElement>;
 }
 
 export const TextSelectionToolbar = ({ containerRef }: TextSelectionToolbarProps) => {
   const { user } = useAuth();
+  // ... existing state
   const [selectedText, setSelectedText] = useState('');
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // ... existing useEffect
     const handleSelection = () => {
       const selection = window.getSelection();
       const text = selection?.toString().trim();
@@ -25,19 +29,19 @@ export const TextSelectionToolbar = ({ containerRef }: TextSelectionToolbarProps
         // Check if selection is within the chat container
         const range = selection?.getRangeAt(0);
         const container = containerRef.current;
-        
+
         if (range && container.contains(range.commonAncestorContainer)) {
           setSelectedText(text);
-          
+
           // Get selection position
           const rect = range.getBoundingClientRect();
           const containerRect = container.getBoundingClientRect();
-          
+
           setPosition({
             top: rect.top - containerRect.top - 45, // Position above selection
             left: rect.left - containerRect.left + (rect.width / 2) - 80 // Center toolbar
           });
-          
+
           setIsVisible(true);
         }
       } else {
@@ -66,21 +70,18 @@ export const TextSelectionToolbar = ({ containerRef }: TextSelectionToolbarProps
     if (!user || !selectedText) return;
 
     try {
-      const { error } = await supabase
-        .from('notes')
-        .insert([{
-          title: selectedText.substring(0, 50) + (selectedText.length > 50 ? '...' : ''),
-          content: selectedText,
-          tags: ['chatbot'],
-          user_id: user.id,
-          is_favorite: false
-        }]);
-
-      if (error) throw error;
+      await addDoc(collection(db, 'notes'), {
+        title: selectedText.substring(0, 50) + (selectedText.length > 50 ? '...' : ''),
+        content: selectedText,
+        tags: ['chatbot'],
+        user_id: user.uid,
+        is_favorite: false,
+        created_at: new Date().toISOString()
+      });
 
       toast.success('Texto agregado a notas');
       setIsVisible(false);
-      
+
       // Clear selection
       window.getSelection()?.removeAllRanges();
     } catch (error) {

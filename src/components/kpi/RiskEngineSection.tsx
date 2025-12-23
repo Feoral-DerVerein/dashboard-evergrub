@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { HelpTooltip } from "@/components/dashboard/HelpTooltip";
 import { RiskEngine } from "@/services/dashboardAnalyticsService";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
@@ -60,7 +61,10 @@ const RiskEngineSection = ({ data, isLoading }: RiskEngineSectionProps) => {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Risk Overview Card */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.risk_engine.title_overview')}</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+          {t('cards.risk_engine.title_overview')}
+          <HelpTooltip kpiName={t('cards.risk_engine.title_overview')} />
+        </h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="p-4 bg-muted/30 rounded-lg">
             <div className="text-sm text-muted-foreground mb-1">{t('cards.risk_engine.stockout_risk')}</div>

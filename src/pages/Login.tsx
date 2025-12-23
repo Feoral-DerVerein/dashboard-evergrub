@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { Provider } from "@supabase/supabase-js";
-import MelbourneWeatherCard from "@/components/widgets/MelbourneWeatherCard";
+import { useAuth } from "@/context/AuthContext";
+
 import CompleteProfile from "@/components/CompleteProfile";
 
 
 // Declare the spline-viewer custom element for TypeScript
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
       'spline-viewer': {
@@ -49,50 +49,54 @@ const Login = () => {
   const [currentUserEmail, setCurrentUserEmail] = useState("");
 
   const navigate = useNavigate();
+  // Get auth methods from context
+  const { signIn, signUp, signInWithGoogle } = useAuth();
+
   const { toast } = useToast();
 
   // Check for OAuth callback and handle profile completion
   useEffect(() => {
-    const checkOAuthCallback = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+    // With mocked auth, we might just check if user is already logged in
+    // But since AuthContext handles state, we might redirect if user exists in context
+    // The original logic checked URL params via auth provider
+    // For migration purposes, we can simplify or remove this check if relying on AuthRoute/ProtectedRoute
+  }, [navigate]);
 
-      if (user) {
-        // Check if profile needs completion
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('phone, country, business_type')
-          .eq('id', user.id)
-          .single();
-
-        if (profile && (!profile.phone || !profile.country || !profile.business_type)) {
-          setCurrentUserId(user.id);
-          setCurrentUserEmail(user.email || '');
-          setShowCompleteProfile(true);
-        } else if (profile) {
-          navigate("/aladdin", { replace: true });
-        }
+  // Hide Spline Logo Logic
+  useEffect(() => {
+    const hideSplineLogo = () => {
+      const viewer = document.querySelector('spline-viewer');
+      if (viewer?.shadowRoot) {
+        const style = document.createElement('style');
+        style.textContent = '#logo, a[href*="spline.design"] { display: none !important; }';
+        viewer.shadowRoot.appendChild(style);
       }
     };
 
-    checkOAuthCallback();
-  }, [navigate]);
+    // Try immediately and then observe or retry
+    hideSplineLogo();
+    const interval = setInterval(hideSplineLogo, 1000); // Retry a few times just in case
+    setTimeout(() => clearInterval(interval), 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       console.log(`Attempting to ${activeTab} with email: ${email}`);
       if (activeTab === 'login') {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-        if (error) throw error;
-        console.log("Login successful", data);
+        const { error } = await signIn(email, password);
+
+        if (error) throw new Error(error);
+
+        console.log("Login successful");
         toast({
           title: "Login successful",
           description: "Welcome back!"
         });
-        navigate("/aladdin", { replace: true });
+        navigate("/negentropy", { replace: true });
       } else {
         // Validate all fields for signup
         if (!firstName || !lastName || !phone || !country || !businessType) {
@@ -104,38 +108,25 @@ const Login = () => {
           return;
         }
 
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              first_name: firstName,
-              last_name: lastName,
-              phone: phone,
-              country: country,
-              business_type: businessType
-            },
-            emailRedirectTo: `${window.location.origin}/aladdin`
-          }
+        const { error } = await signUp(email, password, {
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone,
+          country: country,
+          business_type: businessType
         });
-        if (error) throw error;
-        console.log("Registration successful", data);
 
-        // Check if email confirmation is required
-        if (data.user && !data.session) {
-          toast({
-            title: "Registration successful",
-            description: "Check your email to verify your account before logging in."
-          });
-        } else if (data.session) {
-          toast({
-            title: "Registration successful",
-            description: "Welcome! Redirecting to dashboard..."
-          });
-          setTimeout(() => {
-            navigate("/aladdin", { replace: true });
-          }, 1500);
-        }
+        if (error) throw new Error(error);
+
+        console.log("Registration successful");
+
+        toast({
+          title: "Registration successful",
+          description: "Welcome! Redirecting to dashboard..."
+        });
+        setTimeout(() => {
+          navigate("/negentropy", { replace: true });
+        }, 1500);
 
         // Clear signup fields
         setFirstName("");
@@ -155,17 +146,12 @@ const Login = () => {
       setLoading(false);
     }
   };
+
   const handleSocialLogin = async (provider: 'google') => {
     try {
       console.log(`Attempting login with ${provider}`);
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: provider as Provider,
-        options: {
-          redirectTo: window.location.origin + '/aladdin'
-        }
-      });
-      if (error) throw error;
-      console.log(`${provider} login initiated`, data);
+      await signInWithGoogle();
+      // Error handling is inside signInWithGoogle or swallowed for mock
     } catch (error: any) {
       console.error(`Error with ${provider}:`, error);
       toast({
@@ -177,38 +163,10 @@ const Login = () => {
   };
 
   const handleResendConfirmation = async () => {
-    if (!email) {
-      toast({
-        title: "Error",
-        description: "Please enter your email address first",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: email
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Email sent!",
-        description: "Check your inbox for the confirmation email. Don't forget to check spam folder."
-      });
-    } catch (error: any) {
-      console.error("Error resending confirmation:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to resend confirmation email",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
+    toast({
+      title: "Info",
+      description: "Email confirmation disabled during migration.",
+    });
   };
   return <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
     {/* Complete Profile Modal */}
@@ -216,7 +174,7 @@ const Login = () => {
       open={showCompleteProfile}
       onComplete={() => {
         setShowCompleteProfile(false);
-        navigate("/aladdin", { replace: true });
+        navigate("/negentropy", { replace: true });
       }}
       userId={currentUserId}
       email={currentUserEmail}
@@ -240,21 +198,19 @@ const Login = () => {
         }
       `}</style>
 
-    {/* Weather Card - Real Melbourne Weather */}
-    <div className="absolute bottom-3 right-3 z-20 hidden lg:block">
-      <MelbourneWeatherCard />
-    </div>
+
 
     <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 relative z-10">
-      {/* Logo */}
       <div className="flex flex-col items-center mb-8 space-y-3">
-        <img src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png" alt="Main Logo" className="h-16 w-auto" />
+        <img src="/lovable-uploads/negentropy-icon-blue-sparkles.png" alt="Negentropy AI" className="h-16 w-auto object-contain" />
+        <span className="text-2xl font-bold tracking-tight text-white">Negentropy AI</span>
       </div>
 
       {/* Login Title */}
 
 
       <form onSubmit={handleSubmit} className="space-y-4">
+
         {/* Signup-only fields */}
         {activeTab === 'signup' && (
           <>

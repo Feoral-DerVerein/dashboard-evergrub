@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { BusinessHealth } from "@/services/dashboardAnalyticsService";
 import { useTranslation } from "react-i18next";
+import { HelpTooltip } from "@/components/dashboard/HelpTooltip";
 
 interface BusinessHealthCardsProps {
   data?: BusinessHealth;
@@ -33,12 +34,18 @@ const BusinessHealthCards = ({ data, isLoading }: BusinessHealthCardsProps) => {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
       <Card className="p-4">
-        <div className="text-sm text-muted-foreground mb-2">{t('cards.business_health.inventory_turnover')}</div>
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm text-muted-foreground">{t('cards.business_health.inventory_turnover')}</div>
+          <HelpTooltip kpiName="Inventory Turnover" />
+        </div>
         <div className="text-3xl font-semibold text-foreground">{data.inventoryTurnover}x</div>
       </Card>
 
       <Card className="p-4">
-        <div className="text-sm text-muted-foreground mb-2">{t('cards.business_health.waste_percentage')}</div>
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm text-muted-foreground">{t('cards.business_health.waste_percentage')}</div>
+          <HelpTooltip kpiName="Waste Reduction" />
+        </div>
         <div className={`text-3xl font-semibold ${data.wastePercentage > 5 ? 'text-destructive' : 'text-success'}`}>
           {data.wastePercentage.toFixed(1)}%
         </div>
@@ -57,7 +64,10 @@ const BusinessHealthCards = ({ data, isLoading }: BusinessHealthCardsProps) => {
       </Card>
 
       <Card className="p-4">
-        <div className="text-sm text-muted-foreground mb-2">{t('cards.business_health.overall_score')}</div>
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm text-muted-foreground">{t('cards.business_health.overall_score')}</div>
+          <HelpTooltip kpiName="Business Score" description="An overall metric calculated from waste, stockouts, and turnover efficiency." />
+        </div>
         <div className={`text-3xl font-semibold ${getScoreColor(data.overallScore)}`}>
           {data.overallScore}/100
         </div>

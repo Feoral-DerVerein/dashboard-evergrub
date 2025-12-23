@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
@@ -79,7 +80,10 @@ const AutopilotControlCard = () => {
             <Bot className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <CardTitle>{t('autopilot_control.title')}</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              {t('autopilot_control.title')}
+              <HelpTooltip kpiName="Control de Piloto Automático" />
+            </CardTitle>
             <CardDescription>
               {t('autopilot_control.description')}
             </CardDescription>

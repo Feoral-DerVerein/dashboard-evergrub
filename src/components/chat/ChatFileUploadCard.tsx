@@ -1,175 +1,108 @@
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { Upload, FileSpreadsheet, CheckCircle2, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import * as XLSX from 'xlsx';
-import { dataImportService } from '@/services/dataImportService';
+import { useState, useRef } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Upload, X, FileText, Image, File, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+import { storage } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from 'uuid';
 
-export const ChatFileUploadCard = () => {
-  const { toast } = useToast();
+interface ChatFileUploadCardProps {
+  onUploadComplete: (url: string, fileName: string, fileType: string) => void;
+  allowedTypes?: string[]; // e.g., ['image/png', 'application/pdf']
+  maxSizeMB?: number;
+}
+
+export const ChatFileUploadCard = ({
+  onUploadComplete,
+  allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf', 'text/csv', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+  maxSizeMB = 10
+}: ChatFileUploadCardProps) => {
+  const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      await uploadFile(e.target.files[0]);
+    }
+  };
 
-    // Validate file type
-    const validTypes = [
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-      'application/vnd.ms-excel', // .xls
-      'text/csv'
-    ];
+  const uploadFile = async (file: File) => {
+    // Validation
+    if (allowedTypes.length > 0 && !allowedTypes.includes(file.type)) {
+      toast.error(`File type not allowed. Supported types: ${allowedTypes.map(t => t.split('/')[1]).join(', ')}`);
+      return;
+    }
 
-    if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls|csv)$/i)) {
-      toast({
-        title: "Invalid Format",
-        description: "Please select an Excel (.xlsx, .xls) or CSV file",
-        variant: "destructive"
-      });
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      toast.error(`File too large. Maximum size is ${maxSizeMB}MB`);
       return;
     }
 
     setIsUploading(true);
+    setUploadProgress(10); // Start progress
 
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication Error",
-          description: "You must be logged in to upload files",
-          variant: "destructive"
-        });
-        return;
-      }
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `chat-uploads/${fileName}`;
 
-      // Read and parse the file
-      const arrayBuffer = await file.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      
-      // Get first sheet
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-      
-      // Convert to JSON
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      const storageRef = ref(storage, filePath);
+      await uploadBytes(storageRef, file);
+      setUploadProgress(100);
 
-      console.log('Parsed data:', jsonData);
+      const publicUrl = await getDownloadURL(storageRef);
 
-      // Get store profile
-      const { data: storeProfile } = await supabase
-        .from('store_profiles')
-        .select('name, categories')
-        .eq('userId', user.id)
-        .maybeSingle();
-
-      // Save to database for chatbot
-      const { error } = await supabase
-        .from('uploaded_data')
-        .insert([{
-          user_id: user.id,
-          business_name: storeProfile?.name || 'Unknown',
-          business_type: storeProfile?.categories?.[0] || 'Unknown',
-          json_data: jsonData as any,
-          pdf_info: null,
-          google_sheet_url: null
-        }]);
-
-      if (error) throw error;
-
-      // Process and import data automatically to KPI tables
-      const importResult = await dataImportService.processImportedData(jsonData, user.id);
-
-      setUploadedFileName(file.name);
-      
-      if (importResult.success) {
-        toast({
-          title: "✅ File uploaded and processed successfully",
-          description: `${file.name} - ${jsonData.length} rows processed. ${importResult.message}. Data is now visible in KPI dashboard.`
-        });
-      } else {
-        toast({
-          title: "✅ File uploaded successfully",
-          description: `${file.name} - ${jsonData.length} rows processed. Data saved for chatbot analysis. Note: ${importResult.message}`
-        });
-      }
-
-    } catch (error) {
+      onUploadComplete(publicUrl, file.name, file.type);
+      toast.success("File uploaded successfully");
+    } catch (error: any) {
       console.error('Error uploading file:', error);
-      toast({
-        title: "Error uploading file",
-        description: error instanceof Error ? error.message : "Please try again",
-        variant: "destructive"
-      });
+      toast.error(`Upload failed: ${error.message}`);
     } finally {
       setIsUploading(false);
-      // Reset input
-      e.target.value = '';
+      setUploadProgress(0);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
   return (
-    <Card className="glass-card-chatbot overflow-hidden">
-      <CardContent className="p-6">
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <FileSpreadsheet className="w-8 h-8 text-primary" />
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="font-semibold text-lg mb-2">Upload Database</h3>
-            <p className="text-sm text-muted-foreground">
-              Upload Excel or CSV files for the chatbot to analyze your data
-            </p>
-          </div>
+    <Card className="w-full max-w-sm bg-background border-dashed border-2 hover:border-primary transition-colors">
+      <CardContent className="p-6 flex flex-col items-center text-center gap-4">
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleFileSelect}
+          accept={allowedTypes.join(',')}
+        />
 
-          {uploadedFileName && (
-            <div className="flex items-center justify-center gap-2 text-sm text-green-600 bg-green-50 p-3 rounded-lg">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Last file: {uploadedFileName}</span>
-            </div>
+        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+          {isUploading ? (
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+          ) : (
+            <Upload className="w-6 h-6 text-primary" />
           )}
+        </div>
 
-          <div>
-            <input
-              type="file"
-              id="chat-file-upload"
-              accept=".xlsx,.xls,.csv"
-              onChange={handleFileUpload}
-              disabled={isUploading}
-              className="hidden"
-            />
-            <label htmlFor="chat-file-upload">
-              <Button
-                type="button"
-                disabled={isUploading}
-                className="w-full"
-                onClick={() => document.getElementById('chat-file-upload')?.click()}
-              >
-                {isUploading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4 mr-2" />
-                    Select File
-                  </>
-                )}
-              </Button>
-            </label>
-          </div>
-
-          <p className="text-xs text-muted-foreground">
-            Supported formats: Excel (.xlsx, .xls) and CSV
+        <div>
+          <p className="font-medium">Click to upload or drag and drop</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Max file size: {maxSizeMB}MB
           </p>
         </div>
+
+        <Button
+          variant="secondary"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className="w-full"
+        >
+          {isUploading ? 'Uploading...' : 'Select File'}
+        </Button>
       </CardContent>
     </Card>
   );

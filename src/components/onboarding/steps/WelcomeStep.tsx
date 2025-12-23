@@ -18,7 +18,8 @@ const businessTypes = [
     { value: "restaurant", label: "Restaurant" },
     { value: "hotel", label: "Hotel" },
     { value: "supermarket", label: "Supermarket" },
-    { value: "hospital", label: "Hospital/Healthcare" },
+
+
     { value: "bakery", label: "Bakery" },
     { value: "catering", label: "Catering Service" },
     { value: "other", label: "Other" }

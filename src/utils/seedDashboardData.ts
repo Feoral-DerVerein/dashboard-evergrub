@@ -6,7 +6,15 @@
 
 import { POSIntegrationService } from '@/services/api/pos-integration';
 import type { POSTransaction, POSItem } from '@/types/dashboard';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from "@/lib/firebase";
+import {
+    collection,
+    writeBatch,
+    doc,
+    query,
+    where,
+    getDocs
+} from "firebase/firestore";
 
 /**
  * Product categories for realistic data generation
@@ -189,17 +197,20 @@ export const injectTestProducts = async (
             tenant_id: userId,
         }));
 
-        const { data, error } = await supabase
-            .from('products')
-            .insert(productsWithTenant)
-            .select();
+        const batch = writeBatch(db);
+        const productsCollection = collection(db, 'products');
 
-        if (error) throw error;
+        productsWithTenant.forEach(product => {
+            const newDocRef = doc(productsCollection);
+            batch.set(newDocRef, { ...product, created_at: new Date().toISOString() });
+        });
+
+        await batch.commit();
 
         return {
             success: true,
-            message: `Successfully injected ${data?.length || 0} products`,
-            count: data?.length || 0,
+            message: `Successfully injected ${productsWithTenant.length} products`,
+            count: productsWithTenant.length,
         };
     } catch (error) {
         console.error('Error in injectTestProducts:', error);
@@ -276,21 +287,25 @@ export const clearTestData = async (userId: string): Promise<{ success: boolean;
     try {
         console.log(`Clearing test data for user ${userId}...`);
 
-        // Delete sales
-        const { error: salesError } = await supabase
-            .from('sales')
-            .delete()
-            .eq('tenant_id', userId);
+        // Batch delete sales
+        const salesQ = query(collection(db, 'sales'), where('tenant_id', '==', userId));
+        const salesSnapshot = await getDocs(salesQ);
 
-        if (salesError) throw salesError;
+        const salesBatch = writeBatch(db);
+        salesSnapshot.docs.forEach(doc => {
+            salesBatch.delete(doc.ref);
+        });
+        await salesBatch.commit();
 
-        // Delete products
-        const { error: productsError } = await supabase
-            .from('products')
-            .delete()
-            .eq('tenant_id', userId);
+        // Batch delete products
+        const productsQ = query(collection(db, 'products'), where('tenant_id', '==', userId));
+        const productsSnapshot = await getDocs(productsQ);
 
-        if (productsError) throw productsError;
+        const productsBatch = writeBatch(db);
+        productsSnapshot.docs.forEach(doc => {
+            productsBatch.delete(doc.ref);
+        });
+        await productsBatch.commit();
 
         return {
             success: true,
@@ -304,3 +319,4 @@ export const clearTestData = async (userId: string): Promise<{ success: boolean;
         };
     }
 };
+

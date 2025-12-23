@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { HelpTooltip } from "@/components/dashboard/HelpTooltip";
 import { TopProduct } from "@/services/dashboardAnalyticsService";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
@@ -63,7 +64,10 @@ const TopProductsForecastCard = ({ data, isLoading }: TopProductsForecastCardPro
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.top_products.title')}</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+        {t('cards.top_products.title')}
+        <HelpTooltip kpiName={t('cards.top_products.title')} />
+      </h3>
 
       <div className="space-y-3 max-h-[500px] overflow-y-auto">
         {data.map((product, idx) => (

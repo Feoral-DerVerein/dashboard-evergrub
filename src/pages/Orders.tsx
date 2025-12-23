@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { notificationService } from "@/services/notificationService";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
+
 const Orders = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [orders, setOrders] = useState<Order[]>([]);
@@ -56,43 +56,31 @@ const Orders = () => {
   };
 
   // Filter orders by source - using from_orders_page to distinguish POS vs Marketplace
-  const posOrders = orders.filter(order => 
+  const posOrders = orders.filter(order =>
     // POS orders are created directly in the system (from_orders_page = true or manual creation)
-    order.customerName === "Test Customer" || 
+    order.customerName === "Test Customer" ||
     order.customerName?.includes("test") ||
     order.location === "Loading Deck" ||
     order.location === "Entrance B"
   );
-  const marketplaceOrders = orders.filter(order => 
+  const marketplaceOrders = orders.filter(order =>
     // Marketplace orders are external orders (surprise bags, external customers)
     !posOrders.includes(order)
   );
 
-  // Set up real-time subscription for orders
+  // Set up polling for orders (mock realtime)
   useEffect(() => {
-    const channel = supabase
-      .channel('orders-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders'
-        },
-        () => {
-          console.log('Order changed, refreshing...');
-          fetchOrders();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-  useEffect(() => {
+    // Initial fetch
     fetchOrders();
+
+    // Poll every 5 seconds to simulate realtime updates
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [lastOrderUpdate, lastOrderDelete]);
+
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsDetailOpen(true);
@@ -104,7 +92,8 @@ const Orders = () => {
       const result = await orderService.updateOrderStatus(orderId, status, true);
       console.log("Update result:", result);
       if (!result.success) {
-        throw new Error(result.error?.message || "Unknown error");
+        const errorMessage = typeof result.error === 'string' ? result.error : (result.error?.message || "Unknown error");
+        throw new Error(errorMessage);
       }
       if (status === "completed") {
         const completedOrder = orders.find(order => order.id === orderId);
@@ -209,53 +198,53 @@ const Orders = () => {
     }
   };
   const OrderDetailsDialog = () => <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-      <DialogContent className="sm:max-w-md">
-        <DialogTitle className="text-center font-bold text-xl">Order Details</DialogTitle>
-        {selectedOrder && <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="text-gray-500 font-medium">Order ID:</div>
-              <div className="font-medium">{selectedOrder.id.substring(0, 8)}</div>
-              
-              <div className="text-gray-500 font-medium">Customer:</div>
-              <div>{getCustomerName(selectedOrder.id)}</div>
-              
-              <div className="text-gray-500 font-medium">Total:</div>
-              <div className="font-semibold">${selectedOrder.total.toFixed(2)}</div>
-              
-              <div className="text-gray-500 font-medium">Status:</div>
-              <div className="capitalize font-medium">
-                <Badge className={`${getStatusColor(selectedOrder.status)} flex w-fit items-center`}>
-                  {getStatusIcon(selectedOrder.status)}
-                  {getStatusLabel(selectedOrder.status)}
-                </Badge>
-              </div>
-              
-              <div className="text-gray-500 font-medium">Location:</div>
-              <div>{selectedOrder.location || "N/A"}</div>
-              
-              <div className="text-gray-500 font-medium">Phone:</div>
-              <div>{selectedOrder.phone || "N/A"}</div>
-            </div>
-            
-            <div className="border-t pt-4">
-              <h3 className="font-semibold mb-3 text-lg">Items:</h3>
-              <div className="space-y-3 bg-gray-50 p-3 rounded-md">
-                {selectedOrder.items.map((item, index) => <div key={item.id || index} className="flex justify-between py-1 border-b border-gray-100 last:border-0">
-                    <span className="font-medium">{item.quantity}x {item.name}</span>
-                    <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
-                  </div>)}
-              </div>
-            </div>
-            
-            {selectedOrder.specialRequest && <div className="border-t pt-4">
-                <h3 className="font-semibold mb-2 text-lg">Special Request:</h3>
-                <p className="text-gray-700 bg-gray-50 p-3 rounded-md italic">
-                  "{selectedOrder.specialRequest}"
-                </p>
-              </div>}
-          </div>}
-      </DialogContent>
-    </Dialog>;
+    <DialogContent className="sm:max-w-md">
+      <DialogTitle className="text-center font-bold text-xl">Order Details</DialogTitle>
+      {selectedOrder && <div className="space-y-5">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-gray-500 font-medium">Order ID:</div>
+          <div className="font-medium">{selectedOrder.id.substring(0, 8)}</div>
+
+          <div className="text-gray-500 font-medium">Customer:</div>
+          <div>{getCustomerName(selectedOrder.id)}</div>
+
+          <div className="text-gray-500 font-medium">Total:</div>
+          <div className="font-semibold">${selectedOrder.total.toFixed(2)}</div>
+
+          <div className="text-gray-500 font-medium">Status:</div>
+          <div className="capitalize font-medium">
+            <Badge className={`${getStatusColor(selectedOrder.status)} flex w-fit items-center`}>
+              {getStatusIcon(selectedOrder.status)}
+              {getStatusLabel(selectedOrder.status)}
+            </Badge>
+          </div>
+
+          <div className="text-gray-500 font-medium">Location:</div>
+          <div>{selectedOrder.location || "N/A"}</div>
+
+          <div className="text-gray-500 font-medium">Phone:</div>
+          <div>{selectedOrder.phone || "N/A"}</div>
+        </div>
+
+        <div className="border-t pt-4">
+          <h3 className="font-semibold mb-3 text-lg">Items:</h3>
+          <div className="space-y-3 bg-gray-50 p-3 rounded-md">
+            {selectedOrder.items.map((item, index) => <div key={item.id || index} className="flex justify-between py-1 border-b border-gray-100 last:border-0">
+              <span className="font-medium">{item.quantity}x {item.name}</span>
+              <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
+            </div>)}
+          </div>
+        </div>
+
+        {selectedOrder.specialRequest && <div className="border-t pt-4">
+          <h3 className="font-semibold mb-2 text-lg">Special Request:</h3>
+          <p className="text-gray-700 bg-gray-50 p-3 rounded-md italic">
+            "{selectedOrder.specialRequest}"
+          </p>
+        </div>}
+      </div>}
+    </DialogContent>
+  </Dialog>;
   const OrderCard = ({
     order
   }: {
@@ -266,67 +255,67 @@ const Orders = () => {
     };
     const customerName = getCustomerName(order.id);
     return <Card className="mb-4 overflow-hidden glass-card-hover transition-all duration-200">
-        <CardContent className="p-0">
-          <div className="p-4 border-b border-gray-100">
-            <div className="flex justify-between items-center mb-3">
-              <div className="flex items-center gap-2">
-                <ShoppingBag className="h-4 w-4 text-gray-400" />
-                <span className="text-sm font-mono text-gray-500">#{order.id.substring(0, 8)}</span>
-              </div>
-              <Badge className={`${getStatusColor(order.status)} flex items-center`}>
-                {getStatusIcon(order.status)}
-                {getStatusLabel(order.status)}
-              </Badge>
+      <CardContent className="p-0">
+        <div className="p-4 border-b border-gray-100">
+          <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="h-4 w-4 text-gray-400" />
+              <span className="text-sm font-mono text-gray-500">#{order.id.substring(0, 8)}</span>
             </div>
-            
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10 bg-blue-100 text-blue-600">
-                  <AvatarFallback>{getInitials(customerName)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold text-base">{customerName}</h3>
-                  <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
-                    <Package className="h-3.5 w-3.5" />
-                    <span>{order.items.length} items</span>
-                  </div>
-                  <div className="text-xs text-gray-600 mt-1 font-medium">
-                    {order.status === "completed" ? "Paid" : "Pay in person"}
-                  </div>
+            <Badge className={`${getStatusColor(order.status)} flex items-center`}>
+              {getStatusIcon(order.status)}
+              {getStatusLabel(order.status)}
+            </Badge>
+          </div>
+
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10 bg-blue-100 text-blue-600">
+                <AvatarFallback>{getInitials(customerName)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="font-semibold text-base">{customerName}</h3>
+                <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
+                  <Package className="h-3.5 w-3.5" />
+                  <span>{order.items.length} items</span>
+                </div>
+                <div className="text-xs text-gray-600 mt-1 font-medium">
+                  {order.status === "completed" ? "Paid" : "Pay in person"}
                 </div>
               </div>
-              
-              <div className="text-right">
-                <div className="font-bold text-lg text-emerald-700">${order.total.toFixed(2)}</div>
-                <div className="text-xs text-gray-500 mt-1">{order.timestamp}</div>
-              </div>
+            </div>
+
+            <div className="text-right">
+              <div className="font-bold text-lg text-emerald-700">${order.total.toFixed(2)}</div>
+              <div className="text-xs text-gray-500 mt-1">{order.timestamp}</div>
             </div>
           </div>
-        </CardContent>
-        
-        <CardFooter className="p-0 flex border-t border-gray-100">
-          <Button variant="ghost" className="flex-1 rounded-none h-11 border-r border-gray-100 hover:bg-gray-50 text-blue-600" onClick={() => handleViewDetails(order)}>
-            <Eye className="h-4 w-4 mr-2" />
-            Details
+        </div>
+      </CardContent>
+
+      <CardFooter className="p-0 flex border-t border-gray-100">
+        <Button variant="ghost" className="flex-1 rounded-none h-11 border-r border-gray-100 hover:bg-gray-50 text-blue-600" onClick={() => handleViewDetails(order)}>
+          <Eye className="h-4 w-4 mr-2" />
+          Details
+        </Button>
+
+        {order.status === "pending" && <>
+          <Button variant="ghost" className="flex-1 rounded-none h-11 border-r border-gray-100 hover:bg-gray-50 text-emerald-600" disabled={updatingOrderId === order.id} onClick={() => handleStatusChange(order.id, "accepted")}>
+            <Check className="h-4 w-4 mr-2" />
+            Accept
           </Button>
-          
-          {order.status === "pending" && <>
-              <Button variant="ghost" className="flex-1 rounded-none h-11 border-r border-gray-100 hover:bg-gray-50 text-emerald-600" disabled={updatingOrderId === order.id} onClick={() => handleStatusChange(order.id, "accepted")}>
-                <Check className="h-4 w-4 mr-2" />
-                Accept
-              </Button>
-              <Button variant="ghost" className="flex-1 rounded-none h-11 hover:bg-gray-50 text-red-600" disabled={updatingOrderId === order.id} onClick={() => handleStatusChange(order.id, "rejected")}>
-                <X className="h-4 w-4 mr-2" />
-                Reject
-              </Button>
-            </>}
-          
-          {order.status === "accepted" && <Button variant="ghost" className="flex-1 rounded-none h-11 hover:bg-gray-50 text-emerald-600" disabled={updatingOrderId === order.id} onClick={() => handleStatusChange(order.id, "completed")}>
-              <Package className="h-4 w-4 mr-2" />
-              Complete
-            </Button>}
-        </CardFooter>
-      </Card>;
+          <Button variant="ghost" className="flex-1 rounded-none h-11 hover:bg-gray-50 text-red-600" disabled={updatingOrderId === order.id} onClick={() => handleStatusChange(order.id, "rejected")}>
+            <X className="h-4 w-4 mr-2" />
+            Reject
+          </Button>
+        </>}
+
+        {order.status === "accepted" && <Button variant="ghost" className="flex-1 rounded-none h-11 hover:bg-gray-50 text-emerald-600" disabled={updatingOrderId === order.id} onClick={() => handleStatusChange(order.id, "completed")}>
+          <Package className="h-4 w-4 mr-2" />
+          Complete
+        </Button>}
+      </CardFooter>
+    </Card>;
   };
   const renderOrdersList = (ordersList: Order[], emptyMessage: string) => {
     if (ordersList.length === 0) {
@@ -393,14 +382,14 @@ const Orders = () => {
                 POS System ({posOrders.length})
               </TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="marketplace">
               {renderOrdersList(
                 marketplaceOrders,
                 "No marketplace orders yet. Orders from external customers will appear here."
               )}
             </TabsContent>
-            
+
             <TabsContent value="pos">
               {renderOrdersList(
                 posOrders,

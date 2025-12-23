@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { HelpTooltip } from "@/components/dashboard/HelpTooltip";
 import { InfluencingFactor } from "@/services/dashboardAnalyticsService";
 import { TrendingUp, TrendingDown, Calendar, Cloud, Users, Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -68,7 +69,10 @@ const InfluencingFactorsCard = ({ data, isLoading }: InfluencingFactorsCardProps
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4">{t('cards.influencing_factors.title')}</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+        {t('cards.influencing_factors.title')}
+        <HelpTooltip kpiName={t('cards.influencing_factors.title')} />
+      </h3>
       <div className="text-sm text-muted-foreground mb-4">
         {t('cards.influencing_factors.subtitle')}
       </div>

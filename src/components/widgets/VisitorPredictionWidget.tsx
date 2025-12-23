@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { Users, TrendingUp, Clock, AlertCircle, Loader2 } from "lucide-react";
+import { HelpTooltip } from "@/components/dashboard/HelpTooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { visitorPredictionService, VisitorPredictionData } from "@/services/visitorPredictionService";
+import { useAuth } from "@/context/AuthContext";
 
 const VisitorPredictionWidget = () => {
+  const { user } = useAuth();
   const [prediction, setPrediction] = useState<VisitorPredictionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +18,7 @@ const VisitorPredictionWidget = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await visitorPredictionService.getPrediction();
+        const data = await visitorPredictionService.getPrediction(user?.uid);
         setPrediction(data);
       } catch (err) {
         console.error('Error fetching visitor prediction:', err);
@@ -96,6 +99,7 @@ const VisitorPredictionWidget = () => {
         <CardTitle className="flex items-center gap-2 text-purple-900">
           <Users className="w-5 h-5" />
           Predicción de Visitantes
+          <HelpTooltip kpiName="Predicción de Visitantes" />
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -112,7 +116,7 @@ const VisitorPredictionWidget = () => {
               </span>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-purple-500" />

@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react';
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/firebase";
+import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore";
 import { toast } from "@/components/ui/use-toast";
 
 export function useNotificationsAndOrders() {
@@ -12,115 +12,68 @@ export function useNotificationsAndOrders() {
   const [lastNotificationUpdate, setLastNotificationUpdate] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchOrderCount = async () => {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('id')
-        .eq('status', 'pending');
-      
-      if (!error && data) {
-        setOrderCount(data.length);
-      }
-    };
+    // 1. Orders subscription (pending)
+    const qOrders = query(collection(db, 'orders'), where('status', '==', 'pending'));
+    const unsubscribeOrders = onSnapshot(qOrders, (snapshot) => {
+      setOrderCount(snapshot.size);
 
-    const fetchNotificationCount = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('notifications')
-          .select('id')
-          .eq('is_read', false);
-        
-        if (error) {
-          throw error;
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added" || change.type === "modified") {
+          // Not exact "update" vs "insert" matching like Postgres, but good enough signal
+          setLastOrderUpdate(change.doc.id);
         }
-        
-        console.log("Notifications count:", data?.length || 0);
-        setNotificationCount(data?.length || 0);
-      } catch (error) {
-        console.error("Error fetching notifications count:", error);
-        // Default to 3 notifications as in the original code
-        setNotificationCount(3);
-      }
-    };
+        if (change.type === "removed") {
+          setLastOrderDelete(change.doc.id);
+        }
+      });
+    });
 
+    // 2. Notifications subscription (unread)
+    const qNotifications = query(collection(db, 'notifications'), where('is_read', '==', false));
+    const unsubscribeNotifications = onSnapshot(qNotifications, (snapshot) => {
+      console.log("Notifications count:", snapshot.size);
+      setNotificationCount(snapshot.size);
+
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const data = change.doc.data();
+          toast({
+            title: "New Notification",
+            description: data.title
+          });
+          setLastNotificationUpdate(change.doc.id);
+        }
+      });
+    });
+
+    // 3. Sales Count (last 24 hours) - One-off fetch for now to save reads, or could be realtime too
+    // Keeping it simple with one-off as per previous logic (though previous logic was re-fetched on changes)
     const fetchSalesCount = async () => {
       try {
-        const { data, error } = await supabase
-          .from('sales')
-          .select('id')
-          .gte('sale_date', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()); // Last 24 hours
-        
-        if (error) {
-          throw error;
-        }
-        
-        setSalesCount(data?.length || 0);
+        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const qSales = query(collection(db, 'sales'), where('sale_date', '>=', yesterday));
+        const snapshot = await getDocs(qSales);
+        setSalesCount(snapshot.size);
       } catch (error) {
         console.error("Error fetching sales count:", error);
         setSalesCount(0);
       }
     };
 
-    fetchOrderCount();
-    fetchNotificationCount();
     fetchSalesCount();
 
-    // Set up real-time subscription for orders table
-    const ordersChannel = supabase
-      .channel('orders-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'orders' },
-        (payload) => {
-          console.log('Order change detected:', payload);
-          
-          if (payload.eventType === 'UPDATE' && payload.new && payload.new.id) {
-            console.log(`Order change detected: ${payload.new.id}, new status: ${payload.new.status}`);
-            setLastOrderUpdate(payload.new.id);
-          }
-          
-          if (payload.eventType === 'DELETE' && payload.old && payload.old.id) {
-            console.log(`Order deletion detected: ${payload.old.id}`);
-            setLastOrderDelete(payload.old.id);
-          }
-          
-          fetchOrderCount();
-        }
-      )
-      .subscribe();
-
-    // Set up real-time subscription for notifications table
-    const notificationsChannel = supabase
-      .channel('notifications-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'notifications' },
-        (payload) => {
-          console.log('Notification change detected:', payload);
-          if (payload.eventType === 'INSERT' && payload.new) {
-            toast({
-              title: "New Notification",
-              description: payload.new.title
-            });
-            setLastNotificationUpdate(payload.new.id);
-          }
-          fetchNotificationCount();
-        }
-      )
-      .subscribe();
-
     return () => {
-      supabase.removeChannel(ordersChannel);
-      supabase.removeChannel(notificationsChannel);
+      unsubscribeOrders();
+      unsubscribeNotifications();
     };
   }, []);
 
-  return { 
-    orderCount, 
+  return {
+    orderCount,
     notificationCount,
     salesCount,
-    lastOrderUpdate, 
+    lastOrderUpdate,
     lastOrderDelete,
-    lastNotificationUpdate 
+    lastNotificationUpdate
   };
 }

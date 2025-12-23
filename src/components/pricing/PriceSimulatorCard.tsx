@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,12 +43,12 @@ const PriceSimulatorCard = () => {
 
     const currentPrice = selectedProduct.current_price || selectedProduct.base_price || 0;
     const cost = selectedProduct.cost || currentPrice * 0.6; // Estimate if not available
-    
+
     const currentMargin = ((currentPrice - cost) / currentPrice) * 100;
     const newMargin = ((newPrice - cost) / newPrice) * 100;
-    
+
     const breakEvenUnits = Math.ceil(cost / newPrice);
-    
+
     // Simple sales estimation: lower price = higher sales
     const priceChangePercent = ((newPrice - currentPrice) / currentPrice) * 100;
     const estimatedSalesIncrease = Math.max(0, -priceChangePercent * 1.5); // Simplified elasticity
@@ -113,6 +114,7 @@ const PriceSimulatorCard = () => {
         <CardTitle className="flex items-center gap-2">
           <Calculator className="h-5 w-5 text-primary" />
           Simulador de Precios
+          <HelpTooltip kpiName="Simulador de Precios" />
         </CardTitle>
         <CardDescription>
           Simula cambios de precio y analiza el impacto antes de aplicarlos

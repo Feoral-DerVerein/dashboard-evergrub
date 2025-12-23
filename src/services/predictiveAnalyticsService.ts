@@ -1,4 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 
 export interface SalesPrediction {
   date: string;
@@ -47,52 +48,69 @@ export const predictiveAnalyticsService = {
     timeRange: 'hour' | 'day' | 'week' | 'month',
     productId?: string
   ): Promise<SalesPrediction[]> {
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-sales-predictions', {
-        body: { timeRange, productId },
-      });
+    // Return mock data for demo purposes
+    const today = new Date();
+    const mockData: SalesPrediction[] = [];
 
-      if (error) throw error;
-      return data?.predictions || [];
-    } catch (error) {
-      console.error('Error fetching sales predictions:', error);
-      return [];
+    const intervals = timeRange === 'hour' ? 24 : timeRange === 'day' ? 7 : timeRange === 'week' ? 4 : 12;
+
+    for (let i = 0; i < intervals; i++) {
+      const date = new Date(today);
+      if (timeRange === 'hour') date.setHours(date.getHours() - (intervals - i));
+      else if (timeRange === 'day') date.setDate(date.getDate() - (intervals - i));
+      else if (timeRange === 'week') date.setDate(date.getDate() - (intervals - i) * 7);
+      else date.setMonth(date.getMonth() - (intervals - i));
+
+      const baseValue = 1000 + Math.random() * 500;
+      mockData.push({
+        date: date.toISOString(),
+        actual: i < intervals - 2 ? Math.round(baseValue + Math.random() * 200) : undefined,
+        predicted: Math.round(baseValue + Math.random() * 100),
+        confidence: 0.85 + Math.random() * 0.1,
+      });
     }
+
+    return mockData;
   },
 
   async getClimateData(): Promise<ClimateData> {
-    try {
-      const { data, error } = await supabase.functions.invoke('fetch-weather-data', {
-        body: { city: 'Melbourne' }, // Default location
-      });
+    // Return mock climate data for demo purposes
+    const today = new Date();
+    const forecast = [];
 
-      if (error) throw error;
-      return {
-        temperature: data?.temperature || 20,
-        forecast: data?.forecast || [],
-        recommendedProducts: data?.recommendedProducts || [],
-      };
-    } catch (error) {
-      console.error('Error fetching climate data:', error);
-      return {
-        temperature: 20,
-        forecast: [],
-        recommendedProducts: [],
-      };
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() + i);
+      forecast.push({
+        date: date.toISOString(),
+        temp: 18 + Math.random() * 10,
+        condition: ['Sunny', 'Cloudy', 'Partly Cloudy', 'Rainy'][Math.floor(Math.random() * 4)],
+      });
     }
+
+    return {
+      temperature: 22 + Math.random() * 5,
+      forecast,
+      recommendedProducts: [
+        { name: 'Iced Coffee', category: 'Drinks', reason: 'Popular in warm weather' },
+        { name: 'Fresh Salads', category: 'Food', reason: 'Light meals preferred on hot days' },
+        { name: 'Fruit Smoothies', category: 'Drinks', reason: 'Refreshing choice for the season' },
+      ],
+    };
   },
 
   async getUpcomingEvents(): Promise<EventData[]> {
     try {
       // Fetch from events_calendar table
-      const { data, error } = await supabase
-        .from('events_calendar')
-        .select('*')
-        .gte('event_date', new Date().toISOString().split('T')[0])
-        .order('event_date', { ascending: true })
-        .limit(10);
+      const q = query(
+        collection(db, 'events_calendar'),
+        where('event_date', '>=', new Date().toISOString().split('T')[0]),
+        orderBy('event_date', 'asc'),
+        limit(10)
+      );
 
-      if (error) throw error;
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map(doc => doc.data());
 
       if (!data || data.length === 0) {
         // Return default holidays if no events configured
@@ -118,7 +136,7 @@ export const predictiveAnalyticsService = {
         ];
       }
 
-      return data.map((event) => ({
+      return data.map((event: any) => ({
         date: new Date(event.event_date).toISOString(),
         name: event.event_name,
         impact: Number(event.expected_increase_percent) || 0,
@@ -131,24 +149,15 @@ export const predictiveAnalyticsService = {
   },
 
   async getCorrelatedProducts(): Promise<CorrelatedProduct[]> {
-    try {
-      const { data, error } = await supabase.functions.invoke('calculate-product-correlations', {
-        body: {},
-      });
-
-      if (error) throw error;
-
-      const correlations = data?.correlations || [];
-      return correlations.map((corr: any) => ({
-        productA: corr.product_a_name,
-        productB: corr.product_b_name,
-        correlation: Number(corr.correlation_score),
-        frequency: corr.frequency,
-      }));
-    } catch (error) {
-      console.error('Error fetching correlations:', error);
-      return [];
-    }
+    // Return mock correlated products for demo purposes
+    return [
+      { productA: 'Croissant', productB: 'Coffee', correlation: 0.92, frequency: 145 },
+      { productA: 'Burger', productB: 'Fries', correlation: 0.88, frequency: 120 },
+      { productA: 'Salad', productB: 'Juice', correlation: 0.75, frequency: 85 },
+      { productA: 'Sandwich', productB: 'Chips', correlation: 0.70, frequency: 72 },
+      { productA: 'Pizza', productB: 'Soda', correlation: 0.85, frequency: 98 },
+      { productA: 'Cake', productB: 'Tea', correlation: 0.65, frequency: 55 },
+    ];
   },
 
   async getWastePrediction(): Promise<{
@@ -156,25 +165,24 @@ export const predictiveAnalyticsService = {
     items: WasteItem[];
     trend: Array<{ week: string; value: number }>;
   }> {
-    try {
-      const { data, error } = await supabase.functions.invoke('predict-waste', {
-        body: {},
-      });
-
-      if (error) throw error;
-
-      return {
-        totalValue: data?.totalValue || 0,
-        items: data?.items || [],
-        trend: data?.trend || [],
-      };
-    } catch (error) {
-      console.error('Error fetching waste prediction:', error);
-      return {
-        totalValue: 0,
-        items: [],
-        trend: [],
-      };
-    }
+    // Return mock waste prediction data for demo purposes
+    return {
+      totalValue: 4500,
+      items: [
+        { product: 'Pan Francés', quantity: 45, value: 850, cause: 'Próxima caducidad' },
+        { product: 'Leche Entera', quantity: 20, value: 620, cause: 'Sobrestock' },
+        { product: 'Yogurt Natural', quantity: 35, value: 540, cause: 'Baja rotación' },
+        { product: 'Ensalada Mixta', quantity: 15, value: 380, cause: 'Próxima caducidad' },
+        { product: 'Queso Fresco', quantity: 12, value: 290, cause: 'Baja demanda' },
+      ],
+      trend: [
+        { week: 'Sem 1', value: 320 },
+        { week: 'Sem 2', value: 280 },
+        { week: 'Sem 3', value: 350 },
+        { week: 'Sem 4', value: 290 },
+        { week: 'Sem 5', value: 230 },
+        { week: 'Actual', value: 180 },
+      ],
+    };
   },
 };

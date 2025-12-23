@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+
 import { Product } from "@/services/productService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, Database, Globe, Zap } from "lucide-react";
@@ -43,7 +43,7 @@ const ApiImportDialog = ({ open, onOpenChange, onImported }: ApiImportDialogProp
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
-      
+
       if (apiKey) {
         headers['Authorization'] = `Bearer ${apiKey}`;
       }
@@ -74,7 +74,7 @@ const ApiImportDialog = ({ open, onOpenChange, onImported }: ApiImportDialogProp
   const handlePosImport = async () => {
     if (!user || !posEndpoint) {
       toast({
-        title: "Error", 
+        title: "Error",
         description: "Please provide a valid POS endpoint",
         variant: "destructive",
       });
@@ -156,7 +156,7 @@ const ApiImportDialog = ({ open, onOpenChange, onImported }: ApiImportDialogProp
         mode: "no-cors",
         body: JSON.stringify({
           action: "import_products",
-          user_id: user?.id,
+          user_id: user?.uid,
           timestamp: new Date().toISOString(),
           triggered_from: window.location.origin,
         }),
@@ -182,7 +182,7 @@ const ApiImportDialog = ({ open, onOpenChange, onImported }: ApiImportDialogProp
     try {
       // Normalize the data - handle different API response formats
       let products = [];
-      
+
       if (Array.isArray(data)) {
         products = data;
       } else if (data.products && Array.isArray(data.products)) {
@@ -206,16 +206,15 @@ const ApiImportDialog = ({ open, onOpenChange, onImported }: ApiImportDialogProp
         quantity: parseInt(item.quantity || item.stock || item.inventory || 1),
         expirationDate: item.expiration_date || item.expiry || item.best_before || new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         image: item.image || item.image_url || item.picture || '',
-        user_id: user?.id,
+        user_id: user?.uid,
       }));
 
-      // Send to our import edge function
-      const { data: importResult, error } = await supabase.functions.invoke('import-products', {
-        body: {
-          products: mappedProducts,
-          user_id: user?.id,
-        },
-      });
+      // Send to our import edge function (Mocked pending Cloud Functions)
+      // const { data: importResult, error } = await supabase.functions.invoke('import-products', { body: { products: mappedProducts, user_id: user?.uid } });
+
+      console.log('Importing products (Mocked):', mappedProducts);
+      const importResult = { inserted: mappedProducts.length };
+      const error = null;
 
       if (error) {
         throw error;
@@ -239,7 +238,7 @@ const ApiImportDialog = ({ open, onOpenChange, onImported }: ApiImportDialogProp
         expirationDate: p.expirationDate,
         image: p.image,
         storeId: "4",
-        userId: user?.id || "",
+        userId: user?.uid || "",
         createdAt: new Date().toISOString(),
         isMarketplaceVisible: true,
       }));

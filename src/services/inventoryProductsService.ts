@@ -1,5 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-
 export interface InventoryProduct {
   id: string;
   product_id: string;
@@ -18,90 +16,136 @@ export interface InventoryProduct {
   updated_at: string;
 }
 
+// Mock Data Store Keys
+const STORAGE_KEY_INVENTORY = 'mock_inventory_products';
+
+const getMockInventory = (): InventoryProduct[] => {
+  const stored = localStorage.getItem(STORAGE_KEY_INVENTORY);
+  if (stored) return JSON.parse(stored);
+
+  // Seed data from previous hardcoded values
+  const seedData = [
+    {
+      id: '1',
+      product_id: '1',
+      product_name: 'Croissant de Almendra',
+      category: 'Panadería',
+      price: 4.50,
+      cost: 2.25,
+      stock_quantity: 45,
+      supplier: 'Panadería Local',
+      barcode: '8412345678901',
+      arrival_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      expiration_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+      location: { zone: 'A', shelf: 1 },
+      user_id: 'user-1',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      product_id: '2',
+      product_name: 'Café Latte Premium',
+      category: 'Bebidas',
+      price: 5.00,
+      cost: 1.80,
+      stock_quantity: 120,
+      supplier: 'Café Importado S.A.',
+      barcode: '8412345678902',
+      arrival_date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      expiration_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      location: { zone: 'B', shelf: 3 },
+      user_id: 'user-1',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: '3',
+      product_id: '3',
+      product_name: 'Ensalada César Fresca',
+      category: 'Comida',
+      price: 12.00,
+      cost: 5.50,
+      stock_quantity: 15,
+      supplier: 'Vegetales Frescos',
+      barcode: '8412345678903',
+      arrival_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      expiration_date: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+      location: { zone: 'C', shelf: 2 },
+      user_id: 'user-1',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: '4',
+      product_id: '4',
+      product_name: 'Yogurt Natural Orgánico',
+      category: 'Lácteos',
+      price: 3.50,
+      cost: 1.50,
+      stock_quantity: 35,
+      supplier: 'Lácteos del Campo',
+      barcode: '8412345678904',
+      arrival_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      expiration_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+      location: { zone: 'D', shelf: 1 },
+      user_id: 'user-1',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: '5',
+      product_id: '5',
+      product_name: 'Sandwich Vegetal',
+      category: 'Comida',
+      price: 8.00,
+      cost: 3.00,
+      stock_quantity: 22,
+      supplier: 'Cocina Central',
+      barcode: '8412345678905',
+      arrival_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      expiration_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      location: { zone: 'A', shelf: 2 },
+      user_id: 'user-1',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: '6',
+      product_id: '6',
+      product_name: 'Tarta de Manzana',
+      category: 'Postres',
+      price: 6.50,
+      cost: 2.80,
+      stock_quantity: 8,
+      supplier: 'Pastelería Artesanal',
+      barcode: '8412345678906',
+      arrival_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      expiration_date: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
+      location: { zone: 'E', shelf: 1 },
+      user_id: 'user-1',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+  ];
+  localStorage.setItem(STORAGE_KEY_INVENTORY, JSON.stringify(seedData));
+  return seedData;
+};
+
 export const inventoryProductsService = {
   async getInventoryProducts(userId: string): Promise<InventoryProduct[]> {
-    try {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        //         .eq('userid', userId)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching inventory products:", error);
-        throw error;
-      }
-
-      return (data || []).map((product) => ({
-        id: product.id.toString(),
-        product_id: product.id.toString(),
-        product_name: product.name,
-        category: product.category,
-        price: Number(product.price),
-        cost: Number(product.original_price || product.price),
-        stock_quantity: product.quantity,
-        supplier: product.brand || undefined,
-        barcode: product.ean || product.sku || undefined,
-        arrival_date: product.created_at,
-        expiration_date: product.expirationdate,
-        location: product.pickup_location || undefined,
-        user_id: product.userid,
-        created_at: product.created_at,
-        updated_at: product.created_at,
-      }));
-    } catch (error) {
-      console.error("Error in getInventoryProducts:", error);
-      return [];
-    }
+    return getMockInventory().filter(p => p.user_id === userId);
   },
 
   async getInventoryProductById(id: string): Promise<InventoryProduct | null> {
-    try {
-      const { data, error } = await supabase.from("products").select("*").eq("id", parseInt(id)).single();
-
-      if (error) {
-        console.error("Error fetching inventory product:", error);
-        return null;
-      }
-
-      if (!data) return null;
-
-      return {
-        id: data.id.toString(),
-        product_id: data.id.toString(),
-        product_name: data.name,
-        category: data.category,
-        price: Number(data.price),
-        cost: Number(data.original_price || data.price),
-        stock_quantity: data.quantity,
-        supplier: data.brand || undefined,
-        barcode: data.ean || data.sku || undefined,
-        arrival_date: data.created_at,
-        expiration_date: data.expirationdate,
-        location: data.pickup_location || undefined,
-        user_id: data.userid,
-        created_at: data.created_at,
-        updated_at: data.created_at,
-      };
-    } catch (error) {
-      console.error("Error in getInventoryProductById:", error);
-      return null;
-    }
+    const products = getMockInventory();
+    return products.find(p => p.id === id) || null;
   },
 
   async deleteInventoryProduct(id: string): Promise<boolean> {
-    try {
-      const { error } = await supabase.from("products").delete().eq("id", parseInt(id));
-
-      if (error) {
-        console.error("Error deleting inventory product:", error);
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Error in deleteInventoryProduct:", error);
-      return false;
-    }
+    const products = getMockInventory();
+    const newProducts = products.filter(p => p.id !== id);
+    localStorage.setItem(STORAGE_KEY_INVENTORY, JSON.stringify(newProducts));
+    return true;
   },
 };

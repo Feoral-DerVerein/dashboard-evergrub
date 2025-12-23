@@ -3,7 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/firebase";
+import { doc, updateDoc, setDoc } from "firebase/firestore";
 
 interface CompleteProfileProps {
   open: boolean;
@@ -21,7 +22,7 @@ const CompleteProfile = ({ open, onComplete, userId, email }: CompleteProfilePro
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!phoneNumber || !country || !businessType) {
       toast({
         title: "Error",
@@ -33,22 +34,23 @@ const CompleteProfile = ({ open, onComplete, userId, email }: CompleteProfilePro
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          phone: phoneNumber,
-          country: country,
-          business_type: businessType
-        })
-        .eq('id', userId);
+      // Update user profile in Firestore
+      const userRef = doc(db, 'users', userId);
 
-      if (error) throw error;
+      // Using setDoc with merge to ensure document exists
+      await setDoc(userRef, {
+        phone: phoneNumber,
+        country: country,
+        business_type: businessType,
+        profile_completed: true,
+        updated_at: new Date().toISOString()
+      }, { merge: true });
 
       toast({
         title: "Profile completed",
         description: "Welcome to Negentropy!"
       });
-      
+
       onComplete();
     } catch (error: any) {
       console.error("Error updating profile:", error);
@@ -63,7 +65,7 @@ const CompleteProfile = ({ open, onComplete, userId, email }: CompleteProfilePro
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={() => { }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Complete Your Profile</DialogTitle>
@@ -71,7 +73,7 @@ const CompleteProfile = ({ open, onComplete, userId, email }: CompleteProfilePro
             Please provide additional information to complete your registration
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Input
@@ -82,7 +84,7 @@ const CompleteProfile = ({ open, onComplete, userId, email }: CompleteProfilePro
               required
             />
           </div>
-          
+
           <div>
             <Input
               type="text"
@@ -92,7 +94,7 @@ const CompleteProfile = ({ open, onComplete, userId, email }: CompleteProfilePro
               required
             />
           </div>
-          
+
           <div>
             <Input
               type="text"
@@ -103,8 +105,8 @@ const CompleteProfile = ({ open, onComplete, userId, email }: CompleteProfilePro
             />
           </div>
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full"
             disabled={loading}
           >

@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Función auxiliar para verificar autenticación
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Auxiliar para verificar rol de admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Colección de Usuarios: Solo el propio usuario puede leer/escribir su perfil
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Stores/Locations: Lectura pública (para login), escritura solo Admin
+    match /store_profiles/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Pedidos y Ventas: Solo usuarios autenticados de la misma organización
+    match /orders/{orderId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Auditoría (Logs inmutables): Solo crear, NUNCA borrar ni editar
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Inmutabilidad por ley
+    }
+
+    // Configuración del sistema
+    match /system_config/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+}

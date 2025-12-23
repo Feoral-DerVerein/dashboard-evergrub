@@ -43,8 +43,14 @@ export const DynamicGreeting = () => {
     const interval = setInterval(updateGreeting, 60000);
     return () => clearInterval(interval);
   }, [user]);
-  return <div className="text-center">
-      
-      
-    </div>;
+  return (
+    <div className="text-center space-y-2 mb-8">
+      <h1 className="text-4xl font-bold tracking-tight text-gray-900 animate-in fade-in slide-in-from-bottom-3 duration-500">
+        {greeting}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">{userName}</span>
+      </h1>
+      <p className="text-lg text-gray-500 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+        How can I help you optimize your inventory today?
+      </p>
+    </div>
+  );
 };

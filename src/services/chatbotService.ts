@@ -1,4 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
+import { db, auth } from '@/lib/firebase';
+import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { ChatIntent, ChatAnalytics, ChatbotResponse } from '@/types/chatbot.types';
 import { BusinessCardData } from '@/components/chat/BusinessCards';
 
@@ -6,90 +7,109 @@ class ChatbotService {
   // Intent analysis - detect what the user is asking about
   analyzeIntent(message: string): ChatIntent {
     const lowerMessage = message.toLowerCase();
-    
+
     // Expiring products keywords - enhanced detection
-    if (lowerMessage.includes('expir') || lowerMessage.includes('expire') || 
-        lowerMessage.includes('due') || lowerMessage.includes('soon') ||
-        lowerMessage.includes('surplus') || lowerMessage.includes('venc') ||
-        lowerMessage.includes('caduc')) {
+    if (lowerMessage.includes('expir') || lowerMessage.includes('expire') ||
+      lowerMessage.includes('due') || lowerMessage.includes('soon') ||
+      lowerMessage.includes('surplus') || lowerMessage.includes('venc') ||
+      lowerMessage.includes('caduc')) {
       return 'expiring_products';
     }
-    
+
     // Sales analysis keywords
     if (lowerMessage.includes('sales') || lowerMessage.includes('revenue') ||
-        lowerMessage.includes('income') || lowerMessage.includes('transact')) {
+      lowerMessage.includes('income') || lowerMessage.includes('transact')) {
       return 'sales_analysis';
     }
-    
+
     // Reports keywords
     if (lowerMessage.includes('report') || lowerMessage.includes('nsw') ||
-        lowerMessage.includes('epa') || lowerMessage.includes('compliance')) {
+      lowerMessage.includes('epa') || lowerMessage.includes('compliance')) {
       return 'reports_status';
     }
-    
+
     // Inventory keywords
     if (lowerMessage.includes('inventory') || lowerMessage.includes('stock') ||
-        lowerMessage.includes('product') || lowerMessage.includes('quantity')) {
+      lowerMessage.includes('product') || lowerMessage.includes('quantity')) {
       return 'inventory_status';
     }
-    
+
     // Business metrics
     if (lowerMessage.includes('metric') || lowerMessage.includes('statistic') ||
-        lowerMessage.includes('performance') || lowerMessage.includes('analytics')) {
+      lowerMessage.includes('performance') || lowerMessage.includes('analytics')) {
       return 'business_metrics';
     }
-    
+
     // Waste reduction
     if (lowerMessage.includes('waste') || lowerMessage.includes('reduction') ||
-        lowerMessage.includes('co2') || lowerMessage.includes('impact')) {
+      lowerMessage.includes('co2') || lowerMessage.includes('impact')) {
       return 'waste_reduction';
     }
-    
+
     return 'general_help';
   }
 
   // Get real-time analytics from database
   async getAnalytics(): Promise<ChatAnalytics> {
     try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not authenticated");
+
       // Get products data
-      const { data: products } = await supabase
-        .from('products')
-        .select('*')
-        .eq('userid', (await supabase.auth.getUser()).data.user?.id);
+      const productsQuery = query(collection(db, 'products'), where('tenant_id', '==', user.uid));
+      const productsSnapshot = await getDocs(productsQuery);
+      const products = productsSnapshot.docs.map(d => d.data());
 
       // Get sales data for this week
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
-      
-      const { data: sales } = await supabase
-        .from('sales')
-        .select('amount, products, created_at')
-        .gte('created_at', weekAgo.toISOString());
+      const weekAgoStr = weekAgo.toISOString();
+
+      // Firestore query for sales >= weekAgoStr
+      // Assuming 'created_at' field exists and is string ISO or Timestamp. Standardizing on string ISO for now based on imports.
+      const salesQuery = query(
+        collection(db, 'sales'),
+        where('created_at', '>=', weekAgoStr)
+        // Note: In Firestore composite index needed for this if filtering by tenant_id too.
+        // For simplicity I'll fetch recent sales and filter in memory if volume is low, 
+        // or add tenant_id filter. Let's add tenant_id filter.
+      );
+      // Wait, complex query needs index. 
+      // I'll try simple query filter where 'tenant_id' == uid
+      // Then filter date in memory to avoid index requirement block.
+      const salesRef = collection(db, 'sales');
+      const qSales = query(salesRef, where('tenant_id', '==', user.uid));
+      const salesSnapshot = await getDocs(qSales);
+
+      const sales = salesSnapshot.docs
+        .map(d => d.data())
+        .filter(s => s.created_at >= weekAgoStr);
 
       // Calculate expiring products (next 3 days)
       const threeDaysFromNow = new Date();
       threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-      
-      const expiringProducts = products?.filter(product => {
-        if (!product.expirationdate) return false;
-        const expDate = new Date(product.expirationdate);
+
+      const expiringProducts = products.filter(product => {
+        if (!product.expiration_date) return false;
+        const expDate = new Date(product.expiration_date);
         return expDate <= threeDaysFromNow && expDate >= new Date();
-      }) || [];
+      });
 
       // Calculate sales total
-      const salesTotal = sales?.reduce((sum, sale) => sum + (sale.amount || 0), 0) || 0;
+      const salesTotal = sales.reduce((sum, sale) => sum + (sale.amount || 0), 0);
 
       // Category analysis
       const categoryCount: Record<string, number> = {};
-      products?.forEach(product => {
-        categoryCount[product.category] = (categoryCount[product.category] || 0) + 1;
+      products.forEach(product => {
+        const cat = product.category || 'Uncategorized';
+        categoryCount[cat] = (categoryCount[cat] || 0) + 1;
       });
 
-      const totalProducts = products?.length || 0;
+      const totalProducts = products.length;
       const topCategories = Object.entries(categoryCount)
         .map(([name, count]) => ({
           name,
-          percentage: Math.round((count / totalProducts) * 100)
+          percentage: totalProducts > 0 ? Math.round((count / totalProducts) * 100) : 0
         }))
         .sort((a, b) => b.percentage - a.percentage)
         .slice(0, 3);
@@ -123,22 +143,22 @@ class ChatbotService {
     switch (intent) {
       case 'expiring_products':
         return await this.handleExpiringProducts(analytics);
-      
+
       case 'sales_analysis':
         return await this.handleSalesAnalysis(analytics);
-      
+
       case 'inventory_status':
         return await this.handleInventoryStatus(analytics);
-      
+
       case 'reports_status':
         return await this.handleReportsStatus(analytics);
-      
+
       case 'business_metrics':
         return await this.handleBusinessMetrics(analytics);
-      
+
       case 'waste_reduction':
         return await this.handleWasteReduction(analytics);
-      
+
       default:
         return this.handleGeneralHelp();
     }
@@ -146,7 +166,7 @@ class ChatbotService {
 
   private async handleExpiringProducts(analytics: ChatAnalytics): Promise<ChatbotResponse> {
     const { expiringProducts, topCategories } = analytics;
-    
+
     if (expiringProducts === 0) {
       return {
         message: '✅ Excellent! You have no products expiring soon (< 72 hours). Your inventory management is working very well.',
@@ -155,7 +175,7 @@ class ChatbotService {
       };
     }
 
-    const categoriesText = topCategories.length > 0 
+    const categoriesText = topCategories.length > 0
       ? `mainly in ${topCategories.map(c => c.name).join(', ')}`
       : '';
 
@@ -170,14 +190,12 @@ class ChatbotService {
   // Get expiring products with full details for cards
   async getExpiringProducts() {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = auth.currentUser;
       if (!user) return [];
 
-      const { data: products } = await supabase
-        .from('products')
-        .select('*')
-        .eq('userid', user.id)
-        .order('expirationdate', { ascending: true });
+      const q = query(collection(db, 'products'), where('tenant_id', '==', user.uid));
+      const snapshot = await getDocs(q);
+      const products = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as any));
 
       if (!products) return [];
 
@@ -186,23 +204,23 @@ class ChatbotService {
       threeDaysFromNow.setHours(now.getHours() + 72);
 
       return products
-        .filter(product => {
-          if (!product.expirationdate) return false;
-          const expDate = new Date(product.expirationdate);
+        .filter((product: any) => {
+          if (!product.expiration_date) return false;
+          const expDate = new Date(product.expiration_date);
           return expDate <= threeDaysFromNow && expDate >= now;
         })
-        .map(product => ({
+        .map((product: any) => ({
           id: product.id,
           name: product.name,
           brand: product.brand || 'N/A',
           price: product.price,
           image: product.image || '',
           category: product.category,
-          expirationDate: product.expirationdate,
+          expirationDate: product.expiration_date,
           quantity: product.quantity,
-          daysUntilExpiry: Math.ceil((new Date(product.expirationdate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+          daysUntilExpiry: Math.ceil((new Date(product.expiration_date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
         }))
-        .sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry);
+        .sort((a: any, b: any) => a.daysUntilExpiry - b.daysUntilExpiry);
     } catch (error) {
       console.error('Error getting expiring products:', error);
       return [];
@@ -211,7 +229,7 @@ class ChatbotService {
 
   private async handleSalesAnalysis(analytics: ChatAnalytics): Promise<ChatbotResponse> {
     const { salesThisWeek, topCategories } = analytics;
-    
+
     if (salesThisWeek === 0) {
       return {
         message: 'No sales recorded this week. Have you been updating your inventory? I suggest reviewing your most popular products.',
@@ -220,7 +238,7 @@ class ChatbotService {
       };
     }
 
-    const categoriesText = topCategories.length > 0 
+    const categoriesText = topCategories.length > 0
       ? `Top categories: ${topCategories.map(c => `${c.name} (${c.percentage}%)`).join(', ')}`
       : '';
 
@@ -233,7 +251,7 @@ class ChatbotService {
 
   private async handleInventoryStatus(analytics: ChatAnalytics): Promise<ChatbotResponse> {
     const { totalProducts, topCategories } = analytics;
-    
+
     if (totalProducts === 0) {
       return {
         message: 'Your inventory is empty. Time to add products! I can help you get started with some popular categories.',
@@ -242,7 +260,7 @@ class ChatbotService {
       };
     }
 
-    const categoriesText = topCategories.length > 0 
+    const categoriesText = topCategories.length > 0
       ? `Main categories: ${topCategories.map(c => `${c.name} (${c.percentage}%)`).join(', ')}`
       : '';
 
@@ -255,7 +273,7 @@ class ChatbotService {
 
   private async handleReportsStatus(analytics: ChatAnalytics): Promise<ChatbotResponse> {
     const { wasteReduced, co2Saved } = analytics;
-    
+
     return {
       message: `Environmental impact: You've reduced ${wasteReduced}kg of waste = ${co2Saved}kg CO2 saved this month. Excellent work for the environment!`,
       intent: 'reports_status',
@@ -265,7 +283,7 @@ class ChatbotService {
 
   private async handleBusinessMetrics(analytics: ChatAnalytics): Promise<ChatbotResponse> {
     const { totalProducts, salesThisWeek, expiringProducts, wasteReduced } = analytics;
-    
+
     return {
       message: `📊 Executive summary: ${totalProducts} products, $${salesThisWeek.toFixed(2)} weekly sales, ${expiringProducts} expiring products, ${wasteReduced}kg waste avoided. ${this.getBusinessAdvice(analytics)}`,
       intent: 'business_metrics',
@@ -275,7 +293,7 @@ class ChatbotService {
 
   private async handleWasteReduction(analytics: ChatAnalytics): Promise<ChatbotResponse> {
     const { wasteReduced, co2Saved, expiringProducts } = analytics;
-    
+
     return {
       message: `🌱 Sustainable impact: ${wasteReduced}kg waste avoided, ${co2Saved}kg CO2 saved. ${expiringProducts > 0 ? `Currently you have ${expiringProducts} products that need urgent attention.` : 'Excellent anti-waste management!'}`,
       intent: 'waste_reduction',
@@ -308,7 +326,7 @@ class ChatbotService {
 
   private getBusinessAdvice(analytics: ChatAnalytics): string {
     const { totalProducts, salesThisWeek, expiringProducts } = analytics;
-    
+
     if (expiringProducts > totalProducts * 0.2) {
       return 'Priority: manage expiring products.';
     }
@@ -325,20 +343,20 @@ class ChatbotService {
     switch (intent) {
       case 'expiring_products':
         if (analytics.expiringProducts > 0) {
-        cards.push({
-          id: 'expiring-alert',
-          type: 'alert',
-          title: 'Expiring Products',
-          data: {
-            count: analytics.expiringProducts,
-            urgency: 'high',
-            categories: analytics.topCategories,
-            recommendation: 'Apply 30-40% discounts or create surprise bags'
-          }
-        });
+          cards.push({
+            id: 'expiring-alert',
+            type: 'alert',
+            title: 'Expiring Products',
+            data: {
+              count: analytics.expiringProducts,
+              urgency: 'high',
+              categories: analytics.topCategories,
+              recommendation: 'Apply 30-40% discounts or create surprise bags'
+            }
+          });
         }
         break;
-        
+
       case 'sales_analysis':
         cards.push({
           id: 'sales-weekly',
@@ -352,7 +370,7 @@ class ChatbotService {
           }
         });
         break;
-        
+
       case 'waste_reduction':
         cards.push({
           id: 'environmental-impact',

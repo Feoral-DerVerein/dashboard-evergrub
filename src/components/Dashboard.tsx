@@ -1,5 +1,5 @@
 import { DynamicGreeting } from '@/components/DynamicGreeting';
-import { AladdinChatPanel } from '@/components/ai/AladdinChatPanel';
+import { NegentropyChatPanel } from '@/components/ai/NegentropyChatPanel';
 
 export const BottomNav = () => {
   return null;
@@ -13,7 +13,7 @@ const Dashboard = () => {
 
       {/* Negen AI Assistant - Main Content */}
       <div className="max-w-5xl mx-auto">
-        <AladdinChatPanel />
+        <NegentropyChatPanel />
       </div>
     </div>
   );

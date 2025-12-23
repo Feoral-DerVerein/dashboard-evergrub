@@ -1,4 +1,7 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db, auth } from '@/lib/firebase';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { storeProfileService } from './storeProfileService';
+import { weatherService, WeatherData } from './weatherService';
 
 export interface VisitorPredictionData {
   expectedVisitors: number;
@@ -8,54 +11,71 @@ export interface VisitorPredictionData {
   factors: string[];
 }
 
-interface WeatherData {
-  current: { temp: number; condition: string; };
-  forecast: Array<{ date: string; temp: number; condition: string; }>;
-}
-
 export const visitorPredictionService = {
-  async getPrediction(): Promise<VisitorPredictionData> {
+  async getPrediction(userId?: string): Promise<VisitorPredictionData> {
     try {
       const today = new Date();
       const dayOfWeek = today.getDay();
       const currentHour = today.getHours();
-      
-      console.log('🔮 Iniciando predicción de visitantes...', { dayOfWeek, currentHour });
-      
+      const effectiveUserId = userId || auth.currentUser?.uid;
+
+      console.log('🔮 Iniciando predicción de visitantes...', { dayOfWeek, currentHour, effectiveUserId });
+
+      // Get store profile for location
+      let lat = -37.8136; // Melbourne fallback
+      let lon = 144.9631;
+      let storeName = "Local";
+
+      if (effectiveUserId) {
+        const profile = await storeProfileService.getStoreProfile(effectiveUserId);
+        if (profile) {
+          storeName = profile.name;
+          if (profile.latitude && profile.longitude) {
+            lat = profile.latitude;
+            lon = profile.longitude;
+          }
+        }
+      }
+
       // Get historical orders for the last 60 days
       const sixtyDaysAgo = new Date(today);
       sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
-      
-      const { data: orders, error: ordersError } = await supabase
-        .from('orders')
-        .select('*')
-        .gte('created_at', sixtyDaysAgo.toISOString())
-        .order('created_at', { ascending: false });
 
-      if (ordersError) {
+      let orders: any[] = [];
+      try {
+        const ordersRef = collection(db, 'orders');
+        const q = query(
+          ordersRef,
+          where('created_at', '>=', sixtyDaysAgo.toISOString()),
+          orderBy('created_at', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        orders = snapshot.docs.map(d => d.data());
+      } catch (ordersError) {
         console.error('Error fetching orders:', ordersError);
       }
 
-      console.log(`📊 Órdenes históricas encontradas: ${orders?.length || 0}`);
-
       // Get upcoming events
-      const { data: events } = await supabase
-        .from('events_calendar')
-        .select('*')
-        .gte('event_date', today.toISOString().split('T')[0])
-        .lte('event_date', new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
-        .order('event_date', { ascending: true });
+      let events: any[] = [];
+      try {
+        const eventsRef = collection(db, 'events_calendar');
+        const qEvents = query(
+          eventsRef,
+          where('event_date', '>=', today.toISOString().split('T')[0]),
+          where('event_date', '<=', new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]),
+          orderBy('event_date', 'asc')
+        );
+        const eventSnapshot = await getDocs(qEvents);
+        events = eventSnapshot.docs.map(d => d.data());
+      } catch (e) {
+        console.warn("Error fetching events", e);
+      }
 
-      console.log(`📅 Eventos encontrados: ${events?.length || 0}`);
-
-      // Fetch weather data
+      // Fetch REAL weather data
       let weatherData: WeatherData | null = null;
       try {
-        const { data: weatherResponse } = await supabase.functions.invoke('fetch-weather-data', {
-          body: { city: 'Melbourne' }
-        });
-        weatherData = weatherResponse;
-        console.log('🌤️ Datos del clima obtenidos:', weatherData?.current);
+        weatherData = await weatherService.fetchWeather(lat, lon);
+        console.log(`🌤️ Datos del clima real para ${storeName}:`, weatherData?.temperature);
       } catch (weatherError) {
         console.warn('Weather data unavailable:', weatherError);
       }
@@ -66,9 +86,7 @@ export const visitorPredictionService = {
         return orderDate.toDateString() === today.toDateString();
       }) || [];
 
-      console.log(`📈 Órdenes hoy: ${ordersToday.length}`);
-
-      // Group orders by day of week and weather conditions
+      // Group orders by day of week
       const ordersByDayOfWeek = orders?.reduce((acc, order) => {
         const orderDate = new Date(order.created_at!);
         const orderDay = orderDate.getDay();
@@ -77,17 +95,13 @@ export const visitorPredictionService = {
         return acc;
       }, {} as Record<number, any[]>) || {};
 
-      // Calculate average visitors for current day of week
       const sameDayOrders = ordersByDayOfWeek[dayOfWeek] || [];
       const weeksOfData = orders && orders.length > 0 ? Math.max(1, Math.floor(orders.length / 7)) : 1;
       const avgVisitorsForDay = Math.round(sameDayOrders.length / weeksOfData) || 0;
-      
-      // Base prediction (use historical average or reasonable default)
-      const baselinePrediction = avgVisitorsForDay > 0 ? avgVisitorsForDay : (dayOfWeek === 0 || dayOfWeek === 6 ? 45 : 35);
-      
-      console.log(`🎯 Predicción base: ${baselinePrediction} (promedio día: ${avgVisitorsForDay})`)
 
-      // Find peak hour based on historical data
+      const baselinePrediction = avgVisitorsForDay > 0 ? avgVisitorsForDay : (dayOfWeek === 0 || dayOfWeek === 6 ? 45 : 35);
+
+      // Find peak hour
       const ordersByHour = orders?.reduce((acc, order) => {
         const orderDate = new Date(order.created_at!);
         const hour = orderDate.getHours();
@@ -97,10 +111,10 @@ export const visitorPredictionService = {
 
       const peakHourNum = Object.entries(ordersByHour)
         .sort(([, a], [, b]) => b - a)[0]?.[0] || 19;
-      
+
       const peakHour = `${peakHourNum}:00`;
 
-      // Calculate trend based on last 2 weeks vs previous 2 weeks
+      // Trend calculation
       const lastTwoWeeks = orders?.filter(order => {
         const orderDate = new Date(order.created_at!);
         const daysAgo = Math.floor((today.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -117,138 +131,90 @@ export const visitorPredictionService = {
       if (lastTwoWeeks > previousTwoWeeks * 1.15) trend = "up";
       else if (lastTwoWeeks < previousTwoWeeks * 0.85) trend = "down";
 
-      // Start with base prediction
       let expectedVisitors = baselinePrediction;
       let confidenceScore = orders && orders.length > 20 ? 65 : 50;
       const factors: string[] = [];
-      
-      console.log(`⚙️ Iniciando cálculos con base: ${expectedVisitors}, confianza inicial: ${confidenceScore}%`);
+
+      // Add historical reliability factor
+      if (avgVisitorsForDay > 0) {
+        factors.push(`Patrón histórico (${avgVisitorsForDay} avg)`);
+      }
 
       // Weather impact analysis
       if (weatherData) {
-        const currentTemp = weatherData.current.temp;
-        const condition = weatherData.current.condition.toLowerCase();
-        
-        // Temperature impact (optimal range 15-25°C)
+        const currentTemp = weatherData.temperature;
+        const condition = weatherData.condition.toLowerCase();
+
         if (currentTemp >= 15 && currentTemp <= 25) {
           expectedVisitors *= 1.15;
-          factors.push(`Clima ideal (${Math.round(currentTemp)}°C)`);
+          factors.push(`Clima óptimo (${currentTemp}°C)`);
           confidenceScore += 10;
-        } else if (currentTemp < 10) {
+        } else if (currentTemp < 12) {
           expectedVisitors *= 0.85;
-          factors.push(`Frío (${Math.round(currentTemp)}°C)`);
-          confidenceScore += 5;
-        } else if (currentTemp > 30) {
+          factors.push(`Frio (${currentTemp}°C)`);
+        } else if (currentTemp > 28) {
           expectedVisitors *= 0.90;
-          factors.push(`Calor (${Math.round(currentTemp)}°C)`);
-          confidenceScore += 5;
+          factors.push(`Calor (${currentTemp}°C)`);
         }
 
-        // Weather condition impact
         if (condition.includes('rain') || condition.includes('storm')) {
           expectedVisitors *= 0.75;
-          factors.push("Lluvia/Tormenta");
+          factors.push("Lluvia prevista");
           confidenceScore += 8;
-        } else if (condition.includes('sunny') || condition.includes('clear')) {
+        } else if (condition.includes('clear') || condition.includes('sunny')) {
           expectedVisitors *= 1.10;
-          factors.push("Soleado");
-          confidenceScore += 8;
+          factors.push("Día despejado");
         }
       }
 
-      // Day of week impact
+      // Day of week
       if (dayOfWeek === 0 || dayOfWeek === 6) {
         expectedVisitors *= 1.25;
         factors.push("Fin de semana");
-        confidenceScore += 5;
       } else if (dayOfWeek === 5) {
         expectedVisitors *= 1.15;
         factors.push("Viernes");
-        confidenceScore += 5;
-      } else {
-        factors.push("Día laboral");
       }
 
-      // Time of day impact
-      if (currentHour >= 18 && currentHour <= 21) {
-        expectedVisitors *= 1.20;
-        factors.push("Hora pico nocturna");
-      } else if (currentHour >= 12 && currentHour <= 14) {
-        expectedVisitors *= 1.10;
-        factors.push("Hora de almuerzo");
-      } else if (currentHour >= 6 && currentHour <= 10) {
-        expectedVisitors *= 0.95;
-        factors.push("Mañana temprana");
-      }
-
-      // Events impact
+      // Events
       const todayEvents = events?.filter(event => {
         const eventDate = new Date(event.event_date);
         return eventDate.toDateString() === today.toDateString();
       }) || [];
 
       if (todayEvents.length > 0) {
-        const highImpactEvents = todayEvents.filter(e => e.impact_level === 'high');
-        const mediumImpactEvents = todayEvents.filter(e => e.impact_level === 'medium');
-        
-        if (highImpactEvents.length > 0) {
-          expectedVisitors *= 1.40;
-          factors.push(`Evento especial: ${highImpactEvents[0].event_name}`);
-          confidenceScore += 15;
-        } else if (mediumImpactEvents.length > 0) {
-          expectedVisitors *= 1.20;
-          factors.push(`Evento: ${mediumImpactEvents[0].event_name}`);
-          confidenceScore += 10;
-        }
+        factors.push(`Evento: ${todayEvents[0].event_name}`);
+        expectedVisitors *= (todayEvents[0].impact_level === 'high' ? 1.4 : 1.2);
+        confidenceScore += 15;
       }
 
-      // Trend impact
-      if (trend === "up") {
-        expectedVisitors *= 1.08;
-        factors.push("Tendencia creciente");
-      } else if (trend === "down") {
-        expectedVisitors *= 0.92;
-        factors.push("Tendencia decreciente");
+      // Add real-time boost
+      if (ordersToday.length > 0) {
+        const completionRate = currentHour / 24;
+        const projectedFromToday = ordersToday.length / (completionRate || 0.1);
+        expectedVisitors = (expectedVisitors * 0.6) + (projectedFromToday * 0.4);
+        factors.push("Ritmo de ventas hoy");
+        confidenceScore += 10;
       }
 
-      // Add current real orders to prediction (with diminishing returns)
-      const todayBoost = Math.min(ordersToday.length, expectedVisitors * 0.3);
-      expectedVisitors += todayBoost;
-      
-      // Calculate final confidence (max 95%)
-      const dataPoints = orders?.length || 0;
-      confidenceScore += Math.min(20, dataPoints / 10);
       confidenceScore = Math.min(95, Math.max(50, confidenceScore));
-
-      // Ensure realistic range
-      const finalPrediction = Math.max(Math.round(expectedVisitors), ordersToday.length + 5);
-
-      console.log(`✅ Predicción final: ${finalPrediction} visitantes (confianza: ${Math.round(confidenceScore)}%)`);
-      console.log(`📋 Factores: ${factors.join(', ')}`);
+      const finalPrediction = Math.max(Math.round(expectedVisitors), ordersToday.length + 2);
 
       return {
         expectedVisitors: finalPrediction,
         confidence: Math.round(confidenceScore),
         peakHour,
         trend,
-        factors: factors.slice(0, 5) // Limit to top 5 factors
+        factors: factors.slice(0, 5)
       };
     } catch (error) {
-      console.error('❌ Error crítico en predicción de visitantes:', error);
-      
-      // Generate realistic fallback based on time
-      const now = new Date();
-      const hour = now.getHours();
-      const isWeekend = now.getDay() === 0 || now.getDay() === 6;
-      const baseFallback = isWeekend ? 50 : 40;
-      const hourMultiplier = hour >= 18 && hour <= 21 ? 1.2 : hour >= 12 && hour <= 14 ? 1.1 : 0.9;
-      
+      console.error('❌ Error en predicción:', error);
       return {
-        expectedVisitors: Math.round(baseFallback * hourMultiplier),
+        expectedVisitors: 40,
         confidence: 45,
         peakHour: "19:00",
         trend: "stable",
-        factors: ["Predicción estimada", isWeekend ? "Fin de semana" : "Día laboral"]
+        factors: ["Fallo de datos", "Cálculo estimado"]
       };
     }
   }

@@ -1,4 +1,20 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  writeBatch,
+  increment,
+  getDoc,
+  setDoc,
+  limit
+} from "firebase/firestore";
 
 export type Ad = {
   id: string;
@@ -38,249 +54,200 @@ export type AdCampaign = {
 export const adsService = {
   // Get all user's ads
   async getUserAds(userId: string): Promise<Ad[]> {
-    const { data, error } = await supabase
-      .from('ads')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+    try {
+      const q = query(
+        collection(db, 'ads'),
+        where('user_id', '==', userId),
+        orderBy('created_at', 'desc')
+      );
 
-    if (error) {
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Ad));
+    } catch (error) {
       console.error('Error fetching user ads:', error);
       throw error;
     }
-
-    return (data || []) as Ad[];
   },
 
   // Get all user's campaigns
   async getUserCampaigns(userId: string): Promise<AdCampaign[]> {
-    const { data, error } = await supabase
-      .from('ad_campaigns')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+    try {
+      const q = query(
+        collection(db, 'ad_campaigns'),
+        where('user_id', '==', userId),
+        orderBy('created_at', 'desc')
+      );
 
-    if (error) {
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AdCampaign));
+    } catch (error) {
       console.error('Error fetching user campaigns:', error);
       throw error;
     }
-
-    return (data || []) as AdCampaign[];
   },
 
   // Create new ad
   async createAd(ad: Omit<Ad, 'id' | 'created_at' | 'updated_at'>): Promise<Ad> {
-    const { data, error } = await supabase
-      .from('ads')
-      .insert([ad])
-      .select('*')
-      .single();
+    try {
+      const adData = {
+        ...ad,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
 
-    if (error) {
+      const docRef = await addDoc(collection(db, 'ads'), adData);
+      return { id: docRef.id, ...adData } as Ad;
+    } catch (error) {
       console.error('Error creating ad:', error);
       throw error;
     }
-
-    return data as Ad;
   },
 
   // Create new campaign
   async createCampaign(campaign: Omit<AdCampaign, 'id' | 'created_at' | 'updated_at'>): Promise<AdCampaign> {
-    const { data, error } = await supabase
-      .from('ad_campaigns')
-      .insert([campaign])
-      .select('*')
-      .single();
+    try {
+      const campaignData = {
+        ...campaign,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
 
-    if (error) {
+      const docRef = await addDoc(collection(db, 'ad_campaigns'), campaignData);
+      return { id: docRef.id, ...campaignData } as AdCampaign;
+    } catch (error) {
       console.error('Error creating campaign:', error);
       throw error;
     }
-
-    return data as AdCampaign;
   },
 
   // Update ad
   async updateAd(id: string, updates: Partial<Ad>): Promise<Ad> {
-    const { data, error } = await supabase
-      .from('ads')
-      .update(updates)
-      .eq('id', id)
-      .select('*')
-      .single();
+    try {
+      const docRef = doc(db, 'ads', id);
+      const updateData = {
+        ...updates,
+        updated_at: new Date().toISOString()
+      };
 
-    if (error) {
+      await updateDoc(docRef, updateData);
+
+      // Fetch fresh data
+      const docSnap = await getDoc(docRef);
+      return { id: docSnap.id, ...docSnap.data() } as Ad;
+    } catch (error) {
       console.error('Error updating ad:', error);
       throw error;
     }
-
-    return data as Ad;
   },
 
   // Update campaign
   async updateCampaign(id: string, updates: Partial<AdCampaign>): Promise<AdCampaign> {
-    const { data, error } = await supabase
-      .from('ad_campaigns')
-      .update(updates)
-      .eq('id', id)
-      .select('*')
-      .single();
+    try {
+      const docRef = doc(db, 'ad_campaigns', id);
+      const updateData = {
+        ...updates,
+        updated_at: new Date().toISOString()
+      };
 
-    if (error) {
+      await updateDoc(docRef, updateData);
+
+      const docSnap = await getDoc(docRef);
+      return { id: docSnap.id, ...docSnap.data() } as AdCampaign;
+    } catch (error) {
       console.error('Error updating campaign:', error);
       throw error;
     }
-
-    return data as AdCampaign;
   },
 
   // Delete ad
   async deleteAd(id: string): Promise<boolean> {
-    const { error } = await supabase
-      .from('ads')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
+    try {
+      await deleteDoc(doc(db, 'ads', id));
+      return true;
+    } catch (error) {
       console.error('Error deleting ad:', error);
       throw error;
     }
-
-    return true;
   },
 
   // Delete campaign
   async deleteCampaign(id: string): Promise<boolean> {
-    const { error } = await supabase
-      .from('ad_campaigns')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
+    try {
+      await deleteDoc(doc(db, 'ad_campaigns', id));
+      return true;
+    } catch (error) {
       console.error('Error deleting campaign:', error);
       throw error;
     }
-
-    return true;
   },
 
   // Get active ads for marketplace banner (public access)
   async getActiveMarketplaceAds(): Promise<Ad[]> {
-    const { data, error } = await supabase
-      .from('ads')
-      .select('*')
-      .eq('status', 'active')
-      .eq('ad_type', 'banner')
-      .order('created_at', { ascending: false })
-      .limit(5);
+    try {
+      const q = query(
+        collection(db, 'ads'),
+        where('status', '==', 'active'),
+        where('ad_type', '==', 'banner'),
+        orderBy('created_at', 'desc'),
+        limit(5)
+      );
 
-    if (error) {
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Ad));
+    } catch (error) {
       console.error('Error fetching marketplace ads:', error);
-      throw error;
+      return []; // Return empty array gracefully
     }
-
-    return (data || []) as Ad[];
   },
 
   // Track ad impression
   async trackImpression(adId: string): Promise<void> {
-    // Get current impressions count
-    const { data: currentAd } = await supabase
-      .from('ads')
-      .select('impressions')
-      .eq('id', adId)
-      .single();
+    try {
+      const adRef = doc(db, 'ads', adId);
 
-    if (currentAd) {
-      // Update ad impressions
-      const { error: adError } = await supabase
-        .from('ads')
-        .update({ 
-          impressions: currentAd.impressions + 1
-        })
-        .eq('id', adId);
-
-      if (adError) {
-        console.error('Error tracking impression:', adError);
-      }
-    }
-
-    // Then update analytics
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Get existing analytics or create new
-    const { data: existingAnalytics } = await supabase
-      .from('ad_analytics')
-      .select('impressions')
-      .eq('ad_id', adId)
-      .eq('date', today)
-      .single();
-
-    const newImpressions = (existingAnalytics?.impressions || 0) + 1;
-    
-    const { error: analyticsError } = await supabase
-      .from('ad_analytics')
-      .upsert({
-        ad_id: adId,
-        date: today,
-        impressions: newImpressions,
-        clicks: existingAnalytics ? undefined : 0,
-        cost: existingAnalytics ? undefined : 0
+      // Update ad stats
+      await updateDoc(adRef, {
+        impressions: increment(1)
       });
 
-    if (analyticsError) {
-      console.error('Error updating analytics:', analyticsError);
+      // Update daily analytics
+      const today = new Date().toISOString().split('T')[0];
+      const analyticsRef = doc(db, 'ad_analytics', `${adId}_${today}`);
+
+      // Using setDoc with merge to simulate upsert
+      await setDoc(analyticsRef, {
+        ad_id: adId,
+        date: today,
+        impressions: increment(1)
+      }, { merge: true });
+
+    } catch (error) {
+      console.error('Error tracking impression:', error);
     }
   },
 
   // Track ad click
   async trackClick(adId: string): Promise<void> {
-    // Get current clicks count
-    const { data: currentAd } = await supabase
-      .from('ads')
-      .select('clicks')
-      .eq('id', adId)
-      .single();
+    try {
+      const adRef = doc(db, 'ads', adId);
 
-    if (currentAd) {
-      // Update ad clicks
-      const { error: adError } = await supabase
-        .from('ads')
-        .update({ 
-          clicks: currentAd.clicks + 1
-        })
-        .eq('id', adId);
-
-      if (adError) {
-        console.error('Error tracking click:', adError);
-      }
-    }
-
-    // Then update analytics
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Get existing analytics or create new
-    const { data: existingAnalytics } = await supabase
-      .from('ad_analytics')
-      .select('clicks')
-      .eq('ad_id', adId)
-      .eq('date', today)
-      .single();
-
-    const newClicks = (existingAnalytics?.clicks || 0) + 1;
-    
-    const { error: analyticsError } = await supabase
-      .from('ad_analytics')
-      .upsert({
-        ad_id: adId,
-        date: today,
-        clicks: newClicks,
-        impressions: existingAnalytics ? undefined : 0,
-        cost: existingAnalytics ? undefined : 0
+      // Update ad stats
+      await updateDoc(adRef, {
+        clicks: increment(1)
       });
 
-    if (analyticsError) {
-      console.error('Error updating analytics:', analyticsError);
+      // Update daily analytics
+      const today = new Date().toISOString().split('T')[0];
+      const analyticsRef = doc(db, 'ad_analytics', `${adId}_${today}`);
+
+      await setDoc(analyticsRef, {
+        ad_id: adId,
+        date: today,
+        clicks: increment(1)
+      }, { merge: true });
+
+    } catch (error) {
+      console.error('Error tracking click:', error);
     }
   }
 };

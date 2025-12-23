@@ -1,28 +1,26 @@
 
 import { useState, useEffect } from 'react';
 import { grainService, UserGrainBalance, GrainTransaction } from '@/services/grainService';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 export const useGrains = () => {
   const [balance, setBalance] = useState<UserGrainBalance | null>(null);
   const [transactions, setTransactions] = useState<GrainTransaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
+  const { user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
-    const getCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+    const fetchData = async () => {
       if (user) {
-        setUserId(user.id);
         await fetchUserData(user.id);
       }
       setLoading(false);
     };
 
-    getCurrentUser();
-  }, []);
+    fetchData();
+  }, [user]);
 
   const fetchUserData = async (userIdParam: string) => {
     try {
@@ -44,19 +42,19 @@ export const useGrains = () => {
   };
 
   const refreshData = async () => {
-    if (userId) {
-      await fetchUserData(userId);
+    if (user) {
+      await fetchUserData(user.id);
     }
   };
 
   const redeemGrains = async (grains: number) => {
-    if (!userId) return;
+    if (!user) return;
 
     try {
       const cashValue = (grains / 2000) * 10; // 2000 grains = $10
-      await grainService.redeemGrains(userId, grains, cashValue);
+      await grainService.redeemGrains(user.id, grains, cashValue);
       await refreshData();
-      
+
       toast({
         title: "Redemption successful!",
         description: `You redeemed ${grains} grains for $${cashValue.toFixed(2)}`,
@@ -71,12 +69,12 @@ export const useGrains = () => {
   };
 
   const useGrainsForPurchase = async (grains: number, description: string, orderId?: string) => {
-    if (!userId) return;
+    if (!user) return;
 
     try {
-      await grainService.useGrainsForPurchase(userId, grains, description, orderId);
+      await grainService.useGrainsForPurchase(user.id, grains, description, orderId);
       await refreshData();
-      
+
       toast({
         title: "Grains used",
         description: `You used ${grains} grains for: ${description}`,

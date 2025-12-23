@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { HelpTooltip } from "@/components/dashboard/HelpTooltip";
 import { SalesForecast } from "@/services/dashboardAnalyticsService";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { TrendingUp, TrendingDown } from "lucide-react";
@@ -32,7 +33,10 @@ const SalesForecastCard = ({ data, isLoading }: SalesForecastCardProps) => {
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-foreground">{t('cards.sales_forecast.title')}</h3>
+        <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+          {t('cards.sales_forecast.title')}
+          <HelpTooltip kpiName={t('cards.sales_forecast.title')} />
+        </h3>
         <div className="flex items-center gap-2">
           {data.growthVsLastWeek >= 0 ? (
             <TrendingUp className="w-5 h-5 text-success" />

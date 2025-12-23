@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -102,7 +103,10 @@ const ExpirationAutomationCard = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Automatización por Riesgo de Expiración</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          Automatización por Riesgo de Expiración
+          <HelpTooltip kpiName="Automatización por Caducidad" />
+        </CardTitle>
         <CardDescription>
           Ajuste automático de precios según días restantes hasta expiración
         </CardDescription>

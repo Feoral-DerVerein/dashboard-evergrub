@@ -16,7 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 const Pricing = () => {
   const navigate = useNavigate();
-  const { user, session } = useAuth();
+  const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
@@ -56,11 +56,15 @@ const Pricing = () => {
       const stripe = await stripePromise;
       if (!stripe) throw new Error("Stripe failed to initialize");
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/checkout-session`, {
+      const token = await user.getIdToken();
+      // Placeholder for Firebase Cloud Function URL
+      const functionUrl = "https://us-central1-YOUR_PROJECT_ID.cloudfunctions.net/checkoutSession";
+
+      const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           priceId: STRIPE_PLANS.ALL_IN_ONE.priceId,
@@ -69,10 +73,18 @@ const Pricing = () => {
         }),
       });
 
+      if (!response.ok) {
+        // If function is not deployed yet, throw specific error or mock success if in dev
+        console.log("Function fetch failed (expected if not deployed). Mocking success.");
+        // Mock ID for testing
+        // return;
+        throw new Error("Checkout session creation failed (Cloud Function not deployed)");
+      }
+
       const { sessionId, error } = await response.json();
       if (error) throw new Error(error);
 
-      const { error: stripeError } = await stripe.redirectToCheckout({
+      const { error: stripeError } = await (stripe as any).redirectToCheckout({
         sessionId,
       });
 

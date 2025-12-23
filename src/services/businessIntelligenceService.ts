@@ -1,9 +1,10 @@
 import { BusinessCardData } from '@/components/chat/BusinessCards';
-import { supabase } from '@/integrations/supabase/client';
+
+
 import { productService, Product } from '@/services/productService';
 
 export class BusinessIntelligenceService {
-  
+
   // Process natural language queries
   static async processQuery(query: string): Promise<BusinessCardData[]> {
     const lowerQuery = query.toLowerCase();
@@ -62,50 +63,50 @@ export class BusinessIntelligenceService {
     // Detect specific product queries
     const productTerms = ['producto', 'product', 'buscar', 'search', 'find', 'show me', 'muestra', 'tengo', 'have', 'disponible', 'available'];
     const categories = ['fruit', 'fruta', 'vegetables', 'verduras', 'meat', 'carne', 'dairy', 'lácteos', 'bakery', 'panadería', 'beverage', 'bebida'];
-    
-    return productTerms.some(term => query.includes(term)) && 
-           (categories.some(cat => query.includes(cat)) || 
-            query.includes('precio') || query.includes('price') ||
-            query.includes('nombre') || query.includes('name') ||
-            query.includes('cantidad') || query.includes('quantity'));
+
+    return productTerms.some(term => query.includes(term)) &&
+      (categories.some(cat => query.includes(cat)) ||
+        query.includes('precio') || query.includes('price') ||
+        query.includes('nombre') || query.includes('name') ||
+        query.includes('cantidad') || query.includes('quantity'));
   }
 
   private static isMarketplaceQuery(query: string): boolean {
-    return query.includes('marketplace') || query.includes('market') || query.includes('mercado') || 
-           query.includes('visible') || query.includes('venta') || query.includes('sale') ||
-           query.includes('público') || query.includes('public') || query.includes('customers') || 
-           query.includes('clientes');
+    return query.includes('marketplace') || query.includes('market') || query.includes('mercado') ||
+      query.includes('visible') || query.includes('venta') || query.includes('sale') ||
+      query.includes('público') || query.includes('public') || query.includes('customers') ||
+      query.includes('clientes');
   }
 
   private static isExpiryQuery(query: string): boolean {
-    return query.includes('expir') || query.includes('expire') || query.includes('expiry') || 
-           query.includes('week') || query.includes('days') || query.includes('tomorrow') ||
-           query.includes('soon') || query.includes('best before') || query.includes('vence') ||
-           query.includes('caducidad') || query.includes('pronto');
+    return query.includes('expir') || query.includes('expire') || query.includes('expiry') ||
+      query.includes('week') || query.includes('days') || query.includes('tomorrow') ||
+      query.includes('soon') || query.includes('best before') || query.includes('vence') ||
+      query.includes('caducidad') || query.includes('pronto');
   }
 
   private static isInventoryQuery(query: string): boolean {
-    return query.includes('inventory') || query.includes('stock') || query.includes('inventario') || 
-           query.includes('quantity') || query.includes('cantidad') || query.includes('warehouse') || 
-           query.includes('almacén') || query.includes('total');
+    return query.includes('inventory') || query.includes('stock') || query.includes('inventario') ||
+      query.includes('quantity') || query.includes('cantidad') || query.includes('warehouse') ||
+      query.includes('almacén') || query.includes('total');
   }
 
   private static isLowStockQuery(query: string): boolean {
     return query.includes('low stock') || query.includes('running low') || query.includes('running out') ||
-           query.includes('restock') || query.includes('replenish') || query.includes('shortage') ||
-           query.includes('poco stock') || query.includes('agotando') || query.includes('reponer');
+      query.includes('restock') || query.includes('replenish') || query.includes('shortage') ||
+      query.includes('poco stock') || query.includes('agotando') || query.includes('reponer');
   }
 
   // Card generation methods
   private static async generateProductCards(query: string): Promise<BusinessCardData[]> {
     const cards: BusinessCardData[] = [];
-    
+
     try {
       const products = await productService.getAllProducts();
-      
+
       // Filter products based on query
       let filteredProducts = products;
-      
+
       // Filter by category
       if (query.includes('fruit') || query.includes('fruta')) {
         filteredProducts = products.filter(p => p.category.toLowerCase().includes('fruit') || p.category.toLowerCase().includes('fruta'));
@@ -118,19 +119,19 @@ export class BusinessIntelligenceService {
       } else if (query.includes('bakery') || query.includes('panadería')) {
         filteredProducts = products.filter(p => p.category.toLowerCase().includes('bakery') || p.category.toLowerCase().includes('pan'));
       }
-      
+
       // Search by name if query contains specific product names
       const searchTerms = query.split(' ').filter(term => term.length > 2);
       if (searchTerms.length > 0 && !query.includes('categoria') && !query.includes('category')) {
-        filteredProducts = products.filter(p => 
+        filteredProducts = products.filter(p =>
           searchTerms.some(term => p.name.toLowerCase().includes(term.toLowerCase()))
         );
       }
 
       filteredProducts.slice(0, 6).forEach((product, index) => {
-        const daysToExpiry = product.expirationDate ? 
+        const daysToExpiry = product.expirationDate ?
           Math.ceil((new Date(product.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
-        
+
         cards.push({
           id: `product-${index}`,
           type: 'inventory',
@@ -157,7 +158,7 @@ export class BusinessIntelligenceService {
 
   private static async generateMarketplaceCards(query: string): Promise<BusinessCardData[]> {
     const cards: BusinessCardData[] = [];
-    
+
     try {
       const products = await productService.getAllProducts();
       const marketplaceProducts = products.filter(p => p.isMarketplaceVisible);
@@ -216,10 +217,10 @@ export class BusinessIntelligenceService {
     try {
       const products = await productService.getAllProducts();
       const today = new Date();
-      
+
       const expiringProducts = products.filter(product => {
         if (!product.expirationDate) return false;
-        
+
         try {
           const expDate = new Date(product.expirationDate);
           const diffTime = expDate.getTime() - today.getTime();
@@ -229,10 +230,10 @@ export class BusinessIntelligenceService {
           return false;
         }
       }).sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
-      
+
       expiringProducts.slice(0, 4).forEach((product, index) => {
         const daysLeft = Math.ceil((new Date(product.expirationDate).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        
+
         cards.push({
           id: `expiry-${index}`,
           type: 'expiry',
@@ -244,11 +245,11 @@ export class BusinessIntelligenceService {
             price: product.price,
             category: product.category,
             daysLeft: daysLeft,
-            recommendation: daysLeft <= 1 ? 
+            recommendation: daysLeft <= 1 ?
               '🔥 Apply 50% discount immediately or donate to charity' :
               daysLeft <= 2 ?
-              '⚡ Apply 30% discount or create buy-one-get-one offer' :
-              '💡 Consider 20% discount or prominent placement'
+                '⚡ Apply 30% discount or create buy-one-get-one offer' :
+                '💡 Consider 20% discount or prominent placement'
           }
         });
       });
@@ -261,7 +262,7 @@ export class BusinessIntelligenceService {
 
   private static async generateInventoryCards(query: string): Promise<BusinessCardData[]> {
     const cards: BusinessCardData[] = [];
-    
+
     try {
       const products = await productService.getAllProducts();
       let filteredProducts = products;
@@ -284,7 +285,7 @@ export class BusinessIntelligenceService {
         const totalQuantity = filteredProducts.reduce((sum, p) => sum + p.quantity, 0);
         const totalValue = filteredProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
         const categories = [...new Set(filteredProducts.map(p => p.category))];
-        
+
         cards.push({
           id: 'inventory-summary',
           type: 'analytics',
@@ -327,11 +328,11 @@ export class BusinessIntelligenceService {
 
   private static async generateLowStockCards(): Promise<BusinessCardData[]> {
     const cards: BusinessCardData[] = [];
-    
+
     try {
       const products = await productService.getAllProducts();
       const lowStockProducts = products.filter(p => p.quantity > 0 && p.quantity <= 10);
-      
+
       lowStockProducts.slice(0, 4).forEach((product, index) => {
         cards.push({
           id: `low-stock-${index}`,
@@ -357,11 +358,11 @@ export class BusinessIntelligenceService {
 
   private static async generateGeneralOverview(): Promise<BusinessCardData[]> {
     const cards: BusinessCardData[] = [];
-    
+
     try {
       const products = await productService.getAllProducts();
       const today = new Date();
-      
+
       // Calculate key metrics
       const totalProducts = products.length;
       const marketplaceProducts = products.filter(p => p.isMarketplaceVisible).length;
@@ -377,7 +378,7 @@ export class BusinessIntelligenceService {
           return false;
         }
       }).length;
-      
+
       const totalValue = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
       const categories = [...new Set(products.map(p => p.category))];
 

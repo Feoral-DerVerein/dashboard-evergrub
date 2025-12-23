@@ -9,7 +9,8 @@ import { ActionButtons } from '@/components/chat/ActionButtons';
 import { useChatbot } from '@/hooks/useChatbot';
 import { useToast } from '@/hooks/use-toast';
 import { IntelligentNewsCards } from '@/components/kpi/IntelligentNewsCards';
-import { supabase } from '@/integrations/supabase/client';
+
+
 import { productService, Product } from '@/services/productService';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExpiringProductCard } from '@/components/chat/ExpiringProductCard';
@@ -201,7 +202,7 @@ const ChatBot = ({
 
         {/* File Upload Card - Show when no messages */}
         {messages.length === 0 && <div className="max-w-md mx-auto mb-6">
-          <ChatFileUploadCard />
+          <ChatFileUploadCard onUploadComplete={(url, name) => sendMessage(`Uploaded file: ${name}`)} />
         </div>}
 
         {/* Messages Display Area (if there are messages) */}

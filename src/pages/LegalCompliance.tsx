@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,14 +25,10 @@ const LegalCompliance = () => {
 
     const fetchDocuments = async () => {
         try {
-            const { data, error } = await supabase
-                .from('legal_documents')
-                .select('*')
-                .eq('tenant_id', user?.id)
-                .order('generated_at', { ascending: false });
-
-            if (error) throw error;
-            setDocuments(data || []);
+            const { complianceService } = await import('@/services/complianceService');
+            if (!user?.id) return;
+            const data = await complianceService.getDocuments(user.id);
+            setDocuments(data);
         } catch (error) {
             console.error("Error fetching documents:", error);
         } finally {
@@ -43,15 +38,9 @@ const LegalCompliance = () => {
 
     const handleGeneratePlan = async () => {
         try {
-            const { error } = await supabase.from('legal_documents').insert({
-                tenant_id: user?.id,
-                document_type: 'prevention_plan',
-                status: 'generating',
-                period_start: new Date().toISOString(),
-                period_end: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-            });
-
-            if (error) throw error;
+            const { complianceService } = await import('@/services/complianceService');
+            if (!user?.id) return;
+            await complianceService.generatePlan(user.id);
 
             toast.success("Prevention Plan generation started", {
                 description: "You will be notified when it is ready."

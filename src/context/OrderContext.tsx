@@ -1,6 +1,4 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export type EventOrder = {
@@ -43,7 +41,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       status: "Processing"
     }
   ]);
-  
+
   // Load saved orders from localStorage on initial render
   useEffect(() => {
     const savedMarketplaceOrders = localStorage.getItem('marketplaceOrders');
@@ -51,20 +49,20 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setMarketplaceOrders(JSON.parse(savedMarketplaceOrders));
     }
   }, []);
-  
+
   // Save orders to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('marketplaceOrders', JSON.stringify(marketplaceOrders));
   }, [marketplaceOrders]);
 
   const removeFromMarketplace = (orderId: string) => {
-    setMarketplaceOrders(prevOrders => 
+    setMarketplaceOrders(prevOrders =>
       prevOrders.filter(order => order.id !== orderId)
     );
   };
 
   return (
-    <OrderContext.Provider value={{ 
+    <OrderContext.Provider value={{
       marketplaceOrders,
       removeFromMarketplace
     }}>

@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
 import { ChevronDown, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
+// import { supabase } from '@/integrations/supabase/client'; // Removed
 
 interface ExpiringProduct {
   id: number;
@@ -34,6 +35,7 @@ const categoryIcons: Record<string, string> = {
 };
 
 export const ExpiringProductCard = ({ product, onActionComplete }: ExpiringProductCardProps) => {
+  const { user } = useAuth(); // Use Auth Context
   const [status, setStatus] = useState<'pending' | 'sent'>('pending');
   const [sentTo, setSentTo] = useState<string>('');
 
@@ -44,22 +46,20 @@ export const ExpiringProductCard = ({ product, onActionComplete }: ExpiringProdu
 
   const handleMarketplaceAction = async (marketplace: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast.error('User not authenticated');
         return;
       }
 
-      // Call edge function to publish to marketplace
-      const { data, error } = await supabase.functions.invoke('publish-to-marketplace', {
-        body: {
-          product_id: product.id,
-          marketplace_name: marketplace,
-          user_id: user.id
-        }
+      // Placeholder for Firebase Cloud Function
+      console.log('Invoking publish-to-marketplace (Mocked)', {
+        product_id: product.id,
+        marketplace_name: marketplace,
+        user_id: user.uid
       });
 
-      if (error) throw error;
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       setStatus('sent');
       setSentTo(marketplace);
@@ -80,22 +80,20 @@ export const ExpiringProductCard = ({ product, onActionComplete }: ExpiringProdu
 
   const handleDonationAction = async (organization: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast.error('User not authenticated');
         return;
       }
 
-      // Call edge function to send to donation
-      const { data, error } = await supabase.functions.invoke('send-to-donation', {
-        body: {
-          product_id: product.id,
-          organization_name: organization,
-          user_id: user.id
-        }
+      // Placeholder for Firebase Cloud Function
+      console.log('Invoking send-to-donation (Mocked)', {
+        product_id: product.id,
+        organization_name: organization,
+        user_id: user.uid
       });
 
-      if (error) throw error;
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       setStatus('sent');
       setSentTo(organization);

@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileSpreadsheet, Loader2, CheckCircle2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/lib/firebase';
+import { collection, doc, writeBatch } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import * as XLSX from 'xlsx';
 
@@ -43,7 +44,7 @@ export const ProductImportCard = () => {
   const parseExcelFile = (file: File): Promise<any[]> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         try {
           const data = e.target?.result;
@@ -64,12 +65,12 @@ export const ProductImportCard = () => {
 
   const convertExcelDate = (value: any): string => {
     if (!value) return new Date().toISOString().split('T')[0];
-    
+
     // If it's already a proper date string, return it
     if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
       return value.split('T')[0];
     }
-    
+
     // Check if it's an Excel serial number (numeric value > 1000)
     const numValue = typeof value === 'number' ? value : parseFloat(value);
     if (!isNaN(numValue) && numValue > 1000 && numValue < 100000) {
@@ -78,20 +79,20 @@ export const ProductImportCard = () => {
       const millisecondsPerDay = 24 * 60 * 60 * 1000;
       const dateMs = excelEpoch.getTime() + (numValue * millisecondsPerDay);
       const date = new Date(dateMs);
-      
+
       const year = date.getUTCFullYear();
       const month = String(date.getUTCMonth() + 1).padStart(2, '0');
       const day = String(date.getUTCDate()).padStart(2, '0');
-      
+
       return `${year}-${month}-${day}`;
     }
-    
+
     // Try to parse as date
     const parsedDate = new Date(value);
     if (!isNaN(parsedDate.getTime())) {
       return parsedDate.toISOString().split('T')[0];
     }
-    
+
     // Default to today
     return new Date().toISOString().split('T')[0];
   };
@@ -99,15 +100,15 @@ export const ProductImportCard = () => {
   const normalizeProductData = (row: any) => {
     const normalizeKey = (key: string) => key.toLowerCase().trim().replace(/\s+/g, '_');
     const normalized: any = {};
-    
+
     Object.keys(row).forEach(key => {
       const normalizedKey = normalizeKey(key);
       normalized[normalizedKey] = row[key];
     });
 
-    const rawExpirationDate = normalized.expiration_date || normalized.fecha_expiracion || 
-                              normalized.expiry_date || normalized.expirationdate || 
-                              normalized.expire_date || normalized.best_before_date;
+    const rawExpirationDate = normalized.expiration_date || normalized.fecha_expiracion ||
+      normalized.expiry_date || normalized.expirationdate ||
+      normalized.expire_date || normalized.best_before_date;
 
     return {
       name: normalized.name || normalized.nombre || normalized.producto || normalized.product || 'Sin nombre',
@@ -116,12 +117,13 @@ export const ProductImportCard = () => {
       price: parseFloat(normalized.price || normalized.precio || '0') || 0,
       quantity: parseInt(normalized.quantity || normalized.cantidad || normalized.stock || '0') || 0,
       description: normalized.description || normalized.descripcion || '',
-      expirationdate: convertExcelDate(rawExpirationDate),
+      expiration_date: convertExcelDate(rawExpirationDate),
       ean: normalized.ean || normalized.barcode || normalized.codigo_barras || null,
       sku: normalized.sku || normalized.codigo || null,
       original_price: parseFloat(normalized.original_price || normalized.precio_original || '0') || null,
       image: normalized.image || normalized.imagen || '',
-      userid: user!.id
+      user_id: user!.uid, // Changed from userid to user_id and user.id to user.uid for Firebase
+      created_at: new Date().toISOString()
     };
   };
 
@@ -148,7 +150,7 @@ export const ProductImportCard = () => {
 
     try {
       const jsonData = await parseExcelFile(selectedFile);
-      
+
       if (jsonData.length === 0) {
         toast({
           title: "Archivo vacío",
@@ -162,22 +164,31 @@ export const ProductImportCard = () => {
       console.log('📊 Datos parseados:', jsonData.length, 'filas');
 
       const products = jsonData.map(row => normalizeProductData(row));
-      
+
       console.log('📦 Productos normalizados:', products.length);
 
-      const { data, error } = await supabase
-        .from('products')
-        .insert(products)
-        .select();
+      // Batch write to Firestore (limit 500 per batch)
+      const batchSize = 500;
+      const chunks = [];
+      for (let i = 0; i < products.length; i += batchSize) {
+        chunks.push(products.slice(i, i + batchSize));
+      }
 
-      if (error) {
-        console.error('❌ Error insertando productos:', error);
-        throw error;
+      let totalAdded = 0;
+
+      for (const chunk of chunks) {
+        const batch = writeBatch(db);
+        chunk.forEach(product => {
+          const ref = doc(collection(db, 'products'));
+          batch.set(ref, product);
+        });
+        await batch.commit();
+        totalAdded += chunk.length;
       }
 
       toast({
         title: "✅ Importación exitosa",
-        description: `${data.length} productos importados correctamente`,
+        description: `${totalAdded} productos importados correctamente`,
       });
 
       setSelectedFile(null);

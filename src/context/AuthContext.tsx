@@ -1,141 +1,135 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Session, User } from '@supabase/supabase-js';
+import {
+  User,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "firebase/auth";
+import { auth, db } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import type { UserProfile, UserRole } from "@/types/dashboard";
 
+// Compatible interface with existing usage
 type AuthContextType = {
-  session: Session | null;
   user: User | null;
   loading: boolean;
-  profile: any | null; // Adding profile to context
+  profile: UserProfile | null;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  refreshProfile: () => Promise<void>; // Expose refresh function
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, data?: any) => Promise<{ error: any }>;
+  refreshProfile: () => Promise<void>;
 };
 
-// Crear el contexto con un valor por defecto para evitar errores
 const defaultAuthContext: AuthContextType = {
-  session: null,
   user: null,
   loading: true,
   profile: null,
   signOut: async () => { },
   signInWithGoogle: async () => { },
+  signIn: async () => ({ error: null }),
+  signUp: async () => ({ error: null }),
   refreshProfile: async () => { },
 };
 
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-      } else {
-        setProfile(data);
-      }
-    } catch (error) {
-      console.error('Error in fetchProfile:', error);
-    }
-  };
-
+  // Initial load
   useEffect(() => {
-    console.log("AuthProvider: initializing");
-
-    // Verificar primero si ya hay una sesión activa
-    const getInitialSession = async () => {
-      try {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
-        console.log("Initial session check:", currentSession?.user?.email || "No session");
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-
-        if (currentSession?.user) {
-          await fetchProfile(currentSession.user.id);
-        }
-      } catch (error) {
-        console.error("Error getting initial session:", error);
-      } finally {
-        setLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        await refreshProfile(currentUser.uid);
+      } else {
+        setProfile(null);
       }
-    };
-
-    getInitialSession();
-
-    // Failsafe: force loading false after 5 seconds
-    const timeout = setTimeout(() => {
-      setLoading(prev => {
-        if (prev) {
-          console.warn("Auth loading timed out, forcing false");
-          return false;
-        }
-        return prev;
-      });
-    }, 5000);
-
-    // Configurar el detector de cambios de estado de autenticación
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        console.log("Auth state changed:", event, currentSession?.user?.email || "No session");
-
-        // Sincronizar state con la sesión actual
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-
-        if (currentSession?.user) {
-          await fetchProfile(currentSession.user.id);
-        } else {
-          setProfile(null);
-        }
-      }
-    );
-
-    return () => {
-      console.log("AuthProvider: cleanup");
-      subscription.unsubscribe();
-    };
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, []);
 
-  const refreshProfile = async () => {
-    if (user) {
-      await fetchProfile(user.id);
+  const refreshProfile = async (uid?: string) => {
+    const targetUid = uid || auth.currentUser?.uid;
+    if (!targetUid) return;
+
+    try {
+      const docRef = doc(db, "profiles", targetUid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setProfile(docSnap.data() as UserProfile);
+      } else {
+        // Create default profile if not exists
+        console.warn("Profile not found in Firestore, creating default");
+        const newProfile: UserProfile = {
+          uid: targetUid,
+          email: auth.currentUser?.email || '',
+          role: 'admin' // Default to admin for now
+        };
+        await setDoc(docRef, newProfile);
+        setProfile(newProfile);
+      }
+    } catch (error) {
+      console.error("Error refreshing profile:", error);
     }
   };
 
   const signOut = async () => {
-    console.log("Signing out");
-    await supabase.auth.signOut();
-    setProfile(null);
+    await firebaseSignOut(auth);
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      return { error: null };
+    } catch (error: any) {
+      return { error: error.message };
+    }
+  };
+
+  const signUp = async (email: string, password: string, data?: any) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Create profile in Firestore
+      if (data) {
+        await setDoc(doc(db, "profiles", userCredential.user.uid), {
+          ...data,
+          email,
+          created_at: new Date().toISOString()
+        });
+      }
+      return { error: null };
+    } catch (error: any) {
+      return { error: error.message };
+    }
   };
 
   const signInWithGoogle = async () => {
-    console.log("Signing in with Google");
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin + '/dashboard',
-      },
-    });
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      console.error("Google Login Error", error);
+      alert("Error initiating Google Login: " + error.message);
+    }
   };
 
   const value = {
-    session,
     user,
     loading,
     profile,
     signOut,
     signInWithGoogle,
-    refreshProfile
+    signIn,
+    signUp,
+    refreshProfile: () => refreshProfile()
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

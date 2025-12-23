@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { autopilotService, ActionLog } from '@/services/autopilotService';
@@ -71,6 +72,7 @@ const ActionLogsCard = () => {
         <CardTitle className="flex items-center gap-2">
           <Activity className="h-5 w-5 text-primary" />
           {t('autopilot_control.action_logs.title')}
+          <HelpTooltip kpiName="Registro de Acciones" />
         </CardTitle>
         <CardDescription>
           {t('autopilot_control.action_logs.description')}

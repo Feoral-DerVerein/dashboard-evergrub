@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { NavLink, Outlet, useLocation, Link } from "react-router-dom";
 import { BarChart3, LogOut, Package, Truck, Plug, FileText, Settings, CreditCard, User, MessageSquare, Brain, Bot, Scale, Heart, Globe, Check, Network } from "lucide-react";
 
@@ -15,6 +16,7 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,10 +28,12 @@ import {
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { NegentropyFloatingWidget } from "@/components/ai/NegentropyFloatingWidget";
+import { useAuth } from "@/context/AuthContext";
+import { KitDigitalFooter } from "@/components/layout/KitDigitalFooter";
 
 
 function AppSidebar() {
@@ -37,6 +41,7 @@ function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { signOut } = useAuth();
 
   const languages = [
     { code: 'en', name: 'English' },
@@ -52,16 +57,14 @@ function AppSidebar() {
   const isCollapsed = state === "collapsed";
 
   const menuItems = [
-    { title: t("sidebar.chat"), url: "/aladdin", icon: MessageSquare },
     { title: t("sidebar.performance"), url: "/kpi", icon: BarChart3 },
     { title: t("sidebar.predictive_analytics"), url: "/predictive-analytics", icon: Brain },
-    { title: t("sidebar.autopilot"), url: "/autopilot", icon: Bot },
     { title: t("sidebar.inventory_products"), url: "/inventory-products", icon: Package },
     { title: t("sidebar.impact_compliance"), url: "/legal", icon: Scale },
   ];
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     toast.success(t("common.logout") + " successfully"); // Small adjustment for now, can be fully translated later
     navigate("/login");
   };
@@ -69,12 +72,13 @@ function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-gray-100 bg-white">
       <SidebarHeader className="border-b border-gray-100 p-4 bg-white">
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center gap-2">
           <img
-            src="/lovable-uploads/57a9a6e0-d484-424e-b78c-34034334c2f7.png"
-            alt="Main Logo"
-            className={isCollapsed ? "h-8 w-8 object-contain" : "h-10 w-auto"}
+            src="/lovable-uploads/negentropy-icon-blue-sparkles.png"
+            alt="Negentropy AI"
+            className={isCollapsed ? "h-8 w-8 object-contain" : "h-8 w-8 object-contain"}
           />
+          {!isCollapsed && <span className="font-bold text-xl tracking-tight">Negentropy AI</span>}
         </div>
       </SidebarHeader>
 
@@ -181,21 +185,36 @@ function AppSidebar() {
 }
 
 const AppLayout = () => {
+  const { user } = useAuth();
   const location = useLocation();
+
+  useEffect(() => {
+    if (user?.uid) {
+      // Trigger background sync for all active integrations
+      import("@/services/syncManager").then(({ syncManager }) => {
+        syncManager.performAutoSync(user.uid);
+      });
+    }
+  }, [user?.uid]);
 
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-gray-50">
         <AppSidebar />
-        <main className="flex-1 glass-card">
-          <div className="h-14 border-b border-gray-100 flex items-center px-4 bg-white/80 backdrop-blur-sm sticky top-0 z-10 justify-between">
+        <main className="flex-1 flex flex-col glass-card min-h-screen">
+          <div className="h-14 border-b border-gray-100 flex items-center px-4 bg-white/80 backdrop-blur-sm sticky top-0 z-10 justify-between flex-shrink-0">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
             </div>
           </div>
-          <Outlet />
+          <div className="flex-1 p-4">
+            <Outlet />
+          </div>
+          <KitDigitalFooter />
         </main>
       </div>
+      <NegentropyFloatingWidget />
+      <OfflineIndicator />
     </SidebarProvider>
   );
 };

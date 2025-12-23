@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { db, auth } from '@/lib/firebase';
+import { collection, query, where, getDocs, limit, orderBy } from 'firebase/firestore';
 import { startOfWeek, startOfMonth, subWeeks, subMonths, format } from 'date-fns';
 
 export interface MetricValue {
@@ -33,82 +34,78 @@ const calculateChange = (current: number, previous: number): number => {
   return ((current - previous) / previous) * 100;
 };
 
-async function fetchMetrics(userId: string, period: 'week' | 'month'): Promise<MetricsData> {
+export async function fetchMetrics(userId: string, period: 'week' | 'month'): Promise<MetricsData> {
   const now = new Date();
   const periodStart = period === 'week' ? startOfWeek(now) : startOfMonth(now);
-  const previousPeriodStart = period === 'week' 
+  const previousPeriodStart = period === 'week'
     ? startOfWeek(subWeeks(now, 1))
     : startOfMonth(subMonths(now, 1));
 
   const currentDate = format(periodStart, 'yyyy-MM-dd');
   const previousDate = format(previousPeriodStart, 'yyyy-MM-dd');
 
-  // Fetch sales metrics from new tables
-  const { data: currentSalesMetrics } = await supabase
-    .from('sales_metrics')
-    .select('total_sales, transactions, profit')
-    .eq('user_id', userId)
-    .gte('date', currentDate)
-    .maybeSingle();
+  // Helper function to fetch single metric doc
+  const fetchMetricDoc = async (collectionName: string, dateStr: string) => {
+    const q = query(
+      collection(db, collectionName),
+      where('user_id', '==', userId),
+      where('date', '>=', dateStr),
+      orderBy('date', 'desc'),
+      limit(1)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.empty ? null : snapshot.docs[0].data();
+  };
 
-  const { data: previousSalesMetrics } = await supabase
-    .from('sales_metrics')
-    .select('total_sales, transactions, profit')
-    .eq('user_id', userId)
-    .gte('date', previousDate)
-    .lt('date', currentDate)
-    .maybeSingle();
+  // Helper for metrics in date range (previous period)
+  const fetchPreviousMetricDoc = async (collectionName: string, startDate: string, endDate: string) => {
+    const q = query(
+      collection(db, collectionName),
+      where('user_id', '==', userId),
+      where('date', '>=', startDate),
+      where('date', '<', endDate),
+      orderBy('date', 'desc'),
+      limit(1)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.empty ? null : snapshot.docs[0].data();
+  };
+
+  // Fetch sales metrics
+  const currentSalesMetrics = await fetchMetricDoc('sales_metrics', currentDate);
+  const previousSalesMetrics = await fetchPreviousMetricDoc('sales_metrics', previousDate, currentDate);
 
   // Fetch sustainability metrics
-  const { data: currentSustainability } = await supabase
-    .from('sustainability_metrics')
-    .select('co2_saved, waste_reduced, food_waste_kg')
-    .eq('user_id', userId)
-    .gte('date', currentDate)
-    .maybeSingle();
-
-  const { data: previousSustainability } = await supabase
-    .from('sustainability_metrics')
-    .select('co2_saved, waste_reduced, food_waste_kg')
-    .eq('user_id', userId)
-    .gte('date', previousDate)
-    .lt('date', currentDate)
-    .maybeSingle();
+  const currentSustainability = await fetchMetricDoc('sustainability_metrics', currentDate);
+  const previousSustainability = await fetchPreviousMetricDoc('sustainability_metrics', previousDate, currentDate);
 
   // Fetch customer metrics
-  const { data: currentCustomer } = await supabase
-    .from('customer_metrics')
-    .select('conversion_rate, return_rate, avg_order_value')
-    .eq('user_id', userId)
-    .gte('date', currentDate)
-    .maybeSingle();
-
-  const { data: previousCustomer } = await supabase
-    .from('customer_metrics')
-    .select('conversion_rate, return_rate, avg_order_value')
-    .eq('user_id', userId)
-    .gte('date', previousDate)
-    .lt('date', currentDate)
-    .maybeSingle();
+  const currentCustomer = await fetchMetricDoc('customer_metrics', currentDate);
+  const previousCustomer = await fetchPreviousMetricDoc('customer_metrics', previousDate, currentDate);
 
   // Fetch surprise bags metrics
-  const { data: surpriseBagsMetrics, count: activeBagsCount } = await supabase
-    .from('surprise_bags_metrics')
-    .select('discount_price, status', { count: 'exact' })
-    .eq('user_id', userId)
-    .eq('status', 'available');
+  const bagsQ = query(
+    collection(db, 'surprise_bags_metrics'),
+    where('user_id', '==', userId),
+    where('status', '==', 'available')
+  );
+  const bagsSnapshot = await getDocs(bagsQ);
+  const surpriseBagsMetrics = bagsSnapshot.docs.map(d => d.data());
+  const activeBagsCount = bagsSnapshot.size;
 
-  const surpriseBagRevenue = (surpriseBagsMetrics || [])
+  const surpriseBagRevenue = surpriseBagsMetrics
     .reduce((sum, bag) => sum + Number(bag.discount_price), 0);
 
   // Fetch grain transactions for operational savings
-  const { data: grainTransactions } = await supabase
-    .from('grain_transactions')
-    .select('amount, cash_value, type')
-    .eq('user_id', userId)
-    .gte('created_at', periodStart.toISOString());
+  const grainQ = query(
+    collection(db, 'grain_transactions'),
+    where('user_id', '==', userId),
+    where('created_at', '>=', periodStart.toISOString())
+  );
+  const grainSnapshot = await getDocs(grainQ);
+  const grainTransactions = grainSnapshot.docs.map(d => d.data());
 
-  const totalSavings = (grainTransactions || [])
+  const totalSavings = grainTransactions
     .filter(t => t.type === 'earned')
     .reduce((sum, t) => sum + Number(t.cash_value || 0), 0);
 
@@ -233,11 +230,17 @@ export function useMetricsData(period: 'week' | 'month' = 'week') {
   return useQuery({
     queryKey: ['metrics', period],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-      return fetchMetrics(user.id, period);
+      const user = auth.currentUser;
+      if (!user) {
+        // If query runs too fast on load, retry or throw which React Query will handle.
+        // Better: check if loading from useAuth, but here we are in a hook using query.
+        // We can return empty metrics or throw.
+        throw new Error("Authenticating...");
+      }
+      return fetchMetrics(user.uid, period);
     },
     refetchInterval: 30000, // Refresh every 30 seconds
     staleTime: 20000,
+    retry: 1
   });
 }

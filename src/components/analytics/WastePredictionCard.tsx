@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { HelpTooltip } from '@/components/dashboard/HelpTooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { predictiveAnalyticsService, WasteItem } from '@/services/predictiveAnalyticsService';
@@ -57,7 +58,10 @@ const WastePredictionCard = () => {
       <CardHeader>
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-destructive" />
-          <CardTitle>Waste Prediction</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            Waste Prediction
+            <HelpTooltip kpiName="Predicción de Mermas" />
+          </CardTitle>
         </div>
         <CardDescription>
           Estimated losses for this week if no action is taken
@@ -104,13 +108,13 @@ const WastePredictionCard = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
-                <XAxis 
-                  dataKey="week" 
+                <XAxis
+                  dataKey="week"
                   tick={{ fill: 'hsl(var(--muted-foreground))' }}
                   tickLine={{ stroke: 'hsl(var(--border))' }}
                   className="text-xs"
                 />
-                <YAxis 
+                <YAxis
                   tick={{ fill: 'hsl(var(--muted-foreground))' }}
                   tickLine={{ stroke: 'hsl(var(--border))' }}
                   className="text-xs"

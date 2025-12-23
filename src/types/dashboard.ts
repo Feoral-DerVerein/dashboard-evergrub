@@ -3,6 +3,17 @@
  * Central type definitions for all dashboard data
  */
 
+export type UserRole = 'admin' | 'manager' | 'staff';
+
+export interface UserProfile {
+    uid: string;
+    email: string;
+    role: UserRole;
+    location_nick?: string; // Assigned location for managers/staff
+    displayName?: string;
+    photoURL?: string;
+}
+
 export interface KPIMetric {
     title: string;
     value: string | number;
@@ -29,7 +40,8 @@ export interface Integration {
     name: string;
     provider: 'square' | 'deliverect' | 'custom' | 'weather' | 'commodities' | 'analytics';
     status: 'connected' | 'disconnected' | 'error' | 'active';
-    lastSync: Date | null;
+    lastSync: Date | null | string;
+    location_nick?: string;
     icon?: string;
     color?: string;
     bg?: string;
@@ -88,9 +100,53 @@ export interface POSTransaction {
 }
 
 export interface POSItem {
-    productId: number;
+    productId: number | string;
     productName: string;
     quantity: number;
     unitPrice: number;
     totalPrice: number;
+    taxRate?: number; // e.g. 21 for 21% IVA
+}
+
+export interface TaxItem {
+    taxRate: number;
+    taxBase: number;
+    taxAmount: number;
+}
+
+export interface Invoice {
+    id: string;
+    invoiceNumber: string; // e.g. F2023-0001
+    date: Date;
+    dueDate?: Date;
+    customerId?: string;
+    customerName: string;
+    customerTaxId: string; // NIF/CIF
+    items: POSItem[];
+    taxDetails: TaxItem[];
+    totalTaxableAmount: number;
+    totalTaxAmount: number;
+    totalAmount: number;
+    status: 'draft' | 'issued' | 'paid' | 'cancelled';
+    isFacturaEGenerated: boolean;
+    xmlSegment?: string; // Simplified segment for storage
+    digitalSignature?: string; // Mock signature hash
+}
+
+export interface PurchaseOrderItem {
+    productId: string | number;
+    name: string;
+    suggestedQuantity: number;
+    estimatedPrice: number;
+}
+
+export interface PurchaseOrder {
+    id: string;
+    date: Date;
+    supplierId?: string;
+    supplierName: string;
+    items: PurchaseOrderItem[];
+    totalEstimatedAmount: number;
+    status: 'draft' | 'pending' | 'approved' | 'rejected';
+    aiRationale: string;
 }

@@ -1,51 +1,38 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { storage } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 export const productImageService = {
-  // Subir imagen de producto
-  async uploadProductImage(file: File | Blob, path: string): Promise<string> {
+  async uploadImage(file: File, customPath?: string): Promise<string> {
     try {
-      const { data, error } = await supabase.storage
-        .from('product-images')
-        .upload(path, file, {
-          upsert: true,
-          contentType: (file as any).type || undefined,
-        });
-      
-      if (error) throw error;
-      
-      const { data: publicUrl } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(path);
-      
-      return publicUrl.publicUrl;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = customPath || `products/${fileName}`;
+
+      const storageRef = ref(storage, filePath);
+      await uploadBytes(storageRef, file);
+      const publicUrl = await getDownloadURL(storageRef);
+
+      return publicUrl;
     } catch (error) {
-      console.error("Error uploading product image:", error);
+      console.error('Error uploading product image:', error);
       throw error;
     }
   },
-  
-  // Subir imagen desde una URL (descarga y sube a Storage)
-  async uploadImageFromUrl(url: string, path: string): Promise<string> {
+
+  async uploadImageFromUrl(url: string, customPath?: string): Promise<string> {
     try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Failed to fetch image: ${res.status}`);
-      const blob = await res.blob();
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const fileName = `${uuidv4()}.jpg`; // Assuming images from URL are typically JPG, or infer from content-type if available
+      const filePath = customPath || `products/${fileName}`;
 
-      const { data, error } = await supabase.storage
-        .from('product-images')
-        .upload(path, blob, {
-          upsert: true,
-          contentType: blob.type || 'image/jpeg',
-        });
+      const storageRef = ref(storage, filePath);
+      await uploadBytes(storageRef, blob);
+      const publicUrl = await getDownloadURL(storageRef);
 
-      if (error) throw error;
-
-      const { data: publicUrl } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(path);
-
-      return publicUrl.publicUrl;
+      return publicUrl;
     } catch (error) {
       console.error('Error uploading image from URL:', error);
       throw error;

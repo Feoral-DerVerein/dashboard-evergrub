@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HelpTooltip } from "@/components/dashboard/HelpTooltip";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
@@ -21,11 +22,11 @@ const ForecastEngineCard = ({ isLoading: externalLoading }: ForecastEngineCardPr
 
   useEffect(() => {
     const loadData = async () => {
-      if (!user?.id) return;
+      if (!user?.uid) return;
 
       setLoading(true);
       try {
-        const data = await performanceEngineService.getForecastData(user.id);
+        const data = await performanceEngineService.getForecastData(user.uid);
         setForecastData(data.forecastData);
         setChartData(data.chartData);
       } catch (error) {
@@ -36,7 +37,7 @@ const ForecastEngineCard = ({ isLoading: externalLoading }: ForecastEngineCardPr
     };
 
     loadData();
-  }, [user?.id]);
+  }, [user?.uid]);
 
   const isLoading = externalLoading || loading;
 
@@ -63,7 +64,10 @@ const ForecastEngineCard = ({ isLoading: externalLoading }: ForecastEngineCardPr
   return (
     <Card className="apple-card">
       <CardHeader>
-        <CardTitle>Demand Forecast</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          {t('cards.forecast_engine.title')}
+          <HelpTooltip kpiName={t('cards.forecast_engine.title')} />
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Mini Line Chart */}

@@ -1,19 +1,19 @@
 import { useState } from "react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
-  DialogDescription 
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Package, 
-  DollarSign, 
-  Calendar, 
-  TrendingUp, 
+import {
+  Package,
+  DollarSign,
+  Calendar,
+  TrendingUp,
   Barcode,
   MapPin,
   Store,
@@ -31,11 +31,11 @@ interface ProductDetailsDialogProps {
   daysLeft: number | null;
 }
 
-export function ProductDetailsDialog({ 
-  product, 
-  open, 
+export function ProductDetailsDialog({
+  product,
+  open,
   onOpenChange,
-  daysLeft 
+  daysLeft
 }: ProductDetailsDialogProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -50,20 +50,25 @@ export function ProductDetailsDialog({
     return 'secondary';
   };
 
-  const handleSendToMarketplace = async () => {
+  const handleSendToMarketplace = async (marketplace: string = 'doordash') => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { functions } = await import("@/lib/firebase");
+      const { httpsCallable } = await import("firebase/functions");
+      const publishFn = httpsCallable(functions, 'publishToMarketplace');
+
+      await publishFn({ productId: product.id, marketplaceName: marketplace });
+
       toast({
-        title: "Success!",
-        description: `${product.product_name} sent to marketplace`,
+        title: "¡Éxito!",
+        description: `${product.product_name} enviado a ${marketplace}`,
       });
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error publishing to marketplace:', error);
       toast({
         title: "Error",
-        description: "Failed to send to marketplace",
+        description: `No se pudo enviar al marketplace: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -76,19 +81,25 @@ export function ProductDetailsDialog({
     navigate('/dashboard');
   };
 
-  const handleDonate = async () => {
+  const handleDonate = async (organization: string = 'Oz Harvest') => {
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { functions } = await import("@/lib/firebase");
+      const { httpsCallable } = await import("firebase/functions");
+      const donationFn = httpsCallable(functions, 'sendToDonation');
+
+      await donationFn({ productId: product.id, organizationName: organization });
+
       toast({
-        title: "Success!",
-        description: `${product.product_name} prepared for donation`,
+        title: "¡Éxito!",
+        description: `${product.product_name} preparado para donación a ${organization}`,
       });
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error sending to donation:', error);
       toast({
         title: "Error",
-        description: "Failed to prepare donation",
+        description: `Error al procesar la donación: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -133,7 +144,7 @@ export function ProductDetailsDialog({
           {/* Detailed Information */}
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">Product Information</h3>
-            
+
             <div className="grid gap-3">
               <div className="flex items-center gap-3">
                 <Store className="w-5 h-5 text-muted-foreground" />
@@ -207,20 +218,20 @@ export function ProductDetailsDialog({
           {/* Actions */}
           <div className="space-y-3">
             <h3 className="font-semibold text-lg">Quick Actions</h3>
-            
+
             <div className="grid gap-2">
-              <Button 
-                className="w-full justify-start" 
+              <Button
+                className="w-full justify-start"
                 variant="outline"
-                onClick={handleSendToMarketplace}
+                onClick={() => handleSendToMarketplace()}
                 disabled={loading}
               >
                 <Store className="w-4 h-4 mr-2" />
                 Send to Marketplace
               </Button>
 
-              <Button 
-                className="w-full justify-start" 
+              <Button
+                className="w-full justify-start"
                 variant="outline"
                 onClick={handleCreateOffer}
                 disabled={loading}
@@ -229,10 +240,10 @@ export function ProductDetailsDialog({
                 Create Special Offer
               </Button>
 
-              <Button 
-                className="w-full justify-start" 
+              <Button
+                className="w-full justify-start"
                 variant="outline"
-                onClick={handleDonate}
+                onClick={() => handleDonate()}
                 disabled={loading}
               >
                 <Heart className="w-4 h-4 mr-2" />

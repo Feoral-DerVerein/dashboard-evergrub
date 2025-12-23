@@ -62,7 +62,7 @@ export async function testPOSConnection(config: POSConfig): Promise<POSConnectio
     const { provider, credentials } = config;
 
     switch (provider) {
-        case 'square':
+        case 'square': {
             const squareResult = await testSquareConnection({
                 application_id: credentials.application_id,
                 access_token: credentials.access_token,
@@ -73,8 +73,9 @@ export async function testPOSConnection(config: POSConfig): Promise<POSConnectio
                 providerName: squareResult.locationName,
                 error: squareResult.error,
             };
+        }
 
-        case 'shopify':
+        case 'shopify': {
             const shopifyResult = await shopifyService.testConnection({
                 shop_domain: credentials.shop_domain,
                 access_token: credentials.access_token,
@@ -84,8 +85,9 @@ export async function testPOSConnection(config: POSConfig): Promise<POSConnectio
                 providerName: shopifyResult.shopName,
                 error: shopifyResult.error,
             };
+        }
 
-        case 'lightspeed':
+        case 'lightspeed': {
             const lightspeedResult = await lightspeedService.testConnection({
                 account_id: credentials.account_id,
                 access_token: credentials.access_token,
@@ -96,8 +98,9 @@ export async function testPOSConnection(config: POSConfig): Promise<POSConnectio
                 providerName: lightspeedResult.accountName,
                 error: lightspeedResult.error,
             };
+        }
 
-        case 'toast':
+        case 'toast': {
             const toastResult = await toastService.testConnection({
                 restaurant_guid: credentials.restaurant_guid,
                 access_token: credentials.access_token,
@@ -107,6 +110,7 @@ export async function testPOSConnection(config: POSConfig): Promise<POSConnectio
                 providerName: toastResult.restaurantName,
                 error: toastResult.error,
             };
+        }
 
         default:
             return {

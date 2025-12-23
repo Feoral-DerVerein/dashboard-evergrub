@@ -8,6 +8,10 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DonationForm } from "@/components/DonationForm";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 type CharityProps = {
   name: string;
@@ -176,14 +180,16 @@ const Donate = () => {
 
   const fetchDonations = async () => {
     try {
-      const { data, error } = await supabase
-        .from('donations')
-        .select('*')
-        .eq('tenant_id', user?.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setDonations(data || []);
+      // Fetch both history and pending to show all
+      const { donationService } = await import('@/services/donationService');
+      const [history, pending] = await Promise.all([
+        donationService.getHistory(user?.id || 'demo-user'),
+        donationService.getPendingProposals(user?.id || 'demo-user')
+      ]);
+      const allDonations = [...pending, ...history].sort((a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      setDonations(allDonations);
     } catch (error) {
       console.error("Error fetching donations:", error);
     } finally {

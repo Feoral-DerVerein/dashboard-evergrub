@@ -361,13 +361,13 @@ const AddProduct = () => {
 
         // Download and upload image automatically if available
         let finalImageUrl = "";
-        if (productData.imageUrl && user?.id) {
+        if (productData.imageUrl && user?.uid) {
           try {
             toast({
               title: "Downloading Image",
               description: "Automatically downloading product image..."
             });
-            const filePath = `${user.id}/${Date.now()}-barcode-${barcode}.jpg`;
+            const filePath = `${user.uid}/${Date.now()}-barcode-${barcode}.jpg`;
             const uploadedUrl = await productImageService.uploadImageFromUrl(productData.imageUrl, filePath);
             finalImageUrl = uploadedUrl;
             setPreviewImage(uploadedUrl);
@@ -459,14 +459,14 @@ const AddProduct = () => {
   };
   const categories = ["Coffee", "Tea", "Pastries", "Sandwiches", "Breakfast", "Beverages", "Desserts", "general stock"];
   const brands = [
-  // Coffee Roasters & Suppliers
-  "Gloria Jean's", "The Coffee Club", "Campos Coffee", "Toby's Estate", "Five Senses Coffee", "Single O", "Industry Beans", "St. Ali", "Allpress Espresso", "Coffee Supreme",
-  // Food & Beverage Brands
-  "Bundaberg", "Golden Circle", "Cottee's", "Arnott's", "Tim Tam", "Lamington", "Vegemite", "Weet-Bix", "Milo", "ANZAC", "Pavlova Co", "Fantales",
-  // Bakery & Pastry Suppliers
-  "Bakers Delight", "Brumby's", "Michel's Patisserie", "Sumo Salad", "Boost Juice", "Guzman y Gomez", "Mad Mex", "Zambrero", "Schnitz", "Grill'd",
-  // Dairy & Local Producers
-  "Pauls", "Dairy Farmers", "A2 Milk", "Bega", "Devondale", "Mainland", "King Island Dairy", "Tasmanian Heritage", "Coopers", "James Boag's"];
+    // Coffee Roasters & Suppliers
+    "Gloria Jean's", "The Coffee Club", "Campos Coffee", "Toby's Estate", "Five Senses Coffee", "Single O", "Industry Beans", "St. Ali", "Allpress Espresso", "Coffee Supreme",
+    // Food & Beverage Brands
+    "Bundaberg", "Golden Circle", "Cottee's", "Arnott's", "Tim Tam", "Lamington", "Vegemite", "Weet-Bix", "Milo", "ANZAC", "Pavlova Co", "Fantales",
+    // Bakery & Pastry Suppliers
+    "Bakers Delight", "Brumby's", "Michel's Patisserie", "Sumo Salad", "Boost Juice", "Guzman y Gomez", "Mad Mex", "Zambrero", "Schnitz", "Grill'd",
+    // Dairy & Local Producers
+    "Pauls", "Dairy Farmers", "A2 Milk", "Bega", "Devondale", "Mainland", "King Island Dairy", "Tasmanian Heritage", "Coopers", "James Boag's"];
 
   // Filter brands based on search term
   const filteredBrands = brands.filter(brand => brand.toLowerCase().includes(brandSearchTerm.toLowerCase()));
@@ -510,7 +510,7 @@ const AddProduct = () => {
       // Prepare file path with safeguards
       const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
       const safeFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-      const filePath = `${user.id}/${safeFileName}.${fileExt}`;
+      const filePath = `${user.uid}/${safeFileName}.${fileExt}`;
       try {
         const publicUrl = await productService.uploadProductImage(file, filePath);
         setFormData({
@@ -571,8 +571,8 @@ const AddProduct = () => {
       if (!finalImage) {
         try {
           const suggestedUrl = await productImageSuggestService.suggestImage(formData.barcode || undefined, formData.name.trim());
-          if (suggestedUrl && user?.id) {
-            const filePath = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(2, 15)}.jpg`;
+          if (suggestedUrl && user?.uid) {
+            const filePath = `${user.uid}/${Date.now()}-${Math.random().toString(36).substring(2, 15)}.jpg`;
             try {
               const uploadedUrl = await productImageService.uploadImageFromUrl(suggestedUrl, filePath);
               finalImage = uploadedUrl;
@@ -597,7 +597,7 @@ const AddProduct = () => {
         quantity: parseInt(formData.quantity) || 1,
         expirationDate: formData.expirationDate,
         image: finalImage,
-        userId: user.id,
+        userId: user.uid,
         storeId: SAFFIRE_FREYCINET_STORE_ID,
         // Surprise bag fields
         isSurpriseBag: formData.isSurpriseBag,
@@ -614,14 +614,14 @@ const AddProduct = () => {
         console.log("Product updated successfully:", result);
         toast({
           title: "✅ Product Updated & Synced",
-          description: `${productData.name} has been updated in Supabase and is available for n8n + Claude chatbot`
+          description: `${productData.name} has been updated in database and is available for n8n + Claude chatbot`
         });
       } else {
         result = await productService.createProduct(productData);
         console.log("Product created successfully:", result);
         toast({
           title: "✅ Product Created & Synced",
-          description: `${productData.name} has been saved to Supabase and is now accessible by n8n + Claude chatbot`
+          description: `${productData.name} has been saved to database and is now accessible by n8n + Claude chatbot`
         });
       }
 
@@ -648,311 +648,311 @@ const AddProduct = () => {
   };
   if (loadingProduct) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p>Loading product data...</p>
-        </div>
-      </div>;
+      <div className="text-center">
+        <p>Loading product data...</p>
+      </div>
+    </div>;
   }
   return <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto glass-card min-h-screen animate-fade-in">
-        <div className="px-4 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Link to="/products" className="text-gray-500 hover:text-gray-700">
-                <ArrowLeft className="w-6 h-6" />
-              </Link>
-              <h1 className="text-xl font-semibold">{isEditMode ? 'Edit Product' : 'Add Product'}</h1>
-            </div>
-            <button onClick={handleSubmit} disabled={loading} className="text-primary-600 font-medium hover:text-primary-700">
-              {loading ? "Saving..." : "Save"}
-            </button>
+    <div className="max-w-4xl mx-auto glass-card min-h-screen animate-fade-in">
+      <div className="px-4 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Link to="/products" className="text-gray-500 hover:text-gray-700">
+              <ArrowLeft className="w-6 h-6" />
+            </Link>
+            <h1 className="text-xl font-semibold">{isEditMode ? 'Edit Product' : 'Add Product'}</h1>
           </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Demo auto-fill button */}
-          {!isEditMode}
-
-          {/* Barcode scanner button */}
-          <button type="button" onClick={handleOpenBarcodeScanner} className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
-            <Barcode className="w-5 h-5" />
-            Scan Barcode
+          <button onClick={handleSubmit} disabled={loading} className="text-primary-600 font-medium hover:text-primary-700">
+            {loading ? "Saving..." : "Save"}
           </button>
+        </div>
+      </div>
 
-          {/* Product name input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Name <span className="text-red-500">*</span>
-            </label>
-            <input type="text" value={formData.name} onChange={e => setFormData({
+      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {/* Demo auto-fill button */}
+        {!isEditMode}
+
+        {/* Barcode scanner button */}
+        <button type="button" onClick={handleOpenBarcodeScanner} className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+          <Barcode className="w-5 h-5" />
+          Scan Barcode
+        </button>
+
+        {/* Product name input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Product Name <span className="text-red-500">*</span>
+          </label>
+          <input type="text" value={formData.name} onChange={e => setFormData({
             ...formData,
             name: e.target.value
           })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required />
-          </div>
+        </div>
 
-          {/* Barcode search input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Search by Barcode
-            </label>
-            <div className="flex gap-2">
-              <Input type="text" value={barcodeSearchInput} onChange={e => setBarcodeSearchInput(e.target.value)} placeholder="Enter barcode number" className="flex-1" onKeyPress={e => {
+        {/* Barcode search input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Search by Barcode
+          </label>
+          <div className="flex gap-2">
+            <Input type="text" value={barcodeSearchInput} onChange={e => setBarcodeSearchInput(e.target.value)} placeholder="Enter barcode number" className="flex-1" onKeyPress={e => {
               if (e.key === 'Enter') {
                 e.preventDefault();
                 handleBarcodeSearch();
               }
             }} />
-              <button type="button" onClick={handleBarcodeSearch} disabled={loading || !barcodeSearchInput.trim()} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2">
-                <Search className="w-4 h-4" />
-                Search
-              </button>
-            </div>
+            <button type="button" onClick={handleBarcodeSearch} disabled={loading || !barcodeSearchInput.trim()} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2">
+              <Search className="w-4 h-4" />
+              Search
+            </button>
           </div>
+        </div>
 
-          {/* Price and discount inputs */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-2 text-green-600">$</span>
-                <input type="number" step="0.01" min="0.01" value={formData.price} onChange={e => setFormData({
+        {/* Price and discount inputs */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Price <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-2 text-green-600">$</span>
+              <input type="number" step="0.01" min="0.01" value={formData.price} onChange={e => setFormData({
                 ...formData,
                 price: e.target.value
               })} className="w-full pl-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required />
-              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Discount</label>
-              <div className="relative">
-                <input type="number" min="0" max="100" value={formData.discount} onChange={e => setFormData({
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Discount</label>
+            <div className="relative">
+              <input type="number" min="0" max="100" value={formData.discount} onChange={e => setFormData({
                 ...formData,
                 discount: e.target.value
               })} className="w-full pr-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                <span className="absolute right-3 top-2 text-gray-500">%</span>
-              </div>
-              <p className="text-sm text-gray-500 mt-1">Final: ${calculateFinalPrice()}</p>
+              <span className="absolute right-3 top-2 text-gray-500">%</span>
             </div>
+            <p className="text-sm text-gray-500 mt-1">Final: ${calculateFinalPrice()}</p>
           </div>
+        </div>
 
-          {/* Description input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea value={formData.description} onChange={e => setFormData({
+        {/* Description input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Description
+          </label>
+          <textarea value={formData.description} onChange={e => setFormData({
             ...formData,
             description: e.target.value
           })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" rows={3} />
-          </div>
+        </div>
 
-          {/* Category and brand inputs */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category <span className="text-red-500">*</span>
-              </label>
-              <select value={formData.category} onChange={e => setFormData({
+        {/* Category and brand inputs */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Category <span className="text-red-500">*</span>
+            </label>
+            <select value={formData.category} onChange={e => setFormData({
               ...formData,
               category: e.target.value
             })} className="w-full p-2 glass-card border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required>
-                <option value="">Select category</option>
-                {categories.map(category => <option key={category} value={category}>
-                    {category}
-                  </option>)}
-              </select>
+              <option value="">Select category</option>
+              {categories.map(category => <option key={category} value={category}>
+                {category}
+              </option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Brand
+            </label>
+
+            {/* Brand Search Input */}
+            <div className="relative mb-2">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input type="text" placeholder="Search brands..." value={brandSearchTerm} onChange={e => setBrandSearchTerm(e.target.value)} className="pl-10" />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Brand
-              </label>
-              
-              {/* Brand Search Input */}
-              <div className="relative mb-2">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input type="text" placeholder="Search brands..." value={brandSearchTerm} onChange={e => setBrandSearchTerm(e.target.value)} className="pl-10" />
-              </div>
-              
-              <select value={formData.brand} onChange={handleBrandChange} className="w-full p-2 glass-card border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                <option value="">Select brand</option>
-                {filteredBrands.map(brand => <option key={brand} value={brand}>
-                    {brand}
-                  </option>)}
-                <option value="other">+ Add New Brand</option>
-              </select>
-              
-              {showCustomBrand && <div className="mt-2">
-                  <Input type="text" value={formData.customBrand} onChange={e => setFormData({
+
+            <select value={formData.brand} onChange={handleBrandChange} className="w-full p-2 glass-card border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+              <option value="">Select brand</option>
+              {filteredBrands.map(brand => <option key={brand} value={brand}>
+                {brand}
+              </option>)}
+              <option value="other">+ Add New Brand</option>
+            </select>
+
+            {showCustomBrand && <div className="mt-2">
+              <Input type="text" value={formData.customBrand} onChange={e => setFormData({
                 ...formData,
                 customBrand: e.target.value
               })} placeholder="Enter new brand name" className="w-full" required={formData.brand === "other"} />
-                </div>}
-            </div>
+            </div>}
           </div>
+        </div>
 
-          {/* Quantity input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Quantity <span className="text-red-500">*</span>
-            </label>
-            <div className="flex items-center">
-              <button type="button" onClick={() => setFormData({
+        {/* Quantity input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Quantity <span className="text-red-500">*</span>
+          </label>
+          <div className="flex items-center">
+            <button type="button" onClick={() => setFormData({
               ...formData,
               quantity: String(Math.max(1, parseInt(formData.quantity) - 1))
             })} className="p-2 border border-gray-200 rounded-l-lg hover:bg-gray-50">
-                −
-              </button>
-              <input type="number" value={formData.quantity} onChange={e => setFormData({
+              −
+            </button>
+            <input type="number" value={formData.quantity} onChange={e => setFormData({
               ...formData,
               quantity: e.target.value
             })} className="w-full p-2 border-t border-b border-gray-200 text-center focus:outline-none focus:ring-2 focus:ring-primary-500" min="1" required />
-              <button type="button" onClick={() => setFormData({
+            <button type="button" onClick={() => setFormData({
               ...formData,
               quantity: String(parseInt(formData.quantity) + 1)
             })} className="p-2 border border-gray-200 rounded-r-lg hover:bg-gray-50">
-                +
-              </button>
-            </div>
+              +
+            </button>
           </div>
+        </div>
 
-          {/* Surprise Bag Section */}
-          <div className="border-t pt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <input type="checkbox" id="isSurpriseBag" checked={formData.isSurpriseBag} onChange={e => setFormData({
+        {/* Surprise Bag Section */}
+        <div className="border-t pt-6">
+          <div className="flex items-center gap-2 mb-4">
+            <input type="checkbox" id="isSurpriseBag" checked={formData.isSurpriseBag} onChange={e => setFormData({
               ...formData,
               isSurpriseBag: e.target.checked,
               category: e.target.checked ? "Surprise Bag" : formData.category
             })} className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500" />
-              
-            </div>
 
-            {formData.isSurpriseBag && <div className="space-y-4 pl-6 border-l-2 border-green-200">
-                {/* Original Price */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Original Price <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-2 text-green-600">$</span>
-                    <input type="number" step="0.01" min="0.01" value={formData.originalPrice} onChange={e => setFormData({
+          </div>
+
+          {formData.isSurpriseBag && <div className="space-y-4 pl-6 border-l-2 border-green-200">
+            {/* Original Price */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Original Price <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-2 text-green-600">$</span>
+                <input type="number" step="0.01" min="0.01" value={formData.originalPrice} onChange={e => setFormData({
                   ...formData,
                   originalPrice: e.target.value
                 })} className="w-full pl-8 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required={formData.isSurpriseBag} />
-                  </div>
-                  {formData.originalPrice && formData.price && <p className="text-sm text-green-600 mt-1">
-                      Discount: {Math.round((1 - parseFloat(formData.price) / parseFloat(formData.originalPrice)) * 100)}%
-                    </p>}
-                </div>
+              </div>
+              {formData.originalPrice && formData.price && <p className="text-sm text-green-600 mt-1">
+                Discount: {Math.round((1 - parseFloat(formData.price) / parseFloat(formData.originalPrice)) * 100)}%
+              </p>}
+            </div>
 
-                {/* Pickup Times */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Pickup Start Time <span className="text-red-500">*</span>
-                    </label>
-                    <input type="time" value={formData.pickupTimeStart} onChange={e => setFormData({
+            {/* Pickup Times */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Pickup Start Time <span className="text-red-500">*</span>
+                </label>
+                <input type="time" value={formData.pickupTimeStart} onChange={e => setFormData({
                   ...formData,
                   pickupTimeStart: e.target.value
                 })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required={formData.isSurpriseBag} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Pickup End Time <span className="text-red-500">*</span>
-                    </label>
-                    <input type="time" value={formData.pickupTimeEnd} onChange={e => setFormData({
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Pickup End Time <span className="text-red-500">*</span>
+                </label>
+                <input type="time" value={formData.pickupTimeEnd} onChange={e => setFormData({
                   ...formData,
                   pickupTimeEnd: e.target.value
                 })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required={formData.isSurpriseBag} />
-                  </div>
-                </div>
+              </div>
+            </div>
 
-                {/* Surprise Bag Contents */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Surprise Bag Contents <span className="text-red-500">*</span>
-                  </label>
-                  <textarea value={formData.surpriseBagContents} onChange={e => setFormData({
+            {/* Surprise Bag Contents */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Surprise Bag Contents <span className="text-red-500">*</span>
+              </label>
+              <textarea value={formData.surpriseBagContents} onChange={e => setFormData({
                 ...formData,
                 surpriseBagContents: e.target.value
               })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" rows={3} placeholder="Describe possible contents (e.g., Pastries, Sandwiches, Coffee)" required={formData.isSurpriseBag} />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Separate items with commas. Describe what customers might find in this surprise bag.
-                  </p>
-                </div>
-              </div>}
-          </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Separate items with commas. Describe what customers might find in this surprise bag.
+              </p>
+            </div>
+          </div>}
+        </div>
 
-          {/* Expiration date input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {formData.isSurpriseBag ? "Pickup Deadline" : "Expiration Date"} <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <input type="date" value={formData.expirationDate} onChange={e => setFormData({
+        {/* Expiration date input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {formData.isSurpriseBag ? "Pickup Deadline" : "Expiration Date"} <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <input type="date" value={formData.expirationDate} onChange={e => setFormData({
               ...formData,
               expirationDate: e.target.value
             })} className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" required />
-              <Calendar className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
-            </div>
-            {formData.isSurpriseBag && <p className="text-xs text-gray-500 mt-1">
-                Last date customers can pick up this surprise bag
-              </p>}
+            <Calendar className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
           </div>
+          {formData.isSurpriseBag && <p className="text-xs text-gray-500 mt-1">
+            Last date customers can pick up this surprise bag
+          </p>}
+        </div>
 
-          {/* Image upload */}
-          <div className="mt-6">
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" />
-            <button type="button" onClick={handleImageClick} className="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
-              {previewImage ? <img src={previewImage} alt="Product" className="w-24 h-24 object-cover rounded-lg" /> : <Camera className="w-8 h-8 text-gray-400 mb-2" />}
-              <span className="text-primary-600">
-                {loading ? "Uploading..." : "Change Photo"}
-              </span>
-              {imageUploadError && <p className="text-red-500 text-xs mt-1">{imageUploadError}</p>}
-              {uploadProgress > 0 && uploadProgress < 100 && <div className="w-full mt-2 bg-gray-200 rounded-full h-2.5">
-                  <div className="bg-green-600 h-2.5 rounded-full" style={{
+        {/* Image upload */}
+        <div className="mt-6">
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" />
+          <button type="button" onClick={handleImageClick} className="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+            {previewImage ? <img src={previewImage} alt="Product" className="w-24 h-24 object-cover rounded-lg" /> : <Camera className="w-8 h-8 text-gray-400 mb-2" />}
+            <span className="text-primary-600">
+              {loading ? "Uploading..." : "Change Photo"}
+            </span>
+            {imageUploadError && <p className="text-red-500 text-xs mt-1">{imageUploadError}</p>}
+            {uploadProgress > 0 && uploadProgress < 100 && <div className="w-full mt-2 bg-gray-200 rounded-full h-2.5">
+              <div className="bg-green-600 h-2.5 rounded-full" style={{
                 width: `${uploadProgress}%`
               }}></div>
-                </div>}
-            </button>
-          </div>
-
-          {/* Submit button */}
-          <button type="submit" disabled={loading} className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors mt-6">
-            {loading ? "Saving..." : isEditMode ? "Update Product" : "Save Product"}
+            </div>}
           </button>
-        </form>
-      </div>
+        </div>
 
-      {/* Barcode Scanner Dialog */}
-      <Dialog open={showBarcodeScanner} onOpenChange={open => {
+        {/* Submit button */}
+        <button type="submit" disabled={loading} className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors mt-6">
+          {loading ? "Saving..." : isEditMode ? "Update Product" : "Save Product"}
+        </button>
+      </form>
+    </div>
+
+    {/* Barcode Scanner Dialog */}
+    <Dialog open={showBarcodeScanner} onOpenChange={open => {
       if (!open) stopBarcodeScanner();
       setShowBarcodeScanner(open);
     }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Scan Barcode</DialogTitle>
-          </DialogHeader>
-          <div className="relative">
-            <video ref={videoRef} className="w-full h-64 bg-black rounded-lg" playsInline muted></video>
-            <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" style={{
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Scan Barcode</DialogTitle>
+        </DialogHeader>
+        <div className="relative">
+          <video ref={videoRef} className="w-full h-64 bg-black rounded-lg" playsInline muted></video>
+          <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" style={{
             display: 'none'
           }}></canvas>
-            
-            {scannerError && <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
-                <p className="text-white text-center p-4">{scannerError}</p>
-              </div>}
-            
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-64 h-64 border-2 border-green-500 opacity-60"></div>
-            </div>
-            
-            <p className="mt-2 text-sm text-center text-gray-500">
-              Position the barcode within the green square
-            </p>
+
+          {scannerError && <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+            <p className="text-white text-center p-4">{scannerError}</p>
+          </div>}
+
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-64 h-64 border-2 border-green-500 opacity-60"></div>
           </div>
-        </DialogContent>
-      </Dialog>
-    </div>;
+
+          <p className="mt-2 text-sm text-center text-gray-500">
+            Position the barcode within the green square
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  </div>;
 };
 export default AddProduct;

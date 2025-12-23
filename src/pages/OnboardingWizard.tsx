@@ -27,7 +27,8 @@ const OnboardingWizard = () => {
                 const status = await onboardingService.getOnboardingStatus(user.id);
 
                 if (status.completed) {
-                    // Already completed, redirect to dashboard
+                    // Already completed, ensure context is synced then redirect
+                    await refreshProfile();
                     navigate("/dashboard", { replace: true });
                     return;
                 }

@@ -1,4 +1,4 @@
-import { 
+import {
   Package,
   Apple,
   Cookie,
@@ -18,8 +18,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 import { useState } from 'react';
+import { functions } from '@/lib/firebase';
+import { httpsCallable } from 'firebase/functions';
 
 interface ProductCardData {
   id: string;
@@ -42,7 +44,8 @@ interface InteractiveProductCardProps {
 export function InteractiveProductCard({ product, onAction }: InteractiveProductCardProps) {
   const [status, setStatus] = useState<'pending' | 'sent'>('pending');
   const [sentTo, setSentTo] = useState<string>('');
-  
+  const { user } = useAuth();
+
   const urgencyColors = {
     low: 'bg-green-50 text-green-700',
     medium: 'bg-yellow-50 text-yellow-700',
@@ -52,22 +55,15 @@ export function InteractiveProductCard({ product, onAction }: InteractiveProduct
 
   const handleMarketplaceAction = async (marketplace: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast.error('User not authenticated');
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('publish-to-marketplace', {
-        body: {
-          product_id: parseInt(product.id),
-          marketplace_name: marketplace,
-          user_id: user.id
-        }
-      });
+      const publishFn = httpsCallable(functions, 'publishToMarketplace');
+      await publishFn({ productId: product.id, marketplaceName: marketplace });
 
-      if (error) throw error;
-
+      // Success
       setStatus('sent');
       setSentTo(marketplace);
       toast.success(`✅ ${product.name} sent to ${marketplace}`, {
@@ -83,21 +79,13 @@ export function InteractiveProductCard({ product, onAction }: InteractiveProduct
 
   const handleDonationAction = async (organization: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast.error('User not authenticated');
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('send-to-donation', {
-        body: {
-          product_id: parseInt(product.id),
-          organization_name: organization,
-          user_id: user.id
-        }
-      });
-
-      if (error) throw error;
+      const donationFn = httpsCallable(functions, 'sendToDonation');
+      await donationFn({ productId: product.id, organizationName: organization });
 
       setStatus('sent');
       setSentTo(organization);
@@ -116,7 +104,7 @@ export function InteractiveProductCard({ product, onAction }: InteractiveProduct
   const getCategoryIcon = () => {
     const category = product.category.toLowerCase();
     const iconProps = { className: "w-6 h-6 text-gray-500" };
-    
+
     if (category.includes('fruit') || category.includes('apple')) return <Apple {...iconProps} />;
     if (category.includes('pastries') || category.includes('bakery') || category.includes('bread')) return <Cookie {...iconProps} />;
     if (category.includes('coffee') || category.includes('beverage')) return <Coffee {...iconProps} />;
@@ -129,7 +117,7 @@ export function InteractiveProductCard({ product, onAction }: InteractiveProduct
     if (category.includes('sandwich') || category.includes('deli')) return <Sandwich {...iconProps} />;
     if (category.includes('dessert') || category.includes('ice cream')) return <IceCream {...iconProps} />;
     if (category.includes('wine') || category.includes('alcohol')) return <Wine {...iconProps} />;
-    
+
     return <Package {...iconProps} />;
   };
 
@@ -144,7 +132,7 @@ export function InteractiveProductCard({ product, onAction }: InteractiveProduct
         {/* Product Info */}
         <div className="flex-1 min-w-0">
           {product.urgency && (
-            <Badge 
+            <Badge
               className={`${urgencyColors[product.urgency]} px-2 py-0.5 rounded-full text-xs font-medium border-0 inline-block mb-1`}
             >
               {product.urgency}
@@ -154,7 +142,7 @@ export function InteractiveProductCard({ product, onAction }: InteractiveProduct
             <span className="font-bold text-gray-900 text-base">Product</span>
             <span className="text-gray-600 text-sm">{product.category}</span>
           </div>
-          
+
           {/* Status Badge */}
           {status === 'sent' && sentTo && (
             <div className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded inline-block">

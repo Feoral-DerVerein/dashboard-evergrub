@@ -21,6 +21,8 @@ export interface StoreProfile {
   name: string;
   description: string;
   location: string;
+  latitude?: number;
+  longitude?: number;
   contactPhone: string;
   contactEmail: string;
   socialFacebook: string;
