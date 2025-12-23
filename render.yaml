@@ -2,7 +2,6 @@ services:
   - type: web
     name: negentropy-ml-service
     env: docker
-    region: frankfurt
     plan: free
     rootDir: ml-service
     envVars:
