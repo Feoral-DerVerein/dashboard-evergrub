@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { BottomNav } from "@/components/Dashboard";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft, Heart, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -183,8 +183,8 @@ const Donate = () => {
       // Fetch both history and pending to show all
       const { donationService } = await import('@/services/donationService');
       const [history, pending] = await Promise.all([
-        donationService.getHistory(user?.id || 'demo-user'),
-        donationService.getPendingProposals(user?.id || 'demo-user')
+        donationService.getHistory(user?.uid || 'demo-user'),
+        donationService.getPendingProposals(user?.uid || 'demo-user')
       ]);
       const allDonations = [...pending, ...history].sort((a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -251,16 +251,17 @@ const Donate = () => {
                     <TableHead>Quantity</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Certificate</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-4">Loading...</TableCell>
+                      <TableCell colSpan={5} className="text-center py-4">Loading...</TableCell>
                     </TableRow>
                   ) : donations.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-4 text-gray-500">No donations yet.</TableCell>
+                      <TableCell colSpan={5} className="text-center py-4 text-gray-500">No donations yet.</TableCell>
                     </TableRow>
                   ) : (
                     donations.map((donation) => (
@@ -273,6 +274,26 @@ const Donate = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>{new Date(donation.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Download Tax Certificate"
+                            onClick={async () => {
+                              const { donationCertificateService } = await import('@/services/donationCertificateService');
+                              // Mock Donor Data (In production, get from user profile)
+                              const mockDonor = {
+                                name: user?.displayName || "Mi Supermercado S.L.",
+                                nif: "B12345678",
+                                address: "Calle Comercio 123, Madrid"
+                              };
+                              donationCertificateService.generateCertificate(donation, mockDonor);
+                              toast.success("Certificate downloaded!");
+                            }}
+                          >
+                            <FileText className="h-4 w-4 text-gray-500 hover:text-blue-600" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   )}
